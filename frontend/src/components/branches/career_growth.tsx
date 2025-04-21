@@ -10,7 +10,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { motion } from 'framer-motion';
-import {SkillNode} from '@/components/branches/career_growth';
+import {SkillNode} from '@/components/branches/career_growth_skill';
 import { MarkerType } from 'reactflow';
 
 function getNodeStyle(type: string) {
