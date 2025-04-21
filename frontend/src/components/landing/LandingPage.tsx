@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Player } from '@lottiefiles/react-lottie-player';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import CareerGrowthTree from '@/components/branches/career_growth';
+import SkillTreeFlow from '@/components/branches/career_growth';
 import DemoChat from '@/components/chat/DemoChat';
 
 export default function LandingPage() {
@@ -137,7 +137,7 @@ export default function LandingPage() {
       {/* Career Tree Visual */}
       <section className="section">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Career Growth Tree</h2>
-        <CareerGrowthTree />
+        <SkillTreeFlow />
         <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
           <p>
             The tree is a visual metaphor and recommendation engine. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now.
