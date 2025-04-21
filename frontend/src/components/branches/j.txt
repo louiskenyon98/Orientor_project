@@ -1,0 +1,52 @@
+// Full update to SkillTreeFlow to define another layer of skills leading to second outcomes
+// ... (keeps existing content above intact)
+
+      // NEW SKILL LAYER AFTER OUTCOME
+      const skill2Id = `${id}-skill-2`
+      const outcome2Id = `${id}-outcome-2`
+
+      nodes.push({
+        id: skill2Id,
+        type: 'default',
+        position: { x: position.x + 100, y: finalY + 150 },
+        data: {
+          label: (
+            <div className="text-xs font-medium text-center rounded-xl px-4 py-2 bg-slate-200 text-gray-800 border border-gray-300 shadow-sm">
+              Manage Teams Remotely
+              <div className="text-[10px] mt-1 text-gray-600 italic">💡 Lead async sprint rituals</div>
+            </div>
+          ),
+        },
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top,
+      });
+
+      nodes.push({
+        id: outcome2Id,
+        type: 'default',
+        position: { x: position.x + 100, y: finalY + 300 },
+        data: {
+          label: (
+            <div className="text-xs font-semibold text-center rounded-xl px-4 py-3 bg-white border shadow">
+              🌍 Global Program Manager<br />in Learning or DEI
+            </div>
+          ),
+        },
+        targetPosition: Position.Bottom,
+      });
+
+      edges.push({
+        id: `${finalId}-${skill2Id}`,
+        source: finalId,
+        target: skill2Id,
+        type: 'smoothstep',
+        markerEnd: { type: 'arrowclosed' },
+      });
+
+      edges.push({
+        id: `${skill2Id}-${outcome2Id}`,
+        source: skill2Id,
+        target: outcome2Id,
+        type: 'smoothstep',
+        markerEnd: { type: 'arrowclosed' },
+      });

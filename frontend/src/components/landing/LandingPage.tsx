@@ -4,6 +4,11 @@ import Image from 'next/image';
 import { Player } from '@lottiefiles/react-lottie-player'; // npm install @lottiefiles/react-lottie-player
 import { motion } from 'framer-motion'; // npm install framer-motion
 import Link from 'next/link';
+import CareerGrowthTree from '@/components/branches/career_growth'; // Adjust the path if necessary
+// import CareerGrowthTree from '@/components/branches/career_growth1'; // Adjust the path if necessary
+import SkillTreeVisualizer from "@/components/branches/SkillTreeVisualizer";
+import SkillTreeGraph from '@/components/branches/SkillTreeGraph2';
+
 
 export default function LandingPage() {
   const router = useRouter();
@@ -51,6 +56,14 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      
+      <section className="section">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">Career Growth Tree</h2>
+        {/* <div className="min-h-[1200px] w-full"></div> */}
+        {/* <SkillTreeGraph /> */}
+        {/* <SkillTreeGraph root={CareerGrowthTree} /> */}
+        <CareerGrowthTree />
+      </section>
 
       {/* Features Section */}
       <section className="section">
@@ -97,6 +110,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      
 
       {/* CTA Section */}
       <section className="section">
@@ -120,3 +134,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
