@@ -28,23 +28,24 @@ export default function LandingPage() {
               <Link href="/login" className="btn btn-primary">Log In</Link>
               <Link href="/register" className="btn btn-outline">Sign Up</Link>
             </div>
-            <div className="absolute top-10 right-40 flex items-center justify-center p-4">
+            {/* Hero Background Image
+            <div className="absolute inset-0 -z-10">
               <Image
                 src="/navigo-hero.png"
-                alt="Navigo splash"
-                width={300}
-                height={150}
-                className="rounded-lg object-contain"
+                alt="Navigo forest visual"
+                layout="fill"
+                objectFit="cover"
+                className="opacity-40"
                 priority
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
       {/* Problem Section */}
       <section className="section mt-1">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">The Problem We're Tackling</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
           {/* Problem 1: Unclear Direction */}
           <div className="card hover-lift">
@@ -56,6 +57,19 @@ export default function LandingPage() {
             <h3 className="text-xl font-bold text-red-600 mb-4">Unclear Direction</h3>
             <p className="text-neutral-500">
               Many students don’t know what they’re good at, what excites them, or where to even begin exploring. Traditional guidance is shallow and generic.
+            </p>
+          </div>
+
+          {/* Problem 2:  Digital Overload */}
+          <div className="card hover-lift">
+            <div className="mb-6 p-3 bg-blue-100 rounded-full w-14 h-14 flex items-center justify-center">
+              <svg className="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-600 mb-4">It's easier to type than to talk</h3>
+            <p className="text-neutral-500">
+             Students often turn to screens instead of seeking help face-to-face.
             </p>
           </div>
 
@@ -137,12 +151,12 @@ export default function LandingPage() {
       {/* Career Tree Visual */}
       <section className="section">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Career Growth Tree</h2>
-        <SkillTreeFlow />
         <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
           <p>
-            The tree is a visual metaphor and recommendation engine. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now.
+            The tree is the intelligence of the platform, an AI recommendation engine. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now.
           </p>
         </div>
+        <SkillTreeFlow />
       </section>
 
       {/* Demo Chat Section */}
