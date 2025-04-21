@@ -1,5 +1,5 @@
 // src/components/SkillTreeVisualizer.tsx
-import { SkillNode } from "@/components/branches/career_growth1";
+import { SkillNode } from "@/components/branches/career_growth";
 
 export default function SkillTreeVisualizer({ root }: { root: SkillNode }) {
   return (

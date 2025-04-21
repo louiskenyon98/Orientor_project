@@ -77,7 +77,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
         type: 'smoothstep',
         style: { stroke: '#6b7280' },
         markerEnd: {
-          type: 'arrowclosed',
+          type: 'arrowclosed' as MarkerType,
         },
       });
     }
@@ -146,7 +146,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
           target: metaSkillId,
           type: 'smoothstep',
           markerEnd: {
-            type: 'arrowclosed',
+            type: 'arrowclosed' as MarkerType,
           },
         });
 
@@ -156,7 +156,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
           target: finalId,
           type: 'smoothstep',
           markerEnd: {
-            type: 'arrowclosed',
+            type: 'arrowclosed' as MarkerType,
           },
         });
       }
