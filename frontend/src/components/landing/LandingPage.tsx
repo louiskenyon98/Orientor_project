@@ -7,8 +7,6 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import CareerGrowthTree from '@/components/branches/career_growth';
-import SkillTreeVisualizer from "@/components/branches/SkillTreeVisualizer";
-import SkillTreeGraph from '@/components/branches/SkillTreeGraph2';
 import DemoChat from '@/components/chat/DemoChat';
 
 export default function LandingPage() {
