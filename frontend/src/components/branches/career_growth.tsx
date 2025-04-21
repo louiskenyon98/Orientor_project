@@ -10,6 +10,8 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { motion } from 'framer-motion';
+import {SkillNode} from '@/components/branches/career_growth';
+import { MarkerType } from 'reactflow';
 
 function getNodeStyle(type: string) {
   switch (type) {
@@ -80,7 +82,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
       });
     }
 
-    node.nextSkills?.forEach((child, index) => {
+    node.nextSkills?.forEach((child: SkillNode, index: number) => {
       queue.push({
         node: child,
         depth: depth + 1,
@@ -132,7 +134,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
         type: 'smoothstep',
         style: { stroke: '#d1d5db', strokeDasharray: '4 2' },
         markerEnd: {
-          type: 'arrowclosed',
+          type: 'arrowclosed' as MarkerType,
         },
       });
 
