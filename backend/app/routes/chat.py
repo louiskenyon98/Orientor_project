@@ -128,7 +128,7 @@ async def send_message(
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=conversation_history[user_id],
-                max_tokens=30,
+                max_tokens=100,
                 temperature=0.8,  # Slightly higher temperature for more creative responses
                 presence_penalty=0.6,  # Encourage more diverse responses
                 frequency_penalty=0.3,  # Reduce repetition while maintaining coherence
