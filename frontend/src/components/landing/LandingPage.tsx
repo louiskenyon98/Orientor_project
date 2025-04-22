@@ -153,7 +153,7 @@ export default function LandingPage() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Career Growth Tree</h2>
         <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
           <p>
-            The tree is the intelligence of the platform, an AI recommendation engine. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now.
+            The tree is the intelligence of the platform, an AI recommendation engine, following the latest trends in the job market. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now. 
           </p>
         </div>
         <SkillTreeFlow />
@@ -178,12 +178,12 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="section">
         <div className="bg-gradient-primary p-[1px] rounded-lg shadow-glow-purple">
-          <div className="bg-neutral-800/90 backdrop-blur-md rounded-[calc(0.5rem-1px)] p-8 md:p-12">
+          <div className="bg-neutral-600/90 backdrop-blur-md rounded-[calc(0.5rem-1px)] p-8 md:p-12">
             <div className="max-w-3xl mx-auto space-y-8">
               <h2 className="text-3xl md:text-4xl font-bold text-center text-neutral-50">
                 Start Your Journey Today
               </h2>
-              <p className="text-xl text-center text-neutral-500">
+              <p className="text-xl text-center text-neutral-100">
                 Join Navigo and let your curiosity, discipline, and imagination build the future you're meant to explore.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">

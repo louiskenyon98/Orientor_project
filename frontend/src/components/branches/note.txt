@@ -29,8 +29,6 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
   const edges: Edge[] = [];
   let yGap = 250;
   let xGap = 300;
-  let skillMap: Record<string, { x: number, y: number }> = {};
-
   let queue: { node: SkillNode; depth: number; column: number; parentId?: string; type?: string }[] = [
     { node: root, depth: 0, column: 2, type: 'root' },
   ];
@@ -39,8 +37,6 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
     const { node, depth, column, parentId, type = 'skill' } = queue.shift()!;
     const id = node.id;
     const position = { x: column * xGap, y: depth * yGap };
-
-    skillMap[id] = position;
 
     nodes.push({
       id,
@@ -142,6 +138,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
         },
       });
 
+      // Ensure that the edges are only created if the next skills exist
       if (node.nextSkills && node.nextSkills.length > 0) {
         edges.push({
           id: `${jobId}-${metaSkillId}`,
@@ -164,21 +161,6 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
         });
       }
     }
-
-    // 🧠 NEW: auto-detect and link similar skills across paths
-    for (let targetId in skillMap) {
-      if (targetId !== id && node.skillDescription === nodes.find(n => n.id === targetId)?.data?.label?.props?.children?.[0]) {
-        edges.push({
-          id: `${id}-nudge-${targetId}`,
-          source: id,
-          target: targetId,
-          type: 'step',
-          animated: true,
-          style: { stroke: '#4ade80', strokeDasharray: '2 2' },
-          markerEnd: { type: 'arrowclosed' as MarkerType },
-        });
-      }
-    }
   }
   return { nodes, edges };
 }
@@ -196,12 +178,23 @@ const root: SkillNode = {
         {
           id: 's1-1',
           skillDescription: 'You step up when others need it',
-          taskSuggestion: 'Coordinate a community event',
+          improvementSuggestion: 'Show some leadership',
+          taskSuggestion: 'Volunteer to coordinate a community event',
           reachableJobs: [
             { jobTitle: 'Youth Counselor', jobDomain: 'Community Services', requiredSkills: [] },
+            { jobTitle: 'Volunteer Program Coordinator', jobDomain: 'Non-profit Organizations', requiredSkills: [] },
           ],
-        }
-      ]
+        },
+        {
+          id: 's1-2',
+          skillDescription: 'You care deeply about social equity',
+          taskSuggestion: 'Write a reflection about systemic barriers in your community',
+          reachableJobs: [
+            { jobTitle: 'Social Worker', jobDomain: 'Public Health', requiredSkills: [] },
+            { jobTitle: 'Community Outreach Officer', jobDomain: 'Municipal Services', requiredSkills: [] },
+          ],
+        },
+      ],
     },
     {
       id: 's2',
@@ -215,10 +208,10 @@ const root: SkillNode = {
           taskSuggestion: 'Join a local emergency preparedness drill',
           reachableJobs: [
             { jobTitle: 'Paramedic', jobDomain: 'Emergency Services', requiredSkills: [] },
-            { jobTitle: 'Disaster Response Officer', jobDomain: 'Crisis Management', requiredSkills: [] }
+            { jobTitle: 'Disaster Response Officer', jobDomain: 'Crisis Management', requiredSkills: [] },
           ],
-        }
-      ]
+        },
+      ],
     },
     {
       id: 's3',
@@ -229,21 +222,21 @@ const root: SkillNode = {
         {
           id: 's3-1',
           skillDescription: 'You understand your audience deeply',
-          taskSuggestion: 'Interview people from different backgrounds about their needs',
+          taskSuggestion: 'Interview 5 people from different backgrounds about their needs',
           reachableJobs: [
             { jobTitle: 'UX Designer', jobDomain: 'Tech & Accessibility', requiredSkills: [] },
             { jobTitle: 'Workshop Facilitator', jobDomain: 'Adult Learning & Training', requiredSkills: [] },
-          ]
+          ],
         },
         {
-          id: 's3-x',
-          skillDescription: 'You act fast in emergencies', // link with s2-1
-          taskSuggestion: 'Join an emergency simulation',
+          id: 's2-1',
+          skillDescription: 'You act fast in emergencies',
+          taskSuggestion: 'Join a local emergency preparedness drill',
           reachableJobs: [
-            { jobTitle: 'First Response Coordinator', jobDomain: 'Crisis Planning', requiredSkills: [] }
-          ]
-        }
-      ]
+            { jobTitle: 'Paramedic', requiredSkills: ['Stress tolerance'] },
+          ],
+        },
+      ],
     },
     {
       id: 's4',
@@ -257,7 +250,6 @@ const root: SkillNode = {
           taskSuggestion: 'Debate or present at a local event or Toastmasters club',
           reachableJobs: [
             { jobTitle: 'Content Creator', jobDomain: 'Digital Media', requiredSkills: [] },
-            { jobTitle: 'Technical Writer', jobDomain: 'Documentation & Manuals', requiredSkills: [] },
           ],
           nextSkills: [
             {
@@ -266,7 +258,7 @@ const root: SkillNode = {
               taskSuggestion: 'Build a campaign with a clear call to action',
               reachableJobs: [
                 { jobTitle: 'Brand Storyteller', jobDomain: 'Strategic Marketing', requiredSkills: [] },
-              ]
+              ],
             },
             {
               id: 's4-1-b',
@@ -274,13 +266,13 @@ const root: SkillNode = {
               taskSuggestion: 'Write a user manual for a product you use',
               reachableJobs: [
                 { jobTitle: 'UX Writer', jobDomain: 'Product Design', requiredSkills: [] },
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
 export default function SkillTreeFlow() {
