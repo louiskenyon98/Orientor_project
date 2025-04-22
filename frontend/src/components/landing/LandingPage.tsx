@@ -7,6 +7,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import SkillTreeFlow from '@/components/branches/career_growth';
+import CareerTechTree from '@/components/branches/Career_evolution';
 import DemoChat from '@/components/chat/DemoChat';
 
 export default function LandingPage() {
@@ -157,6 +158,17 @@ export default function LandingPage() {
           </p>
         </div>
         <SkillTreeFlow />
+      </section>
+
+      {/* Skills Tree Visual */}
+            <section className="section">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Technical Skills Growth Tree</h2>
+        <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
+          <p>
+          From spreadsheets to Python, from dashboards to dealmaking, it tracks your technical evolution and reveals the real roles these skills can lead to. Each branch connects what you’re building now to what you could become—guided by what the market needs, and grounded in what you’ve already mastered.
+          </p>
+        </div>
+        <CareerTechTree />
       </section>
 
       {/* Demo Chat Section */}
