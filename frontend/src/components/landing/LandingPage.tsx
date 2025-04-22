@@ -143,20 +143,20 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-bold text-accent-amber mb-4">Space: Your Personal Mission Hub</h3>
             <p className="text-neutral-600">
-              Track your chosen career goals, compare your current skills with what’s needed, reflect on daily progress, and receive micro-recommendations on how to advance.
+              Track your chosen career goals, compare your current skills with what’s needed, reflect on daily progress, and receive reflections on how to advance.
             </p>
           </div>
 
-          {/* Feature 3: Future Path Prediction */}
+          {/* Feature 4: Future Path Prediction */}
           <div className="card hover-lift border-l-4 border-primary-purple bg-primary-teal/10">
             <div className="mb-6 p-3 bg-primary-teal/20 rounded-full w-14 h-14 flex items-center justify-center">
               <svg className="w-8 h-8 text-primary-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v7" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-primary-purple mb-4">See Your Possible Futures</h3>
+            <h3 className="text-xl font-bold text-primary-purple mb-4">Engaging, not dreading</h3>
             <p className="text-neutral-600">
-              Navigo predicts skill-based branches of what you could become. Think of it as a constellation of futures—mapped out based on your growth patterns and intentions.
+            Youth doesn’t want to fill out a questionnaire for 1 hour and get a static answer of what to become. Instead, they engage with the platform interactively, and the platform indirectly learn about them and recommends them.
             </p>
           </div>
 
