@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { saveRecommendation } from '@/services/spaceService';
+import axios from 'axios';
 
 interface SearchResult {
   id: string;
@@ -49,41 +50,33 @@ export default function VectorSearchPage() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
-  async function handleSearch(e: React.FormEvent) {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!query.trim()) {
-      setError('Please enter a search query');
-      return;
-    }
-
     setLoading(true);
-    setError('');
+    setError(null);
     setSaveSuccess(null);
 
     try {
-      const response = await fetch('http://localhost:8000/vector/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, top_k: 5 })
+      console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
+      console.log('Making search request with query:', query);
+      
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/vector/search`, {
+        query: query
       });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
+      
+      console.log('Search response:', response.data);
+      const data = response.data as { results: SearchResult[] };
       setResults(data.results);
     } catch (err) {
-      setError('Failed to search. Please try again.');
       console.error('Search error:', err);
+      setError('Failed to search. Please try again.');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   async function handleSaveToSpace(result: SearchResult) {
     try {
