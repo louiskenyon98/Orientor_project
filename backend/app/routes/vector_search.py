@@ -135,91 +135,69 @@ class SearchRequest(BaseModel):
     query: str
     top_k: Optional[int] = 5
 
-@router.post("/search", response_model=SearchResponse)
-async def search_embeddings(request: SearchRequest):
+@router.post("/search")
+async def search(query: str, top_k: int = 5):
     """
-    Search for OaSIS records using semantic similarity with Pinecone's integrated embeddings
+    Search for career recommendations using vector similarity
     """
     try:
-        logger.info(f"Searching with query: {request.query}")
+        logger.info(f"Received search request with query: {query}")
+        logger.info(f"Using Pinecone index: {get_pinecone_index().name}")
         
-        # Get Pinecone index with proper error handling
-        index = get_pinecone_index()
+        # Get embeddings from OpenAI
+        logger.info("Getting embeddings from OpenAI...")
+        response = await client.embeddings.create(
+            model="text-embedding-3-small",
+            input=query
+        )
+        embedding = response.data[0].embedding
+        logger.info("Successfully got embeddings")
         
-        # Format query payload for integrated embeddings
-        query_payload = {
-            "inputs": {
-                "text": request.query
-            },
-            "top_k": request.top_k
-        }
+        # Query Pinecone
+        logger.info("Querying Pinecone...")
+        results = get_pinecone_index().query(
+            vector=embedding,
+            top_k=top_k,
+            include_metadata=True
+        )
+        logger.info(f"Got {len(results.matches)} results from Pinecone")
         
-        # Query Pinecone using integrated embeddings
-        try:
-            pinecone_response = index.search(
-                namespace="", 
-                query=query_payload
-            )
-            logger.info("Received response from Pinecone")
-            logger.debug(f"Pinecone response: {pinecone_response}")
-            
-            # Extract hits from the response
-            hits = pinecone_response.result.hits if hasattr(pinecone_response, 'result') else []
-            logger.info(f"Found {len(hits)} matches")
-            
-            if not hits:
-                return SearchResponse(query=request.query, results=[])
-            
-        except Exception as e:
-            logger.error(f"Pinecone query error: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"Error querying vector database: {str(e)}"
-            )
-
-        results = []
-        for hit in hits:
-            oasis_code = hit['_id'].split('-')[1] if '-' in hit['_id'] else ""
-            fields = hit.get('fields', {})
-            text = fields.get('text', '')
-
-            parsed_fields = {}
-            for match in re.finditer(r"([^:\n\r]+?):\s*(.*?)(?=  [A-Z][a-z]+:|$)", text):
-                parsed_fields = extract_fields_from_text(text)
-
-            label = parsed_fields.get("oasis_label__final_x") or parsed_fields.get("label") or ""
-            lead_statement = parsed_fields.get("lead_statement", "")
-            main_duties = parsed_fields.get("main_duties", "")
-
-            result = SearchResult(
-                id=hit['_id'],
-                score=float(hit['_score']),
-                oasis_code=oasis_code,
-                label=label,
-                lead_statement=lead_statement,
-                main_duties=main_duties,
-                creativity=try_parse_float(parsed_fields.get("creativity")),
-                leadership=try_parse_float(parsed_fields.get("leadership")),
-                digital_literacy=try_parse_float(parsed_fields.get("digital_literacy")),
-                critical_thinking=try_parse_float(parsed_fields.get("critical_thinking")),
-                problem_solving=try_parse_float(parsed_fields.get("problem_solving")),
-                stress_tolerance=try_parse_float(parsed_fields.get("stress_tolerance")),
-                analytical_thinking=try_parse_float(parsed_fields.get("analytical_thinking")),
-                attention_to_detail=try_parse_float(parsed_fields.get("attention_to_detail")),
-                collaboration=try_parse_float(parsed_fields.get("collaboration")),
-                adaptability=try_parse_float(parsed_fields.get("adaptability")),
-                independence=try_parse_float(parsed_fields.get("independence")),
-                evaluation=try_parse_float(parsed_fields.get("evaluation")),
-                decision_making=try_parse_float(parsed_fields.get("decision_making")),
-                all_fields=parsed_fields
-            )
-            results.append(result)
-            print(f'result: {result}')
-
-        return SearchResponse(query=request.query, results=results)
+        # Process results
+        processed_results = []
+        for match in results.matches:
+            logger.info(f"Processing match with score: {match.score}")
+            processed_results.append({
+                "id": match.id,
+                "score": match.score,
+                "oasis_code": match.metadata.get("oasis_code", ""),
+                "label": match.metadata.get("label", ""),
+                "lead_statement": match.metadata.get("lead_statement", ""),
+                "main_duties": match.metadata.get("main_duties", ""),
+                "creativity": match.metadata.get("creativity"),
+                "leadership": match.metadata.get("leadership"),
+                "digital_literacy": match.metadata.get("digital_literacy"),
+                "critical_thinking": match.metadata.get("critical_thinking"),
+                "problem_solving": match.metadata.get("problem_solving"),
+                "analytical_thinking": match.metadata.get("analytical_thinking"),
+                "attention_to_detail": match.metadata.get("attention_to_detail"),
+                "collaboration": match.metadata.get("collaboration"),
+                "adaptability": match.metadata.get("adaptability"),
+                "independence": match.metadata.get("independence"),
+                "evaluation": match.metadata.get("evaluation"),
+                "decision_making": match.metadata.get("decision_making"),
+                "stress_tolerance": match.metadata.get("stress_tolerance"),
+                "all_fields": match.metadata
+            })
+        
+        logger.info("Successfully processed all results")
+        return {"results": processed_results}
+        
     except Exception as e:
-        logger.error(f"Search error: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Vector search failed: {str(e)}")
+        logger.error(f"Error in search endpoint: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Search failed: {str(e)}"
+        )
 
 @router.post("/search/save", status_code=status.HTTP_201_CREATED)
 async def save_search_result(
