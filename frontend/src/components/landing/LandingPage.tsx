@@ -106,7 +106,7 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="section mt-1">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">How Navigo Helps</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
           {/* Feature 1: Career Guidance */}
           <div className="card hover-lift border-l-4 border-primary-teal bg-primary-purple/10">
@@ -118,6 +118,19 @@ export default function LandingPage() {
             <h3 className="text-xl font-bold text-primary-teal mb-4">Skill-Based Career Mapping</h3>
             <p className="text-neutral-600">
               We go beyond job titles. Navigo builds a graph of your skills to suggest personalized next steps—based on what you know, what you’re building, and where you want to go.
+            </p>
+          </div>
+
+          {/* Feature 2: Deep Personalization */}
+          <div className="card hover-lift border-l-4 border-accent-teal bg-accent-teal/10">
+            <div className="mb-6 p-3 bg-accent-teal/20 rounded-full w-14 h-14 flex items-center justify-center">
+              <svg className="w-8 h-8 text-accent-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20l9-5-9-5-9 5 9 5z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-accent-teal mb-4">Built Around You</h3>
+            <p className="text-neutral-600">
+              Every interaction is personal. From career paths to reflection prompts, the platform adapts to who you are—your strengths, values, goals, and even your hesitations—creating a space where growth feels natural, relevant, and entirely yours.
             </p>
           </div>
 
