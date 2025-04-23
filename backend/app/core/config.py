@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     ENV: str = os.getenv("ENV", "development")
     
     # Database URLs
-    DATABASE_URL: Optional[str] = None
+    DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
     RAILWAY_DATABASE_URL: Optional[str] = os.getenv("RAILWAY_DATABASE_URL")
     LOCAL_DATABASE_URL: Optional[str] = os.getenv("LOCAL_DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/orientor")
 
@@ -25,6 +25,11 @@ class Settings(BaseSettings):
         """
         Returns the appropriate database URL based on the environment
         """
+        # If DATABASE_URL is explicitly set, use it
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
+            
+        # Otherwise, fall back to environment-specific URLs
         if self.ENV == "production":
             if not self.RAILWAY_DATABASE_URL:
                 raise ValueError("RAILWAY_DATABASE_URL must be set in production environment")
