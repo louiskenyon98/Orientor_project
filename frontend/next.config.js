@@ -10,7 +10,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['orientor-backend-production.up.railway.app'], // Add your image domains here
+    domains: ['navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com'], // Add your AWS domain here
     unoptimized: true, // This helps with static exports if needed
   },
   // Vercel specific settings
@@ -20,7 +20,7 @@ const nextConfig = {
   },
   // Handle environment variables
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com',
   },
   // Configure build output - ensure this is properly set
   output: 'standalone',
@@ -43,7 +43,7 @@ const nextConfig = {
       return [
         {
           source: '/api/:path*',
-          destination: 'https://orientor-backend-production.up.railway.app/:path*',
+          destination: 'http://navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com/:path*',
         },
       ];
     }
