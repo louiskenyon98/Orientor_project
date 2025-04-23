@@ -28,7 +28,10 @@ origins = [
     "http://localhost:5173",
     "https://localhost:3000",
     "https://localhost:5173",
-    "https://navigoproject.vercel.app"
+    "https://navigoproject.vercel.app",
+    "https://orientor-project.vercel.app",
+    "https://orientor.vercel.app",
+    "https://*.vercel.app"  # Allow all Vercel subdomains
 ]
 
 app.add_middleware(

@@ -7,7 +7,26 @@ export default function HealthCheck() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/health`);
+        // Use the same protocol as the current page
+        const protocol = window.location.protocol;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/^https?:\/\//, '');
+        const fullUrl = `${protocol}//${apiUrl}/health`;
+        
+        console.log('Checking health at:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Important for CORS with credentials
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('Health check response:', data);
         setHealthStatus(data.status);
