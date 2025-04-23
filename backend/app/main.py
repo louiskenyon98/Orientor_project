@@ -90,7 +90,7 @@ logger.info("======================")
 def read_root():
     return {"message": "Welcome to the Orientor API"}
 
-@app.get("/health")
+@app.get("api/health")
 def health_check():
     try:
         return {"status": "ok"}
