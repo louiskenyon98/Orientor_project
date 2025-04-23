@@ -28,9 +28,7 @@ origins = [
     "http://localhost:5173",
     "https://localhost:3000",
     "https://localhost:5173",
-    "https://orientor-project.vercel.app",
-    "https://orientor.vercel.app",
-    "https://*.vercel.app"
+    "https://navigoproject.vercel.app"
 ]
 
 app.add_middleware(
@@ -98,4 +96,4 @@ def health_check():
         return {"status": "error", "detail": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000) #, reload=True)
