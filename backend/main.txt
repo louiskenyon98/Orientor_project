@@ -63,6 +63,27 @@ app.include_router(vector_router)
 def read_root():
     return {"message": "Welcome to the Orientor API"}
 
+# @app.on_event("startup")
+# async def startup_event():
+#     import os
+#     print("🚀 FastAPI is starting...")
+#     print("ENV VARS:", dict(os.environ))
+
+@app.get("/health")
+def health_check():
+    try:
+        return {"status": "ok"}
+    except Exception as e:
+        print("❌ Health check failed:", str(e))
+        return {"status": "error", "detail": str(e)}
+    
+@app.get("/debug")
+def debug_env():
+    import os
+    return {"env": {k: os.environ[k] for k in os.environ if k in [
+        "DATABASE_URL", "SECRET_KEY", "OPENAI_API_KEY", "ALGORITHM", "ACCESS_TOKEN_EXPIRE_MINUTES", "PINECONE_API_KEY", "PINECONE_ENVIRONMENT"
+    ]}}
+
 # This file allows running the app with: uvicorn main:app
 # It simply imports and re-exports the app from app.main
 

@@ -41,13 +41,18 @@ KnowledgeBase.csv
 # Ignore all files in the data_n_notebook/data directory
 data_n_notebook/data/
 
+docker-compose.yml
+
 .env.production
 
 /Reactive-Resume/
+/aws-elastic-beanstalk-cli-setup/
 
 navigo-hero.png
 trees.png
 career_comparison.png
+
+demo.txt
 
 # Notes
 black_n_white.txt
