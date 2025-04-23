@@ -3,13 +3,12 @@ import { useEffect, useState } from 'react';
 export default function HealthCheck() {
   const [healthStatus, setHealthStatus] = useState<string>('checking...');
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        // Use the proxy endpoint
         const fullUrl = '/api/health';
-        
         console.log('Checking health at:', fullUrl);
         
         const response = await fetch(fullUrl, {
@@ -21,17 +20,23 @@ export default function HealthCheck() {
           credentials: 'include',
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
         }
 
         const data = await response.json();
         console.log('Health check response:', data);
         setHealthStatus(data.status);
+        setDebugInfo(`Status: ${response.status}, URL: ${fullUrl}`);
       } catch (err) {
         console.error('Health check failed:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
         setHealthStatus('error');
+        setDebugInfo(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     };
 
@@ -55,7 +60,7 @@ export default function HealthCheck() {
         </div>
       )}
       <div className="mt-2 text-sm text-gray-500">
-        Checking health endpoint via Vercel proxy
+        {debugInfo}
       </div>
     </div>
   );
