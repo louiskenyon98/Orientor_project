@@ -20,7 +20,7 @@ const nextConfig = {
   },
   // Handle environment variables
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
   },
   // Configure build output - ensure this is properly set
   output: 'standalone',
