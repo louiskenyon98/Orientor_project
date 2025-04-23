@@ -7,9 +7,8 @@ export default function HealthCheck() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        // Use the exact URL from environment variable, just clean up trailing slash
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-        const fullUrl = `${apiUrl}/health`;
+        // Use the proxy endpoint
+        const fullUrl = '/api/health';
         
         console.log('Checking health at:', fullUrl);
         
@@ -56,7 +55,7 @@ export default function HealthCheck() {
         </div>
       )}
       <div className="mt-2 text-sm text-gray-500">
-        API URL: {process.env.NEXT_PUBLIC_API_URL}
+        Checking health endpoint via Vercel proxy
       </div>
     </div>
   );

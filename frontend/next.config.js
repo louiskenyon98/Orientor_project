@@ -36,20 +36,6 @@ const nextConfig = {
     maxInactiveAge: 60 * 60 * 1000,
     pagesBufferLength: 5,
   },
-  // Remove static export settings
-  async rewrites() {
-    // Only apply rewrites in production (Vercel)
-    if (process.env.NODE_ENV === 'production') {
-      return [
-        {
-          source: '/api/:path*',
-          destination: 'http://navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com/:path*',
-        },
-      ];
-    }
-    // Return empty array for local development
-    return [];
-  },
   // Custom error handling
   async headers() {
     return [
