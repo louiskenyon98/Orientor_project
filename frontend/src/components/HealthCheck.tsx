@@ -7,10 +7,9 @@ export default function HealthCheck() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        // Use the same protocol as the current page
-        const protocol = window.location.protocol;
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/^https?:\/\//, '');
-        const fullUrl = `${protocol}//${apiUrl}/health`;
+        // Use the exact URL from environment variable, just clean up trailing slash
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+        const fullUrl = `${apiUrl}/health`;
         
         console.log('Checking health at:', fullUrl);
         
@@ -20,7 +19,7 @@ export default function HealthCheck() {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-          credentials: 'include', // Important for CORS with credentials
+          credentials: 'include',
         });
 
         if (!response.ok) {
