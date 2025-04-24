@@ -9,7 +9,7 @@ import Link from 'next/link';
 import SkillTreeFlow from '@/components/branches/career_growth';
 import CareerTechTree from '@/components/branches/Career_evolution';
 import DemoChat from '@/components/chat/DemoChat';
-
+import JobSwipeCard from '@/components/chat/swipe_recommendation';
 export default function LandingPage() {
   const router = useRouter();
 
@@ -162,6 +162,10 @@ export default function LandingPage() {
 
         </div>
       </section>
+      <div className="max-w-1xl mx-auto bg-transparent">
+        <JobSwipeCard />
+      </div>
+      
       {/* Career Tree Visual */}
       <section className="section">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Career Growth Tree</h2>
