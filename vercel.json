@@ -4,7 +4,15 @@
   "installCommand": "cd frontend && npm install",
   "outputDirectory": "frontend/.next",
   "framework": "nextjs",
-  "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "/api"
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com/:path*"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -23,11 +31,5 @@
         }
       ]
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://orientor-backend-production.up.railway.app/api/:path*"
-    }
   ]
-} 
+}
