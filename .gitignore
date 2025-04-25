@@ -47,6 +47,10 @@ docker-compose.yml
 
 /Reactive-Resume/
 /aws-elastic-beanstalk-cli-setup/
+/data_n_notebook/siamese_pipeline/mlruns/
+/data_n_notebook/MLflow_Huggingface/mlruns/
+
+siamese_pairs.pkl
 
 navigo-hero.png
 trees.png

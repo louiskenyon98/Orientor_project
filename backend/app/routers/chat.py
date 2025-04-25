@@ -5,7 +5,7 @@ import logging
 from openai import OpenAI
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from app.routes.user import get_current_user
+from app.routers.user import get_current_user
 from app.models import User, UserProfile
 from sqlalchemy.orm import Session
 from app.utils.database import get_db

@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from ..utils.database import get_db
 from ..models import User, UserProfile
-from ..routes.user import get_current_user
+from ..routers.user import get_current_user
 
 router = APIRouter(prefix="/users", tags=["users"])
 

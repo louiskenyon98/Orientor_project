@@ -1,0 +1,7 @@
+sentence-transformers
+torch
+mlflow
+tqdm
+pinecone-client
+python-dotenv
+scikit-learn
