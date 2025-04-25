@@ -5,15 +5,15 @@ import os
 import logging
 
 # Import routers directly
-from app.routes.user import router as auth_router, get_current_user
+from app.routers.user import router as auth_router, get_current_user
 from app.routers.users import router as users_router
-from app.routes.chat import router as chat_router
+from app.routers.chat import router as chat_router
 from app.routers.peers import router as peers_router
 from app.routers.messages import router as messages_router
 from app.routers.profiles import router as profiles_router
 from app.routers.test import router as test_router
 from app.routers.space import router as space_router
-from app.routes.vector_search import router as vector_router
+from app.routers.vector_search import router as vector_router
 
 # Configure logging
 logger = logging.getLogger(__name__)

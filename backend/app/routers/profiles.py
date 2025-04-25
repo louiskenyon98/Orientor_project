@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 import logging
 from app.utils.database import get_db
 from app.models import User, UserProfile, UserSkill
-from app.routes.user import get_current_user
+from app.routers.user import get_current_user
 
 # Configure logging
 logger = logging.getLogger(__name__)

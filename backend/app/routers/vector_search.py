@@ -7,7 +7,7 @@ from typing import List, Optional
 from dotenv import load_dotenv
 import logging
 from ..models import SavedRecommendation
-from ..routes.user import get_current_user
+from ..routers.user import get_current_user
 from ..schemas.space import SavedRecommendationCreate
 from ..utils.database import get_db
 from sqlalchemy.orm import Session
