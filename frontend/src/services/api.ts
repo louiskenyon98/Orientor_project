@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -22,10 +22,23 @@ api.interceptors.request.use((config) => {
 // Function to get career recommendations for the Find Your Way tab
 export const getCareerRecommendations = async (limit = 10) => {
   try {
+    console.log('Fetching career recommendations from:', `${API_URL}/careers/recommendations?limit=${limit}`);
     const response = await api.get(`/careers/recommendations?limit=${limit}`);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching career recommendations:', error);
+    if (error?.response) {
+      console.error('API Error Details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          baseURL: error.config?.baseURL,
+          url: error.config?.url,
+          headers: error.config?.headers
+        }
+      });
+    }
     throw error;
   }
 };
