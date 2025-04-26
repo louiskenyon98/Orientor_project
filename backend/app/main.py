@@ -16,10 +16,14 @@ from app.routers.space import router as space_router
 from app.routers.vector_search import router as vector_router
 from app.routers.recommendations import router as recommendations_router
 from app.routers.careers import router as careers_router
+# from app.routers.resume import router as resume_router  # Commented out resume router
 
 # Configure logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 # Create FastAPI app
 app = FastAPI(title="Orientor API")
@@ -62,6 +66,7 @@ try:
     logger.info(f"Registering vector_router routes: {[f'{route.path} [{route.methods}]' for route in vector_router.routes]}")
     logger.info(f"Registering recommendations_router routes: {[f'{route.path} [{route.methods}]' for route in recommendations_router.routes]}")
     logger.info(f"Registering careers_router routes: {[f'{route.path} [{route.methods}]' for route in careers_router.routes]}")
+    # logger.info(f"Registering resume_router routes: {[f'{route.path} [{route.methods}]' for route in resume_router.routes]}")  # Commented out resume router logging
     logger.info("============================================")
 except Exception as e:
     logger.error(f"Error while logging router details: {str(e)}")
@@ -84,6 +89,7 @@ app.include_router(space_router)
 app.include_router(vector_router)
 app.include_router(recommendations_router)
 app.include_router(careers_router)
+# app.include_router(resume_router)  # Commented out resume router inclusion
 logger.info("All routers included successfully")
 
 # Explicitly capture route after including it
@@ -96,7 +102,7 @@ logger.info("======================")
 def read_root():
     return {"message": "Welcome to the Orientor API"}
 
-@app.get("api/health")
+@app.get("/api/health")
 def health_check():
     try:
         return {"status": "ok"}
