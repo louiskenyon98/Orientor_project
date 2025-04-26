@@ -64,3 +64,9 @@ demo.txt
 # Notes
 black_n_white.txt
 problem_n_solution.txt
+
+# models 
+# ohe_Siamese.pkl
+# scaler_Siamese.pkl
+# pca384_Siamese.pkl
+# finetuned_model/
