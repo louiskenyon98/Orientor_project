@@ -30,6 +30,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} scroll-smooth`}>
+      <head>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+      </head>
       <body className="min-h-screen bg-white text-neutral-700 antialiased">
         {/* Background patterns */}
         <div 

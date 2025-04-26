@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, Float, Text, JSON
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, Float, Text, JSON, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..utils.database import Base
@@ -7,7 +7,7 @@ class SavedRecommendation(Base):
     __tablename__ = "saved_recommendations"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     oasis_code = Column(String, nullable=False)
     label = Column(String, nullable=False)
     description = Column(Text, nullable=True)
@@ -26,8 +26,7 @@ class SavedRecommendation(Base):
     decision_making = Column(Float, nullable=True)
     stress_tolerance = Column(Float, nullable=True)
     all_fields = Column(JSON, nullable=True)
-    saved_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+    saved_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
     # Define unique constraint to prevent duplicates
     __table_args__ = (
