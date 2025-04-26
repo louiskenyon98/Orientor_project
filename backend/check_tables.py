@@ -11,7 +11,7 @@ def check_db_tables():
     # Load environment variables from .env file
     if os.getenv("ENV") == "production":
         load_dotenv(".env.production")
-        DATABASE_URL = os.getenv("RAILWAY_DATABASE_URL")
+        DATABASE_URL = os.getenv("DATABASE_URL")
     else:
         load_dotenv()
         DATABASE_URL = os.getenv("LOCAL_DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/orientor")

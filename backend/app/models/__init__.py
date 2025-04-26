@@ -5,6 +5,7 @@ from .message import Message
 from .saved_recommendation import SavedRecommendation
 from .user_note import UserNote
 from .user_skill import UserSkill
+from .user_recommendation import UserRecommendation
 from ..utils.database import Base
 
-__all__ = ['User', 'UserProfile', 'SuggestedPeers', 'Message', 'SavedRecommendation', 'UserNote', 'UserSkill', 'Base']
+__all__ = ['User', 'UserProfile', 'SuggestedPeers', 'Message', 'SavedRecommendation', 'UserNote', 'UserSkill', 'UserRecommendation', 'Base']

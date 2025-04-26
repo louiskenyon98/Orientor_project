@@ -22,4 +22,5 @@ class User(Base):
     profile = relationship("UserProfile", back_populates="user", uselist=False)
     saved_recommendations = relationship("SavedRecommendation", back_populates="user", cascade="all, delete-orphan")
     notes = relationship("UserNote", back_populates="user", cascade="all, delete-orphan")
-    skills = relationship("UserSkill", back_populates="user", uselist=False) 
+    skills = relationship("UserSkill", back_populates="user", uselist=False)
+    recommendations = relationship("UserRecommendation", back_populates="user", cascade="all, delete-orphan") 
