@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 import logging
 from app.utils.database import get_db
 from app.models import User, UserProfile, UserSkill
 from app.routers.user import get_current_user
+from app.services.embedding_service import process_user_embedding
+from app.services.peer_matching_service import generate_peer_suggestions
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -37,6 +39,13 @@ class ProfileResponse(BaseModel):
     digital_literacy: Optional[float] = None
     critical_thinking: Optional[float] = None
     problem_solving: Optional[float] = None
+    # Job-related fields for embeddings
+    job_title: Optional[str] = None
+    industry: Optional[str] = None
+    years_experience: Optional[int] = None
+    education_level: Optional[str] = None
+    career_goals: Optional[str] = None
+    skills: Optional[List[str]] = None
 
     class Config:
         from_attributes = True
@@ -70,6 +79,13 @@ class ProfileUpdate(BaseModel):
     digital_literacy: Optional[float] = Field(None, ge=0, le=5)
     critical_thinking: Optional[float] = Field(None, ge=0, le=5)
     problem_solving: Optional[float] = Field(None, ge=0, le=5)
+    # Job-related fields for embeddings
+    job_title: Optional[str] = None
+    industry: Optional[str] = None
+    years_experience: Optional[int] = Field(None, ge=0)
+    education_level: Optional[str] = None
+    career_goals: Optional[str] = None
+    skills: Optional[List[str]] = None
 
 @router.get("/me", response_model=ProfileResponse)
 def get_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -159,6 +175,37 @@ def update_profile(
         response.digital_literacy = skills.digital_literacy
         response.critical_thinking = skills.critical_thinking
         response.problem_solving = skills.problem_solving
+        
+        # Generate user embedding based on profile data
+        try:
+            # Prepare profile data for embedding generation
+            embedding_data = {
+                "job_title": profile_data.job_title if profile_data.job_title else "",
+                "industry": profile_data.industry if profile_data.industry else "",
+                "years_experience": profile_data.years_experience if profile_data.years_experience else 0,
+                "education_level": profile_data.education_level if profile_data.education_level else "",
+                "career_goals": profile_data.career_goals if profile_data.career_goals else "",
+                "skills": profile_data.skills if profile_data.skills else [],
+                "interests": profile_data.interests if profile_data.interests else ""
+            }
+            
+            # Process embedding generation
+            embedding_success = process_user_embedding(db, current_user.id, embedding_data)
+            
+            if embedding_success:
+                logger.info(f"Successfully generated embedding for user ID: {current_user.id}")
+                
+                # Generate peer suggestions
+                peer_success = generate_peer_suggestions(db, current_user.id)
+                if peer_success:
+                    logger.info(f"Successfully generated peer suggestions for user ID: {current_user.id}")
+                else:
+                    logger.warning(f"Failed to generate peer suggestions for user ID: {current_user.id}")
+            else:
+                logger.warning(f"Failed to generate embedding for user ID: {current_user.id}")
+        except Exception as e:
+            logger.error(f"Error in embedding/peer suggestion process: {str(e)}")
+            # Don't fail the profile update if embedding generation fails
         
         logger.info(f"Successfully updated profile for user ID: {current_user.id}")
         return response
