@@ -6,13 +6,14 @@ from pydantic import BaseModel
 from typing import List, Optional
 from dotenv import load_dotenv
 import logging
-from ..models import SavedRecommendation
+from ..models import SavedRecommendation, User
 from ..routers.user import get_current_user
 from ..schemas.space import SavedRecommendationCreate
 from ..utils.database import get_db
 from sqlalchemy.orm import Session
 import re
 from typing import List, Optional, Dict
+from sqlalchemy import text
 
 
 # Configure logging
@@ -134,6 +135,18 @@ class SearchResponse(BaseModel):
 class SearchRequest(BaseModel):
     query: str
     top_k: Optional[int] = 5
+
+class SuggestedPeer(BaseModel):
+    user_id: int
+    name: str
+    major: Optional[str] = None
+    year: Optional[int] = None
+    similarity: float
+    hobbies: Optional[str] = None
+    interests: Optional[str] = None
+
+class SuggestedPeersResponse(BaseModel):
+    peers: List[SuggestedPeer]
 
 @router.post("/search", response_model=SearchResponse)
 async def search_embeddings(request: SearchRequest):
@@ -348,4 +361,44 @@ async def health_check():
         }
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Vector search service unhealthy: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Vector search service unhealthy: {str(e)}")
+
+@router.get("/suggested-peers", response_model=SuggestedPeersResponse)
+async def get_suggested_peers(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get suggested peers for the current user"""
+    try:
+        # Get suggested peers from database
+        query = text("""
+            SELECT sp.suggested_id, sp.similarity,
+                   up.name, up.major, up.year, up.hobbies
+            FROM suggested_peers sp
+            JOIN user_profiles up ON sp.suggested_id = up.user_id
+            WHERE sp.user_id = :user_id
+            ORDER BY sp.similarity DESC
+        """)
+        results = db.execute(query, {"user_id": current_user.id}).fetchall()
+        
+        # Format response
+        peers = []
+        for result in results:
+            peer = SuggestedPeer(
+                user_id=result.suggested_id,
+                name=result.name,
+                major=result.major,
+                year=result.year,
+                similarity=result.similarity,
+                hobbies=result.hobbies
+            )
+            peers.append(peer)
+        
+        return SuggestedPeersResponse(peers=peers)
+        
+    except Exception as e:
+        logger.error(f"Error getting suggested peers: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get suggested peers"
+        ) 

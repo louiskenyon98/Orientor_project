@@ -29,12 +29,12 @@ class Settings(BaseSettings):
         if self.DATABASE_URL:
             return self.DATABASE_URL
             
-        # Otherwise, fall back to environment-specific URLs
-        if self.ENV == "production":
-            if not self.RAILWAY_DATABASE_URL:
-                raise ValueError("RAILWAY_DATABASE_URL must be set in production environment")
-            return self.RAILWAY_DATABASE_URL
-        return self.LOCAL_DATABASE_URL or ""
+        # # Otherwise, fall back to environment-specific URLs
+        # if self.ENV == "production":
+        #     if not self.RAILWAY_DATABASE_URL:
+        #         raise ValueError("RAILWAY_DATABASE_URL must be set in production environment")
+        #     return self.RAILWAY_DATABASE_URL
+        # return self.LOCAL_DATABASE_URL or ""
 
     class Config:
         env_file = ".env"

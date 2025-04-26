@@ -44,6 +44,7 @@ data_n_notebook/data/
 docker-compose.yml
 
 .env.production
+backend/.env.example
 
 /Reactive-Resume/
 /aws-elastic-beanstalk-cli-setup/
