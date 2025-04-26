@@ -17,7 +17,7 @@ export default function MainLayout({
 
     // Public routes that don't require authentication
     const publicRoutes = ['/login', '/register'];
-    const isPublicRoute = publicRoutes.includes(pathname);
+    const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
 
     useEffect(() => {
         // Check if user is logged in
