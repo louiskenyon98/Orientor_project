@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # Path to ML models
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
-EMBEDDING_MODEL_PATH = os.path.join(MODEL_DIR, "embedding_model.pkl")
+EMBEDDING_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model_quantized")
 PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca_model.pkl")
 OHE_MODEL_PATH = os.path.join(MODEL_DIR, "ohe_model.pkl")
 SCALER_MODEL_PATH = os.path.join(MODEL_DIR, "scaler_model.pkl")

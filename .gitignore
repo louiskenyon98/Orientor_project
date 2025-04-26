@@ -69,4 +69,4 @@ problem_n_solution.txt
 # ohe_Siamese.pkl
 # scaler_Siamese.pkl
 # pca384_Siamese.pkl
-# finetuned_model/
+finetuned_model/
