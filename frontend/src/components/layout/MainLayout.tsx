@@ -21,7 +21,7 @@ export default function MainLayout({
 
     useEffect(() => {
         // Check if user is logged in
-        const token = localStorage.getItem('access_token');
+        const token = localStorage.getItem('access_token') || '';
         console.log('Token from localStorage:', token ? 'Found' : 'Not found');
         console.log('Current pathname:', pathname);
         console.log('Is public route:', isPublicRoute);
