@@ -285,14 +285,40 @@ const root: SkillNode = {
 
 export default function SkillTreeFlow() {
   const { nodes, edges } = convertToFlowGraph(root);
+  
+  // Calculate the bounds of the graph
+  const minX = Math.min(...nodes.map(node => node.position.x)) - 100;
+  const maxX = Math.max(...nodes.map(node => node.position.x + 200)) + 100;
+  const minY = Math.min(...nodes.map(node => node.position.y)) - 100;
+  const maxY = Math.max(...nodes.map(node => node.position.y + 250)) + 100;
+  
+  const width = maxX - minX;
+  const height = maxY - minY;
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <div style={{ 
+      width: '100%', 
+      height: '80vh',
+      maxHeight: '800px',
+      overflow: 'hidden',
+      borderRadius: '12px',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+    }}>
       <ReactFlowProvider>
-        <ReactFlow nodes={nodes} edges={edges} fitView panOnScroll zoomOnScroll fitViewOptions={{ padding: 0.4 }}>
+        <ReactFlow 
+          nodes={nodes} 
+          edges={edges} 
+          fitView 
+          panOnScroll 
+          zoomOnScroll 
+          fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
+          minZoom={0.2}
+          maxZoom={1.5}
+          translateExtent={[[minX, minY], [maxX, maxY]]} // This limits the pan area
+        >
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
           <Background color="#f3f4f6" gap={24} />
-          <Controls showInteractive={false} />
+          <Controls showInteractive={false} position="bottom-right" />
         </ReactFlow>
       </ReactFlowProvider>
     </div>
