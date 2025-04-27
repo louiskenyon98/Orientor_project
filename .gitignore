@@ -69,4 +69,8 @@ problem_n_solution.txt
 # ohe_Siamese.pkl
 # scaler_Siamese.pkl
 # pca384_Siamese.pkl
-finetuned_model/
+# Start of Selection
+# It is not necessary to specify the full path to ignore these directories.
+# Instead, you can use relative paths or patterns to ignore them.
+# backend/app/models/finetuned_model/
+# backend/app/models/finetuned_model_quantized/
