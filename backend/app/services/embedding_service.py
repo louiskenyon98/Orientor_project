@@ -1,39 +1,46 @@
 import os
-import logging
-import numpy as np
-import pandas as pd
 import pickle
-from typing import Dict, Any, Optional
+import logging
+from typing import Optional, Dict, Any
+import pandas as pd
+import numpy as np
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from sentence_transformers import SentenceTransformer
 
-# Configure logging
+# Configure logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Path to ML models
+# Paths
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
-EMBEDDING_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model_quantized")
-PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca_model.pkl")
-OHE_MODEL_PATH = os.path.join(MODEL_DIR, "ohe_model.pkl")
-SCALER_MODEL_PATH = os.path.join(MODEL_DIR, "scaler_model.pkl")
+FINETUNED_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model_quantized")
+PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
+OHE_MODEL_PATH = os.path.join(MODEL_DIR, "ohe_Siamese.pkl")
+SCALER_MODEL_PATH = os.path.join(MODEL_DIR, "scaler_Siamese.pkl")
 
-# Load models if they exist
+# Load models properly
 try:
-    with open(EMBEDDING_MODEL_PATH, 'rb') as f:
-        EMBEDDING_MODEL = pickle.load(f)
-    with open(PCA_MODEL_PATH, 'rb') as f:
-        PCA_MODEL = pickle.load(f)
-    with open(OHE_MODEL_PATH, 'rb') as f:
-        OHE_MODEL = pickle.load(f)
-    with open(SCALER_MODEL_PATH, 'rb') as f:
-        SCALER_MODEL = pickle.load(f)
-    
-    logger.info("All embedding models loaded successfully")
-    MODELS_LOADED = True
+    EMBEDDING_MODEL = SentenceTransformer(FINETUNED_MODEL_PATH)
+    logger.info("Embedding model loaded successfully.")
 except Exception as e:
-    logger.error(f"Error loading embedding models: {str(e)}")
-    MODELS_LOADED = False
+    logger.error(f"Error loading embedding model: {str(e)}")
+    EMBEDDING_MODEL = None
+
+def load_pickle_model(path: str):
+    try:
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    except Exception as e:
+        logger.error(f"Error loading pickle model {path}: {str(e)}")
+        return None
+
+PCA_MODEL = load_pickle_model(PCA_MODEL_PATH)
+OHE_MODEL = load_pickle_model(OHE_MODEL_PATH)
+SCALER_MODEL = load_pickle_model(SCALER_MODEL_PATH)
+
+# Preprocess, embed, etc. (your existing code can stay)
+
 
 def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFrame]:
     """
