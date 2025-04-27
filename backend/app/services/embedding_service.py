@@ -7,6 +7,7 @@ import numpy as np
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from sentence_transformers import SentenceTransformer
+import joblib
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -14,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 # Paths
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
-FINETUNED_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model_quantized")
-PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
+FINETUNED_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model") # _quantized
+# PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
+PCA_MODEL = joblib.load('/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/backend/app/models/pca384_Siamese.pkl')
 OHE_MODEL_PATH = os.path.join(MODEL_DIR, "ohe_Siamese.pkl")
 SCALER_MODEL_PATH = os.path.join(MODEL_DIR, "scaler_Siamese.pkl")
 
