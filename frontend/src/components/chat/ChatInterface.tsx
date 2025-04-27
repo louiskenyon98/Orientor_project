@@ -23,6 +23,7 @@ export default function ChatInterface() {
   const [isTyping, setIsTyping] = useState(false);
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -112,49 +113,60 @@ export default function ChatInterface() {
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsTyping(false);
+      // Focus back on input after message is sent
+      inputRef.current?.focus();
     }
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg shadow-md border border-gray-700 p-6">
-      <div className="space-y-4">
-        <div className="space-y-4 h-[400px] overflow-y-auto mb-4">
-          {messages.map((message) => (
-            <ChatMessage 
-              key={message.id}
-              message={message.text}
-              type={message.type}
-              userColor="bg-blue-600"
-              aiColor="bg-gray-700"
-            />
-          ))}
-          {isTyping && (
-            <ChatMessage 
-              message="Typing..."
-              type="ai"
-              userColor="bg-blue-600"
-              aiColor="bg-gray-700"
-            />
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+    <div className="bg-gray-900 rounded-lg shadow-md border border-gray-700 flex flex-col h-[calc(100vh-12rem)] md:h-[600px] max-w-4xl mx-auto">
+      <div className="px-4 py-3 border-b border-gray-700">
+        <h2 className="text-lg font-medium text-gray-100">Career Advisor Chat</h2>
+      </div>
 
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 scroll-smooth">
+        {messages.map((message) => (
+          <ChatMessage 
+            key={message.id}
+            message={message.text}
+            type={message.type}
+            userColor="bg-blue-600"
+            aiColor="bg-gray-700"
+          />
+        ))}
+        {isTyping && (
+          <ChatMessage 
+            message="Typing..."
+            type="ai"
+            userColor="bg-blue-600"
+            aiColor="bg-gray-700"
+          />
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="border-t border-gray-700 p-3 md:p-4">
         <div className="flex items-center space-x-2">
           <input
+            ref={inputRef}
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && !isTyping && handleSend()}
             placeholder="Type your message..."
-            className="flex-1 p-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 p-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isTyping}
           />
           <button 
             onClick={handleSend}
             disabled={!inputText.trim() || isTyping}
-            className="bg-blue-600 hover:bg-blue-500 text-gray-900 px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 h-[46px] min-w-[80px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            aria-label="Send message"
           >
-            Send
+            <span className="hidden xs:inline">Send</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 xs:ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
           </button>
         </div>
       </div>
