@@ -9,7 +9,7 @@ from ..models import User, UserProfile, SuggestedPeers
 from typing import List, Dict, Any, Optional
 import time
 import pandas as pd
-from pinecone import Pinecone
+import pinecone
 import json
 
 # Configure logging
@@ -306,8 +306,8 @@ def recommend_careers_for_user(user_id: int, db: Session, top_k: int = 5) -> Lis
             return []
         
         try:
-            pc = Pinecone(api_key=pinecone_api_key)
-            index = pc.Index("oasis-minilm-index")
+            pinecone.init(api_key=pinecone_api_key, environment=pinecone_environment)
+            index = pinecone.Index("oasis-minilm-index")
             
             # Query Pinecone
             query_results = index.query(

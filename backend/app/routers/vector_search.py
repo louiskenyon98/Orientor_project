@@ -1,6 +1,6 @@
 import os
 import openai
-from pinecone import Pinecone
+import pinecone
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List, Optional
@@ -44,8 +44,9 @@ def get_pinecone_index():
         index_name = "oasis-minilm-index"
         
         logger.info(f"Initializing Pinecone with environment: {pinecone_environment}")
-        pc = Pinecone(api_key=pinecone_api_key)
-        index = pc.Index(index_name)
+        pc = pinecone(api_key=pinecone_api_key)
+        pinecone.init(api_key=pinecone_api_key, environment=pinecone_environment)
+        index = pinecone.Index(index_name)
         return index
     except Exception as e:
         logger.error(f"Error initializing Pinecone: {e}")
