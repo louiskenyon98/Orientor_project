@@ -13,7 +13,9 @@ export default function MainLayout({
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+    const [careerMenuOpen, setCareerMenuOpen] = useState(false);
     const moreMenuRef = useRef<HTMLDivElement>(null);
+    const careerMenuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -47,6 +49,9 @@ export default function MainLayout({
             if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
                 setMoreMenuOpen(false);
             }
+            if (careerMenuRef.current && !careerMenuRef.current.contains(event.target as Node)) {
+                setCareerMenuOpen(false);
+            }
         }
         
         document.addEventListener("mousedown", handleClickOutside);
@@ -58,6 +63,7 @@ export default function MainLayout({
     // Close mobile menus when route changes
     useEffect(() => {
         setMoreMenuOpen(false);
+        setCareerMenuOpen(false);
     }, [pathname]);
 
     const handleLogout = () => {
@@ -85,29 +91,131 @@ export default function MainLayout({
         );
     }
 
+    // Check if current path is in career path section
+    const isCareerPath = ['/vector-search', '/find-your-way', '/cv'].includes(pathname || '');
+
     console.log('Rendering layout with isLoggedIn:', isLoggedIn);
 
     return (
         <div className="min-h-screen flex flex-col">
             {/* Desktop Navigation Bar - Only visible on larger screens */}
             {isLoggedIn && (
-                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/10 backdrop-blur-md border-b border-white/10 hidden md:block">
-                    <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-                        <Link href="/" className="text-xl font-light tracking-wide text-neutral-800">
-                            Navigo
-                        </Link>
-                        
-                        <div className="flex gap-8">
-                            <Link href="/chat" className="nav-link">Chat</Link>
-                            <Link href="/peers" className="nav-link">Suggested Peers</Link>
-                            <Link href="/vector-search" className="nav-link">Career recommendation</Link>
-                            <Link href="/find-your-way" className="nav-link">Swipe Your Way</Link>
-                            <Link href="/cv" className="nav-link">Resume Builder</Link>
-                            <Link href="/space" className="nav-link">My Space</Link>
-                            <Link href="/profile" className="nav-link">Profile</Link>
-                            <button onClick={handleLogout} className="nav-link">Logout</button>
+                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm hidden md:block">
+                    <div className="max-w-7xl mx-auto px-8">
+                        <div className="flex justify-between h-16">
+                            {/* Left Side - Logo and Primary Navigation */}
+                            <div className="flex items-center space-x-8">
+                                {/* Logo */}
+                                <Link href="/" className="flex-shrink-0 flex items-center">
+                                    <span className="text-xl font-semibold tracking-tight text-gray-900">
+                                        Navigo
+                                    </span>
+                                </Link>
+                                
+                                {/* Primary Navigation */}
+                                <div className="flex items-center space-x-1">
+                                    <Link 
+                                        href="/chat" 
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/chat' 
+                                                ? 'text-blue-700 bg-blue-50' 
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        Mentor
+                                    </Link>
+                                    
+                                    <Link 
+                                        href="/peers" 
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/peers' 
+                                                ? 'text-blue-700 bg-blue-50' 
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        Network
+                                    </Link>
+                                    
+                                    {/* Career Path Dropdown */}
+                                    <div className="relative" ref={careerMenuRef}>
+                                        <button 
+                                            onClick={() => setCareerMenuOpen(!careerMenuOpen)}
+                                            className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
+                                                ${isCareerPath
+                                                    ? 'text-blue-700 bg-blue-50' 
+                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            Career Growth
+                                            <svg className={`ml-1 h-4 w-4 transition-transform duration-200 ${careerMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        
+                                        {careerMenuOpen && (
+                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
+                                                <div className="py-1" role="menu" aria-orientation="vertical">
+                                                    <Link
+                                                        href="/vector-search"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/vector-search' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Career Insights
+                                                    </Link>
+                                                    <Link
+                                                        href="/find-your-way"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/find-your-way' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Pathway Explorer
+                                                    </Link>
+                                                    <Link
+                                                        href="/cv"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/cv' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Resume Studio
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <Link 
+                                        href="/space" 
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/space' 
+                                                ? 'text-blue-700 bg-blue-50' 
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        Workspace
+                                    </Link>
+                                </div>
+                            </div>
+                            
+                            {/* Right Side - User Profile & Logout */}
+                            <div className="flex items-center space-x-1">
+                                <Link 
+                                    href="/profile"
+                                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                        ${pathname === '/profile' 
+                                            ? 'text-blue-700 bg-blue-50' 
+                                            : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    Profile
+                                </Link>
+                                
+                                <button 
+                                    onClick={handleLogout}
+                                    className="px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors duration-150 ease-in-out"
+                                >
+                                    Sign Out
+                                </button>
+                            </div>
                         </div>
-                    </nav>
+                    </div>
                 </header>
             )}
 
