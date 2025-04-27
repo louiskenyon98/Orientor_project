@@ -109,6 +109,11 @@ def health_check():
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
         return {"status": "error", "detail": str(e)}
+    
+def load_models():
+    global ready
+    # Load your big models here
+    ready = True
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000) #, reload=True)
