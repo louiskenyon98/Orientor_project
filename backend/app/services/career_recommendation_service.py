@@ -7,7 +7,7 @@ from sqlalchemy import text
 import pickle
 import random
 from .peer_matching_service import parse_embedding
-from pinecone import Pinecone
+import pinecone
 import re
 
 # Configure logging
@@ -129,8 +129,8 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         try:
             pinecone_api_key = os.getenv("PINECONE_API_KEY")
             if pinecone_api_key:
-                pc = Pinecone(api_key=pinecone_api_key)
-                index = pc.Index("oasis-minilm-index")
+                pinecone.init(api_key=pinecone_api_key, environment=os.getenv("PINECONE_ENVIRONMENT"))
+                index = pinecone.Index("oasis-minilm-index")
                 
                 # For Pinecone v3+, we need to ensure the embedding size matches
                 # the index's dimension. If we can't determine it, we'll use a default.
@@ -202,8 +202,8 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             logger.error("Pinecone API key or environment not set")
             return []
         
-        pc = Pinecone(api_key=pinecone_api_key)
-        index = pc.Index("oasis-minilm-index")
+        pinecone.init(api_key=pinecone_api_key, environment=pinecone_environment)
+        index = pinecone.Index("oasis-minilm-index")
         
         # Ensure embedding is the right format and size - handle numpy arrays
         if isinstance(embedding, np.ndarray):
