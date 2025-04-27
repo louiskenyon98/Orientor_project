@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
 FINETUNED_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model") # _quantized
 # PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
-PCA_MODEL = joblib.load('/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/backend/app/models/pca384_Siamese.pkl')
+PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
 OHE_MODEL_PATH = os.path.join(MODEL_DIR, "ohe_Siamese.pkl")
 SCALER_MODEL_PATH = os.path.join(MODEL_DIR, "scaler_Siamese.pkl")
 
@@ -37,7 +37,7 @@ def load_pickle_model(path: str):
         logger.error(f"Error loading pickle model {path}: {str(e)}")
         return None
 
-PCA_MODEL = load_pickle_model(PCA_MODEL_PATH)
+PCA_MODEL = joblib.load(PCA_MODEL_PATH)
 OHE_MODEL = load_pickle_model(OHE_MODEL_PATH)
 SCALER_MODEL = load_pickle_model(SCALER_MODEL_PATH)
 
