@@ -5,9 +5,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
-    PORT=8000 \
-    DATABASE_URL=postgresql://postgres:Navigo.phil.007@navigo-db.cezukgaam3m7.us-east-1.rds.amazonaws.com:5432/navigo
-
+    PORT=8000 
 # Set working directory
 WORKDIR /app
 
