@@ -1,7 +1,45 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
 .env
-.git
 
+# Git
+.git/
+.git-lfs/
+.gitattributes
+.gitignore
 
+# Docker
 docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Models and data
+*.pkl
+*.bin
+*.h5
+*.pt
+*.onnx
+data/
+models/
+mlruns/
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

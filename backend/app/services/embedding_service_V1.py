@@ -7,54 +7,28 @@ import numpy as np
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from sentence_transformers import SentenceTransformer
-import boto3
-import tempfile
 import joblib
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# AWS S3 Setup
-S3_BUCKET = os.getenv("S3_BUCKET_NAME", "navigo-finetune-embedder-prod")
-s3 = boto3.client('s3')
+# Paths
+MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
+FINETUNED_MODEL_PATH = os.path.join(MODEL_DIR, "finetuned_model") # _quantized
+# PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
+PCA_MODEL_PATH = os.path.join(MODEL_DIR, "pca384_Siamese.pkl")
+OHE_MODEL_PATH = os.path.join(MODEL_DIR, "ohe_Siamese.pkl")
+SCALER_MODEL_PATH = os.path.join(MODEL_DIR, "scaler_Siamese.pkl")
 
-# Helper functions to download from S3
-def download_model_from_s3(s3_key: str) -> str:
-    local_path = f"/tmp/{os.path.basename(s3_key)}"
-    if not os.path.exists(local_path):
-        s3.download_file(S3_BUCKET, s3_key, local_path)
-    return local_path
-
-def download_folder_from_s3(s3_prefix: str, local_dir: str):
-    if not os.path.exists(local_dir):
-        os.makedirs(local_dir)
-    paginator = s3.get_paginator('list_objects_v2')
-    for page in paginator.paginate(Bucket=S3_BUCKET, Prefix=s3_prefix):
-        for obj in page.get('Contents', []):
-            key = obj['Key']
-            filename = key.split('/')[-1]
-            if filename:  # Avoid empty keys
-                local_file_path = os.path.join(local_dir, filename)
-                s3.download_file(S3_BUCKET, key, local_file_path)
-
-# Load models from S3
+# Load models properly
 try:
-    local_finetuned_model_dir = "/tmp/finetuned_model"
-    download_folder_from_s3("sentence_transformers/", local_finetuned_model_dir)
-    EMBEDDING_MODEL = SentenceTransformer(local_finetuned_model_dir)
-    logger.info("Embedding model loaded successfully from S3.")
+    EMBEDDING_MODEL = SentenceTransformer(FINETUNED_MODEL_PATH)
+    logger.info("Embedding model loaded successfully.")
 except Exception as e:
     logger.error(f"Error loading embedding model: {str(e)}")
     EMBEDDING_MODEL = None
 
-try:
-    PCA_MODEL = joblib.load(download_model_from_s3("siamese_models/pca384_Siamese.pkl"))
-except Exception as e:
-    logger.error(f"Error loading PCA model: {str(e)}")
-    PCA_MODEL = None
-
-# Helper function for pickle models
 def load_pickle_model(path: str):
     try:
         with open(path, "rb") as f:
@@ -63,19 +37,26 @@ def load_pickle_model(path: str):
         logger.error(f"Error loading pickle model {path}: {str(e)}")
         return None
 
-OHE_MODEL = load_pickle_model(download_model_from_s3("siamese_models/ohe_Siamese.pkl"))
-SCALER_MODEL = load_pickle_model(download_model_from_s3("siamese_models/scaler_Siamese.pkl"))
+PCA_MODEL = joblib.load(PCA_MODEL_PATH)
+OHE_MODEL = load_pickle_model(OHE_MODEL_PATH)
+SCALER_MODEL = load_pickle_model(SCALER_MODEL_PATH)
 
-# Flag to check if models loaded
-MODELS_LOADED = all([EMBEDDING_MODEL, PCA_MODEL, OHE_MODEL, SCALER_MODEL])
+# Preprocess, embed, etc. (your existing code can stay)
 
-# --- Core Functions ---
 
 def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFrame]:
     """
-    Preprocess user profile data for embedding generation.
+    Preprocess user profile data for embedding generation
+    
+    Args:
+        profile_data: Dictionary containing user profile data
+        
+    Returns:
+        Preprocessed DataFrame ready for embedding generation or None if preprocessing fails
     """
     try:
+        # Create a DataFrame from user profile data
+        # Adjust field names as needed based on your schema
         user_df = pd.DataFrame([{
             "job_title": profile_data.get("job_title", ""),
             "industry": profile_data.get("industry", ""),
@@ -85,7 +66,8 @@ def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFra
             "interests": ",".join(profile_data.get("interests", [])),
             "career_goals": profile_data.get("career_goals", "")
         }])
-
+        
+        # Apply One-Hot Encoding
         if OHE_MODEL is not None:
             categorical_cols = ["job_title", "industry", "education_level"]
             for col in categorical_cols:
@@ -95,13 +77,14 @@ def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFra
                     encoded_df = pd.DataFrame(encoded_cols, columns=feature_names)
                     user_df = pd.concat([user_df, encoded_df], axis=1)
                     user_df = user_df.drop(col, axis=1)
-
+        
+        # Apply scaling to numerical features
         if SCALER_MODEL is not None:
             numerical_cols = ["years_experience"]
             for col in numerical_cols:
                 if col in user_df.columns:
                     user_df[col] = SCALER_MODEL.transform(user_df[[col]])
-
+        
         return user_df
     except Exception as e:
         logger.error(f"Error preprocessing user profile data: {str(e)}")
@@ -109,22 +92,31 @@ def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFra
 
 def generate_embedding(profile_data: Dict[str, Any]) -> Optional[np.ndarray]:
     """
-    Generate embedding for a user profile.
+    Generate embedding for a user profile
+    
+    Args:
+        profile_data: Dictionary containing user profile data
+        
+    Returns:
+        Embedding vector or None if generation fails
     """
     if not MODELS_LOADED:
-        logger.error("Models not loaded, cannot generate embedding.")
+        logger.error("Models not loaded, cannot generate embedding")
         return None
-
+    
     try:
+        # Preprocess the profile data
         processed_data = preprocess_user_profile(profile_data)
         if processed_data is None:
             return None
-
+        
+        # Generate embedding with your fine-tuned model
         embedding = EMBEDDING_MODEL.predict(processed_data)
-
+        
+        # Apply PCA if needed
         if PCA_MODEL is not None:
             embedding = PCA_MODEL.transform(embedding.reshape(1, -1))
-
+        
         return embedding.flatten()
     except Exception as e:
         logger.error(f"Error generating embedding: {str(e)}")
@@ -132,20 +124,30 @@ def generate_embedding(profile_data: Dict[str, Any]) -> Optional[np.ndarray]:
 
 def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
     """
-    Store user embedding in the database.
+    Store user embedding in the database
+    
+    Args:
+        db: Database session
+        user_id: ID of the user
+        embedding: Embedding vector
+        
+    Returns:
+        True if successful, False otherwise
     """
     try:
+        # Convert embedding to string for storage
         embedding_str = str(embedding.tolist())
-
+        
+        # Update user profile with embedding
         query = text("""
             UPDATE user_profiles
             SET embedding = :embedding
             WHERE user_id = :user_id
         """)
-
+        
         db.execute(query, {"user_id": user_id, "embedding": embedding_str})
         db.commit()
-
+        
         logger.info(f"Stored embedding for user {user_id}")
         return True
     except Exception as e:
@@ -155,15 +157,26 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
 
 def process_user_embedding(db: Session, user_id: int, profile_data: Dict[str, Any]) -> bool:
     """
-    Process user embedding generation and storage.
+    Process user embedding generation and storage
+    
+    Args:
+        db: Database session
+        user_id: ID of the user
+        profile_data: Dictionary containing user profile data
+        
+    Returns:
+        True if successful, False otherwise
     """
     try:
+        # Generate embedding
         embedding = generate_embedding(profile_data)
         if embedding is None:
             return False
-
+        
+        # Store embedding
         success = store_embedding(db, user_id, embedding)
+        
         return success
     except Exception as e:
         logger.error(f"Error processing user embedding: {str(e)}")
-        return False
+        return False 
