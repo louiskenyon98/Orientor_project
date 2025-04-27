@@ -16,6 +16,13 @@ from app.routers.space import router as space_router
 from app.routers.vector_search import router as vector_router
 from app.routers.recommendations import router as recommendations_router
 from app.routers.careers import router as careers_router
+from fastapi import FastAPI, HTTPException
+from pathlib import Path
+from scripts.model_loader import load_models
+import logging
+from logging.handlers import RotatingFileHandler
+
+
 # from app.routers.resume import router as resume_router  # Commented out resume router
 
 # Configure logging
@@ -102,14 +109,36 @@ logger.info("======================")
 def read_root():
     return {"message": "Welcome to the Orientor API"}
 
-@app.get("/api/health") # /api/health
-def health_check():
-    try:
-        return {"status": "ok"}
-    except Exception as e:
-        logger.error(f"Health check failed: {str(e)}")
-        return {"status": "error", "detail": str(e)}
-    
+# @app.get("/api/health") # /api/health
+# def health_check():
+#     try:
+#         return {"status": "ok"}
+#     except Exception as e:
+#         logger.error(f"Health check failed: {str(e)}")
+#         return {"status": "error", "detail": str(e)}
+
+@app.get("/api/health")
+async def health_check():
+    if Path("/app/.model_loading").exists():
+        raise HTTPException(status_code=503, detail="Service warming up")
+    return {"status": "healthy"}
+
+# In your startup event
+@app.on_event("startup")
+async def startup_event():
+    load_models()
+
+
+# In your FastAPI app
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        RotatingFileHandler('app.log', maxBytes=10000000, backupCount=5),
+        logging.StreamHandler()
+    ]
+)
+
 def load_models():
     global ready
     # Load your big models here
