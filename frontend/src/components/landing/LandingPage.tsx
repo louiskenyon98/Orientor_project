@@ -250,6 +250,99 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Resume Section */}
+      <section className="section mt-16 mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">Turn Your Growth Into a Resume</h2>
+        <div className="text-center text-neutral-600 max-w-2xl mx-auto mb-12">
+          <p className="text-lg">
+            As you explore careers, refine your skills, and grow through challenges, our AI quietly builds a resume for you — gathering everything you accomplish into a beautiful, professional document, ready to launch your future.
+          </p>
+          <p className="text-lg mt-4">
+            Your story, your skills, your evolution — transformed into a resume that speaks for you.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* Left Column - Text */}
+          <div className="space-y-8 order-2 md:order-1">
+            <h3 className="text-2xl font-bold text-primary-teal">Professionally Crafted, Automatically Updated</h3>
+            <p className="text-neutral-600">
+              No more stress over resume formatting or wondering what to highlight. As you interact with Navigo, we capture your growth journey and transform it into a compelling professional narrative.
+            </p>
+            
+            <ul className="space-y-6">
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-purple/20 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-primary-purple" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Automatic Updates</h4>
+                  <p className="text-gray-600 mt-1">Your resume evolves as you do, reflecting new skills and accomplishments in real-time.</p>
+                </div>
+              </li>
+              
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-teal/20 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-primary-teal" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Professional Design</h4>
+                  <p className="text-gray-600 mt-1">Beautiful templates that highlight your strengths and present you at your best.</p>
+                </div>
+              </li>
+              
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-accent-amber/20 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-accent-amber" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Export Ready</h4>
+                  <p className="text-gray-600 mt-1">Download your resume in multiple formats whenever you need it for applications.</p>
+                </div>
+              </li>
+            </ul>
+            
+            <Link href="/register" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-purple hover:bg-primary-purple/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-purple">
+              Start Building Your Resume
+            </Link>
+            <p className="text-sm text-gray-500 mt-2">No templates, no stress — just your journey, captured and elevated.</p>
+          </div>
+          
+          {/* Right Column - Resume Image */}
+          <motion.div 
+            className="order-1 md:order-2"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-purple/30 to-primary-teal/30 rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+              <div className="relative bg-white rounded-lg transform transition duration-500 group-hover:scale-[1.01] group-hover:-rotate-1">
+                <Image
+                  src="/images/resume.jpeg"
+                  width={600}
+                  height={800}
+                  alt="Professional resume created automatically"
+                  className="rounded-lg shadow-lg"
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-white/90 px-4 py-2 rounded-md shadow-md">
+                    <p className="text-sm font-medium text-gray-700">Built Automatically. Updated Live as You Grow.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <div className="max-w-1xl mx-auto bg-transparent">
         <JobSwipeCard />
       </div>
