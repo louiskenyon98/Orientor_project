@@ -279,7 +279,11 @@ export default function MainLayout({
                                         </Link>
                                         <Link 
                                             href="/tree" 
-                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/tree' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                                            className={`flex items-center px-4 py-3 text-sm ${
+                                                pathname === '/tree' 
+                                                    ? 'text-gray-900 font-medium' 
+                                                    : 'text-gray-700 hover:text-gray-900'
+                                            }`}
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500">account_tree</span>
                                             Skill Tree Explorer

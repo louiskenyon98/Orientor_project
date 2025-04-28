@@ -23,28 +23,71 @@ export function convertToFlowGraph(tree: TreeNode) {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
   
-  // Layout constants
-  const X_SPACING = 250;
-  const Y_SPACING = 150;
+  // Layout constants - optimized for compact layout
+  const X_SPACING = 180; // Reduced horizontal spacing 
+  const Y_SPACING = 120; // Reduced vertical spacing
   
-  let nodeCount = 0;
+  // Mapping to track node positions
+  const nodePositions = new Map();
   
-  // Recursive function to traverse the tree and build nodes and edges
-  function processNode(node: TreeNode, depth: number, parentId?: string, xOffset = 0) {
+  // First pass: gather tree structure information
+  function analyzeTree(node: TreeNode, depth = 0) {
+    if (!node) return { width: 0, count: 0 };
+    
+    if (!node.children || node.children.length === 0) {
+      return { width: X_SPACING, count: 1 };
+    }
+    
+    let totalWidth = 0;
+    let childCount = 0;
+    
+    node.children.forEach(child => {
+      const { width, count } = analyzeTree(child, depth + 1);
+      totalWidth += width;
+      childCount += count;
+    });
+    
+    // Ensure minimum width for nodes with few children
+    return { 
+      width: Math.max(totalWidth, X_SPACING), 
+      count: Math.max(childCount, 1) 
+    };
+  }
+  
+  // Analyze the tree first
+  const treeInfo = analyzeTree(tree);
+  
+  // Second pass: position nodes with balanced layout
+  function processNode(
+    node: TreeNode, 
+    depth: number, 
+    xOffset = 0, 
+    parentId?: string, 
+    siblingIndex = 0, 
+    siblingCount = 1
+  ) {
+    if (!node) return { width: 0 };
+    
     const id = node.id;
-    nodeCount++;
+    
+    // Calculate horizontal position - center node relative to its children
+    let nodeX = xOffset;
     
     // Create node with appropriate type and data
     nodes.push({
       id,
-      type: NODE_TYPES[node.type],  // Custom node type for styling
+      type: NODE_TYPES[node.type],
       data: { 
         label: node.label, 
         actions: node.actions,
         nodeType: node.type,
       },
-      position: { x: xOffset, y: depth * Y_SPACING }
+      position: { x: nodeX, y: depth * Y_SPACING },
+      draggable: true, // Allow nodes to be dragged 
     });
+    
+    // Record node position for edge creation
+    nodePositions.set(id, { x: nodeX, y: depth * Y_SPACING });
     
     // Create edge from parent to this node
     if (parentId) {
@@ -52,75 +95,105 @@ export function convertToFlowGraph(tree: TreeNode) {
         id: `${parentId}-${id}`,
         source: parentId,
         target: id,
-        type: 'smoothstep',  // Smooth transitions between nodes
+        type: 'smoothstep',
+        animated: true,
+        style: { 
+          stroke: '#94a3b8',
+          strokeWidth: 1.5,
+          strokeDasharray: '6 3',
+        },
       });
     }
     
-    // Process children
-    if (node.children && node.children.length > 0) {
-      const childWidth = X_SPACING * Math.pow(3, 3 - depth);  // Width changes based on depth
-      const startX = xOffset - (childWidth * (node.children.length - 1)) / 2;
-      
-      // Process each child
-      node.children.forEach((child, index) => {
-        const childX = startX + index * childWidth;
-        processNode(child, depth + 1, id, childX);
-      });
+    if (!node.children || node.children.length === 0) {
+      return { width: X_SPACING };
     }
+    
+    // Determine width needed for all children
+    const childCount = node.children.length;
+    let childTotalWidth = 0;
+    
+    // First compute total required width
+    node.children.forEach(child => {
+      const analysis = analyzeTree(child);
+      childTotalWidth += analysis.width;
+    });
+    
+    // Apply compact positioning for children
+    let currentChildX = nodeX - (childTotalWidth / 2) + (X_SPACING / 2);
+    
+    node.children.forEach((child, index) => {
+      const childInfo = processNode(
+        child, 
+        depth + 1, 
+        currentChildX, 
+        id, 
+        index, 
+        childCount
+      );
+      
+      // Move to next child position
+      currentChildX += childInfo.width;
+    });
+    
+    return { width: Math.max(childTotalWidth, X_SPACING) };
   }
   
-  // Start processing from the root node
+  // Process the tree
   processNode(tree, 0);
   
   return { nodes, edges };
 }
 
-// Helper to get the appropriate node style based on node type
+// Premium Node Styling (matching frontend premium upgrade)
 export function getNodeStyle(type: string) {
   switch (type) {
     case 'root':
       return {
-        background: '#6366f1', // Indigo
+        background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', // Indigo gradient
         color: 'white',
-        borderRadius: '50%',
-        width: 120,
-        height: 120,
-        fontSize: '14px',
-        fontWeight: 'bold',
+        borderRadius: '20px',
+        padding: '20px',
+        fontSize: '16px',
+        fontWeight: 600,
+        boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
       };
     case 'skill':
       return {
-        background: '#3b82f6', // Blue
+        background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)', // Cyan/blue gradient
         color: 'white',
-        borderRadius: '8px',
-        width: 160,
-        padding: '10px',
+        borderRadius: '16px',
+        padding: '18px',
         fontSize: '14px',
+        fontWeight: 500,
+        boxShadow: '0 6px 18px rgba(59, 130, 246, 0.2)',
       };
     case 'outcome':
       return {
-        background: '#10b981', // Emerald
+        background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', // Green gradient
         color: 'white',
-        borderRadius: '12px',
-        width: 180,
-        padding: '10px',
+        borderRadius: '16px',
+        padding: '18px',
         fontSize: '15px',
-        fontWeight: 'bold',
+        fontWeight: 600,
+        boxShadow: '0 6px 18px rgba(16, 185, 129, 0.25)',
       };
     case 'career':
       return {
-        background: '#f59e0b', // Amber
+        background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', // Gold gradient
         color: 'white',
-        borderRadius: '8px',
-        width: 150,
-        padding: '8px',
+        borderRadius: '16px',
+        padding: '16px',
         fontSize: '13px',
+        fontWeight: 500,
+        boxShadow: '0 6px 18px rgba(245, 158, 11, 0.25)',
       };
     default:
       return {
-        background: '#9ca3af', // Gray
+        background: '#9ca3af', // Neutral fallback
         color: 'white',
-        borderRadius: '4px',
+        borderRadius: '12px',
+        padding: '16px',
       };
   }
-} 
+}

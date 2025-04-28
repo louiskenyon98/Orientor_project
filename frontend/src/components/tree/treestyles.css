@@ -1,0 +1,75 @@
+/* Tree component styles */
+.tree-flow-container {
+  background-color: #f8fafc;
+}
+
+/* Node styles */
+.node {
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.skill-node-tooltip {
+  position: absolute;
+  z-index: 9999;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  max-width: 350px;
+  font-size: 14px;
+}
+
+/* Ensure tooltips are on top of everything */
+.react-flow__node {
+  z-index: 2;
+}
+
+.react-flow__edge {
+  z-index: 1;
+}
+
+/* Animation classes */
+.node-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(14, 165, 233, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
+  }
+}
+
+/* Tooltip arrow */
+.tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.tooltip-arrow-left {
+  border-width: 8px 8px 8px 0;
+  border-color: transparent white transparent transparent;
+  right: 100%;
+  top: 20px;
+}
+
+.tooltip-arrow-right {
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent white;
+  left: 100%;
+  top: 20px;
+} 
