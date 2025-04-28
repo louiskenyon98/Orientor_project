@@ -10,6 +10,14 @@ module.exports = {
         primary: {
           blue: '#3B82F6',
           indigo: '#6366F1',
+          teal: '#59C2C9',
+          purple: '#7D5BA6',
+          lilac: '#A78BDA',
+        },
+        // Accent colors
+        accent: {
+          teal: '#38B2AC',
+          amber: '#F59E0B',
         },
         // Neutral palette
         neutral: {
