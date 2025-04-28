@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import './globals.css';
+import Navigation from '@/components/layout/Navigation';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,6 +44,9 @@ export default function RootLayout({
           className="fixed inset-0 -z-10 bg-[url('/patterns/grid.svg')] bg-repeat opacity-900"
           style={{ backgroundSize: '200px 200px' }}
         ></div>
+        
+        {/* Navigation */}
+        <Navigation />
         
         {/* Main content */}
         <main>
