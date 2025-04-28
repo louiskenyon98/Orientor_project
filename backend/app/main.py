@@ -16,6 +16,7 @@ from app.routers.space import router as space_router
 from app.routers.vector_search import router as vector_router
 from app.routers.recommendations import router as recommendations_router
 from app.routers.careers import router as careers_router
+from app.routers.tree import router as tree_router  # Import the new tree router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
 from scripts.model_loader import load_models
@@ -73,6 +74,7 @@ try:
     logger.info(f"Registering vector_router routes: {[f'{route.path} [{route.methods}]' for route in vector_router.routes]}")
     logger.info(f"Registering recommendations_router routes: {[f'{route.path} [{route.methods}]' for route in recommendations_router.routes]}")
     logger.info(f"Registering careers_router routes: {[f'{route.path} [{route.methods}]' for route in careers_router.routes]}")
+    logger.info(f"Registering tree_router routes: {[f'{route.path} [{route.methods}]' for route in tree_router.routes]}")  # Log tree router
     # logger.info(f"Registering resume_router routes: {[f'{route.path} [{route.methods}]' for route in resume_router.routes]}")  # Commented out resume router logging
     logger.info("============================================")
 except Exception as e:
@@ -96,6 +98,7 @@ app.include_router(space_router)
 app.include_router(vector_router)
 app.include_router(recommendations_router)
 app.include_router(careers_router)
+app.include_router(tree_router)  # Include the tree router
 # app.include_router(resume_router)  # Commented out resume router inclusion
 logger.info("All routers included successfully")
 

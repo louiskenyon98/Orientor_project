@@ -92,7 +92,7 @@ export default function MainLayout({
     }
 
     // Check if current path is in career path section
-    const isCareerPath = ['/vector-search', '/find-your-way', '/cv'].includes(pathname || '');
+    const isCareerPath = ['/vector-search', '/find-your-way', '/cv', '/tree'].includes(pathname || '');
 
     console.log('Rendering layout with isLoggedIn:', isLoggedIn);
 
@@ -168,6 +168,13 @@ export default function MainLayout({
                                                         role="menuitem"
                                                     >
                                                         Pathway Explorer
+                                                    </Link>
+                                                    <Link
+                                                        href="/tree"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/tree' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Skill Tree Explorer
                                                     </Link>
                                                     <Link
                                                         href="/cv"
@@ -269,6 +276,13 @@ export default function MainLayout({
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500">explore</span>
                                             Swipe Your Way
+                                        </Link>
+                                        <Link 
+                                            href="/tree" 
+                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/tree' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-gray-500">account_tree</span>
+                                            Skill Tree Explorer
                                         </Link>
                                         <Link 
                                             href="/cv" 
