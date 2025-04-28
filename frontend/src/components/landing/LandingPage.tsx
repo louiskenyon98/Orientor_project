@@ -10,6 +10,7 @@ import SkillTreeFlow from '@/components/branches/career_growth';
 import CareerTechTree from '@/components/branches/Career_evolution';
 import DemoChat from '@/components/chat/DemoChat';
 import JobSwipeCard from '@/components/chat/swipe_recommendation';
+import SkillSpiderChart from './SkillSpiderChart';
 export default function LandingPage() {
   const router = useRouter();
 
@@ -57,7 +58,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-bold text-red-600 mb-4">Unclear Direction</h3>
             <p className="text-neutral-500">
-              Many students don’t know what they’re good at, what excites them, or where to even begin exploring. Traditional guidance is shallow and generic.
+              Many students don't know what they're good at, what excites them, or where to even begin exploring. Traditional guidance is shallow and generic.
             </p>
           </div>
 
@@ -83,7 +84,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-bold text-yellow-600 mb-4">Fragmented and Passive Tools</h3>
             <p className="text-neutral-500">
-              Advice is scattered and platforms like job boards or course lists don’t engage users in self-reflection or adaptive learning.
+              Advice is scattered and platforms like job boards or course lists don't engage users in self-reflection or adaptive learning.
             </p>
           </div>
 
@@ -117,7 +118,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-bold text-primary-teal mb-4">Skill-Based Career Mapping</h3>
             <p className="text-neutral-600">
-              We go beyond job titles. Navigo builds a graph of your skills to suggest personalized next steps—based on what you know, what you’re building, and where you want to go.
+              We go beyond job titles. Navigo builds a graph of your skills to suggest personalized next steps—based on what you know, what you're building, and where you want to go.
             </p>
           </div>
 
@@ -143,7 +144,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-bold text-accent-amber mb-4">Space: Your Personal Mission Hub</h3>
             <p className="text-neutral-600">
-              Track your chosen career goals, compare your current skills with what’s needed, reflect on daily progress, and receive reflections on how to advance.
+              Track your chosen career goals, compare your current skills with what's needed, reflect on daily progress, and receive reflections on how to advance.
             </p>
           </div>
 
@@ -156,12 +157,99 @@ export default function LandingPage() {
             </div>
             <h3 className="text-xl font-bold text-primary-purple mb-4">Engaging, not dreading</h3>
             <p className="text-neutral-600">
-            Youth doesn’t want to fill out a questionnaire for 1 hour and get a static answer of what to become. Instead, they engage with the platform interactively, and the platform indirectly learn about them and recommends them.
+            Youth doesn't want to fill out a questionnaire for 1 hour and get a static answer of what to become. Instead, they engage with the platform interactively, and the platform indirectly learn about them and recommends them.
             </p>
           </div>
 
         </div>
       </section>
+      
+      {/* Skills Gap Section */}
+      <section className="section mt-16 mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">Understand Your Path, Bridge the Gap</h2>
+        <div className="text-center text-neutral-600 max-w-2xl mx-auto mb-12">
+          <p className="text-lg">
+            Our AI compares your current skills against career profiles defined by over 100 variables — including skills, tasks, abilities, interests, and general requirements.
+          </p>
+          <p className="text-lg mt-4">
+            Once you save the careers you aspire to, our AI analyzes how far you are from these roles. It doesn't just stop there — it recommends actionable steps, tailored learning paths, and personal challenges to help you close the gap between your current profile and your dream career.
+          </p>
+          <p className="text-lg mt-4">
+            With every step, you're not just imagining your future — you're actively building it.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* Left Column - Text */}
+          <div className="space-y-8">
+            <h3 className="text-2xl font-bold text-primary-teal">Your Journey, Made Visible</h3>
+            <p className="text-neutral-600">
+              Our AI doesn't just show you the dream — it shows you the work. It compares where you are today to where you want to be, and guides you step-by-step to bridge the gap.
+            </p>
+            
+            <ul className="space-y-6">
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Save Your Dream Careers</h4>
+                  <p className="text-gray-600 mt-1">Identify the roles that inspire you and add them to your personal space.</p>
+                </div>
+              </li>
+              
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Compare Your Skills</h4>
+                  <p className="text-gray-600 mt-1">See where you currently stand across 100+ skill and ability dimensions.</p>
+                </div>
+              </li>
+              
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-purple-100 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Visualize the Gap</h4>
+                  <p className="text-gray-600 mt-1">Discover how far you are from your goals — clearly, visually, and personalized.</p>
+                </div>
+              </li>
+              
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-yellow-100 flex items-center justify-center mr-3 mt-1">
+                  <svg className="h-4 w-4 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Get Actionable Guidance</h4>
+                  <p className="text-gray-600 mt-1">Receive personalized recommendations and challenges to help you bridge the distance.</p>
+                </div>
+              </li>
+            </ul>
+            
+            <Link href="/register" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-teal hover:bg-primary-teal/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-teal">
+              See How You Compare
+            </Link>
+          </div>
+          
+          {/* Right Column - Spider Chart */}
+          <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Skills Gap Analysis</h3>
+            <SkillSpiderChart />
+          </div>
+        </div>
+      </section>
+
       <div className="max-w-1xl mx-auto bg-transparent">
         <JobSwipeCard />
       </div>
@@ -182,7 +270,7 @@ export default function LandingPage() {
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Technical Skills Growth Tree</h2>
         <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
           <p>
-          From spreadsheets to Python, from dashboards to dealmaking, it tracks your technical evolution and reveals the real roles these skills can lead to. Each branch connects what you’re building now to what you could become—guided by what the market needs, and grounded in what you’ve already mastered.
+          From spreadsheets to Python, from dashboards to dealmaking, it tracks your technical evolution and reveals the real roles these skills can lead to. Each branch connects what you're building now to what you could become—guided by what the market needs, and grounded in what you've already mastered.
           </p>
         </div>
         <CareerTechTree />

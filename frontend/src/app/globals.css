@@ -165,5 +165,15 @@
   .grow {
     @apply animate-grow;
   }
+  
+  /* Gradient Text */
+  .gradient-text {
+    @apply font-bold;
+    background: linear-gradient(to right, #7D5BA6, #59C2C9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+  }
 }
 
