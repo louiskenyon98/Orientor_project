@@ -22,6 +22,7 @@ from pathlib import Path
 from scripts.model_loader import load_models
 import logging
 from logging.handlers import RotatingFileHandler
+from app.api.api import api_router
 
 
 # from app.routers.resume import router as resume_router  # Commented out resume router
@@ -34,18 +35,17 @@ logging.basicConfig(
 )
 
 # Create FastAPI app
-app = FastAPI(title="Orientor API")
+app = FastAPI(
+    title="Navigo API",
+    description="API for the Navigo Career and Skill Tree Explorer",
+    version="0.1.0",
+)
 
 # Configure CORS
 origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://localhost:3000",
-    "https://localhost:5173",
-    "https://navigoproject.vercel.app",
-    "https://orientor-project.vercel.app",
-    "https://orientor.vercel.app",
-    "https://*.vercel.app"  # Allow all Vercel subdomains
+    "http://localhost:3000",  # Frontend development server
+    "http://localhost:8000",  # Backend when served 
+    "https://navigo-explorer.vercel.app",  # Production frontend (if applicable)
 ]
 
 app.add_middleware(
@@ -108,9 +108,11 @@ for route in app.routes:
     logger.info(f"Route: {route.path}, Methods: {route.methods}")
 logger.info("======================")
 
+app.include_router(api_router, prefix="/api/v1")
+
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to the Orientor API"}
+async def root():
+    return {"message": "Welcome to the Navigo API. Go to /docs for API documentation."}
 
 # @app.get("/api/health") # /api/health
 # def health_check():

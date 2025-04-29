@@ -76,6 +76,16 @@ export default function Navigation() {
                       Pathway Explorer
                     </Link>
                     <Link 
+                      href="/career" 
+                      className={`block px-4 py-2 text-sm ${
+                        pathname === '/career' 
+                          ? 'text-gray-900 font-medium' 
+                          : 'text-gray-700 hover:text-gray-900'
+                      }`}
+                    >
+                      Career Explorer
+                    </Link>
+                    <Link 
                       href="/tree" 
                       className={`block px-4 py-2 text-sm ${
                         pathname === '/tree' 
@@ -84,6 +94,16 @@ export default function Navigation() {
                       }`}
                     >
                       Skill Tree Explorer
+                    </Link>
+                    <Link 
+                      href="/enhanced-skills" 
+                      className={`block px-4 py-2 text-sm ${
+                        pathname === '/enhanced-skills' 
+                          ? 'text-gray-900 font-medium' 
+                          : 'text-gray-700 hover:text-gray-900'
+                      }`}
+                    >
+                      Enhanced Skills Path
                     </Link>
                     <Link 
                       href="/resume-studio" 

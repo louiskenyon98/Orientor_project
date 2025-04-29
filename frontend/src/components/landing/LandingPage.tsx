@@ -164,6 +164,48 @@ export default function LandingPage() {
         </div>
       </section>
       
+
+      <div className="max-w-1xl mx-auto bg-transparent">
+        <JobSwipeCard />
+      </div>
+      
+      {/* Career Tree Visual */}
+      <section className="section">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Career Growth Tree</h2>
+        <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
+          <p>
+            The tree is the intelligence of the platform, an AI recommendation engine, following the latest trends in the job market. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now. 
+          </p>
+        </div>
+        <SkillTreeFlow />
+      </section>
+
+      {/* Skills Tree Visual */}
+            <section className="section">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Technical Skills Growth Tree</h2>
+        <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
+          <p>
+          From spreadsheets to Python, from dashboards to dealmaking, it tracks your technical evolution and reveals the real roles these skills can lead to. Each branch connects what you're building now to what you could become—guided by what the market needs, and grounded in what you've already mastered.
+          </p>
+        </div>
+        <CareerTechTree />
+      </section>
+
+      {/* Demo Chat Section */}
+      <main className="min-h-screen bg-gradient-to-b from-gray-0 to-white">
+        <div className="container mx-auto px-2 py-4">
+          <h1 className="text-4xl font-bold text-center mb-4 text-gray-900">
+            Talk to Navigo
+          </h1>
+          <p className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
+            The chat isn't just a bot—it's a reflection partner. It helps you dig deeper into your interests, reflect on experiences, and receive tailored guidance, in a calm and exploratory tone.
+          </p>
+          <div className="max-w-2xl mx-auto">
+            <DemoChat />
+          </div>
+        </div>
+      </main>
+
       {/* Skills Gap Section */}
       <section className="section mt-16 mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">Understand Your Path, Bridge the Gap</h2>
@@ -342,49 +384,7 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
-
-      <div className="max-w-1xl mx-auto bg-transparent">
-        <JobSwipeCard />
-      </div>
-      
-      {/* Career Tree Visual */}
-      <section className="section">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Career Growth Tree</h2>
-        <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
-          <p>
-            The tree is the intelligence of the platform, an AI recommendation engine, following the latest trends in the job market. It represents your evolving skillset and helps you see how different behaviors or experiences open new paths. Each branch is a future that grows from who you are now. 
-          </p>
-        </div>
-        <SkillTreeFlow />
-      </section>
-
-      {/* Skills Tree Visual */}
-            <section className="section">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 gradient-text">Technical Skills Growth Tree</h2>
-        <div className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
-          <p>
-          From spreadsheets to Python, from dashboards to dealmaking, it tracks your technical evolution and reveals the real roles these skills can lead to. Each branch connects what you're building now to what you could become—guided by what the market needs, and grounded in what you've already mastered.
-          </p>
-        </div>
-        <CareerTechTree />
-      </section>
-
-      {/* Demo Chat Section */}
-      <main className="min-h-screen bg-gradient-to-b from-gray-0 to-white">
-        <div className="container mx-auto px-2 py-4">
-          <h1 className="text-4xl font-bold text-center mb-4 text-gray-900">
-            Talk to Navigo
-          </h1>
-          <p className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
-            The chat isn't just a bot—it's a reflection partner. It helps you dig deeper into your interests, reflect on experiences, and receive tailored guidance, in a calm and exploratory tone.
-          </p>
-          <div className="max-w-2xl mx-auto">
-            <DemoChat />
-          </div>
-        </div>
-      </main>
-
-
+  
       {/* CTA Section */}
       <section className="section">
         <div className="bg-gradient-primary p-[1px] rounded-lg shadow-glow-purple">
@@ -404,7 +404,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
   );
 }
 
