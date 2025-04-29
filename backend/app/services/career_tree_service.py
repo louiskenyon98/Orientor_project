@@ -30,109 +30,66 @@ class CareerTreeService:
         Builds the GPT-4o prompt for generating the career tree based on the student profile.
         """
         logger.debug(f"Building prompt with profile (first 50 chars): {profile[:50]}...")
-        
-        prompt = f"""You are TREE-ENGINE-Career, an LLM that outputs ONLY valid JSON representing a structured Career Exploration Tree.
+         
+        prompt = (
+    "You are CAREER-ENGINE, a structured LLM trained to output strict JSON trees representing Career Exploration Maps.\n\n"
+    "Your task is to design a career growth tree that inspires students to explore broad career paths based on their interests, "
+    "without locking them into specific jobs yet.\n\n"
+    "---\n\n"
+    "# INPUT\n"
+    "Start from this user profile:\n"
+    f'"{profile}"\n\n'
+    "---\n\n"
+    "# TREE STRUCTURE\n"
+    "1. Root Node (\"root\" type)\n"
+    "- Describes the student's self-assessment or broad interest\n\n"
+    "2. Domain Nodes (\"outcome\" type)\n"
+    "- Represent wide career fields (Tech, Arts, Healthcare, Environment, Business, etc.)\n"
+    "- Should feel aspirational but grounded\n\n"
+    "3. Family Nodes (\"outcome\" type)\n"
+    "- Represent career families inside each domain (e.g., Tech ➝ Programming, Cybersecurity, AI Research)\n\n"
+    "4. (Optional) Bridge Nodes (\"outcome\" type)\n"
+    "- Show intersections (e.g., \"Tech for Healthcare\" ➝ Health Informatics)\n\n"
+    "No specific job titles are needed. No skills. No technical stacks.\n\n"
+    "---\n\n"
+    "# PRINCIPLES\n"
+    "✅ Emotional pull first\n"
+    "✅ Breadth > Depth\n"
+    "✅ Exploration\n"
+    "✅ Keep simple: Max 2 layers deep\n\n"
+    "---\n\n"
+    "# OUTPUT FORMAT (Strict JSON)\n"
+    "{\n"
+    '  "id": "root",\n'
+    '  "label": "Curious about technology and solving problems",\n'
+    '  "type": "root",\n'
+    '  "level": 0,\n'
+    '  "children": [\n'
+    '    {\n'
+    '      "id": "domain-tech",\n'
+    '      "label": "Technology",\n'
+    '      "type": "outcome",\n'
+    '      "level": 1,\n'
+    '      "children": [\n'
+    '        {\n'
+    '          "id": "family-programming",\n'
+    '          "label": "Programming & Software Development",\n'
+    '          "type": "outcome",\n'
+    '          "level": 2\n'
+    '        }\n'
+    '      ]\n'
+    '    }\n'
+    '  ]\n'
+    "}\n\n"
+    "---\n\n"
+    "# SPECIAL NOTES\n"
+    "- Minimum: 4–5 Domains\n"
+    "- Each Domain: 2–3 Families\n"
+    "- Allow interdisciplinary families if natural\n"
+    "- Max total nodes: ~15–20\n\n"
+    "Return only valid JSON. No explanations or extra text."
+)
 
-Start from the student's initial profile:
-{profile}
-
-Structure:
-1. Root Node: Initial Profile (type: "root", level: 0)
-2. Level 1: 3 broad Career Domains (type: "domain", level: 1)
-3. Level 2: 2 Career Families under each Domain (type: "family", level: 2)
-4. Level 3: 2 Exploration Skills per Career Family (type: "skill", level: 3)
-
-IMPORTANT: You MUST use EXACTLY these node types:
-- "root" for the root node
-- "domain" for broad Career Domains (level 1)
-- "family" for Career Families inside a Domain (level 2)
-- "skill" for 2 skills attached to each Career Family (level 3)
-
-DO NOT use types like "field", "career", "outcome", or "job-title" — they will cause validation errors!
-
-Rules:
-- **Temporal Coherence**: Domains come first, Families come next, Skills last.
-- **Spatial Coherence**: Structure the tree top-down, each node must have children (except skills).
-- **Actions**: For each skill node, include 2–3 recommended action steps to start developing that skill.
-- **Strict JSON only.** No explanation, no markdown, no commentary.
-- Use EXACTLY these fields for every node:
-  - "id" (lowercase, dash-separated unique identifier)
-  - "label" (what the user sees)
-  - "type" ("root", "domain", "family", or "skill")
-  - "level" (0 for root, 1 for domain, 2 for family, 3 for skill)
-  - "actions" (for skills only)
-  - "children" (array of children nodes)
-
-Example (partial structure):
-
-{{
-  "id": "root",
-  "label": "Initial Profile",
-  "type": "root",
-  "level": 0,
-  "children": [
-    {{
-      "id": "domain-tech",
-      "label": "Technology",
-      "type": "domain",
-      "level": 1,
-      "children": [
-        {{
-          "id": "family-programming",
-          "label": "Programming",
-          "type": "family",
-          "level": 2,
-          "children": [
-            {{
-              "id": "skill-python-basics",
-              "label": "Learn Python Basics",
-              "type": "skill",
-              "level": 3,
-              "actions": ["Follow a beginner Python tutorial", "Write small Python scripts"]
-            }},
-            {{
-              "id": "skill-web-development",
-              "label": "Understand Web Development Fundamentals",
-              "type": "skill",
-              "level": 3,
-              "actions": ["Build a simple personal website", "Learn HTML and CSS basics"]
-            }}
-          ]
-        }},
-        {{
-          "id": "family-cybersecurity",
-          "label": "Cybersecurity",
-          "type": "family",
-          "level": 2,
-          "children": [
-            {{
-              "id": "skill-network-basics",
-              "label": "Understand Computer Networks",
-              "type": "skill",
-              "level": 3,
-              "actions": ["Study basic networking concepts", "Practice setting up local networks"]
-            }},
-            {{
-              "id": "skill-security-principles",
-              "label": "Learn Basic Security Principles",
-              "type": "skill",
-              "level": 3,
-              "actions": ["Research best practices for safe passwords", "Learn about encryption basics"]
-            }}
-          ]
-        }}
-      ]
-    }}
-  ]
-}}
-
-Reminder:
-- Career Domains must be inspiring and broad.
-- Career Families must feel practical but open.
-- Skills must be simple, actionable, and beginner-friendly.
-
-Strict JSON output only.
-"""
         logger.debug(f"Prompt built, length: {len(prompt)} characters")
         return prompt
     
@@ -248,7 +205,7 @@ Strict JSON output only.
                 
                 api_call_start = time.time()
                 response = self.client.chat.completions.create(
-                    model="gpt-4o",
+                    model="gpt-3.5-turbo", #gpt-3.5-turbo", #gpt-4o
                     messages=[
                         {"role": "system", "content": "You are TREE-ENGINE-Career, generating structured career trees in strict JSON format."},
                         {"role": "user", "content": prompt}

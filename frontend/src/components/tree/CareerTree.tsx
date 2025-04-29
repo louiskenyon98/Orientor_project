@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -14,12 +14,13 @@ import 'reactflow/dist/style.css';
 import { CareerDomainNode, CareerFamilyNode, CareerSkillNode } from './CareerNodes';
 import { motion } from 'framer-motion';
 import { careerTreeService, CareerTreeNode } from '../../services/careerTreeService';
+import { convertToFlowGraph, TreeNode } from '../../utils/convertToFlowGraph';
 
-// Custom node types
+// Define custom node types
 const nodeTypes: NodeTypes = {
-  careerDomain: CareerDomainNode,
-  careerFamily: CareerFamilyNode,
-  careerSkill: CareerSkillNode,
+  rootNode: CareerDomainNode,
+  skillNode: CareerFamilyNode,
+  careerNode: CareerSkillNode,
 };
 
 // Animation variants for the title
@@ -42,77 +43,36 @@ For example:
 - What skills are you good at?
 - What careers are you curious about?`;
 
-// Convert API tree data to ReactFlow nodes and edges
-function convertTreeToReactFlow(treeData: CareerTreeNode): { nodes: Node[], edges: Edge[] } {
-  const nodes: Node[] = [];
-  const edges: Edge[] = [];
+// Convert CareerTreeNode to TreeNode
+function convertCareerToTreeNode(careerNode: CareerTreeNode): TreeNode {
+  let nodeType: "root" | "skill" | "outcome" | "career";
   
-  // Recursively process the tree and build nodes/edges
-  const processNode = (node: CareerTreeNode, position = { x: 0, y: 0 }, parentId: string | null = null) => {
-    let nodeType = "";
-    
-    // Map API node types to CareerNodes component types
-    switch (node.type) {
-      case "root":
-        nodeType = "careerDomain"; // We display root as a domain for visual consistency
-        break;
-      case "domain":
-        nodeType = "careerDomain";
-        break;
-      case "family":
-        nodeType = "careerFamily";
-        break;
-      case "skill":
-        nodeType = "careerSkill";
-        break;
-      default:
-        nodeType = "careerDomain"; // Default fallback
-    }
-    
-    // Add the current node
-    nodes.push({
-      id: node.id,
-      type: nodeType,
-      data: { 
-        label: node.label,
-        actions: node.actions
-      },
-      position
-    });
-    
-    // Add edge from parent to this node if there's a parent
-    if (parentId) {
-      edges.push({
-        id: `${parentId}-${node.id}`,
-        source: parentId,
-        target: node.id,
-        type: 'smoothstep',
-        animated: node.level === 1 // Animate connections to first level
-      });
-    }
-    
-    // Process children if any
-    if (node.children && node.children.length > 0) {
-      const childCount = node.children.length;
-      const horizontalSpacing = 200; // Space between nodes horizontally
-      const verticalSpacing = 150; // Space between levels
-      
-      // Calculate starting position for children to center them under parent
-      const startX = position.x - ((childCount - 1) * horizontalSpacing) / 2;
-      const childY = position.y + verticalSpacing;
-      
-      // Process each child
-      node.children.forEach((child, index) => {
-        const childX = startX + index * horizontalSpacing;
-        processNode(child, { x: childX, y: childY }, node.id);
-      });
-    }
+  // Map career node types to TreeNode types
+  switch (careerNode.type) {
+    case "root":
+      nodeType = "root";
+      break;
+    case "domain":
+      nodeType = "career";
+      break;
+    case "family":
+      nodeType = "skill";
+      break;
+    case "skill":
+      nodeType = "skill";
+      break;
+    default:
+      nodeType = "skill"; // Default fallback
+  }
+  
+  return {
+    id: careerNode.id,
+    label: careerNode.label,
+    type: nodeType,
+    level: careerNode.level || 0,
+    actions: careerNode.actions,
+    children: careerNode.children?.map(child => convertCareerToTreeNode(child))
   };
-  
-  // Start processing from the root
-  processNode(treeData, { x: 400, y: 50 });
-  
-  return { nodes, edges };
 }
 
 export default function CareerTree() {
@@ -136,10 +96,13 @@ export default function CareerTree() {
     setIsSubmitted(true);
     
     try {
-      const tree = await careerTreeService.generateCareerTree(profile);
+      const careerTree = await careerTreeService.generateCareerTree(profile);
       
-      // Convert tree data to ReactFlow format
-      const { nodes: treeNodes, edges: treeEdges } = convertTreeToReactFlow(tree);
+      // Convert CareerTreeNode to TreeNode
+      const treeNode = convertCareerToTreeNode(careerTree);
+      
+      // Convert tree data to ReactFlow format using the utility function
+      const { nodes: treeNodes, edges: treeEdges } = convertToFlowGraph(treeNode);
       
       setNodes(treeNodes);
       setEdges(treeEdges);
@@ -156,6 +119,13 @@ export default function CareerTree() {
     setSelectedNode(node);
   }, []);
 
+  // Handle click outside the popup
+  const handleClickOutside = useCallback((event: React.MouseEvent) => {
+    if (event.target === event.currentTarget) {
+      setSelectedNode(null);
+    }
+  }, []);
+
   return (
     <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
       <motion.div 
@@ -164,19 +134,12 @@ export default function CareerTree() {
         animate="visible"
         variants={titleVariants}
       >
-        Career Exploration
-        <p className="text-sm text-gray-500 mt-1">
-          Discover career domains and families that align with your interests
-        </p>
       </motion.div>
       
       {!isSubmitted ? (
         <div className="flex-1 p-6 flex flex-col items-center justify-center">
           <div className="max-w-2xl w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-medium text-gray-800 mb-4">Tell us about yourself</h2>
-            <p className="text-gray-600 mb-4">
-              Describe your interests, skills, and aspirations to generate a personalized career exploration tree.
-            </p>
             <textarea 
               className="w-full h-40 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={PROFILE_PLACEHOLDER}
@@ -222,7 +185,7 @@ export default function CareerTree() {
           </div>
         </div>
       ) : (
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -231,21 +194,21 @@ export default function CareerTree() {
             onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             connectionLineType={ConnectionLineType.SmoothStep}
-            defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+            defaultViewport={{ x: 0, y: 0, zoom: 0.6 }}
             fitView
             minZoom={0.4}
-            maxZoom={1.5}
+            maxZoom={2}
             proOptions={{ hideAttribution: true }}
           >
             <Background color="#f8fafc" gap={16} size={1} />
             <Controls />
             <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100">
               <div className="text-sm text-gray-600">
-                <div className="font-medium mb-2">How to use:</div>
+                <div className="font-medium mb-2">Your Career Path:</div>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Explore different career domains</li>
-                  <li>Click on skills to see recommended actions</li>
-                  <li>Drag to pan the view and scroll to zoom</li>
+                  <li>Follow the connections between career options</li>
+                  <li>Click on a skill to see recommended actions</li>
+                  <li>Complete all actions before progressing</li>
                 </ul>
                 <button
                   onClick={() => setIsSubmitted(false)}
@@ -256,6 +219,36 @@ export default function CareerTree() {
               </div>
             </Panel>
           </ReactFlow>
+
+          {/* Node Popup */}
+          {selectedNode && (
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+              onClick={handleClickOutside}
+            >
+              <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">{selectedNode.data.label}</h3>
+                {selectedNode.data.actions && selectedNode.data.actions.length > 0 ? (
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-700">Recommended Actions:</h4>
+                    <ul className="list-disc pl-5 space-y-2">
+                      {selectedNode.data.actions.map((action: string, index: number) => (
+                        <li key={index} className="text-gray-600">{action}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-gray-600">No specific actions recommended for this node.</p>
+                )}
+                <button
+                  onClick={() => setSelectedNode(null)}
+                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

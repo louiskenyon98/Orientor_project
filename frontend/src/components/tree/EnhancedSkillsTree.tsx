@@ -96,19 +96,12 @@ export default function EnhancedSkillsTree() {
         animate="visible"
         variants={titleVariants}
       >
-        Technical Skills Journey
-        <p className="text-sm text-gray-500 mt-1">
-          Build your technical skills progressively from basics to advanced concepts
-        </p>
       </motion.div>
       
       {!isSubmitted ? (
         <div className="flex-1 p-6 flex flex-col items-center justify-center">
           <div className="max-w-2xl w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-medium text-gray-800 mb-4">Tell us about your technical journey</h2>
-            <p className="text-gray-600 mb-4">
-              Describe your technical background, interests, and goals to generate a personalized skills development path.
-            </p>
             <textarea 
               className="w-full h-40 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={TECH_PROFILE_PLACEHOLDER}
