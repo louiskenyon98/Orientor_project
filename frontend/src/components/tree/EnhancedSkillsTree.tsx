@@ -13,6 +13,8 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { SkillNode, OutcomeNode, RootNode } from './CustomNodes';
 import { motion } from 'framer-motion';
+import { skillsTreeService, SkillsTreeNode } from '../../services/skillsTreeService';
+import { convertToFlowGraph } from '../../utils/convertToFlowGraph';
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -20,198 +22,6 @@ const nodeTypes: NodeTypes = {
   outcomeNode: OutcomeNode,
   rootNode: RootNode,
 };
-
-// Sample data structure for programming path with multiple skill levels
-const initialNodes: Node[] = [
-  // Root Node (Career Domain)
-  {
-    id: 'programming',
-    type: 'rootNode',
-    data: { label: 'Programming' },
-    position: { x: 400, y: 50 },
-  },
-  
-  // Level 1 Skills (Basics)
-  {
-    id: 'python-basics',
-    type: 'skillNode',
-    data: { 
-      label: 'Python Basics',
-      actions: [
-        'Complete Python Basic Syntax course',
-        'Practice with 5 beginner exercises',
-        'Build a simple calculator app'
-      ]
-    },
-    position: { x: 200, y: 150 },
-  },
-  {
-    id: 'html-css',
-    type: 'skillNode',
-    data: { 
-      label: 'HTML & CSS',
-      actions: [
-        'Learn basic HTML tags',
-        'Style a webpage with CSS',
-        'Create a personal portfolio page'
-      ]
-    },
-    position: { x: 600, y: 150 },
-  },
-  
-  // Level 2 Skills (Intermediate)
-  {
-    id: 'git-version-control',
-    type: 'skillNode',
-    data: { 
-      label: 'Git Version Control',
-      actions: [
-        'Set up Git repository',
-        'Learn basic Git commands',
-        'Practice branching and merging'
-      ]
-    },
-    position: { x: 100, y: 250 },
-  },
-  {
-    id: 'data-structures',
-    type: 'skillNode',
-    data: { 
-      label: 'Data Structures',
-      actions: [
-        'Learn arrays and lists',
-        'Implement linked lists',
-        'Practice with stacks and queues'
-      ]
-    },
-    position: { x: 300, y: 250 },
-  },
-  {
-    id: 'responsive-design',
-    type: 'skillNode',
-    data: { 
-      label: 'Responsive Design',
-      actions: [
-        'Learn media queries',
-        'Implement flexbox layouts',
-        'Create a responsive webpage'
-      ]
-    },
-    position: { x: 500, y: 250 },
-  },
-  {
-    id: 'javascript-basics',
-    type: 'skillNode',
-    data: { 
-      label: 'JavaScript Basics',
-      actions: [
-        'Learn JS syntax and variables',
-        'Implement DOM manipulation',
-        'Create interactive web elements'
-      ]
-    },
-    position: { x: 700, y: 250 },
-  },
-  
-  // Level 3 Skills (Advanced)
-  {
-    id: 'sql-databases',
-    type: 'skillNode',
-    data: { 
-      label: 'SQL & Databases',
-      actions: [
-        'Learn SQL query basics',
-        'Connect application to database',
-        'Implement CRUD operations'
-      ]
-    },
-    position: { x: 0, y: 350 },
-  },
-  {
-    id: 'algorithms',
-    type: 'skillNode',
-    data: { 
-      label: 'Algorithms',
-      actions: [
-        'Study sorting algorithms',
-        'Implement search algorithms',
-        'Analyze algorithm efficiency'
-      ]
-    },
-    position: { x: 200, y: 350 },
-  },
-  {
-    id: 'apis',
-    type: 'skillNode',
-    data: { 
-      label: 'APIs',
-      actions: [
-        'Learn RESTful API concepts',
-        'Consume third-party APIs',
-        'Build a simple API'
-      ]
-    },
-    position: { x: 400, y: 350 },
-  },
-  {
-    id: 'react-basics',
-    type: 'skillNode',
-    data: { 
-      label: 'React Basics',
-      actions: [
-        'Understand React components',
-        'Implement state management',
-        'Build a simple React app'
-      ]
-    },
-    position: { x: 600, y: 350 },
-  },
-  {
-    id: 'javascript-advanced',
-    type: 'skillNode',
-    data: { 
-      label: 'Advanced JavaScript',
-      actions: [
-        'Learn async programming',
-        'Master closures and scope',
-        'Practice with ES6+ features'
-      ]
-    },
-    position: { x: 800, y: 350 },
-  },
-  
-  // Level 4 Skills (Specialized)
-  {
-    id: 'full-stack-project',
-    type: 'outcomeNode',
-    data: { label: 'Full Stack Project' },
-    position: { x: 400, y: 450 },
-  },
-];
-
-// Define connections between nodes
-const initialEdges: Edge[] = [
-  // Connect root to first level skills
-  { id: 'e-root-python', source: 'programming', target: 'python-basics', type: 'smoothstep', animated: true },
-  { id: 'e-root-html', source: 'programming', target: 'html-css', type: 'smoothstep', animated: true },
-  
-  // Connect first level to second level
-  { id: 'e-python-git', source: 'python-basics', target: 'git-version-control', type: 'smoothstep' },
-  { id: 'e-python-ds', source: 'python-basics', target: 'data-structures', type: 'smoothstep' },
-  { id: 'e-html-responsive', source: 'html-css', target: 'responsive-design', type: 'smoothstep' },
-  { id: 'e-html-js', source: 'html-css', target: 'javascript-basics', type: 'smoothstep' },
-  
-  // Connect second level to third level
-  { id: 'e-git-sql', source: 'git-version-control', target: 'sql-databases', type: 'smoothstep' },
-  { id: 'e-ds-algo', source: 'data-structures', target: 'algorithms', type: 'smoothstep' },
-  { id: 'e-ds-api', source: 'data-structures', target: 'apis', type: 'smoothstep' },
-  { id: 'e-js-react', source: 'javascript-basics', target: 'react-basics', type: 'smoothstep' },
-  { id: 'e-js-advanced', source: 'javascript-basics', target: 'javascript-advanced', type: 'smoothstep' },
-  
-  // Connect to final outcome
-  { id: 'e-api-fullstack', source: 'apis', target: 'full-stack-project', type: 'smoothstep' },
-  { id: 'e-react-fullstack', source: 'react-basics', target: 'full-stack-project', type: 'smoothstep' },
-];
 
 // Animation variants for the title
 const titleVariants = {
@@ -226,10 +36,52 @@ const titleVariants = {
   }
 };
 
+// Default profile placeholder text for technical skills
+const TECH_PROFILE_PLACEHOLDER = `Tell us about your technical background and goals.
+For example:
+- What programming languages or technologies do you know?
+- What specific technical field are you interested in? (web dev, data science, mobile apps, etc.)
+- What level are you currently at? (beginner, intermediate, advanced)
+- What technical skills do you want to develop?`;
+
 export default function EnhancedSkillsTree() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  // State for the skills tree
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  
+  // State for user input and loading
+  const [profile, setProfile] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Generate skills tree using the profile input
+  const generateSkillsTree = useCallback(async () => {
+    if (!profile.trim()) {
+      setError('Please enter your technical background and goals first');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    setIsSubmitted(true);
+    
+    try {
+      const tree = await skillsTreeService.generateSkillsTree(profile);
+      
+      // Convert tree data to ReactFlow format using the utility function
+      const { nodes: treeNodes, edges: treeEdges } = convertToFlowGraph(tree);
+      
+      setNodes(treeNodes);
+      setEdges(treeEdges);
+    } catch (err: any) {
+      console.error('Error generating skills tree:', err);
+      setError(err.message || 'Failed to load skills tree. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [profile, setNodes, setEdges]);
 
   // Handle node click
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
@@ -237,46 +89,107 @@ export default function EnhancedSkillsTree() {
   }, []);
 
   return (
-    <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
       <motion.div 
         className="p-4 text-2xl font-light text-gray-800 border-b border-gray-100"
         initial="hidden"
         animate="visible"
         variants={titleVariants}
       >
-        Programming Skills Journey
+        Technical Skills Journey
         <p className="text-sm text-gray-500 mt-1">
-          Build your skills progressively from basics to advanced concepts
+          Build your technical skills progressively from basics to advanced concepts
         </p>
       </motion.div>
       
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={onNodeClick}
-        nodeTypes={nodeTypes}
-        connectionLineType={ConnectionLineType.SmoothStep}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.6 }}
-        fitView
-        minZoom={0.4}
-        maxZoom={2}
-        proOptions={{ hideAttribution: true }}
-      >
-        <Background color="#f8fafc" gap={16} size={1} />
-        <Controls />
-        <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100">
-          <div className="text-sm text-gray-600">
-            <div className="font-medium mb-2">Your Learning Path:</div>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Follow the connections between skills</li>
-              <li>Click on a skill to see recommended actions</li>
-              <li>Complete all actions before progressing</li>
-            </ul>
+      {!isSubmitted ? (
+        <div className="flex-1 p-6 flex flex-col items-center justify-center">
+          <div className="max-w-2xl w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-medium text-gray-800 mb-4">Tell us about your technical journey</h2>
+            <p className="text-gray-600 mb-4">
+              Describe your technical background, interests, and goals to generate a personalized skills development path.
+            </p>
+            <textarea 
+              className="w-full h-40 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={TECH_PROFILE_PLACEHOLDER}
+              value={profile}
+              onChange={(e) => setProfile(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={generateSkillsTree}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                disabled={isLoading}
+              >
+                Generate Skills Path
+              </button>
+            </div>
           </div>
-        </Panel>
-      </ReactFlow>
+        </div>
+      ) : isLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p className="text-gray-600">Generating your personalized skills path...</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200 max-w-md">
+            <p className="text-red-700 mb-4">{error}</p>
+            <div className="flex space-x-3">
+              <button 
+                onClick={() => setIsSubmitted(false)}
+                className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Edit Profile
+              </button>
+              <button 
+                onClick={generateSkillsTree}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1">
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onNodeClick={onNodeClick}
+            nodeTypes={nodeTypes}
+            connectionLineType={ConnectionLineType.SmoothStep}
+            defaultViewport={{ x: 0, y: 0, zoom: 0.6 }}
+            fitView
+            minZoom={0.4}
+            maxZoom={2}
+            proOptions={{ hideAttribution: true }}
+          >
+            <Background color="#f8fafc" gap={16} size={1} />
+            <Controls />
+            <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100">
+              <div className="text-sm text-gray-600">
+                <div className="font-medium mb-2">Your Learning Path:</div>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Follow the connections between skills</li>
+                  <li>Click on a skill to see recommended actions</li>
+                  <li>Complete all actions before progressing</li>
+                </ul>
+                <button
+                  onClick={() => setIsSubmitted(false)}
+                  className="mt-3 w-full text-blue-600 border border-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors text-sm"
+                >
+                  Edit Technical Profile
+                </button>
+              </div>
+            </Panel>
+          </ReactFlow>
+        </div>
+      )}
     </div>
   );
 } 
