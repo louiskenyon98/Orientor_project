@@ -63,14 +63,15 @@ const baseNodeStyle: React.CSSProperties = {
 const popoverContainerStyle: React.CSSProperties = {
   position: 'absolute',
   backgroundColor: 'white',
-  padding: '14px',
+  padding: '20px',
   borderRadius: '10px',
   boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15)',
   zIndex: 1000,
-  width: '240px',
-  maxWidth: '90vw',
+  width: '280px',
+  maxWidth: '400px',
   border: '1px solid rgba(0, 0, 0, 0.05)',
   backdropFilter: 'blur(8px)',
+  lineHeight: 1.6
 };
 
 // Common component for all node types
@@ -238,11 +239,16 @@ export function SkillNode({ data, id, selected }: NodeProps) {
           {showActions && data.actions && data.actions.length > 0 && (
             <motion.div
               className="w-full mt-4 bg-white rounded-lg p-4 shadow-lg border border-gray-200 text-gray-700 text-sm"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{ overflow: 'hidden' }}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={popoverVariants}
+              style={{
+                overflow: 'hidden',
+                minWidth: '280px',
+                maxWidth: '400px',
+                lineHeight: 1.6,
+              }}
             >
               <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-200">
                 <h3 className="text-blue-600 font-semibold text-sm">Recommended Actions</h3>

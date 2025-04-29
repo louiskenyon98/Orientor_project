@@ -47,77 +47,38 @@ interface CareerNodeProps {
   selected: boolean;
 }
 
-// Career Domain Node (Level 1)
-export function CareerDomainNode({ data, selected }: CareerNodeProps) {
-  const nodeStyle = { 
-    ...baseNodeStyle,
-    background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', // Strong blue gradient
-    color: 'white',
-    borderRadius: '12px',
-    fontSize: '16px',
-    fontWeight: 600,
-    padding: '16px 20px',
-    minHeight: '90px',
-    minWidth: '140px',
-    boxShadow: selected 
-      ? '0 0 0 2px #93c5fd, 0 4px 12px rgba(59, 130, 246, 0.35)' 
-      : '0 4px 12px rgba(59, 130, 246, 0.25)',
-  };
-  
+// Career Domain Node (Root)
+export const CareerDomainNode = ({ data }: { data: any }) => {
   return (
-    <motion.div 
-      style={nodeStyle}
-      initial="hidden"
-      animate="visible"
-      variants={nodeVariants}
-      whileHover={{ y: -2, scale: 1.02, boxShadow: '0 6px 15px rgba(59, 130, 246, 0.3)' }}
-    >
-      <div>{data.label}</div>
-      <Handle 
-        type="source" 
-        position={Position.Bottom} 
-        style={{ background: '#bfdbfe', border: '2px solid #3b82f6', width: '8px', height: '8px' }}
-      />
-    </motion.div>
+    <div className="px-4 py-2 shadow-lg rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
+      <Handle type="target" position={Position.Top} className="w-16 !bg-indigo-400" />
+      <div className="text-center font-medium">{data.label}</div>
+      <Handle type="source" position={Position.Bottom} className="w-16 !bg-indigo-400" />
+    </div>
   );
-}
+};
 
-// Career Family Node (Level 2)
-export function CareerFamilyNode({ data, selected }: CareerNodeProps) {
-  const nodeStyle = { 
-    ...baseNodeStyle, 
-    background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 100%)', // Teal gradient
-    color: 'white',
-    minHeight: '80px',
-    maxWidth: '150px',
-    boxShadow: selected 
-      ? '0 0 0 2px #99f6e4, 0 4px 12px rgba(13, 148, 136, 0.25)' 
-      : '0 4px 12px rgba(13, 148, 136, 0.2)',
-  };
-  
+// Career Family Node (Skill)
+export const CareerFamilyNode = ({ data }: { data: any }) => {
   return (
-    <motion.div 
-      style={nodeStyle}
-      initial="hidden"
-      animate="visible"
-      variants={nodeVariants}
-      whileHover={{ y: -2, boxShadow: '0 6px 15px rgba(13, 148, 136, 0.25)' }}
-    >
-      <div>{data.label}</div>
-      <Handle 
-        type="target" 
-        position={Position.Top} 
-        style={{ background: '#99f6e4', border: '2px solid #0d9488', width: '8px', height: '8px' }}
-      />
-      {/* Add source handle for future expansion to Level 3 if needed */}
-      <Handle 
-        type="source" 
-        position={Position.Bottom} 
-        style={{ background: '#99f6e4', border: '2px solid #0d9488', width: '8px', height: '8px' }}
-      />
-    </motion.div>
+    <div className="px-4 py-2 shadow-lg rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+      <Handle type="target" position={Position.Top} className="w-16 !bg-blue-400" />
+      <div className="text-center font-medium">{data.label}</div>
+      <Handle type="source" position={Position.Bottom} className="w-16 !bg-blue-400" />
+    </div>
   );
-}
+};
+
+// Career Skill Node (Career)
+export const CareerSkillNode = ({ data }: { data: any }) => {
+  return (
+    <div className="px-4 py-2 shadow-lg rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white">
+      <Handle type="target" position={Position.Top} className="w-16 !bg-green-400" />
+      <div className="text-center font-medium">{data.label}</div>
+      <Handle type="source" position={Position.Bottom} className="w-16 !bg-green-400" />
+    </div>
+  );
+};
 
 // Optional: Career Specialization Node (Level 3) - Prepared for future expansion
 export function CareerSpecializationNode({ data, selected }: CareerNodeProps) {
@@ -146,99 +107,6 @@ export function CareerSpecializationNode({ data, selected }: CareerNodeProps) {
         position={Position.Top} 
         style={{ background: '#d8b4fe', border: '2px solid #a855f7', width: '6px', height: '6px' }}
       />
-    </motion.div>
-  );
-}
-
-// Career Skill Node (Level 3)
-export function CareerSkillNode({ data, selected }: CareerNodeProps) {
-  const [showActions, setShowActions] = useState(false);
-  const nodeRef = useRef<HTMLDivElement>(null);
-  
-  const nodeStyle = { 
-    ...baseNodeStyle, 
-    background: 'linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%)', // Purple gradient
-    color: 'white',
-    minHeight: '70px',
-    maxWidth: '140px',
-    boxShadow: selected 
-      ? '0 0 0 2px #c4b5fd, 0 4px 12px rgba(124, 58, 237, 0.25)' 
-      : '0 4px 12px rgba(124, 58, 237, 0.2)',
-    cursor: 'pointer',
-  };
-  
-  // Secondary text style (smaller text below main label)
-  const secondaryTextStyle: React.CSSProperties = {
-    fontSize: '12px',
-    opacity: 0.9,
-    marginTop: '6px',
-    fontStyle: 'italic',
-    fontWeight: 400,
-  };
-  
-  // Extract action text if available
-  const actionPreview = data.actions && data.actions.length > 0 
-    ? data.actions[0].split(' ').slice(0, 3).join(' ') + '...'
-    : null;
-  
-  return (
-    <motion.div 
-      ref={nodeRef}
-      style={nodeStyle}
-      initial="hidden"
-      animate="visible"
-      variants={nodeVariants}
-      whileHover={{ y: -2, boxShadow: '0 6px 15px rgba(124, 58, 237, 0.25)' }}
-      onClick={() => setShowActions(!showActions)}
-    >
-      <div>{data.label}</div>
-      
-      {/* Secondary small preview text */}
-      {actionPreview && (
-        <div style={secondaryTextStyle}>{actionPreview}</div>
-      )}
-      
-      <Handle 
-        type="target" 
-        position={Position.Top} 
-        style={{ background: '#c4b5fd', border: '2px solid #8b5cf6', width: '6px', height: '6px' }}
-      />
-      
-      {/* Show actions panel when clicked */}
-      <AnimatePresence>
-        {showActions && data.actions && data.actions.length > 0 && (
-          <motion.div
-            className="w-full mt-4 bg-white rounded-lg p-4 shadow-lg border border-gray-200 text-gray-700 text-sm"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ overflow: 'hidden' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-200">
-              <h3 className="text-purple-600 font-semibold text-sm">Suggested Actions</h3>
-              <button 
-                onClick={(e) => { 
-                  e.stopPropagation(); 
-                  setShowActions(false); 
-                }}
-                className="text-gray-400 hover:text-gray-600 transition-colors text-xs"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <ul className="space-y-2 list-disc list-inside">
-              {data.actions.map((action, index) => (
-                <li key={index} className="text-gray-600 text-xs">
-                  {action}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 } 

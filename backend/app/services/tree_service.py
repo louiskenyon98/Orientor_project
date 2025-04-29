@@ -210,6 +210,46 @@ Example format (partial):
         logger.info("Building prompt")
         prompt = self._build_prompt(profile)
         
+        # Generate the tree with the built prompt
+        return await self._generate_tree_with_prompt(prompt, user_id)
+
+    async def generate_custom_tree(self, profile: str, custom_prompt: str, user_id: str = None) -> TreeNode:
+        """
+        Generates a skill tree using a custom prompt.
+        Caches the tree by user_id if provided.
+        """
+        start_time = time.time()
+        logger.info(f"Starting custom tree generation for {'user ' + user_id if user_id else 'anonymous user'}")
+        
+        # Create a unique cache key for this custom prompt + profile combination
+        cache_key = f"{user_id}_{hash(custom_prompt)}" if user_id else None
+        
+        # Check cache first (if cache_key is provided)
+        if cache_key and cache_key in tree_cache:
+            logger.info(f"Using cached custom tree for key {cache_key}")
+            return tree_cache[cache_key]
+        
+        # Use the custom prompt with the profile
+        logger.info("Using custom prompt for tree generation")
+        final_prompt = custom_prompt.replace("{user_profile_input}", profile)
+        
+        # Generate the tree with the custom prompt
+        tree = await self._generate_tree_with_prompt(final_prompt, cache_key)
+        
+        # If it's a skills tree, ensure the node types are valid
+        tree_data = tree.dict()
+        tree_data = self._preprocess_tree(tree_data)
+        tree = self._validate_tree(tree_data)
+        
+        return tree
+        
+    async def _generate_tree_with_prompt(self, prompt: str, cache_key: str = None) -> TreeNode:
+        """
+        Internal method to generate a tree using a given prompt.
+        Abstracts the API call and validation logic for reuse.
+        """
+        start_time = time.time()
+        
         # Call OpenAI API
         max_retries = 3
         for attempt in range(max_retries):
@@ -222,7 +262,7 @@ Example format (partial):
                 
                 api_call_start = time.time()
                 response = self.client.chat.completions.create(
-                    model="gpt-4o",
+                    model="gpt-3.5-turbo", #gpt-3.5-turbo", #gpt-4o
                     messages=[
                         {"role": "system", "content": "You are TREE-ENGINE, generating structured skill trees in strict JSON format."},
                         {"role": "user", "content": prompt}
@@ -255,10 +295,10 @@ Example format (partial):
                 logger.info("Validating tree structure")
                 tree = self._validate_tree(tree_data)
                 
-                # Cache the result if user_id is provided
-                if user_id:
-                    logger.info(f"Caching tree for user {user_id}")
-                    tree_cache[user_id] = tree
+                # Cache the result if cache_key is provided
+                if cache_key:
+                    logger.info(f"Caching tree with key {cache_key}")
+                    tree_cache[cache_key] = tree
                 
                 total_duration = time.time() - start_time
                 logger.info(f"Tree generation completed successfully in {total_duration:.2f} seconds")

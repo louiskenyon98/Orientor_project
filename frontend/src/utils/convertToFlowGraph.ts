@@ -18,6 +18,14 @@ export const NODE_TYPES = {
   career: 'careerNode',
 };
 
+// Map TreeNode types to ReactFlow node types
+const nodeTypeMap: Record<TreeNode["type"], string> = {
+  root: "rootNode",
+  skill: "skillNode",
+  outcome: "skillNode",
+  career: "careerNode"
+};
+
 // Helper to convert the tree to ReactFlow nodes and edges
 export function convertToFlowGraph(tree: TreeNode) {
   const nodes: Node[] = [];

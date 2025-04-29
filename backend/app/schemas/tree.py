@@ -1,4 +1,4 @@
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict
 from pydantic import BaseModel, Field
 
 
@@ -10,9 +10,34 @@ class TreeNode(BaseModel):
     actions: Optional[List[str]] = Field(None, description="List of actions (required for skill nodes)")
     children: Optional[List["TreeNode"]] = Field(None, description="List of child nodes")
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "root",
+                "label": "Student Profile",
+                "type": "root",
+                "level": 0,
+                "children": [
+                    {
+                        "id": "skill-1",
+                        "label": "Communication",
+                        "type": "skill",
+                        "level": 1,
+                        "actions": ["Join debate club", "Practice public speaking", "Write blog posts"],
+                        "children": []
+                    }
+                ]
+            }
+        }
+
 
 class ProfileInput(BaseModel):
-    profile: str = Field(..., description="Student profile description (interests, traits, etc.)")
+    profile: str = Field(..., description="User profile text for tree generation")
+
+
+class SkillsTreeInput(BaseModel):
+    profile: str = Field(..., description="Technical profile for skills tree generation")
+    custom_prompt: str = Field("", description="Custom prompt for generating a technical skills tree")
 
 
 class TreeResponse(BaseModel):
