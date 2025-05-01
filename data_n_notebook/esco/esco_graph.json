@@ -1,343 +1,243 @@
 {
   "nodes": [
     {
-      "id": "occupation::key_17619",
-      "label": "art director",
+      "id": "occupation::key_15630",
+      "label": "data scientist",
       "type": "occupation"
     },
     {
-      "id": "skill::key_4913",
-      "label": "personal directing styles",
+      "id": "skill::key_3315",
+      "label": "data mining",
       "type": "skill"
     },
     {
-      "id": "skill::key_5404",
-      "label": "design principles",
+      "id": "skill::key_4165",
+      "label": "visual presentation techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_11512",
-      "label": "business strategy concepts",
+      "id": "skill::key_7047",
+      "label": "information extraction",
       "type": "skill"
     },
     {
-      "id": "skill::key_14430",
-      "label": "health and safety regulations",
+      "id": "skill::key_8223",
+      "label": "statistics",
       "type": "skill"
     },
     {
-      "id": "skill::key_15086",
-      "label": "theatre techniques",
+      "id": "skill::key_9362",
+      "label": "information categorisation",
       "type": "skill"
     },
     {
-      "id": "skill::key_1428",
-      "label": "create solutions to problems",
+      "id": "skill::key_9656",
+      "label": "resource description framework query language",
       "type": "skill"
     },
     {
-      "id": "skill::key_1945",
-      "label": "follow time cues",
+      "id": "skill::key_9870",
+      "label": "query languages",
       "type": "skill"
     },
     {
-      "id": "skill::key_2241",
-      "label": "read scripts",
+      "id": "skill::key_10877",
+      "label": "online analytical processing",
       "type": "skill"
     },
     {
-      "id": "skill::key_2824",
-      "label": "consult with producer",
+      "id": "skill::key_15084",
+      "label": "data models",
       "type": "skill"
     },
     {
-      "id": "skill::key_3081",
-      "label": "manage budgets",
+      "id": "skill::key_1289",
+      "label": "draft scientific or academic papers and technical documentation",
       "type": "skill"
     },
     {
-      "id": "skill::key_3759",
-      "label": "work with playwrights",
+      "id": "skill::key_1626",
+      "label": "normalise data",
       "type": "skill"
     },
     {
-      "id": "skill::key_4703",
-      "label": "cue a performance",
+      "id": "skill::key_1703",
+      "label": "manage research data",
       "type": "skill"
     },
     {
-      "id": "skill::key_6199",
-      "label": "assemble an artistic team",
+      "id": "skill::key_2732",
+      "label": "use data processing techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_8116",
-      "label": "finish project within budget",
+      "id": "skill::key_2900",
+      "label": "interpret current data",
       "type": "skill"
     },
     {
-      "id": "skill::key_8838",
-      "label": "determine visual concepts",
+      "id": "skill::key_3014",
+      "label": "interact professionally in research and professional environments",
       "type": "skill"
     },
     {
-      "id": "skill::key_8963",
-      "label": "develop creative ideas",
+      "id": "skill::key_3638",
+      "label": "disseminate results to the scientific community",
       "type": "skill"
     },
     {
-      "id": "skill::key_8975",
-      "label": "analyse the need for technical resources",
+      "id": "skill::key_3645",
+      "label": "operate open source software",
       "type": "skill"
     },
     {
-      "id": "skill::key_9596",
-      "label": "analyse a script",
+      "id": "skill::key_3787",
+      "label": "establish data processes",
       "type": "skill"
     },
     {
-      "id": "skill::key_10102",
-      "label": "direct an artistic team",
+      "id": "skill::key_3800",
+      "label": "speak different languages",
       "type": "skill"
     },
     {
-      "id": "skill::key_11626",
-      "label": "develop professional network",
+      "id": "skill::key_4011",
+      "label": "execute analytical mathematical calculations",
       "type": "skill"
     },
     {
-      "id": "skill::key_13118",
-      "label": "develop design concept",
+      "id": "skill::key_4434",
+      "label": "evaluate research activities",
       "type": "skill"
     },
     {
-      "id": "skill::key_14235",
-      "label": "keep up with trends",
+      "id": "skill::key_4824",
+      "label": "demonstrate disciplinary expertise",
       "type": "skill"
     },
     {
-      "id": "skill::key_14277",
-      "label": "create new concepts",
+      "id": "skill::key_4990",
+      "label": "use databases",
       "type": "skill"
     },
     {
-      "id": "skill::key_2711",
-      "label": "trends in fashion",
+      "id": "skill::key_5289",
+      "label": "handle data samples",
       "type": "skill"
     },
     {
-      "id": "skill::key_3200",
-      "label": "music and video industry",
+      "id": "skill::key_5467",
+      "label": "increase the impact of science on policy and society",
       "type": "skill"
     },
     {
-      "id": "skill::key_3221",
-      "label": "cultural projects",
+      "id": "skill::key_5588",
+      "label": "manage findable accessible interoperable and reusable data",
       "type": "skill"
     },
     {
-      "id": "skill::key_3562",
-      "label": "musical instruments",
+      "id": "skill::key_5611",
+      "label": "perform scientific research",
       "type": "skill"
     },
     {
-      "id": "skill::key_4354",
-      "label": "photography",
+      "id": "skill::key_5652",
+      "label": "build recommender systems",
       "type": "skill"
     },
     {
-      "id": "skill::key_4962",
-      "label": "digital marketing techniques",
+      "id": "skill::key_5675",
+      "label": "perform data cleansing",
       "type": "skill"
     },
     {
-      "id": "skill::key_5246",
-      "label": "film production process",
+      "id": "skill::key_5732",
+      "label": "manage intellectual property rights",
       "type": "skill"
     },
     {
-      "id": "skill::key_5664",
-      "label": "social media marketing techniques",
+      "id": "skill::key_6465",
+      "label": "apply for research funding",
       "type": "skill"
     },
     {
-      "id": "skill::key_5812",
-      "label": "musical genres",
+      "id": "skill::key_7191",
+      "label": "design database scheme",
       "type": "skill"
     },
     {
-      "id": "skill::key_6182",
-      "label": "technical drawings",
+      "id": "skill::key_7490",
+      "label": "implement data quality processes",
       "type": "skill"
     },
     {
-      "id": "skill::key_6287",
-      "label": "marketing management",
+      "id": "skill::key_7952",
+      "label": "collect ICT data",
       "type": "skill"
     },
     {
-      "id": "skill::key_8266",
-      "label": "graphic design",
+      "id": "skill::key_8464",
+      "label": "apply research ethics and scientific integrity principles in research activities",
       "type": "skill"
     },
     {
-      "id": "skill::key_9266",
-      "label": "acting and directing techniques",
+      "id": "skill::key_8653",
+      "label": "promote open innovation in research",
       "type": "skill"
     },
     {
-      "id": "skill::key_9678",
-      "label": "computer equipment",
+      "id": "skill::key_9576",
+      "label": "publish academic research",
       "type": "skill"
     },
     {
-      "id": "skill::key_10300",
-      "label": "multimedia systems",
+      "id": "skill::key_9624",
+      "label": "promote the transfer of knowledge",
       "type": "skill"
     },
     {
-      "id": "skill::key_10621",
-      "label": "advertising techniques",
+      "id": "skill::key_9719",
+      "label": "think abstractly",
       "type": "skill"
     },
     {
-      "id": "skill::key_11603",
-      "label": "history of fashion",
+      "id": "skill::key_10297",
+      "label": "mentor individuals",
       "type": "skill"
     },
     {
-      "id": "skill::key_11865",
-      "label": "lighting techniques",
+      "id": "skill::key_10425",
+      "label": "manage data collection systems",
       "type": "skill"
     },
     {
-      "id": "skill::key_13285",
-      "label": "marketing principles",
+      "id": "skill::key_10461",
+      "label": "manage personal professional development",
       "type": "skill"
     },
     {
-      "id": "skill::key_13699",
-      "label": "audiovisual equipment",
+      "id": "skill::key_11873",
+      "label": "write scientific publications",
       "type": "skill"
     },
     {
-      "id": "skill::key_13979",
-      "label": "cinematography",
+      "id": "skill::key_11882",
+      "label": "deliver visual presentation of data",
       "type": "skill"
     },
     {
-      "id": "skill::key_1401",
-      "label": "select music for performance",
+      "id": "skill::key_11965",
+      "label": "report analysis results",
       "type": "skill"
     },
     {
-      "id": "skill::key_1525",
-      "label": "organise rehearsals",
+      "id": "skill::key_12357",
+      "label": "develop professional network with researchers and scientists",
       "type": "skill"
     },
     {
-      "id": "skill::key_2229",
-      "label": "work with motion picture editing team",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_3032",
-      "label": "liaise with cultural partners",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_3466",
-      "label": "define artistic vision",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_4116",
-      "label": "manage staff",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_4816",
-      "label": "plan musical performances",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5177",
-      "label": "coordinate with creative departments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_6774",
-      "label": "evaluate advertising campaign",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_6945",
-      "label": "approve advertising campaign",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7022",
-      "label": "promote cultural venue events",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7120",
-      "label": "maintain blocking notes",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8446",
-      "label": "lead cast and crew",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8768",
-      "label": "translate artistic concepts to technical designs",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9291",
-      "label": "manage contracts",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10032",
-      "label": "contact talent agents",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10072",
-      "label": "search databases",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10127",
-      "label": "manage prompt book",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10655",
-      "label": "create production schedules",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10760",
-      "label": "coordinate advertising campaigns",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10912",
-      "label": "work with video and motion picture production team",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_11215",
-      "label": "work with pre-production team",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_12221",
-      "label": "supervise equipment",
+      "id": "skill::key_12405",
+      "label": "integrate gender dimension in research",
       "type": "skill"
     },
     {
@@ -346,383 +246,203 @@
       "type": "skill"
     },
     {
-      "id": "skill::key_12536",
-      "label": "use technical documentation",
+      "id": "skill::key_13106",
+      "label": "manage open publications",
       "type": "skill"
     },
     {
-      "id": "skill::key_12622",
-      "label": "check material resources",
+      "id": "skill::key_14653",
+      "label": "synthesise information",
       "type": "skill"
     },
     {
-      "id": "skill::key_12702",
-      "label": "coordinate artistic production",
+      "id": "skill::key_14690",
+      "label": "conduct research across disciplines",
       "type": "skill"
     },
     {
-      "id": "skill::key_12849",
-      "label": "evaluate art quality",
+      "id": "skill::key_14777",
+      "label": "develop data processing applications",
       "type": "skill"
     },
     {
-      "id": "skill::key_12934",
-      "label": "carry out auditions",
+      "id": "skill::key_14835",
+      "label": "promote the participation of citizens in scientific and research activities",
       "type": "skill"
     },
     {
-      "id": "skill::key_13484",
-      "label": "estimate duration of work",
+      "id": "skill::key_15116",
+      "label": "communicate with a non-scientific audience",
       "type": "skill"
     },
     {
-      "id": "skill::key_13578",
-      "label": "discover acting talent",
+      "id": "skill::key_2335",
+      "label": "business intelligence",
       "type": "skill"
     },
     {
-      "id": "skill::key_14144",
-      "label": "negotiate with artists",
+      "id": "skill::key_2736",
+      "label": "MDX",
       "type": "skill"
     },
     {
-      "id": "skill::key_14150",
-      "label": "carry out interviews to select artistic team members",
+      "id": "skill::key_4730",
+      "label": "XQuery",
       "type": "skill"
     },
     {
-      "id": "skill::key_14488",
-      "label": "ensure visual quality of the set",
+      "id": "skill::key_6401",
+      "label": "SPARQL",
       "type": "skill"
     },
     {
-      "id": "skill::key_14612",
-      "label": "coordinate technical teams in artistic productions",
+      "id": "skill::key_10293",
+      "label": "LDAP",
       "type": "skill"
     },
     {
-      "id": "skill::key_1723",
-      "label": "plan marketing strategy",
+      "id": "skill::key_11999",
+      "label": "unstructured data",
       "type": "skill"
     },
     {
-      "id": "skill::key_2048",
-      "label": "transfer uncut audiovisual material to computer",
+      "id": "skill::key_12105",
+      "label": "LINQ",
       "type": "skill"
     },
     {
-      "id": "skill::key_2301",
-      "label": "teach fashion to clients",
+      "id": "skill::key_12362",
+      "label": "data quality assessment",
       "type": "skill"
     },
     {
-      "id": "skill::key_2309",
-      "label": "implement marketing strategies",
+      "id": "skill::key_13603",
+      "label": "Hadoop",
       "type": "skill"
     },
     {
-      "id": "skill::key_2588",
-      "label": "restore musical instruments",
+      "id": "skill::key_14564",
+      "label": "N1QL",
       "type": "skill"
     },
     {
-      "id": "skill::key_2833",
-      "label": "select auxiliary equipment for photographic work",
+      "id": "skill::key_1424",
+      "label": "manage ICT data classification",
       "type": "skill"
     },
     {
-      "id": "skill::key_2835",
-      "label": "repair musical instruments",
+      "id": "skill::key_2616",
+      "label": "use spreadsheets software",
       "type": "skill"
     },
     {
-      "id": "skill::key_2898",
-      "label": "focus stage lights",
+      "id": "skill::key_4869",
+      "label": "perform data mining",
       "type": "skill"
     },
     {
-      "id": "skill::key_8129",
-      "label": "cost management",
+      "id": "skill::key_5121",
+      "label": "integrate ICT data",
       "type": "skill"
     },
     {
-      "id": "skill::key_3140",
-      "label": "analyse theatre texts",
+      "id": "skill::key_5443",
+      "label": "teach in academic or vocational contexts",
       "type": "skill"
     },
     {
-      "id": "skill::key_3206",
-      "label": "consult with production director",
+      "id": "skill::key_5483",
+      "label": "manage ICT data architecture",
       "type": "skill"
     },
     {
-      "id": "skill::key_3539",
-      "label": "improvise music",
+      "id": "skill::key_5913",
+      "label": "define data quality criteria",
       "type": "skill"
     },
     {
-      "id": "skill::key_3544",
-      "label": "measure light levels",
+      "id": "skill::key_8203",
+      "label": "design database in the cloud",
       "type": "skill"
     },
     {
-      "id": "skill::key_3652",
-      "label": "expand store regional presence",
+      "id": "skill::key_10012",
+      "label": "manage data",
       "type": "skill"
     },
     {
-      "id": "skill::key_3685",
-      "label": "participate in fashion shows",
+      "id": "skill::key_11006",
+      "label": "apply blended learning",
       "type": "skill"
     },
     {
-      "id": "skill::key_3767",
-      "label": "translate requirements into visual design",
+      "id": "skill::key_14894",
+      "label": "create data models",
       "type": "skill"
     },
     {
-      "id": "skill::key_3894",
-      "label": "study music",
+      "id": "skill::key_1353",
+      "label": "migrate existing data",
       "type": "skill"
     },
     {
-      "id": "skill::key_3899",
-      "label": "hang advertising posters",
+      "id": "skill::key_1550",
+      "label": "perform online data analysis",
       "type": "skill"
     },
     {
-      "id": "skill::key_3914",
-      "label": "create musical instrument parts",
+      "id": "skill::key_1565",
+      "label": "identify statistical patterns",
       "type": "skill"
     },
     {
-      "id": "skill::key_3930",
-      "label": "identify talent",
+      "id": "skill::key_1716",
+      "label": "produce statistical financial records",
       "type": "skill"
     },
     {
-      "id": "skill::key_4013",
-      "label": "perform customers\u2019 needs analysis",
+      "id": "skill::key_1794",
+      "label": "use interface description language",
       "type": "skill"
     },
     {
-      "id": "skill::key_4035",
-      "label": "set up multimedia equipment",
+      "id": "skill::key_2426",
+      "label": "communication",
       "type": "skill"
     },
     {
-      "id": "skill::key_4088",
-      "label": "transpose music",
+      "id": "skill::key_2825",
+      "label": "classical languages",
       "type": "skill"
     },
     {
-      "id": "skill::key_10732",
-      "label": "manage healthcare staff",
+      "id": "skill::key_3976",
+      "label": "modern languages",
       "type": "skill"
     },
     {
-      "id": "skill::key_4157",
-      "label": "maintain musical instruments",
+      "id": "skill::key_9491",
+      "label": "foreign languages for international careers",
       "type": "skill"
     },
     {
-      "id": "skill::key_4168",
-      "label": "draw up lighting plan",
+      "id": "skill::key_4933",
+      "label": "mathematics",
       "type": "skill"
     },
     {
-      "id": "skill::key_4361",
-      "label": "advise customers on audiovisual equipment",
+      "id": "skill::key_4245",
+      "label": "interpret extraction data",
       "type": "skill"
     },
     {
-      "id": "skill::key_4442",
-      "label": "buy advertising space",
+      "id": "skill::key_4348",
+      "label": "apply statistical analysis techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_4512",
-      "label": "set up advertising material",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_4651",
-      "label": "set up photographic equipment",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_4826",
-      "label": "inform on safety standards",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5051",
-      "label": "decorate musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5478",
-      "label": "control food safety regulations",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5496",
-      "label": "estimate value of musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5632",
-      "label": "manage sales channels",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5733",
-      "label": "set up audiovisual peripheral equipment",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5870",
-      "label": "use technical drawing software",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_5919",
-      "label": "tune stringed musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_6439",
-      "label": "orchestrate music",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_6805",
-      "label": "apply social media marketing",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10092",
-      "label": "outdoor advertising",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7066",
-      "label": "prepare rehearsals",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7150",
-      "label": "develop an artistic approach to your interpretation",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7179",
-      "label": "design musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7327",
-      "label": "maintain audiovisual equipment",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7374",
-      "label": "maintain theatre equipment",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7394",
-      "label": "install lighting",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7607",
-      "label": "plan digital marketing",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7887",
-      "label": "liaise with advertising agencies",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7939",
-      "label": "connect music fragments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7948",
-      "label": "make artistic food creations",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8181",
-      "label": "collaborate with music librarians",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8262",
-      "label": "teach design and applied arts principles",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8305",
-      "label": "select video shots",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8723",
-      "label": "make technical drawings of fashion pieces",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_8761",
-      "label": "examine advertisement layout",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9121",
-      "label": "play musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9162",
-      "label": "coordinate marketing plan actions",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9244",
-      "label": "plot lighting states with automated lights",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_6324",
-      "label": "contract law",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9344",
-      "label": "design lighting",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9355",
-      "label": "demonstrate a technical foundation in musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_9419",
-      "label": "assist customers in selecting music and video recordings",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10020",
-      "label": "conduct musical ensembles",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_10024",
-      "label": "read lighting plans",
+      "id": "skill::key_9953",
+      "label": "data mining methods",
       "type": "skill"
     },
     {
@@ -731,88 +451,168 @@
       "type": "skill"
     },
     {
-      "id": "skill::key_10166",
-      "label": "specialise in a musical genre",
+      "id": "skill::key_10587",
+      "label": "database management systems",
       "type": "skill"
     },
     {
-      "id": "skill::key_10406",
-      "label": "supervise projects for the conservation of heritage buildings",
+      "id": "skill::key_5102",
+      "label": "find trends in geographic data",
       "type": "skill"
     },
     {
-      "id": "skill::key_10547",
-      "label": "create advertisements",
+      "id": "skill::key_5129",
+      "label": "think analytically",
       "type": "skill"
     },
     {
-      "id": "skill::key_10608",
-      "label": "help set performance schedule",
+      "id": "skill::key_8607",
+      "label": "knowledge management",
       "type": "skill"
     },
     {
-      "id": "skill::key_10817",
-      "label": "assist multimedia operator",
+      "id": "skill::key_2750",
+      "label": "information architecture",
       "type": "skill"
     },
     {
-      "id": "skill::key_10871",
-      "label": "read engineering drawings",
+      "id": "skill::key_11911",
+      "label": "ICT architectural frameworks",
       "type": "skill"
     },
     {
-      "id": "skill::key_10889",
-      "label": "rewire electronic musical instruments",
+      "id": "skill::key_5506",
+      "label": "apply business acumen",
       "type": "skill"
     },
     {
-      "id": "skill::key_10948",
-      "label": "make artistic processes explicit",
+      "id": "skill::key_5566",
+      "label": "develop financial statistics reports",
       "type": "skill"
     },
     {
-      "id": "skill::key_10992",
-      "label": "follow directions of the artistic director",
+      "id": "skill::key_14091",
+      "label": "scientific research methodology",
       "type": "skill"
     },
     {
-      "id": "skill::key_10994",
-      "label": "sell audiovisual equipment",
+      "id": "skill::key_6718",
+      "label": "online job platforms",
       "type": "skill"
     },
     {
-      "id": "skill::key_11000",
-      "label": "advise  customers on audiovisual equipment installation",
+      "id": "skill::key_5972",
+      "label": "use software tools for site modelling",
       "type": "skill"
     },
     {
-      "id": "skill::key_11039",
-      "label": "advise customers on type of computer equipment",
+      "id": "skill::key_6036",
+      "label": "manage quantitative data",
       "type": "skill"
     },
     {
-      "id": "skill::key_11203",
-      "label": "critically reflect on artistic production processes",
+      "id": "skill::key_6986",
+      "label": "use analytics for commercial purposes",
       "type": "skill"
     },
     {
-      "id": "skill::key_11719",
-      "label": "compose music",
+      "id": "skill::key_9950",
+      "label": "database development tools",
       "type": "skill"
     },
     {
-      "id": "skill::key_12050",
-      "label": "cut raw footage digitally",
+      "id": "skill::key_7398",
+      "label": "use methods of logistical data analysis",
       "type": "skill"
     },
     {
-      "id": "skill::key_12363",
-      "label": "record music",
+      "id": "skill::key_8154",
+      "label": "analyse library users' queries",
       "type": "skill"
     },
     {
-      "id": "skill::key_12366",
-      "label": "create artificial light",
+      "id": "skill::key_8797",
+      "label": "distributed computing",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_2182",
+      "label": "design cloud architecture",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10605",
+      "label": "design database backup specifications",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_9876",
+      "label": "data extraction, transformation and loading tools",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_7094",
+      "label": "audit techniques",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_13532",
+      "label": "product data management",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10289",
+      "label": "inspect data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_7229",
+      "label": "collection management",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_5740",
+      "label": "personal development",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_6953",
+      "label": "personality development theories",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10954",
+      "label": "collect statistics on medical records",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11161",
+      "label": "interpret geophysical data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11213",
+      "label": "assess reliability of data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11393",
+      "label": "develop statistical software",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11567",
+      "label": "carry out statistical forecasts",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_9668",
+      "label": "financial analysis",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_12372",
+      "label": "structure information",
       "type": "skill"
     },
     {
@@ -826,48 +626,18 @@
       "type": "skill"
     },
     {
-      "id": "skill::key_12455",
-      "label": "perform copywriting",
+      "id": "skill::key_12533",
+      "label": "execute visual presentation changes",
       "type": "skill"
     },
     {
-      "id": "skill::key_12467",
-      "label": "assemble musical instrument parts",
+      "id": "skill::key_12746",
+      "label": "interpret automatic call distribution data",
       "type": "skill"
     },
     {
-      "id": "skill::key_12602",
-      "label": "have computer literacy",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_12643",
-      "label": "supervise video quality",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_12801",
-      "label": "make film shooting schedule",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_12831",
-      "label": "make drawings",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_12871",
-      "label": "read musical score",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_12957",
-      "label": "perform music solo",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_13304",
-      "label": "maintain theatre sets",
+      "id": "skill::key_13071",
+      "label": "compile statistical data for insurance purposes",
       "type": "skill"
     },
     {
@@ -876,43 +646,13 @@
       "type": "skill"
     },
     {
-      "id": "skill::key_13369",
-      "label": "prevent technical problems of musical instruments",
+      "id": "skill::key_13538",
+      "label": "test ICT queries",
       "type": "skill"
     },
     {
-      "id": "skill::key_13412",
-      "label": "plan audiovisual recording",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_13473",
-      "label": "create theatre workbooks",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_13623",
-      "label": "stay up-to-date with hair style trends",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_13903",
-      "label": "adjust the work during the creative process",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14027",
-      "label": "apply fashion trends to footwear and leather goods",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14074",
-      "label": "trade in musical instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14177",
-      "label": "develop animations",
+      "id": "skill::key_14163",
+      "label": "apply control process statistical methods",
       "type": "skill"
     },
     {
@@ -921,490 +661,505 @@
       "type": "skill"
     },
     {
-      "id": "skill::key_14393",
-      "label": "explain characteristics of computer peripheral equipment",
+      "id": "skill::key_15002",
+      "label": "implement data warehousing techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_14553",
-      "label": "follow directions of on-site director",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14572",
-      "label": "operate 3D computer graphics software",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14587",
-      "label": "tune keyboard music instruments",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14598",
-      "label": "make strategic business decisions",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14656",
-      "label": "build a strategic marketing plan for destination management",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14709",
-      "label": "produce wind musical instrument components",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_14802",
-      "label": "stay up-to-date with music and video releases",
+      "id": "skill::key_15023",
+      "label": "manage ICT semantic integration",
       "type": "skill"
     }
   ],
   "edges": [
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_4913",
+      "source": "occupation::key_15630",
+      "target": "skill::key_3315",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_5404",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4165",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_11512",
+      "source": "occupation::key_15630",
+      "target": "skill::key_7047",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14430",
+      "source": "occupation::key_15630",
+      "target": "skill::key_8223",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_15086",
+      "source": "occupation::key_15630",
+      "target": "skill::key_9362",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_1428",
+      "source": "occupation::key_15630",
+      "target": "skill::key_9656",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_1945",
+      "source": "occupation::key_15630",
+      "target": "skill::key_9870",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_2241",
+      "source": "occupation::key_15630",
+      "target": "skill::key_10877",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_2824",
+      "source": "occupation::key_15630",
+      "target": "skill::key_15084",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3081",
+      "source": "occupation::key_15630",
+      "target": "skill::key_1289",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3759",
+      "source": "occupation::key_15630",
+      "target": "skill::key_1626",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_4703",
+      "source": "occupation::key_15630",
+      "target": "skill::key_1703",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_6199",
+      "source": "occupation::key_15630",
+      "target": "skill::key_2732",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8116",
+      "source": "occupation::key_15630",
+      "target": "skill::key_2900",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8838",
+      "source": "occupation::key_15630",
+      "target": "skill::key_3014",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8963",
+      "source": "occupation::key_15630",
+      "target": "skill::key_3638",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8975",
+      "source": "occupation::key_15630",
+      "target": "skill::key_3645",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_9596",
+      "source": "occupation::key_15630",
+      "target": "skill::key_3787",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10102",
+      "source": "occupation::key_15630",
+      "target": "skill::key_3800",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_11626",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4011",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_13118",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4434",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14235",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4824",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14277",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4990",
       "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_2711",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5289",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3200",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5467",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3221",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5588",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3562",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5611",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_4354",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5652",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_4962",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5675",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_5246",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_5732",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_5664",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_6465",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_5812",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_7191",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_6182",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_7490",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_6287",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_7952",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8266",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_8464",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_9266",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_8653",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_9678",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_9576",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10300",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_9624",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10621",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_9719",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_11603",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_10297",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_11865",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_10425",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_13285",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_10461",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_13699",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_11873",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_13979",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_11882",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_1401",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_11965",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_1525",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_12357",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_2229",
-      "type": "optional"
+      "source": "occupation::key_15630",
+      "target": "skill::key_12405",
+      "type": "essential"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3032",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_3466",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_4116",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_4816",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_5177",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_6774",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_6945",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_7022",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_7120",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8446",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_8768",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_9291",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10032",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10072",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10127",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10655",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10760",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_10912",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_11215",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
-      "target": "skill::key_12221",
-      "type": "optional"
-    },
-    {
-      "source": "occupation::key_17619",
+      "source": "occupation::key_15630",
       "target": "skill::key_12408",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_13106",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_14653",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_14690",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_14777",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_14835",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_15116",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_2335",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_12536",
+      "source": "occupation::key_15630",
+      "target": "skill::key_2736",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_12622",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4730",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_12702",
+      "source": "occupation::key_15630",
+      "target": "skill::key_6401",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_12849",
+      "source": "occupation::key_15630",
+      "target": "skill::key_10293",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_12934",
+      "source": "occupation::key_15630",
+      "target": "skill::key_11999",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_13484",
+      "source": "occupation::key_15630",
+      "target": "skill::key_12105",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_13578",
+      "source": "occupation::key_15630",
+      "target": "skill::key_12362",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14144",
+      "source": "occupation::key_15630",
+      "target": "skill::key_13603",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14150",
+      "source": "occupation::key_15630",
+      "target": "skill::key_14564",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14488",
+      "source": "occupation::key_15630",
+      "target": "skill::key_1424",
       "type": "optional"
     },
     {
-      "source": "occupation::key_17619",
-      "target": "skill::key_14612",
+      "source": "occupation::key_15630",
+      "target": "skill::key_2616",
       "type": "optional"
     },
     {
-      "source": "skill::key_3081",
-      "target": "skill::key_8129",
+      "source": "occupation::key_15630",
+      "target": "skill::key_4869",
       "type": "optional"
     },
     {
-      "source": "skill::key_3032",
-      "target": "skill::key_3221",
+      "source": "occupation::key_15630",
+      "target": "skill::key_5121",
       "type": "optional"
     },
     {
-      "source": "skill::key_4116",
-      "target": "skill::key_10732",
+      "source": "occupation::key_15630",
+      "target": "skill::key_5443",
       "type": "optional"
     },
     {
-      "source": "skill::key_6774",
-      "target": "skill::key_10621",
+      "source": "occupation::key_15630",
+      "target": "skill::key_5483",
       "type": "optional"
     },
     {
-      "source": "skill::key_6945",
-      "target": "skill::key_10092",
+      "source": "occupation::key_15630",
+      "target": "skill::key_5913",
       "type": "optional"
     },
     {
-      "source": "skill::key_6945",
-      "target": "skill::key_10621",
+      "source": "occupation::key_15630",
+      "target": "skill::key_8203",
       "type": "optional"
     },
     {
-      "source": "skill::key_9291",
-      "target": "skill::key_6324",
+      "source": "occupation::key_15630",
+      "target": "skill::key_10012",
       "type": "optional"
     },
     {
-      "source": "skill::key_10072",
+      "source": "occupation::key_15630",
+      "target": "skill::key_11006",
+      "type": "optional"
+    },
+    {
+      "source": "occupation::key_15630",
+      "target": "skill::key_14894",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_9656",
+      "target": "skill::key_9870",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_1626",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_2900",
+      "target": "skill::key_15084",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_3800",
+      "target": "skill::key_2426",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_3800",
+      "target": "skill::key_2825",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_3800",
+      "target": "skill::key_3976",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_3800",
+      "target": "skill::key_9491",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4011",
+      "target": "skill::key_4933",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4990",
       "target": "skill::key_4957",
       "type": "optional"
     },
     {
-      "source": "skill::key_10760",
-      "target": "skill::key_10092",
+      "source": "skill::key_4990",
+      "target": "skill::key_10587",
       "type": "optional"
     },
     {
-      "source": "skill::key_10760",
-      "target": "skill::key_10621",
+      "source": "skill::key_5467",
+      "target": "skill::key_8607",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_5611",
+      "target": "skill::key_14091",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_5652",
+      "target": "skill::key_6718",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_5675",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_7191",
+      "target": "skill::key_9950",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_7490",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_9576",
+      "target": "skill::key_14091",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_10425",
+      "target": "skill::key_7229",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_10461",
+      "target": "skill::key_5740",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_10461",
+      "target": "skill::key_6953",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11882",
+      "target": "skill::key_4165",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11965",
+      "target": "skill::key_9668",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11965",
+      "target": "skill::key_14091",
       "type": "optional"
     },
     {
@@ -1418,549 +1173,264 @@
       "type": "optional"
     },
     {
-      "source": "skill::key_1723",
-      "target": "skill::key_13285",
+      "source": "skill::key_4869",
+      "target": "skill::key_3315",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4869",
+      "target": "skill::key_9953",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4869",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_5483",
+      "target": "skill::key_2750",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_5483",
+      "target": "skill::key_11911",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_5483",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_8203",
+      "target": "skill::key_4957",
       "type": "essential"
     },
     {
-      "source": "skill::key_2048",
-      "target": "skill::key_13699",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_2301",
-      "target": "skill::key_2711",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_2309",
-      "target": "skill::key_13285",
+      "source": "skill::key_8203",
+      "target": "skill::key_8797",
       "type": "essential"
     },
     {
-      "source": "skill::key_2588",
-      "target": "skill::key_3562",
+      "source": "skill::key_8203",
+      "target": "skill::key_2182",
       "type": "optional"
     },
     {
-      "source": "skill::key_2833",
-      "target": "skill::key_4354",
+      "source": "skill::key_8203",
+      "target": "skill::key_7191",
       "type": "optional"
     },
     {
-      "source": "skill::key_2835",
-      "target": "skill::key_3562",
+      "source": "skill::key_8203",
+      "target": "skill::key_10605",
       "type": "optional"
     },
     {
-      "source": "skill::key_2898",
-      "target": "skill::key_11865",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3140",
-      "target": "skill::key_15086",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3206",
-      "target": "skill::key_4913",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3539",
-      "target": "skill::key_5812",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3544",
-      "target": "skill::key_11865",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3652",
-      "target": "skill::key_13285",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3685",
-      "target": "skill::key_2711",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3767",
-      "target": "skill::key_8266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3894",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3899",
-      "target": "skill::key_10621",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3914",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_3930",
-      "target": "skill::key_13578",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_4013",
-      "target": "skill::key_13285",
+      "source": "skill::key_10012",
+      "target": "skill::key_7094",
       "type": "essential"
     },
     {
-      "source": "skill::key_4035",
-      "target": "skill::key_10300",
+      "source": "skill::key_10012",
+      "target": "skill::key_13532",
       "type": "optional"
     },
     {
-      "source": "skill::key_4088",
-      "target": "skill::key_3562",
+      "source": "skill::key_14894",
+      "target": "skill::key_15084",
       "type": "optional"
     },
     {
-      "source": "skill::key_4157",
-      "target": "skill::key_3562",
+      "source": "skill::key_1353",
+      "target": "skill::key_3315",
       "type": "optional"
     },
     {
-      "source": "skill::key_4168",
-      "target": "skill::key_6182",
+      "source": "skill::key_1353",
+      "target": "skill::key_11999",
       "type": "optional"
     },
     {
-      "source": "skill::key_4361",
-      "target": "skill::key_13699",
+      "source": "skill::key_1550",
+      "target": "skill::key_10877",
       "type": "optional"
     },
     {
-      "source": "skill::key_4442",
-      "target": "skill::key_10621",
+      "source": "skill::key_1565",
+      "target": "skill::key_8223",
       "type": "optional"
     },
     {
-      "source": "skill::key_4512",
-      "target": "skill::key_10621",
+      "source": "skill::key_1716",
+      "target": "skill::key_8223",
       "type": "optional"
     },
     {
-      "source": "skill::key_4651",
-      "target": "skill::key_4354",
+      "source": "skill::key_1794",
+      "target": "skill::key_9656",
       "type": "optional"
     },
     {
-      "source": "skill::key_4826",
-      "target": "skill::key_14430",
+      "source": "skill::key_4245",
+      "target": "skill::key_7047",
       "type": "optional"
     },
     {
-      "source": "skill::key_5051",
-      "target": "skill::key_3562",
+      "source": "skill::key_4245",
+      "target": "skill::key_15084",
       "type": "optional"
     },
     {
-      "source": "skill::key_5478",
-      "target": "skill::key_14430",
+      "source": "skill::key_4348",
+      "target": "skill::key_8223",
       "type": "optional"
     },
     {
-      "source": "skill::key_5496",
-      "target": "skill::key_3562",
+      "source": "skill::key_5102",
+      "target": "skill::key_11999",
       "type": "optional"
     },
     {
-      "source": "skill::key_5632",
-      "target": "skill::key_6287",
+      "source": "skill::key_5129",
+      "target": "skill::key_10877",
       "type": "optional"
     },
     {
-      "source": "skill::key_5733",
-      "target": "skill::key_13699",
+      "source": "skill::key_5506",
+      "target": "skill::key_2335",
       "type": "optional"
     },
     {
-      "source": "skill::key_5870",
-      "target": "skill::key_6182",
+      "source": "skill::key_5566",
+      "target": "skill::key_8223",
       "type": "optional"
     },
     {
-      "source": "skill::key_5919",
-      "target": "skill::key_3562",
+      "source": "skill::key_5972",
+      "target": "skill::key_15084",
       "type": "optional"
     },
     {
-      "source": "skill::key_6439",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_6805",
-      "target": "skill::key_4962",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_6805",
-      "target": "skill::key_5664",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_7066",
-      "target": "skill::key_8975",
+      "source": "skill::key_6036",
+      "target": "skill::key_2732",
       "type": "essential"
     },
     {
-      "source": "skill::key_7150",
-      "target": "skill::key_14277",
+      "source": "skill::key_6036",
+      "target": "skill::key_5289",
       "type": "essential"
     },
     {
-      "source": "skill::key_7179",
-      "target": "skill::key_3562",
+      "source": "skill::key_6986",
+      "target": "skill::key_11999",
       "type": "optional"
     },
     {
-      "source": "skill::key_7327",
-      "target": "skill::key_13699",
+      "source": "skill::key_7398",
+      "target": "skill::key_15084",
       "type": "optional"
     },
     {
-      "source": "skill::key_7374",
-      "target": "skill::key_15086",
+      "source": "skill::key_8154",
+      "target": "skill::key_9870",
       "type": "optional"
     },
     {
-      "source": "skill::key_7394",
-      "target": "skill::key_11865",
+      "source": "skill::key_9876",
+      "target": "skill::key_7047",
       "type": "optional"
     },
     {
-      "source": "skill::key_7607",
-      "target": "skill::key_10621",
+      "source": "skill::key_10289",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_10954",
+      "target": "skill::key_8223",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11161",
+      "target": "skill::key_15084",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11213",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11393",
+      "target": "skill::key_8223",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11567",
+      "target": "skill::key_8223",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_12372",
+      "target": "skill::key_9362",
       "type": "essential"
     },
     {
-      "source": "skill::key_7607",
-      "target": "skill::key_13285",
+      "source": "skill::key_12372",
+      "target": "skill::key_11999",
       "type": "essential"
     },
     {
-      "source": "skill::key_7607",
-      "target": "skill::key_4962",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_7887",
-      "target": "skill::key_10621",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_7939",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_7948",
-      "target": "skill::key_9266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_8181",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_8262",
-      "target": "skill::key_8266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_8305",
-      "target": "skill::key_3200",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_8723",
-      "target": "skill::key_6182",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_8761",
-      "target": "skill::key_10621",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_9121",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_9162",
-      "target": "skill::key_6287",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_9244",
-      "target": "skill::key_11865",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_9344",
-      "target": "skill::key_11865",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_9355",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_9419",
-      "target": "skill::key_3200",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10020",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10024",
-      "target": "skill::key_11865",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10166",
-      "target": "skill::key_5812",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10406",
-      "target": "skill::key_3221",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10547",
-      "target": "skill::key_10621",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10608",
-      "target": "skill::key_14144",
+      "source": "skill::key_12372",
+      "target": "skill::key_15084",
       "type": "essential"
     },
     {
-      "source": "skill::key_10817",
-      "target": "skill::key_10300",
+      "source": "skill::key_12533",
+      "target": "skill::key_4165",
       "type": "optional"
     },
     {
-      "source": "skill::key_10871",
-      "target": "skill::key_6182",
+      "source": "skill::key_12746",
+      "target": "skill::key_15084",
       "type": "optional"
     },
     {
-      "source": "skill::key_10889",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10948",
-      "target": "skill::key_9266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10992",
-      "target": "skill::key_4913",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_10994",
-      "target": "skill::key_13699",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_11000",
-      "target": "skill::key_13699",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_11039",
-      "target": "skill::key_9678",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_11203",
-      "target": "skill::key_9266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_11719",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12050",
-      "target": "skill::key_3200",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12363",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12366",
-      "target": "skill::key_11865",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12455",
-      "target": "skill::key_10621",
-      "type": "essential"
-    },
-    {
-      "source": "skill::key_12467",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12602",
-      "target": "skill::key_9678",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12643",
-      "target": "skill::key_3200",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12801",
-      "target": "skill::key_5246",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12831",
-      "target": "skill::key_6182",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12871",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_12957",
-      "target": "skill::key_5812",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_13304",
-      "target": "skill::key_15086",
+      "source": "skill::key_13071",
+      "target": "skill::key_8223",
       "type": "optional"
     },
     {
       "source": "skill::key_13366",
-      "target": "skill::key_10300",
+      "target": "skill::key_4165",
       "type": "optional"
     },
     {
-      "source": "skill::key_13369",
-      "target": "skill::key_3562",
+      "source": "skill::key_13538",
+      "target": "skill::key_9870",
       "type": "optional"
     },
     {
-      "source": "skill::key_13412",
-      "target": "skill::key_13699",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_13473",
-      "target": "skill::key_15086",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_13623",
-      "target": "skill::key_2711",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_13903",
-      "target": "skill::key_9266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14027",
-      "target": "skill::key_2711",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14027",
-      "target": "skill::key_11603",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14074",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14177",
-      "target": "skill::key_8266",
+      "source": "skill::key_14163",
+      "target": "skill::key_8223",
       "type": "optional"
     },
     {
       "source": "skill::key_14268",
-      "target": "skill::key_8266",
+      "target": "skill::key_4165",
       "type": "optional"
     },
     {
-      "source": "skill::key_14393",
-      "target": "skill::key_9678",
+      "source": "skill::key_15002",
+      "target": "skill::key_11999",
       "type": "optional"
     },
     {
-      "source": "skill::key_14553",
-      "target": "skill::key_4913",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14572",
-      "target": "skill::key_8266",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14587",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14598",
-      "target": "skill::key_11512",
+      "source": "skill::key_15023",
+      "target": "skill::key_15084",
       "type": "essential"
-    },
-    {
-      "source": "skill::key_14656",
-      "target": "skill::key_6287",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14709",
-      "target": "skill::key_3562",
-      "type": "optional"
-    },
-    {
-      "source": "skill::key_14802",
-      "target": "skill::key_3200",
-      "type": "optional"
     }
   ]
 }
