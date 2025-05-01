@@ -78,6 +78,13 @@ def build_graph(esco_data):
     print(f"[LOG] Finished building graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
     return G
 
+def get_skill_label(esco_data, skill_id):
+    skill_row = esco_data['skills'].query("ID == @skill_id")
+    if not skill_row.empty:
+        return clean_label(skill_row.iloc[0]['PREFERREDLABEL'])
+    print(f"[WARN] Skill ID {skill_id} not found in skills.csv")
+    return f"skill::{skill_id}"
+
 def build_occupation_subgraph(esco_data, occupation_id):
     print(f"[LOG] Building filtered graph for occupation: {occupation_id}")
     G = nx.DiGraph()
@@ -98,7 +105,8 @@ def build_occupation_subgraph(esco_data, occupation_id):
 
     for _, row in related_skills.iterrows():
         skill_key = f"skill::{row['SKILLID']}"
-        skill_row = esco_data['skills'].query("ID == @row['SKILLID']")
+        skill_id = row['SKILLID']
+        skill_row = esco_data['skills'].query("ID == @skill_id")
         label = (
             clean_label(skill_row.iloc[0]['PREFERREDLABEL']) 
             if not skill_row.empty else f"skill::{row['SKILLID']}"
@@ -115,8 +123,8 @@ def build_occupation_subgraph(esco_data, occupation_id):
         if row['REQUIRINGID'] in all_skills or row['REQUIREDID'] in all_skills:
             src = f"skill::{row['REQUIRINGID']}"
             tgt = f"skill::{row['REQUIREDID']}"
-            ensure_node(G, src, 'skill')
-            ensure_node(G, tgt, 'skill')
+            ensure_node(G, src, 'skill', get_skill_label(esco_data, row['REQUIRINGID']))
+            ensure_node(G, tgt, 'skill', get_skill_label(esco_data, row['REQUIREDID']))
             G.add_edge(src, tgt, type=row['RELATIONTYPE'].lower())
 
     print(f"[LOG] Subgraph built with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
