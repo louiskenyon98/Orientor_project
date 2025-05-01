@@ -43,12 +43,12 @@ class CareerTreeService:
     "# TREE STRUCTURE\n"
     "1. Root Node (\"root\" type)\n"
     "- Describes the student's self-assessment or broad interest\n\n"
-    "2. Domain Nodes (\"outcome\" type)\n"
+    "2. Domain Nodes (\"domain\" type)\n"
     "- Represent wide career fields (Tech, Arts, Healthcare, Environment, Business, etc.)\n"
     "- Should feel aspirational but grounded\n\n"
-    "3. Family Nodes (\"outcome\" type)\n"
+    "3. Family Nodes (\"family\" type)\n"
     "- Represent career families inside each domain (e.g., Tech ➝ Programming, Cybersecurity, AI Research)\n\n"
-    "4. (Optional) Bridge Nodes (\"outcome\" type)\n"
+    "4. (Optional) Bridge Nodes (\"domain\" type)\n"
     "- Show intersections (e.g., \"Tech for Healthcare\" ➝ Health Informatics)\n\n"
     "No specific job titles are needed. No skills. No technical stacks.\n\n"
     "---\n\n"
@@ -68,13 +68,13 @@ class CareerTreeService:
     '    {\n'
     '      "id": "domain-tech",\n'
     '      "label": "Technology",\n'
-    '      "type": "outcome",\n'
+    '      "type": "domain",\n'
     '      "level": 1,\n'
     '      "children": [\n'
     '        {\n'
     '          "id": "family-programming",\n'
     '          "label": "Programming & Software Development",\n'
-    '          "type": "outcome",\n'
+    '          "type": "family",\n'
     '          "level": 2\n'
     '        }\n'
     '      ]\n'
@@ -205,7 +205,7 @@ class CareerTreeService:
                 
                 api_call_start = time.time()
                 response = self.client.chat.completions.create(
-                    model="gpt-3.5-turbo", #gpt-3.5-turbo", #gpt-4o
+                    model="gpt-4o", #gpt-3.5-turbo", #gpt-4o
                     messages=[
                         {"role": "system", "content": "You are TREE-ENGINE-Career, generating structured career trees in strict JSON format."},
                         {"role": "user", "content": prompt}

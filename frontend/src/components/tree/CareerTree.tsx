@@ -11,16 +11,16 @@ import ReactFlow, {
   NodeTypes,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { CareerDomainNode, CareerFamilyNode, CareerSkillNode } from './CareerNodes';
+import { SkillNode, OutcomeNode, RootNode } from './CustomNodes';
 import { motion } from 'framer-motion';
 import { careerTreeService, CareerTreeNode } from '../../services/careerTreeService';
 import { convertToFlowGraph, TreeNode } from '../../utils/convertToFlowGraph';
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
-  rootNode: CareerDomainNode,
-  skillNode: CareerFamilyNode,
-  careerNode: CareerSkillNode,
+  rootNode: RootNode,
+  skillNode: SkillNode,
+  outcomeNode: OutcomeNode,
 };
 
 // Animation variants for the title
@@ -45,7 +45,7 @@ For example:
 
 // Convert CareerTreeNode to TreeNode
 function convertCareerToTreeNode(careerNode: CareerTreeNode): TreeNode {
-  let nodeType: "root" | "skill" | "outcome" | "career";
+  let nodeType: "root" | "skill" | "outcome";
   
   // Map career node types to TreeNode types
   switch (careerNode.type) {
@@ -53,7 +53,7 @@ function convertCareerToTreeNode(careerNode: CareerTreeNode): TreeNode {
       nodeType = "root";
       break;
     case "domain":
-      nodeType = "career";
+      nodeType = "outcome";
       break;
     case "family":
       nodeType = "skill";
@@ -119,13 +119,6 @@ export default function CareerTree() {
     setSelectedNode(node);
   }, []);
 
-  // Handle click outside the popup
-  const handleClickOutside = useCallback((event: React.MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      setSelectedNode(null);
-    }
-  }, []);
-
   return (
     <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
       <motion.div 
@@ -185,7 +178,7 @@ export default function CareerTree() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 relative">
+        <div className="flex-1">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -219,36 +212,6 @@ export default function CareerTree() {
               </div>
             </Panel>
           </ReactFlow>
-
-          {/* Node Popup */}
-          {selectedNode && (
-            <div 
-              className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-              onClick={handleClickOutside}
-            >
-              <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">{selectedNode.data.label}</h3>
-                {selectedNode.data.actions && selectedNode.data.actions.length > 0 ? (
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-gray-700">Recommended Actions:</h4>
-                    <ul className="list-disc pl-5 space-y-2">
-                      {selectedNode.data.actions.map((action: string, index: number) => (
-                        <li key={index} className="text-gray-600">{action}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <p className="text-gray-600">No specific actions recommended for this node.</p>
-                )}
-                <button
-                  onClick={() => setSelectedNode(null)}
-                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

@@ -262,7 +262,7 @@ Example format (partial):
                 
                 api_call_start = time.time()
                 response = self.client.chat.completions.create(
-                    model="gpt-3.5-turbo", #gpt-3.5-turbo", #gpt-4o
+                    model="gpt-4o", #gpt-3.5-turbo", #gpt-4o
                     messages=[
                         {"role": "system", "content": "You are TREE-ENGINE, generating structured skill trees in strict JSON format."},
                         {"role": "user", "content": prompt}
