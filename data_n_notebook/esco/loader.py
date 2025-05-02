@@ -11,6 +11,7 @@ def load_esco(DATA_DIR):
         "skill_to_skill_relations": pd.read_csv(DATA_DIR / "skill_to_skill_relations.csv", **read_opts),
         "skill_hierarchy": pd.read_csv(DATA_DIR / "skill_hierarchy.csv", **read_opts),
         "occupation_hierarchy": pd.read_csv(DATA_DIR / "occupation_hierarchy.csv", **read_opts),
+        "isco_groups": pd.read_csv(DATA_DIR / "occupation_groups.csv", **read_opts),
     }
     # Build lookup maps for fast access
     esco_data['skills_lookup'] = esco_data['skills'].set_index('ID')['PREFERREDLABEL'].to_dict()

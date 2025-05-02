@@ -1,7 +1,6 @@
 # visualizer.py
 from pyvis.network import Network
 import json
-
 def visualize_pyvis(G, output_html="esco_graph.html"):
     print(f"[LOG] Generating interactive graph visualization: {output_html}")
     net = Network(notebook=False, directed=True, cdn_resources='in_line', height='1000px', width='200%', bgcolor='#ffffff', font_color='black')
@@ -9,11 +8,22 @@ def visualize_pyvis(G, output_html="esco_graph.html"):
     for node, data in G.nodes(data=True):
         label = data.get('label', node)
         node_type = data.get('type', 'unknown')
-        color = "skyblue" if node_type == 'skill' else "lightgreen"
+        if node_type == 'skill':
+            color = "skyblue"
+        elif node_type == 'skillgroup':
+            color = "lightgreen"
+        elif node_type == 'iscogroup':
+            color = "orange"
+        else:
+            color = "gray"
         net.add_node(node, label=label, title=node_type, color=color, size=10)
 
     for src, dst, data in G.edges(data=True):
-        net.add_edge(src, dst, label=data['type'], font={'size': 5})  # Set smaller font size for edge labels
+        edge_type = data.get('type', '')
+        if edge_type == 'aggregates':
+            net.add_edge(src, dst, label=edge_type, dashes=True, color="gray", width=0.5, font={'size': 5})
+        else:
+            net.add_edge(src, dst, label=edge_type, font={'size': 5})
 
     net.force_atlas_2based()  # Use force-directed layout to spread nodes apart
     net.set_options("""
