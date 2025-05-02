@@ -37,7 +37,7 @@ export async function saveTreePath(tree: TreeNode, treeType: 'career' | 'skills'
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/tree-paths`, {
+  const response = await fetch(`${API_URL}/tree-paths/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export async function fetchUserTreePaths() {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/tree-paths`, {
+  const response = await fetch(`${API_URL}/tree-paths/`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -85,7 +85,7 @@ export async function saveNodeNote(nodeId: string, actionIndex: number, noteText
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/node-notes`, {
+  const response = await fetch(`${API_URL}/node-notes/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export async function fetchNodeNotes(nodeId: string) {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/node-notes/node/${nodeId}`, {
+  const response = await fetch(`${API_URL}/node-notes/node/${nodeId}/`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -161,7 +161,7 @@ export async function getUserProgress() {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/user-progress`, {
+  const response = await fetch(`${API_URL}/user-progress/`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -176,13 +176,13 @@ export async function getUserProgress() {
 }
 
 // Delete a saved tree path
-export async function deleteTreePath(treePathId: number) {
+export async function deleteTreePath(treePathId: string) {
   const token = localStorage.getItem('access_token');
   if (!token) {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/tree-paths/${treePathId}`, {
+  const response = await fetch(`${API_URL}/tree-paths/${treePathId}/`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`

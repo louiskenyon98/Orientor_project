@@ -7,6 +7,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import NotesSection from '@/components/space/NotesSection';
 import { extractChartData } from '@/utils/chartUtils';
 import { toast } from 'react-hot-toast';
+import { useRouter, usePathname } from 'next/navigation';
 
 // Define a stricter type for our components that requires certain fields
 interface Recommendation extends Omit<SpaceServiceRecommendation, 'id'> {
@@ -40,6 +41,12 @@ export default function SpacePage() {
   const [selectedRecommendation, setSelectedRecommendation] = useState<SpaceServiceRecommendation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    console.log('Space page mounted, pathname:', pathname);
+  }, [pathname]);
 
   useEffect(() => {
     const loadRecommendations = async () => {

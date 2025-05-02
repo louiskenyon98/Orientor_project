@@ -65,6 +65,7 @@ export default function MainLayout({
 
     // Close mobile menus when route changes
     useEffect(() => {
+        console.log('Route changed to:', pathname);
         setMoreMenuOpen(false);
         setCareerMenuOpen(false);
         setWorkspaceMenuOpen(false);
@@ -217,7 +218,7 @@ export default function MainLayout({
                                         <button 
                                             onClick={toggleWorkspaceDropdown}
                                             className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
-                                                ${pathname === '/space' || pathname === '/tree-path'
+                                                ${pathname === '/space' || pathname === '/tree-paths'
                                                     ? 'text-blue-700 bg-blue-50' 
                                                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                                                 }`}
@@ -233,9 +234,22 @@ export default function MainLayout({
                                                 <div className="py-1" role="menu" aria-orientation="vertical">
                                                     <Link
                                                         href="/space"
-                                                        onClick={() => {
-                                                            console.log('Workspace link clicked, navigating to /space');
-                                                            router.push('/space');
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            console.log('Navigating to /space');
+                                                            try {
+                                                                router.push('/space');
+                                                                // Fallback in case router.push doesn't trigger navigation
+                                                                setTimeout(() => {
+                                                                    if (pathname !== '/space') {
+                                                                        console.log('Fallback: direct navigation to /space');
+                                                                        window.location.href = '/space';
+                                                                    }
+                                                                }, 500);
+                                                            } catch (err) {
+                                                                console.error('Navigation error:', err);
+                                                                window.location.href = '/space';
+                                                            }
                                                         }}
                                                         className={`block px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
                                                         role="menuitem"
@@ -243,12 +257,25 @@ export default function MainLayout({
                                                         Workspace
                                                     </Link>
                                                     <Link
-                                                        href="/tree-path"
-                                                        onClick={() => {
-                                                            console.log('Tree Path link clicked, navigating to /tree-path');
-                                                            router.push('/tree-path');
+                                                        href="/tree-paths"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            console.log('Navigating to /tree-paths');
+                                                            try {
+                                                                router.push('/tree-paths');
+                                                                // Fallback in case router.push doesn't trigger navigation
+                                                                setTimeout(() => {
+                                                                    if (pathname !== '/tree-paths') {
+                                                                        console.log('Fallback: direct navigation to /tree-paths');
+                                                                        window.location.href = '/tree-paths';
+                                                                    }
+                                                                }, 500);
+                                                            } catch (err) {
+                                                                console.error('Navigation error:', err);
+                                                                window.location.href = '/tree-paths';
+                                                            }
                                                         }}
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/tree-path' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/tree-paths' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
                                                         role="menuitem"
                                                     >
                                                         Tree Path
@@ -385,7 +412,7 @@ export default function MainLayout({
                         <div className="relative">
                             <button 
                                 className={`flex flex-col items-center w-full text-xs ${
-                                    pathname === '/space' || pathname === '/tree-path' ? 'text-blue-600' : 'text-gray-600'
+                                    pathname === '/space' || pathname === '/tree-paths' ? 'text-blue-600' : 'text-gray-600'
                                 }`}
                                 onClick={toggleWorkspaceDropdown}
                                 aria-label="Workspace options"
@@ -394,7 +421,7 @@ export default function MainLayout({
                                 <span>Workspace</span>
                             </button>
                             
-                            {/* Workspace dropdown menu */}
+                            {/* Mobile workspace dropdown menu */}
                             {workspaceMenuOpen && (
                                 <div 
                                     ref={workspaceMenuRef}
@@ -403,9 +430,22 @@ export default function MainLayout({
                                     <div className="py-1">
                                         <Link 
                                             href="/space" 
-                                            onClick={() => {
-                                                console.log('Mobile Workspace link clicked, navigating to /space');
-                                                router.push('/space');
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                console.log('Mobile: Navigating to /space');
+                                                try {
+                                                    router.push('/space');
+                                                    // Fallback in case router.push doesn't trigger navigation
+                                                    setTimeout(() => {
+                                                        if (pathname !== '/space') {
+                                                            console.log('Mobile Fallback: direct navigation to /space');
+                                                            window.location.href = '/space';
+                                                        }
+                                                    }, 500);
+                                                } catch (err) {
+                                                    console.error('Mobile navigation error:', err);
+                                                    window.location.href = '/space';
+                                                }
                                             }}
                                             className={`flex items-center px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
                                         >
@@ -413,12 +453,25 @@ export default function MainLayout({
                                             Workspace
                                         </Link>
                                         <Link 
-                                            href="/tree-path" 
-                                            onClick={() => {
-                                                console.log('Mobile Tree Path link clicked, navigating to /tree-path');
-                                                router.push('/tree-path');
+                                            href="/tree-paths" 
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                console.log('Mobile: Navigating to /tree-paths');
+                                                try {
+                                                    router.push('/tree-paths');
+                                                    // Fallback in case router.push doesn't trigger navigation
+                                                    setTimeout(() => {
+                                                        if (pathname !== '/tree-paths') {
+                                                            console.log('Mobile Fallback: direct navigation to /tree-paths');
+                                                            window.location.href = '/tree-paths';
+                                                        }
+                                                    }, 500);
+                                                } catch (err) {
+                                                    console.error('Mobile navigation error:', err);
+                                                    window.location.href = '/tree-paths';
+                                                }
                                             }}
-                                            className={`flex items-center px-4 py-2 text-sm ${pathname === '/tree-path' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                                            className={`flex items-center px-4 py-2 text-sm ${pathname === '/tree-paths' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500">account_tree</span>
                                             Tree Path

@@ -1,13 +1,14 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { fetchUserTreePaths, deleteTreePath } from '../../utils/treeStorage';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import XPProgress from '../../components/ui/XPProgress';
+import MainLayout from '@/components/layout/MainLayout';
 
 interface TreePath {
-  id: number;
+  id: number; // Changed from string to number to match the API response
   tree_type: string;
   tree_json: any;
   created_at: string;
@@ -18,6 +19,11 @@ export default function TreePathPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    console.log('Tree Path page mounted, pathname:', pathname);
+  }, [pathname]);
 
   // Load tree paths on component mount
   useEffect(() => {
@@ -37,10 +43,10 @@ export default function TreePathPage() {
   }, []);
 
   // Handle deleting a tree path
-  const handleDeleteTreePath = async (id: number) => {
+  const handleDeleteTreePath = async (id: number) => { // Changed from string to number
     if (window.confirm('Are you sure you want to delete this saved tree?')) {
       try {
-        await deleteTreePath(id);
+        await deleteTreePath(id.toString()); // Convert id to string for the API call
         setTreePaths(treePaths.filter(path => path.id !== id));
       } catch (err: any) {
         console.error('Error deleting tree path:', err);
@@ -80,150 +86,156 @@ export default function TreePathPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
-          <p className="mt-2 text-lg text-gray-600">Loading your saved trees...</p>
+      <MainLayout>
+        <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
+            <p className="mt-2 text-lg text-gray-600">Loading your saved trees...</p>
+          </div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+      </MainLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
-          <p className="mt-2 text-lg text-red-600">{error}</p>
-          <button
-            onClick={() => router.push('/')}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Return Home
-          </button>
+      <MainLayout>
+        <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
+            <p className="mt-2 text-lg text-red-600">{error}</p>
+            <button
+              onClick={() => router.push('/')}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Return Home
+            </button>
+          </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
-            <p className="mt-2 text-lg text-gray-600">
-              {treePaths.length > 0 
-                ? `You have ${treePaths.length} saved ${treePaths.length === 1 ? 'tree' : 'trees'}`
-                : 'You have no saved trees yet'}
-            </p>
+    <MainLayout>
+      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
+              <p className="mt-2 text-lg text-gray-600">
+                {treePaths.length > 0 
+                  ? `You have ${treePaths.length} saved ${treePaths.length === 1 ? 'tree' : 'trees'}`
+                  : 'You have no saved trees yet'}
+              </p>
+            </div>
+            
+            {/* XP Progress */}
+            <XPProgress />
           </div>
           
-          {/* XP Progress */}
-          <XPProgress />
-        </div>
-        
-        {/* If no tree paths */}
-        {treePaths.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <svg 
-              className="w-16 h-16 text-gray-400 mx-auto mb-4" 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            >
-              <path d="M12 22V6M9 18H15M5 12H19M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7Z" />
-            </svg>
-            <h2 className="text-xl font-medium text-gray-800 mb-2">No Saved Trees</h2>
-            <p className="text-gray-600 mb-6">
-              Visit the Career Explorer or Enhanced Skills Path to create and save trees
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Link
-                href="/career"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          {/* If no tree paths */}
+          {treePaths.length === 0 && (
+            <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+              <svg 
+                className="w-16 h-16 text-gray-400 mx-auto mb-4" 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
               >
-                Career Explorer
-              </Link>
-              <Link
-                href="/enhanced-skills"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Skills Path
-              </Link>
+                <path d="M12 22V6M9 18H15M5 12H19M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7Z" />
+              </svg>
+              <h2 className="text-xl font-medium text-gray-800 mb-2">No Saved Trees</h2>
+              <p className="text-gray-600 mb-6">
+                Visit the Career Explorer or Enhanced Skills Path to create and save trees
+              </p>
+              <div className="flex justify-center space-x-4">
+                <Link
+                  href="/career"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Career Explorer
+                </Link>
+                <Link
+                  href="/enhanced-skills"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Skills Path
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {/* Tree Path Grid */}
-        {treePaths.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {treePaths.map((path) => (
-              <div key={path.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                {/* Preview */}
-                {generateTreePreview(path.tree_type)}
-                
-                {/* Content */}
-                <div className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {path.tree_type === 'career' ? 'Career Path' : 'Skills Path'}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Saved on {format(new Date(path.created_at), 'MMMM d, yyyy')}
-                      </p>
-                    </div>
-                    
-                    {/* Tree type badge */}
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      path.tree_type === 'career' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {path.tree_type}
-                    </span>
-                  </div>
+          )}
+          
+          {/* Tree Path Grid */}
+          {treePaths.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {treePaths.map((path) => (
+                <div key={path.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                  {/* Preview */}
+                  {generateTreePreview(path.tree_type)}
                   
-                  {/* Path stats (simplified) */}
-                  <div className="mt-4 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <span>
-                        {path.tree_json.children?.length || 0} main nodes
+                  {/* Content */}
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          {path.tree_type === 'career' ? 'Career Path' : 'Skills Path'}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Saved on {format(new Date(path.created_at), 'MMMM d, yyyy')}
+                        </p>
+                      </div>
+                      
+                      {/* Tree type badge */}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        path.tree_type === 'career' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {path.tree_type}
                       </span>
                     </div>
-                  </div>
-                  
-                  {/* Actions */}
-                  <div className="mt-4 flex justify-between">
-                    <Link
-                      href={path.tree_type === 'career' ? '/career' : '/enhanced-skills'}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                    >
-                      View {path.tree_type} tree
-                    </Link>
-                    <button
-                      onClick={() => handleDeleteTreePath(path.id)}
-                      className="text-red-600 hover:text-red-800 text-sm font-medium"
-                    >
-                      Delete
-                    </button>
+                    
+                    {/* Path stats (simplified) */}
+                    <div className="mt-4 text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span>
+                          {path.tree_json.children?.length || 0} main nodes
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="mt-4 flex justify-between">
+                      <Link
+                        href={path.tree_type === 'career' ? '/career' : '/enhanced-skills'}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        View {path.tree_type} tree
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteTreePath(path.id)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 } 

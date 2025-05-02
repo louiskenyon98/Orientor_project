@@ -1,63 +1,66 @@
-import { useEffect, useState } from 'react';
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
-const HealthCheck = () => {
-  const [status, setStatus] = useState<'checking' | 'healthy' | 'unhealthy'>('checking');
-  const [error, setError] = useState<string | null>(null);
+export default function HealthCheck() {
+  const [apiStatus, setApiStatus] = useState({ status: 'checking...', error: null });
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const checkHealth = async () => {
+    async function checkApiHealth() {
       try {
-        const response = await fetch('/api/health');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/health`);
         if (response.ok) {
-          const data = await response.json();
-          if (data.status === 'ok') {
-            setStatus('healthy');
-            setError(null);
-          } else {
-            setStatus('unhealthy');
-            setError('Unexpected response format');
-          }
+          setApiStatus({ status: 'online', error: null });
         } else {
-          setStatus('unhealthy');
-          setError(`HTTP error! status: ${response.status}`);
+          setApiStatus({ status: 'error', error: `API returned ${response.status}` });
         }
       } catch (err) {
-        setStatus('unhealthy');
-        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+        console.error('Health check failed:', err);
+        setApiStatus({ status: 'offline', error: err instanceof Error ? err.message : String(err) });
       }
-    };
-
-    checkHealth();
+    }
+    
+    checkApiHealth();
   }, []);
 
+  const navigateToSpace = () => {
+    console.log('Debug: Navigating to /space');
+    window.location.href = '/space';
+  };
+
+  const navigateToTreePath = () => {
+    console.log('Debug: Navigating to /tree-path');
+    window.location.href = '/tree-path';
+  };
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-2">Backend Health Status</h2>
-      <div className="flex items-center space-x-2">
-        <div
-          className={`w-3 h-3 rounded-full ${
-            status === 'checking'
-              ? 'bg-yellow-500'
-              : status === 'healthy'
-              ? 'bg-green-500'
-              : 'bg-red-500'
-          }`}
-        />
-        <span className="font-medium">
-          {status === 'checking'
-            ? 'Checking...'
-            : status === 'healthy'
-            ? 'Healthy'
-            : 'Unhealthy'}
+    <div className="fixed bottom-0 right-0 m-4 p-2 bg-white/80 backdrop-blur-sm text-xs text-gray-500 rounded shadow-sm border border-gray-200 z-50">
+      <div>
+        API: <span className={apiStatus.status === 'online' ? 'text-green-500' : 'text-red-500'}>
+          {apiStatus.status}
         </span>
       </div>
-      {error && (
-        <div className="mt-2 text-red-500">
-          <p className="text-sm">Error: {error}</p>
-        </div>
-      )}
+      
+      <div className="mt-2">
+        <strong>Current Path:</strong> {pathname}
+      </div>
+      
+      <div className="mt-2 space-x-2">
+        <button 
+          onClick={navigateToSpace}
+          className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
+        >
+          Force Space
+        </button>
+        <button 
+          onClick={navigateToTreePath}
+          className="px-2 py-1 bg-green-500 text-white rounded text-xs"
+        >
+          Force Tree
+        </button>
+      </div>
     </div>
   );
-};
-
-export default HealthCheck; 
+} 

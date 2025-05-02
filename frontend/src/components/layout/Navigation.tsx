@@ -20,6 +20,7 @@ export default function Navigation() {
   };
 
   const toggleWorkspaceDropdown = () => {
+    console.log('Toggling workspace dropdown, current state:', workspaceDropdownOpen);
     setWorkspaceDropdownOpen(!workspaceDropdownOpen);
     if (careerDropdownOpen) setCareerDropdownOpen(false);
   };
