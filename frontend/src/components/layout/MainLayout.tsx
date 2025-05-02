@@ -23,16 +23,13 @@ export default function MainLayout({
     const pathname = usePathname();
 
     // Public routes that don't require authentication
-    const publicRoutes = ['/login', '/register'];
+    const publicRoutes = ['/login', '/register', '/test-page'];
     const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
 
     useEffect(() => {
         // Check if user is logged in
         const token = localStorage.getItem('access_token') || '';
-        console.log('Token from localStorage:', token ? 'Found' : 'Not found');
-        console.log('Current pathname:', pathname);
-        console.log('Is public route:', isPublicRoute);
-        console.log('Show nav:', showNav);
+        console.log('Auth check - Token:', token ? 'Found' : 'Not found', 'Pathname:', pathname);
         
         if (!token && !isPublicRoute && showNav) {
             console.log('No token found, redirecting to login');
@@ -74,8 +71,21 @@ export default function MainLayout({
     }, [pathname]);
 
     const handleLogout = () => {
+        console.log('Logging out user');
         localStorage.removeItem('access_token');
         router.push('/login');
+    };
+
+    const toggleCareerDropdown = () => {
+        console.log('Toggling career dropdown');
+        setCareerMenuOpen(!careerMenuOpen);
+        if (workspaceMenuOpen) setWorkspaceMenuOpen(false);
+    };
+
+    const toggleWorkspaceDropdown = () => {
+        console.log('Toggling workspace dropdown, current state:', workspaceMenuOpen);
+        setWorkspaceMenuOpen(!workspaceMenuOpen);
+        if (careerMenuOpen) setCareerMenuOpen(false);
     };
 
     // For public routes, render immediately without checking auth
@@ -93,7 +103,7 @@ export default function MainLayout({
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-teal"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
     }
@@ -146,7 +156,7 @@ export default function MainLayout({
                                     {/* Career Path Dropdown */}
                                     <div className="relative" ref={careerMenuRef}>
                                         <button 
-                                            onClick={() => setCareerMenuOpen(!careerMenuOpen)}
+                                            onClick={toggleCareerDropdown}
                                             className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
                                                 ${isCareerPath
                                                     ? 'text-blue-700 bg-blue-50' 
@@ -205,7 +215,7 @@ export default function MainLayout({
                                     {/* Workspace Dropdown */}
                                     <div className="relative" ref={workspaceMenuRef}>
                                         <button 
-                                            onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                                            onClick={toggleWorkspaceDropdown}
                                             className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
                                                 ${pathname === '/space' || pathname === '/tree-path'
                                                     ? 'text-blue-700 bg-blue-50' 
@@ -223,6 +233,10 @@ export default function MainLayout({
                                                 <div className="py-1" role="menu" aria-orientation="vertical">
                                                     <Link
                                                         href="/space"
+                                                        onClick={() => {
+                                                            console.log('Workspace link clicked, navigating to /space');
+                                                            router.push('/space');
+                                                        }}
                                                         className={`block px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
                                                         role="menuitem"
                                                     >
@@ -230,6 +244,10 @@ export default function MainLayout({
                                                     </Link>
                                                     <Link
                                                         href="/tree-path"
+                                                        onClick={() => {
+                                                            console.log('Tree Path link clicked, navigating to /tree-path');
+                                                            router.push('/tree-path');
+                                                        }}
                                                         className={`block px-4 py-2 text-sm ${pathname === '/tree-path' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
                                                         role="menuitem"
                                                     >
@@ -269,6 +287,11 @@ export default function MainLayout({
                     </div>
                 </header>
             )}
+
+            {/* Main content area */}
+            <main className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 ${isLoggedIn ? 'pt-0 md:pt-20 pb-16 md:pb-8' : 'py-8'}`}>
+                {children}
+            </main>
 
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
             {isLoggedIn && (
@@ -364,7 +387,7 @@ export default function MainLayout({
                                 className={`flex flex-col items-center w-full text-xs ${
                                     pathname === '/space' || pathname === '/tree-path' ? 'text-blue-600' : 'text-gray-600'
                                 }`}
-                                onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                                onClick={toggleWorkspaceDropdown}
                                 aria-label="Workspace options"
                             >
                                 <span className="material-icons-outlined">folder</span>
@@ -380,6 +403,10 @@ export default function MainLayout({
                                     <div className="py-1">
                                         <Link 
                                             href="/space" 
+                                            onClick={() => {
+                                                console.log('Mobile Workspace link clicked, navigating to /space');
+                                                router.push('/space');
+                                            }}
                                             className={`flex items-center px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500">folder</span>
@@ -387,6 +414,10 @@ export default function MainLayout({
                                         </Link>
                                         <Link 
                                             href="/tree-path" 
+                                            onClick={() => {
+                                                console.log('Mobile Tree Path link clicked, navigating to /tree-path');
+                                                router.push('/tree-path');
+                                            }}
                                             className={`flex items-center px-4 py-2 text-sm ${pathname === '/tree-path' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500">account_tree</span>
@@ -406,11 +437,6 @@ export default function MainLayout({
                     </div>
                 </div>
             )}
-
-            {/* Main content area */}
-            <main className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 ${isLoggedIn ? 'pt-0 md:pt-20 pb-16 md:pb-8' : 'py-8'}`}>
-                {children}
-            </main>
         </div>
     );
 }
