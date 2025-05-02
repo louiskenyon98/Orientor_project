@@ -69,7 +69,8 @@ def run_pipeline():
         print("[ERROR] Invalid selection.")
         return
 
-    G = build_occupation_subgraph(esco_data, occ_id)
+    # G = build_graph(esco_data)
+    G = build_occupation_subgraph(esco_data, occ_id, depth=10, include_groups=True, include_isco=True)
     visualize_pyvis(G, "esco_graph.html")
     export_to_json(G, "esco_graph.json")
     end_time = time.time()
