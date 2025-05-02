@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { motion, AnimatePresence } from 'framer-motion';
+import NoteModal from '../ui/NoteModal';
+import { updateUserXP } from '../../utils/treeStorage';
+import confetti from 'canvas-confetti';
 
 // Animation variants for nodes
 const nodeVariants = {
@@ -121,6 +124,9 @@ export function RootNode({ data, selected }: NodeProps) {
 // Skill Node Component with Actions Tooltip
 export function SkillNode({ data, id, selected }: NodeProps) {
   const [showActions, setShowActions] = useState(false);
+  const [completedActions, setCompletedActions] = useState<boolean[]>([]);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [currentActionIndex, setCurrentActionIndex] = useState(0);
   const nodeRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   
@@ -199,83 +205,153 @@ export function SkillNode({ data, id, selected }: NodeProps) {
     };
   }, [showActions]);
 
+  // Handle action completion
+  const handleCompleteAction = async (index: number) => {
+    // Create a copy of the current state
+    const newCompletedActions = [...completedActions];
+    
+    // Toggle the completed state for this action
+    newCompletedActions[index] = !newCompletedActions[index];
+    setCompletedActions(newCompletedActions);
+    
+    // If action is being marked as completed, update XP
+    if (newCompletedActions[index]) {
+      try {
+        // Trigger confetti effect
+        if (nodeRef.current) {
+          const nodeRect = nodeRef.current.getBoundingClientRect();
+          confetti({
+            particleCount: 50,
+            spread: 60,
+            origin: { 
+              x: (nodeRect.left + nodeRect.width / 2) / window.innerWidth,
+              y: (nodeRect.top + nodeRect.height / 2) / window.innerHeight 
+            }
+          });
+        }
+        
+        // Update XP in the backend
+        await updateUserXP(id);
+      } catch (err) {
+        console.error('Error updating XP:', err);
+      }
+    }
+  };
+  
+  // Open note modal for a specific action
+  const handleOpenNoteModal = (e: React.MouseEvent, index: number) => {
+    e.stopPropagation();
+    setCurrentActionIndex(index);
+    setShowNoteModal(true);
+  };
+
   // Extract action text if available
   const actionPreview = data.actions && data.actions.length > 0 
     ? data.actions[0].split(' ').slice(0, 3).join(' ') + '...'
     : null;
   
-    return (
-      <motion.div 
-        ref={nodeRef}
-        style={{ ...nodeStyle, position: 'relative' }}
-        onClick={() => setShowActions(!showActions)}
-        initial="hidden"
-        animate="visible"
-        variants={nodeVariants}
-        whileHover={{ y: -2, boxShadow: '0 6px 15px rgba(3, 105, 161, 0.25)' }}
-      >
-        {/* Node Label */}
-        <div>{data.label}</div>
-    
-        {/* Secondary small preview text */}
-        {actionPreview && (
-          <div style={secondaryTextStyle}>{actionPreview}</div>
-        )}
-    
-        {/* Handles */}
-        <Handle 
-          type="target" 
-          position={Position.Top} 
-          style={{ background: '#bae6fd', border: '2px solid #0ea5e9', width: '8px', height: '8px' }}
-        />
-        <Handle 
-          type="source" 
-          position={Position.Bottom} 
-          style={{ background: '#bae6fd', border: '2px solid #0ea5e9', width: '8px', height: '8px' }}
-        />
-    
-        {/* Recommended Actions Panel INSIDE node */}
-        <AnimatePresence>
-          {showActions && data.actions && data.actions.length > 0 && (
-            <motion.div
-              className="w-full mt-4 bg-white rounded-lg p-4 shadow-lg border border-gray-200 text-gray-700 text-sm"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={popoverVariants}
-              style={{
-                overflow: 'hidden',
-                minWidth: '280px',
-                maxWidth: '400px',
-                lineHeight: 1.6,
-              }}
-            >
-              <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-200">
-                <h3 className="text-blue-600 font-semibold text-sm">Recommended Actions</h3>
-                <button 
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    setShowActions(false); 
-                  }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors text-xs"
-                >
-                  ✕
-                </button>
-              </div>
-    
-              <ul className="space-y-2 list-disc list-inside">
-                {data.actions.map((action, index) => (
-                  <li key={index} className="text-gray-600 text-xs">
+  return (
+    <motion.div 
+      ref={nodeRef}
+      style={{ ...nodeStyle, position: 'relative' }}
+      onClick={() => setShowActions(!showActions)}
+      initial="hidden"
+      animate="visible"
+      variants={nodeVariants}
+      whileHover={{ y: -2, boxShadow: '0 6px 15px rgba(3, 105, 161, 0.25)' }}
+    >
+      {/* Node Label */}
+      <div>{data.label}</div>
+  
+      {/* Secondary small preview text */}
+      {actionPreview && (
+        <div style={secondaryTextStyle}>{actionPreview}</div>
+      )}
+  
+      {/* Handles */}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        style={{ background: '#bae6fd', border: '2px solid #0ea5e9', width: '8px', height: '8px' }}
+      />
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        style={{ background: '#bae6fd', border: '2px solid #0ea5e9', width: '8px', height: '8px' }}
+      />
+  
+      {/* Recommended Actions Panel */}
+      <AnimatePresence>
+        {showActions && data.actions && data.actions.length > 0 && (
+          <motion.div
+            ref={tooltipRef}
+            className="absolute -right-72 top-0 z-50 bg-white rounded-lg p-4 shadow-xl border border-gray-200 text-gray-700 text-sm w-64"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={popoverVariants}
+          >
+            <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-200">
+              <h3 className="text-blue-600 font-semibold text-sm">Recommended Actions</h3>
+              <button 
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  setShowActions(false); 
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors text-xs"
+              >
+                ✕
+              </button>
+            </div>
+  
+            <ul className="space-y-4">
+              {data.actions.map((action, index) => (
+                <li key={index} className="relative pl-7 pr-8">
+                  {/* Checkbox for completing action */}
+                  <div className="absolute left-0 top-1">
+                    <input
+                      type="checkbox"
+                      checked={completedActions[index] || false}
+                      onChange={() => handleCompleteAction(index)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  {/* Action text */}
+                  <span className={`text-gray-600 text-xs ${completedActions[index] ? 'line-through text-gray-400' : ''}`}>
                     {action}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          )}
-        </AnimatePresence>
-    
-      </motion.div>
-    );
+                  </span>
+                  
+                  {/* Note button */}
+                  <button
+                    onClick={(e) => handleOpenNoteModal(e, index)}
+                    className="absolute right-0 top-0 p-1 text-gray-400 hover:text-blue-500"
+                    title="Add/Edit Note"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Note Modal */}
+      {showNoteModal && data.actions && (
+        <NoteModal
+          isOpen={showNoteModal}
+          onClose={() => setShowNoteModal(false)}
+          nodeId={id}
+          actionIndex={currentActionIndex}
+          actionText={data.actions[currentActionIndex]}
+        />
+      )}
+    </motion.div>
+  );
 }
 
 // Outcome Node Component

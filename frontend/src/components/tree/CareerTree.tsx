@@ -15,6 +15,8 @@ import { SkillNode, OutcomeNode, RootNode } from './CustomNodes';
 import { motion } from 'framer-motion';
 import { careerTreeService, CareerTreeNode } from '../../services/careerTreeService';
 import { convertToFlowGraph, TreeNode } from '../../utils/convertToFlowGraph';
+import { saveTreePath } from '../../utils/treeStorage';
+import XPProgress from '../ui/XPProgress';
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -83,6 +85,8 @@ export default function CareerTree() {
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Generate tree using the profile input
   const generateTree = useCallback(async () => {
@@ -118,6 +122,61 @@ export default function CareerTree() {
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     setSelectedNode(node);
   }, []);
+
+  // Function to save tree to user's path
+  const handleSaveTree = async () => {
+    if (!nodes.length) return;
+    
+    setIsSaving(true);
+    setSaveSuccess(false);
+    
+    try {
+      // Find the root node
+      const rootNodeId = nodes.find(node => node.type === 'rootNode')?.id || 'root';
+      const rootNode = nodes.find(node => node.id === rootNodeId);
+      
+      if (!rootNode) throw new Error('Root node not found');
+      
+      // Create a TreeNode structure from the ReactFlow nodes
+      const createTreeStructure = (nodeId: string): any => {
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) return null;
+        
+        // Find all child edges
+        const childEdges = edges.filter(e => e.source === nodeId);
+        const children = childEdges
+          .map(edge => createTreeStructure(edge.target))
+          .filter(Boolean);
+        
+        return {
+          id: node.id,
+          label: node.data?.label || '',
+          type: node.type === 'rootNode' ? 'root' : 
+                node.type === 'skillNode' ? 'skill' : 'outcome',
+          level: node.data?.level || 0,
+          actions: node.data?.actions || [],
+          children: children.length > 0 ? children : undefined
+        };
+      };
+      
+      // Create tree structure starting from root
+      const treeStructure = createTreeStructure(rootNodeId);
+      
+      // Save to backend
+      await saveTreePath(treeStructure, 'career');
+      setSaveSuccess(true);
+      
+      // Hide success message after a few seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+    } catch (err: any) {
+      console.error('Error saving tree:', err);
+      setError(err.message || 'Failed to save tree');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
@@ -195,7 +254,7 @@ export default function CareerTree() {
           >
             <Background color="#f8fafc" gap={16} size={1} />
             <Controls />
-            <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100">
+            <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100 flex flex-col space-y-4">
               <div className="text-sm text-gray-600">
                 <div className="font-medium mb-2">Your Career Path:</div>
                 <ul className="list-disc pl-5 space-y-1">
@@ -203,13 +262,30 @@ export default function CareerTree() {
                   <li>Click on a skill to see recommended actions</li>
                   <li>Complete all actions before progressing</li>
                 </ul>
-                <button
-                  onClick={() => setIsSubmitted(false)}
-                  className="mt-3 w-full text-blue-600 border border-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors text-sm"
-                >
-                  Edit Profile
-                </button>
+                <div className="flex flex-col space-y-2 mt-3">
+                  <button
+                    onClick={() => setIsSubmitted(false)}
+                    className="w-full text-blue-600 border border-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors text-sm"
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={handleSaveTree}
+                    disabled={isSaving}
+                    className="w-full bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Tree to My Path'}
+                  </button>
+                  {saveSuccess && (
+                    <div className="text-xs text-green-600 font-medium mt-1 text-center">
+                      Tree saved successfully!
+                    </div>
+                  )}
+                </div>
               </div>
+              
+              {/* XP Progress */}
+              <XPProgress />
             </Panel>
           </ReactFlow>
         </div>

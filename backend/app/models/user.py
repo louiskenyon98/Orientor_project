@@ -23,4 +23,9 @@ class User(Base):
     saved_recommendations = relationship("SavedRecommendation", back_populates="user", cascade="all, delete-orphan")
     notes = relationship("UserNote", back_populates="user", cascade="all, delete-orphan")
     skills = relationship("UserSkill", back_populates="user", uselist=False)
-    recommendations = relationship("UserRecommendation", back_populates="user", cascade="all, delete-orphan") 
+    recommendations = relationship("UserRecommendation", back_populates="user", cascade="all, delete-orphan")
+    
+    # New relationships
+    tree_paths = relationship("TreePath", back_populates="user", cascade="all, delete-orphan")
+    node_notes = relationship("NodeNote", back_populates="user", cascade="all, delete-orphan")
+    progress = relationship("UserProgress", back_populates="user", uselist=False, cascade="all, delete-orphan") 

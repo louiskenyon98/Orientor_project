@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import XPProgress from '../ui/XPProgress';
 
 export default function MainLayout({ 
     children, 
@@ -14,8 +15,10 @@ export default function MainLayout({
     const [isLoading, setIsLoading] = useState(true);
     const [moreMenuOpen, setMoreMenuOpen] = useState(false);
     const [careerMenuOpen, setCareerMenuOpen] = useState(false);
+    const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
     const moreMenuRef = useRef<HTMLDivElement>(null);
     const careerMenuRef = useRef<HTMLDivElement>(null);
+    const workspaceMenuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
 
@@ -43,7 +46,7 @@ export default function MainLayout({
         setIsLoading(false);
     }, [router, isPublicRoute, showNav, pathname]);
 
-    // Close more menu when clicking outside
+    // Close menus when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
@@ -51,6 +54,9 @@ export default function MainLayout({
             }
             if (careerMenuRef.current && !careerMenuRef.current.contains(event.target as Node)) {
                 setCareerMenuOpen(false);
+            }
+            if (workspaceMenuRef.current && !workspaceMenuRef.current.contains(event.target as Node)) {
+                setWorkspaceMenuOpen(false);
             }
         }
         
@@ -64,6 +70,7 @@ export default function MainLayout({
     useEffect(() => {
         setMoreMenuOpen(false);
         setCareerMenuOpen(false);
+        setWorkspaceMenuOpen(false);
     }, [pathname]);
 
     const handleLogout = () => {
@@ -195,21 +202,51 @@ export default function MainLayout({
                                         )}
                                     </div>
                                     
-                                    <Link 
-                                        href="/space" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
-                                            ${pathname === '/space' 
-                                                ? 'text-blue-700 bg-blue-50' 
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        Workspace
-                                    </Link>
+                                    {/* Workspace Dropdown */}
+                                    <div className="relative" ref={workspaceMenuRef}>
+                                        <button 
+                                            onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                                            className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
+                                                ${pathname === '/space' || pathname === '/tree-path'
+                                                    ? 'text-blue-700 bg-blue-50' 
+                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            Workspace
+                                            <svg className={`ml-1 h-4 w-4 transition-transform duration-200 ${workspaceMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        
+                                        {workspaceMenuOpen && (
+                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
+                                                <div className="py-1" role="menu" aria-orientation="vertical">
+                                                    <Link
+                                                        href="/space"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Workspace
+                                                    </Link>
+                                                    <Link
+                                                        href="/tree-path"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/tree-path' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Tree Path
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             
-                            {/* Right Side - User Profile & Logout */}
-                            <div className="flex items-center space-x-1">
+                            {/* Right Side - XP Progress, User Profile & Logout */}
+                            <div className="flex items-center space-x-4">
+                                {/* XP Progress Bar */}
+                                <XPProgress className="mr-2" />
+                                
                                 <Link 
                                     href="/profile"
                                     className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
@@ -322,13 +359,43 @@ export default function MainLayout({
                             )}
                         </div>
                         
-                        <Link 
-                            href="/space" 
-                            className={`flex flex-col items-center text-xs ${pathname === '/space' ? 'text-blue-600' : 'text-gray-600'}`}
-                        >
-                            <span className="material-icons-outlined">folder</span>
-                            <span>Space</span>
-                        </Link>
+                        <div className="relative">
+                            <button 
+                                className={`flex flex-col items-center w-full text-xs ${
+                                    pathname === '/space' || pathname === '/tree-path' ? 'text-blue-600' : 'text-gray-600'
+                                }`}
+                                onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                                aria-label="Workspace options"
+                            >
+                                <span className="material-icons-outlined">folder</span>
+                                <span>Workspace</span>
+                            </button>
+                            
+                            {/* Workspace dropdown menu */}
+                            {workspaceMenuOpen && (
+                                <div 
+                                    ref={workspaceMenuRef}
+                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-40 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+                                >
+                                    <div className="py-1">
+                                        <Link 
+                                            href="/space" 
+                                            className={`flex items-center px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-gray-500">folder</span>
+                                            Workspace
+                                        </Link>
+                                        <Link 
+                                            href="/tree-path" 
+                                            className={`flex items-center px-4 py-2 text-sm ${pathname === '/tree-path' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-gray-500">account_tree</span>
+                                            Tree Path
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <Link 
                             href="/profile" 
                             className={`flex flex-col items-center text-xs ${pathname === '/profile' ? 'text-blue-600' : 'text-gray-600'}`}

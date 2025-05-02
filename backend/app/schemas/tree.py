@@ -1,6 +1,8 @@
-from typing import List, Optional, Literal, Dict
+from typing import List, Optional, Literal, Dict, Any
 from pydantic import BaseModel, Field
-
+from datetime import datetime
+from pydantic import BaseModel
+from uuid import UUID
 
 class TreeNode(BaseModel):
     id: str = Field(..., description="Unique lowercase-dash-separated ID")
@@ -45,4 +47,58 @@ class TreeResponse(BaseModel):
 
 
 # Update forward reference for TreeNode.children
-TreeNode.model_rebuild() 
+TreeNode.model_rebuild()
+
+# TreePath schemas
+class TreePathBase(BaseModel):
+    tree_type: str
+    tree_json: Dict[str, Any]
+
+class TreePathCreate(TreePathBase):
+    pass
+
+class TreePath(TreePathBase):
+    id: UUID 
+    user_id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# NodeNote schemas
+class NodeNoteBase(BaseModel):
+    node_id: str
+    action_index: int
+    note_text: str
+
+class NodeNoteCreate(NodeNoteBase):
+    pass
+
+class NodeNote(NodeNoteBase):
+    id: int
+    user_id: int
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# UserProgress schemas
+class UserProgressBase(BaseModel):
+    total_xp: int
+    level: int
+    last_completed_node: Optional[str] = None
+
+class UserProgressCreate(UserProgressBase):
+    pass
+
+class UserProgressUpdate(BaseModel):
+    xp_gained: int
+    node_id: str
+
+class UserProgress(UserProgressBase):
+    id: UUID# int
+    user_id: int
+    last_updated: datetime
+    
+    class Config:
+        from_attributes = True 
