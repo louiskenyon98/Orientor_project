@@ -177,13 +177,6 @@ export default function MainLayout({
                                                         Career Explorer
                                                     </Link>
                                                     <Link
-                                                        href="/tree"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/tree' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Skill Tree Explorer
-                                                    </Link>
-                                                    <Link
                                                         href="/enhanced-skills"
                                                         className={`block px-4 py-2 text-sm ${pathname === '/enhanced-skills' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
                                                         role="menuitem"
@@ -297,17 +290,6 @@ export default function MainLayout({
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500">business</span>
                                             Career Explorer
-                                        </Link>
-                                        <Link 
-                                            href="/tree" 
-                                            className={`flex items-center px-4 py-3 text-sm ${
-                                                pathname === '/tree' 
-                                                    ? 'text-gray-900 font-medium' 
-                                                    : 'text-gray-700 hover:text-gray-900'
-                                            }`}
-                                        >
-                                            <span className="material-icons-outlined mr-2 text-gray-500">account_tree</span>
-                                            Skill Tree Explorer
                                         </Link>
                                         <Link 
                                             href="/enhanced-skills" 

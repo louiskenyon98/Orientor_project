@@ -86,16 +86,6 @@ export default function Navigation() {
                       Career Explorer
                     </Link>
                     <Link 
-                      href="/tree" 
-                      className={`block px-4 py-2 text-sm ${
-                        pathname === '/tree' 
-                          ? 'text-gray-900 font-medium' 
-                          : 'text-gray-700 hover:text-gray-900'
-                      }`}
-                    >
-                      Skill Tree Explorer
-                    </Link>
-                    <Link 
                       href="/enhanced-skills" 
                       className={`block px-4 py-2 text-sm ${
                         pathname === '/enhanced-skills' 
