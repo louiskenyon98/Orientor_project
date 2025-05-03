@@ -1,4 +1,4 @@
-from typing import List, Optional, Literal, Dict, Any
+from typing import List, Optional, Literal, Dict, Any, Union
 from pydantic import BaseModel, Field
 from datetime import datetime
 from pydantic import BaseModel
@@ -96,7 +96,7 @@ class UserProgressUpdate(BaseModel):
     node_id: str
 
 class UserProgress(UserProgressBase):
-    id: UUID# int
+    id: Union[int, UUID]
     user_id: int
     last_updated: datetime
     

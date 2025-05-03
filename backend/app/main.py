@@ -49,14 +49,19 @@ origins = [
     "http://localhost:3000",  # Frontend development server
     "http://localhost:8000",  # Backend when served 
     "https://navigo-explorer.vercel.app",  # Production frontend (if applicable)
+    "http://localhost:5173",  # Vite development server
+    "https://localhost:3000",  # HTTPS local development
+    "https://localhost:5173",  # HTTPS Vite development
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=600,
 )
 
 # Print debug information about routers

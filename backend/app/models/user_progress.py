@@ -1,15 +1,14 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from ..utils.database import Base
 from sqlalchemy.dialects.postgresql import UUID
-from uuid import uuid4    
+from uuid import uuid4
+from ..utils.database import Base
 
 class UserProgress(Base):
     __tablename__ = "user_progress"
     
-    id = Column(Integer, primary_key=True, index=True)
-    uuid = Column(UUID(as_uuid=True), unique=True, default=uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
     total_xp = Column(Integer, default=0, nullable=False)
     level = Column(Integer, default=1, nullable=False)
