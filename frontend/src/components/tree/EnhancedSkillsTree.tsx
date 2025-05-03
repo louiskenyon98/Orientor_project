@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -15,8 +15,9 @@ import { SkillNode, OutcomeNode, RootNode } from './CustomNodes';
 import { motion } from 'framer-motion';
 import { skillsTreeService, SkillsTreeNode } from '../../services/skillsTreeService';
 import { convertToFlowGraph } from '../../utils/convertToFlowGraph';
-import { saveTreePath } from '../../utils/treeStorage';
+import { saveTreePath, getTreePath } from '../../utils/treeStorage';
 import XPProgress from '../ui/XPProgress';
+import { useSearchParams } from 'next/navigation';
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -59,6 +60,42 @@ export default function EnhancedSkillsTree() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const searchParams = useSearchParams();
+  const treeId = searchParams?.get('treeId') || null;
+
+  // Load saved tree if treeId is provided
+  useEffect(() => {
+    const loadSavedTree = async () => {
+      if (!treeId) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        console.log('Loading tree with ID:', treeId);
+        const savedTree = await getTreePath(treeId);
+        console.log('Loaded tree data:', savedTree);
+        
+        if (savedTree && savedTree.tree_json) {
+          // Convert tree data to ReactFlow format
+          const { nodes: treeNodes, edges: treeEdges } = convertToFlowGraph(savedTree.tree_json);
+          setNodes(treeNodes);
+          setEdges(treeEdges);
+          setIsSubmitted(true);
+        } else {
+          throw new Error('Invalid tree data received');
+        }
+      } catch (err: any) {
+        console.error('Error loading saved tree:', err);
+        setError(err.message || 'Failed to load saved tree. Please try again later.');
+        setIsSubmitted(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSavedTree();
+  }, [treeId, setNodes, setEdges]);
 
   // Generate skills tree using the profile input
   const generateSkillsTree = useCallback(async () => {

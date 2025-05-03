@@ -1,8 +1,10 @@
 import logging
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects.postgresql import UUID
+from uuid import uuid4
 from ..core.config import settings
 
 # Set up logging

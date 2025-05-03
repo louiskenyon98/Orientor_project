@@ -6,6 +6,7 @@ from app.routers.user import get_current_user
 from app.models.user import User
 from app.models.tree_path import TreePath
 from app.schemas.tree import TreePathCreate, TreePath as TreePathSchema
+from uuid import UUID
 
 router = APIRouter(
     prefix="/tree-paths",
@@ -38,7 +39,7 @@ async def get_user_tree_paths(
 
 @router.get("/{tree_path_id}", response_model=TreePathSchema)
 async def get_tree_path(
-    tree_path_id: int,
+    tree_path_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -57,7 +58,7 @@ async def get_tree_path(
 
 @router.delete("/{tree_path_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tree_path(
-    tree_path_id: int,
+    tree_path_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):

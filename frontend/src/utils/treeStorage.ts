@@ -182,17 +182,61 @@ export async function deleteTreePath(treePathId: string) {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch(`${API_URL}/tree-paths/${treePathId}/`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
+  try {
+    console.log('Deleting tree with ID:', treePathId);
+    const response = await fetch(`${API_URL}/tree-paths/${treePathId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Failed to delete tree path' }));
-    throw new Error(error.detail || 'Failed to delete tree path');
+    console.log('Delete response status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error deleting tree:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+      throw new Error(errorData.detail || `Failed to delete tree path (${response.status})`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in deleteTreePath:', error);
+    throw error;
+  }
+}
+
+// Get a saved tree by ID
+export async function getTreePath(treeId: string) {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    throw new Error('Authentication required');
   }
 
-  return true;
-} 
+  try {
+    const response = await fetch(`${API_URL}/tree-paths/${treeId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error fetching tree:', errorData);
+      throw new Error(errorData.detail || 'Failed to fetch tree path');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error in getTreePath:', error);
+    throw error;
+  }
+}

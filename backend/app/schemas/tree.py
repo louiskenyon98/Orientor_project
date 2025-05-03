@@ -101,4 +101,4 @@ class UserProgress(UserProgressBase):
     last_updated: datetime
     
     class Config:
-        from_attributes = True 
+        from_attributes = True

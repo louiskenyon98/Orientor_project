@@ -153,7 +153,8 @@ export default function MainLayout({
                                     >
                                         Network
                                     </Link>
-                                    
+
+
                                     {/* Career Path Dropdown */}
                                     <div className="relative" ref={careerMenuRef}>
                                         <button 
@@ -212,9 +213,30 @@ export default function MainLayout({
                                             </div>
                                         )}
                                     </div>
-                                    
+                                    <Link 
+                                        href="/space" 
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/space' 
+                                                ? 'text-blue-700 bg-blue-50' 
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        Workspace
+                                    </Link>
+
+                                    <Link 
+                                        href="/tree-path" 
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/tree-path' 
+                                                ? 'text-blue-700 bg-blue-50' 
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        Tree Path
+                                    </Link>
+
                                     {/* Workspace Dropdown */}
-                                    <div className="relative" ref={workspaceMenuRef}>
+                                    {/* <div className="relative" ref={workspaceMenuRef}>
                                         <button 
                                             onClick={toggleWorkspaceDropdown}
                                             className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
@@ -283,7 +305,7 @@ export default function MainLayout({
                                                 </div>
                                             </div>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             
@@ -414,7 +436,7 @@ export default function MainLayout({
                                 className={`flex flex-col items-center w-full text-xs ${
                                     pathname === '/space' || pathname === '/tree-paths' ? 'text-blue-600' : 'text-gray-600'
                                 }`}
-                                onClick={toggleWorkspaceDropdown}
+                                // onClick={toggleWorkspaceDropdown}
                                 aria-label="Workspace options"
                             >
                                 <span className="material-icons-outlined">folder</span>
@@ -422,7 +444,7 @@ export default function MainLayout({
                             </button>
                             
                             {/* Mobile workspace dropdown menu */}
-                            {workspaceMenuOpen && (
+                            {/* {workspaceMenuOpen && (
                                 <div 
                                     ref={workspaceMenuRef}
                                     className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-40 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
@@ -478,7 +500,7 @@ export default function MainLayout({
                                         </Link>
                                     </div>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                         <Link 
                             href="/profile" 

@@ -217,7 +217,10 @@ export default function TreePathPage() {
                     {/* Actions */}
                     <div className="mt-4 flex justify-between">
                       <Link
-                        href={path.tree_type === 'career' ? '/career' : '/enhanced-skills'}
+                        href={{
+                          pathname: path.tree_type === 'career' ? '/career' : '/enhanced-skills',
+                          query: { treeId: path.id }
+                        }}
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
                         View {path.tree_type} tree
