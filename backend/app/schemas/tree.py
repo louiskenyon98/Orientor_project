@@ -96,7 +96,7 @@ class UserProgressUpdate(BaseModel):
     node_id: str
 
 class UserProgress(UserProgressBase):
-    id: Union[int, UUID]
+    id: str
     user_id: int
     last_updated: datetime
     
