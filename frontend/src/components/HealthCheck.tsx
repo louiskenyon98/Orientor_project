@@ -2,8 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
+interface ApiStatus {
+  status: 'checking...' | 'online' | 'error' | 'offline';
+  error: string | null;
+}
+
 export default function HealthCheck() {
-  const [apiStatus, setApiStatus] = useState({ status: 'checking...', error: null });
+  const [apiStatus, setApiStatus] = useState<ApiStatus>({ status: 'checking...', error: null });
   const router = useRouter();
   const pathname = usePathname();
 
