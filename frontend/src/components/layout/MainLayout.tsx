@@ -433,11 +433,42 @@ export default function MainLayout({
                                 className={`flex flex-col items-center w-full text-xs ${
                                     pathname === '/space' || pathname === '/tree-paths' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
                                 }`}
+                                onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
                                 aria-label="Workspace options"
                             >
                                 <span className="material-icons-outlined">folder</span>
                                 <span>Workspace</span>
                             </button>
+                            
+                            {/* Mobile Workspace Dropdown Menu */}
+                            {workspaceMenuOpen && (
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                    <div className="py-1">
+                                        <Link 
+                                            href="/space" 
+                                            className={`flex items-center px-4 py-3 text-sm ${
+                                                pathname === '/space' 
+                                                    ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' 
+                                                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                                            }`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">space_dashboard</span>
+                                            Space
+                                        </Link>
+                                        <Link 
+                                            href="/tree-path" 
+                                            className={`flex items-center px-4 py-3 text-sm ${
+                                                pathname === '/tree-path' 
+                                                    ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' 
+                                                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                                            }`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">account_tree</span>
+                                            Tree Path
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <Link 
                             href="/profile" 
