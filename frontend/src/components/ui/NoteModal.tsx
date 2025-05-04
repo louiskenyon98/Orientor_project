@@ -68,13 +68,13 @@ export default function NoteModal({ isOpen, onClose, nodeId, actionIndex, action
         ></div>
         
         {/* Modal */}
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-md z-10 relative">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md z-10 relative">
           <div className="p-5">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Notes</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Notes</h3>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-500"
+                className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
               >
                 <span className="sr-only">Close</span>
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,25 +84,25 @@ export default function NoteModal({ isOpen, onClose, nodeId, actionIndex, action
             </div>
             
             <div className="mb-4">
-              <div className="text-sm font-medium text-gray-700 mb-2">Action:</div>
-              <div className="p-3 bg-gray-50 rounded-md text-gray-700 text-sm">{actionText}</div>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Action:</div>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-gray-700 dark:text-gray-300 text-sm">{actionText}</div>
             </div>
             
             <div className="mb-4">
-              <label htmlFor="noteText" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="noteText" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Your Notes:
               </label>
               <textarea
                 id="noteText"
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
-                className="w-full h-32 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-32 p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
                 placeholder="Write your personal notes here..."
               />
             </div>
             
             {error && (
-              <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
+              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
                 {error}
               </div>
             )}
@@ -110,14 +110,14 @@ export default function NoteModal({ isOpen, onClose, nodeId, actionIndex, action
             <div className="flex justify-end space-x-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveNote}
                 disabled={isSaving}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
               >
                 {isSaving ? 'Saving...' : 'Save Note'}
               </button>

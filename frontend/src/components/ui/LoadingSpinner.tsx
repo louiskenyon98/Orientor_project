@@ -3,11 +3,13 @@ import React from 'react';
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   color?: string;
+  className?: string;
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
   size = 'md', 
-  color = 'primary-purple'
+  color = 'primary-purple',
+  className = ''
 }) => {
   const sizeClasses = {
     sm: 'w-5 h-5',
@@ -15,9 +17,19 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     lg: 'w-12 h-12'
   };
 
+  const getColorClass = () => {
+    // If a custom color is provided, just use that
+    if (color !== 'primary-purple') {
+      return `text-${color}`;
+    }
+    
+    // Otherwise use primary-purple with dark mode variant
+    return 'text-primary-purple dark:text-primary-lilac';
+  };
+
   return (
-    <div className="flex justify-center items-center">
-      <div className={`${sizeClasses[size]} text-${color} animate-spin`}>
+    <div className={`flex justify-center items-center ${className}`}>
+      <div className={`${sizeClasses[size]} ${getColorClass()} animate-spin`}>
         <svg 
           className="w-full h-full" 
           xmlns="http://www.w3.org/2000/svg" 

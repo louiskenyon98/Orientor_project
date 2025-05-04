@@ -2,6 +2,7 @@
 import { Inter, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Providers } from './providers';
 import './globals.css';
 
 const inter = Inter({
@@ -33,25 +34,27 @@ export default function RootLayout({
       <head>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
       </head>
-      <body className="min-h-screen bg-white text-neutral-700 antialiased">
-        {/* Background patterns */}
-        <div 
-          className="fixed inset-0 -z-10 bg-[url('/patterns/branch.svg')] bg-repeat opacity-900"
-          style={{ backgroundSize: '200px 200px' }}
-        ></div>
-        <div 
-          className="fixed inset-0 -z-10 bg-[url('/patterns/grid.svg')] bg-repeat opacity-900"
-          style={{ backgroundSize: '200px 200px' }}
-        ></div>
-        
-        {/* Main content */}
-        <main>
-          {children}
-        </main>
+      <Providers>
+        <body className="min-h-screen bg-white dark:bg-black text-neutral-700 dark:text-gray-200 antialiased">
+          {/* Background patterns */}
+          <div 
+            className="fixed inset-0 -z-10 bg-[url('/patterns/branch.svg')] bg-repeat opacity-90 dark:opacity-20"
+            style={{ backgroundSize: '200px 200px' }}
+          ></div>
+          <div 
+            className="fixed inset-0 -z-10 bg-[url('/patterns/grid.svg')] bg-repeat opacity-90 dark:opacity-20"
+            style={{ backgroundSize: '200px 200px' }}
+          ></div>
+          
+          {/* Main content */}
+          <main>
+            {children}
+          </main>
 
-        <Analytics />
-        <SpeedInsights />
-      </body>
+          <Analytics />
+          <SpeedInsights />
+        </body>
+      </Providers>
     </html>
   );
 }

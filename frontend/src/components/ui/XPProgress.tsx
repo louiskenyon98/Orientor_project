@@ -52,15 +52,15 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
   if (loading) {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
-        <div className="h-2 w-24 bg-gray-200 rounded-full animate-pulse"></div>
-        <span className="text-xs text-gray-400">Loading...</span>
+        <div className="h-2 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+        <span className="text-xs text-gray-400 dark:text-gray-500">Loading...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`text-xs text-red-500 ${className}`}>
+      <div className={`text-xs text-red-500 dark:text-red-400 ${className}`}>
         Error loading XP
       </div>
     );
@@ -68,22 +68,22 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
   return (
     <div className={`flex items-center ${className}`}>
       {/* Level Badge */}
-      <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+      <div className="flex-shrink-0 w-8 h-8 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-sm font-medium">
         {level}
       </div>
       
       {/* XP Progress Bar */}
       <div className="ml-4 flex-1">
         <div className="flex items-center justify-start gap-2 text-xs mb-1">
-          <span className="font-medium text-gray-700">Level {level}</span>
-          <span className="text-gray-500">
+          <span className="font-medium text-gray-700 dark:text-gray-200">Level {level}</span>
+          <span className="text-gray-500 dark:text-gray-400">
             {xpInCurrentLevel}/{xpRequiredForNextLevel} XP
             {nextThreshold ? ` to Lvl ${level + 1} ` : ' (Max)'}
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
-            className="bg-blue-600 rounded-full h-2 transition-all duration-500 ease-out"
+            className="bg-blue-600 dark:bg-blue-500 rounded-full h-2 transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>

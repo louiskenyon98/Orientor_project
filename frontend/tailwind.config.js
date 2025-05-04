@@ -3,6 +3,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -89,6 +90,29 @@ module.exports = {
               fontFamily: 'Playfair Display',
               fontWeight: '300',
               letterSpacing: '0.05em',
+            },
+          },
+        },
+        dark: {
+          css: {
+            color: '#e2e8f0',
+            a: {
+              color: '#60a5fa',
+              '&:hover': {
+                color: '#93c5fd',
+              },
+            },
+            h1: {
+              color: '#f7fafc',
+            },
+            h2: {
+              color: '#f7fafc',
+            },
+            h3: {
+              color: '#f7fafc',
+            },
+            strong: {
+              color: '#f7fafc',
             },
           },
         },

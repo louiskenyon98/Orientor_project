@@ -11,11 +11,11 @@
   }
   
   body {
-    @apply bg-white text-neutral-700 min-h-screen font-sans antialiased;
+    @apply bg-white dark:bg-black text-neutral-700 dark:text-gray-200 min-h-screen font-sans antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif text-neutral-800 tracking-wide;
+    @apply font-serif text-neutral-800 dark:text-gray-100 tracking-wide;
   }
 
   h1 {
@@ -31,11 +31,11 @@
   }
 
   p {
-    @apply leading-relaxed text-base md:text-lg text-neutral-600;
+    @apply leading-relaxed text-base md:text-lg text-neutral-600 dark:text-gray-300;
   }
 
   a {
-    @apply text-primary-blue hover:text-primary-indigo transition-colors duration-300;
+    @apply text-primary-blue dark:text-blue-400 hover:text-primary-indigo dark:hover:text-blue-300 transition-colors duration-300;
   }
 }
 
@@ -44,21 +44,21 @@
   .btn {
     @apply inline-flex items-center justify-center px-6 py-3 font-light tracking-wide rounded-lg
     transition-all duration-300
-    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-opacity-50
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 focus:ring-opacity-50
     disabled:opacity-60 disabled:cursor-not-allowed
     text-base;
   }
   
   .btn-primary {
-    @apply bg-primary-blue text-white shadow-soft hover:bg-primary-indigo;
+    @apply bg-primary-blue text-white shadow-soft hover:bg-primary-indigo dark:bg-blue-600 dark:hover:bg-blue-700;
   }
   
   .btn-secondary {
-    @apply bg-white text-primary-blue border border-primary-blue/20 hover:bg-primary-blue/5;
+    @apply bg-white dark:bg-gray-800 text-primary-blue dark:text-blue-400 border border-primary-blue/20 dark:border-blue-500/20 hover:bg-primary-blue/5 dark:hover:bg-blue-900/30;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-neutral-600 hover:text-primary-blue;
+    @apply bg-transparent text-neutral-600 dark:text-gray-300 hover:text-primary-blue dark:hover:text-blue-400;
   }
 
   .btn-sm {
@@ -71,24 +71,24 @@
 
   /* Cards & Containers */
   .card {
-    @apply bg-white/30 backdrop-blur-md rounded-xl p-6 md:p-8 
-    shadow-soft border border-white/20
+    @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-xl p-6 md:p-8 
+    shadow-soft border border-white/20 dark:border-gray-800/50
     transition-all duration-300;
   }
   
   .panel {
-    @apply bg-white/10 backdrop-blur-md rounded-xl p-6 shadow-soft;
+    @apply bg-white/10 dark:bg-gray-900/20 backdrop-blur-md rounded-xl p-6 shadow-soft;
   }
 
   .glass {
-    @apply bg-white/30 backdrop-blur-md border border-white/20;
+    @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/20 dark:border-gray-700/30;
   }
 
   /* Form Elements */
   .input {
-    @apply w-full px-4 py-3 bg-white/30 border-b border-neutral-300 rounded-none
-    focus:outline-none focus:border-primary-blue
-    text-neutral-700 placeholder-neutral-400;
+    @apply w-full px-4 py-3 bg-white/30 dark:bg-gray-900/30 border-b border-neutral-300 dark:border-gray-600 rounded-none
+    focus:outline-none focus:border-primary-blue dark:focus:border-blue-500
+    text-neutral-700 dark:text-gray-200 placeholder-neutral-400 dark:placeholder-gray-500;
   }
 
   .input-group {
@@ -96,18 +96,18 @@
   }
 
   .label {
-    @apply block text-sm font-light text-neutral-600 mb-1;
+    @apply block text-sm font-light text-neutral-600 dark:text-gray-300 mb-1;
   }
 
   /* Navigation */
   .nav-link {
-    @apply px-4 py-2 rounded-lg transition-all duration-300 text-neutral-600
-    hover:text-primary-blue relative;
+    @apply px-4 py-2 rounded-lg transition-all duration-300 text-neutral-600 dark:text-gray-300
+    hover:text-primary-blue dark:hover:text-blue-400 relative;
   }
 
   .nav-link::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary-blue transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary-blue dark:bg-blue-500 transition-all duration-300;
   }
 
   .nav-link:hover::after {
@@ -115,7 +115,7 @@
   }
 
   .nav-link-active {
-    @apply text-primary-blue;
+    @apply text-primary-blue dark:text-blue-400;
   }
 
   .nav-link-active::after {
@@ -128,11 +128,11 @@
   }
   
   .message-user {
-    @apply message-bubble bg-primary-blue text-white ml-auto;
+    @apply message-bubble bg-primary-blue dark:bg-blue-700 text-white ml-auto;
   }
   
   .message-system {
-    @apply message-bubble bg-white/50 backdrop-blur-md border border-white/20;
+    @apply message-bubble bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border border-white/20 dark:border-gray-700/30;
   }
 
   /* Section layouts */
@@ -146,11 +146,11 @@
 
   /* Background patterns */
   .bg-branch {
-    @apply bg-branch-pattern bg-repeat opacity-900;
+    @apply bg-branch-pattern bg-repeat opacity-90 dark:opacity-20;
   }
 
   .bg-grid {
-    @apply bg-grid-pattern bg-repeat opacity-900;
+    @apply bg-grid-pattern bg-repeat opacity-90 dark:opacity-20;
   }
 
   /* Animations & Effects */
