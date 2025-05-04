@@ -214,27 +214,6 @@ export default function MainLayout({
                                             </div>
                                         )}
                                     </div>
-                                    {/* <Link 
-                                        href="/space" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
-                                            ${pathname === '/space' 
-                                                ? 'text-blue-700 bg-blue-50' 
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        Workspace
-                                    </Link>
-
-                                    <Link 
-                                        href="/tree-path" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
-                                            ${pathname === '/tree-path' 
-                                                ? 'text-blue-700 bg-blue-50' 
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                                            }`}
-                                    >
-                                        Tree Path
-                                    </Link> */}
 
                                     {/* Workspace Dropdown */}
                                     <div className="relative inline-block text-left" ref={workspaceMenuRef}>
@@ -445,49 +424,37 @@ export default function MainLayout({
                                 <span>Workspace</span>
                             </Link>
                             
-                            {/* Mobile Workspace Dropdown Menu */}
-                            {workspaceMenuOpen && (
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                    <div className="py-1">
-                                        <Link 
-                                            href="/space"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setTimeout(() => {
-                                                    setWorkspaceMenuOpen(false);
-                                                    window.location.href = '/space';
-                                                }, 100);
-                                            }}
-                                            className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
-                                                ${pathname === '/space'
-                                                    ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
-                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
-                                                }`}
-                                        >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">space_dashboard</span>
-                                            Space
-                                        </Link>
-                                        <Link 
-                                            href="/tree-path"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setTimeout(() => {
-                                                    setWorkspaceMenuOpen(false);
-                                                    window.location.href = '/tree-path';
-                                                }, 100);
-                                            }}
-                                            className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
-                                                ${pathname === '/tree-path'
-                                                    ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
-                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
-                                                }`}
-                                        >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">account_tree</span>
-                                            Tree Path
-                                        </Link>
-                                    </div>
+                        {/* Mobile Workspace Dropdown Menu */}
+                        {workspaceMenuOpen && (
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div className="py-1">
+                                    <Link 
+                                        href="/space"
+                                        onClick={() => setWorkspaceMenuOpen(false)}
+                                        className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/space'
+                                                ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                                            }`}
+                                    >
+                                        <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">space_dashboard</span>
+                                        Space
+                                    </Link>
+                                    <Link 
+                                        href="/tree-path"
+                                        onClick={() => setWorkspaceMenuOpen(false)}
+                                        className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                            ${pathname === '/tree-path'
+                                                ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
+                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                                            }`}
+                                    >
+                                        <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">account_tree</span>
+                                        Tree Path
+                                    </Link>
                                 </div>
-                            )}
+                            </div>
+                        )}
                         </div>
                         <Link 
                             href="/profile" 
