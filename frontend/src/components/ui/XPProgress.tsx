@@ -65,7 +65,6 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
       </div>
     );
   }
-
   return (
     <div className={`flex items-center ${className}`}>
       {/* Level Badge */}
@@ -74,12 +73,12 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
       </div>
       
       {/* XP Progress Bar */}
-      <div className="ml-3 flex-1">
-        <div className="flex justify-between items-center text-xs mb-1">
+      <div className="ml-4 flex-1">
+        <div className="flex items-center justify-start gap-2 text-xs mb-1">
           <span className="font-medium text-gray-700">Level {level}</span>
           <span className="text-gray-500">
             {xpInCurrentLevel}/{xpRequiredForNextLevel} XP
-            {nextThreshold ? ` to Lvl ${level + 1}` : ' (Max)'}
+            {nextThreshold ? ` to Lvl ${level + 1} ` : ' (Max)'}
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">

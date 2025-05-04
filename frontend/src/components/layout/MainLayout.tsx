@@ -213,7 +213,7 @@ export default function MainLayout({
                                             </div>
                                         )}
                                     </div>
-                                    <Link 
+                                    {/* <Link 
                                         href="/space" 
                                         className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
                                             ${pathname === '/space' 
@@ -233,79 +233,56 @@ export default function MainLayout({
                                             }`}
                                     >
                                         Tree Path
-                                    </Link>
+                                    </Link> */}
 
                                     {/* Workspace Dropdown */}
-                                    {/* <div className="relative" ref={workspaceMenuRef}>
-                                        <button 
-                                            onClick={toggleWorkspaceDropdown}
-                                            className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
-                                                ${pathname === '/space' || pathname === '/tree-paths'
-                                                    ? 'text-blue-700 bg-blue-50' 
-                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                                                }`}
+                                    <div className="relative inline-block text-left" ref={workspaceMenuRef}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                                            className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors duration-150 ease-in-out"
                                         >
                                             Workspace
-                                            <svg className={`ml-1 h-4 w-4 transition-transform duration-200 ${workspaceMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            <svg
+                                            className={`ml-2 h-4 w-4 transition-transform duration-200 ${workspaceMenuOpen ? 'rotate-180' : ''}`}
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                            >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                                clipRule="evenodd"
+                                            />
                                             </svg>
                                         </button>
-                                        
-                                        {workspaceMenuOpen && (
-                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
-                                                <div className="py-1" role="menu" aria-orientation="vertical">
-                                                    <Link
-                                                        href="/space"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            console.log('Navigating to /space');
-                                                            try {
-                                                                router.push('/space');
-                                                                // Fallback in case router.push doesn't trigger navigation
-                                                                setTimeout(() => {
-                                                                    if (pathname !== '/space') {
-                                                                        console.log('Fallback: direct navigation to /space');
-                                                                        window.location.href = '/space';
-                                                                    }
-                                                                }, 500);
-                                                            } catch (err) {
-                                                                console.error('Navigation error:', err);
-                                                                window.location.href = '/space';
-                                                            }
-                                                        }}
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/space' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Workspace
-                                                    </Link>
-                                                    <Link
-                                                        href="/tree-paths"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            console.log('Navigating to /tree-paths');
-                                                            try {
-                                                                router.push('/tree-paths');
-                                                                // Fallback in case router.push doesn't trigger navigation
-                                                                setTimeout(() => {
-                                                                    if (pathname !== '/tree-paths') {
-                                                                        console.log('Fallback: direct navigation to /tree-paths');
-                                                                        window.location.href = '/tree-paths';
-                                                                    }
-                                                                }, 500);
-                                                            } catch (err) {
-                                                                console.error('Navigation error:', err);
-                                                                window.location.href = '/tree-paths';
-                                                            }
-                                                        }}
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/tree-paths' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Tree Path
-                                                    </Link>
-                                                </div>
+
+                                        <div className={`absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${workspaceMenuOpen ? 'block' : 'hidden'}`}>
+                                            <div className="py-1">
+                                            <Link
+                                                href="/space"
+                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                                ${pathname === '/space'
+                                                    ? 'text-blue-700 bg-blue-50'
+                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                Space
+                                            </Link>
+                                            <Link
+                                                href="/tree-path"
+                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                                ${pathname === '/tree-path'
+                                                    ? 'text-blue-700 bg-blue-50'
+                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                Tree Path
+                                            </Link>
                                             </div>
-                                        )}
-                                    </div> */}
+                                        </div>
+                                        </div>
                                 </div>
                             </div>
                             
