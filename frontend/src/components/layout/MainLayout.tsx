@@ -446,6 +446,7 @@ export default function MainLayout({
                                     <div className="py-1">
                                         <Link 
                                             href="/space" 
+                                            onClick={() => setWorkspaceMenuOpen(false)}
                                             className={`flex items-center px-4 py-3 text-sm ${
                                                 pathname === '/space' 
                                                     ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' 
@@ -457,6 +458,7 @@ export default function MainLayout({
                                         </Link>
                                         <Link 
                                             href="/tree-path" 
+                                            onClick={() => setWorkspaceMenuOpen(false)}
                                             className={`flex items-center px-4 py-3 text-sm ${
                                                 pathname === '/tree-path' 
                                                     ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' 
