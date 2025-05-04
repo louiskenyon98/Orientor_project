@@ -429,16 +429,21 @@ export default function MainLayout({
                         </div>
                         
                         <div className="relative">
-                            <button 
+                            <Link
+                                href="/space"
                                 className={`flex flex-col items-center w-full text-xs ${
-                                    pathname === '/space' || pathname === '/tree-paths' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'
+                                    pathname === '/space' || pathname === '/tree-path' 
+                                        ? 'text-blue-600 dark:text-blue-400' 
+                                        : 'text-gray-600 dark:text-gray-400'
                                 }`}
-                                onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-                                aria-label="Workspace options"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setWorkspaceMenuOpen(!workspaceMenuOpen);
+                                }}
                             >
                                 <span className="material-icons-outlined">folder</span>
                                 <span>Workspace</span>
-                            </button>
+                            </Link>
                             
                             {/* Mobile Workspace Dropdown Menu */}
                             {workspaceMenuOpen && (
@@ -446,7 +451,13 @@ export default function MainLayout({
                                     <div className="py-1">
                                         <Link 
                                             href="/space"
-                                            onClick={() => setWorkspaceMenuOpen(false)}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setTimeout(() => {
+                                                    setWorkspaceMenuOpen(false);
+                                                    window.location.href = '/space';
+                                                }, 100);
+                                            }}
                                             className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
                                                 ${pathname === '/space'
                                                     ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
@@ -458,7 +469,13 @@ export default function MainLayout({
                                         </Link>
                                         <Link 
                                             href="/tree-path"
-                                            onClick={() => setWorkspaceMenuOpen(false)}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setTimeout(() => {
+                                                    setWorkspaceMenuOpen(false);
+                                                    window.location.href = '/tree-path';
+                                                }, 100);
+                                            }}
                                             className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
                                                 ${pathname === '/tree-path'
                                                     ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'

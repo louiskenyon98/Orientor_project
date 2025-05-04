@@ -64,7 +64,7 @@ export default function SuggestedPeersPage() {
     <MainLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-neutral-darkest">Suggested Peers</h2>
+          <h2 className="text-2xl font-bold text-neutral-darkest">Peers</h2>
           <div className="text-sm text-neutral-gray">
             Students with similar interests and backgrounds
           </div>
