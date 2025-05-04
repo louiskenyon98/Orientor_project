@@ -88,6 +88,7 @@ export default function CareerTree() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isCareerPathVisible, setIsCareerPathVisible] = useState(true); // State to manage visibility
   const searchParams = useSearchParams();
   const treeId = searchParams?.get('treeId') || null;
 
@@ -289,36 +290,47 @@ export default function CareerTree() {
             maxZoom={2}
             proOptions={{ hideAttribution: true }}
           >
+            
             <Background color="#f8fafc" gap={16} size={1} />
             <Controls />
             <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100 flex flex-col space-y-4">
-              <div className="text-sm text-gray-600">
-                <div className="font-medium mb-2">Your Career Path:</div>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Follow the connections between career options</li>
-                  <li>Click on a skill to see recommended actions</li>
-                  <li>Complete all actions before progressing</li>
-                </ul>
-                <div className="flex flex-col space-y-2 mt-3">
-                  <button
-                    onClick={() => setIsSubmitted(false)}
-                    className="w-full text-blue-600 border border-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors text-sm"
-                  >
-                    Edit Profile
-                  </button>
-                  <button
-                    onClick={handleSaveTree}
-                    disabled={isSaving}
-                    className="w-full bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
-                  >
-                    {isSaving ? 'Saving...' : 'Save Tree to My Path'}
-                  </button>
-                  {saveSuccess && (
-                    <div className="text-xs text-green-600 font-medium mt-1 text-center">
-                      Tree saved successfully!
+              <div className="flex flex-col">
+                <button 
+                  onClick={() => setIsCareerPathVisible(!isCareerPathVisible)} 
+                  className="text-sm text-blue-600 mb-2"
+                >
+                  {isCareerPathVisible ? 'Hide Your Career Path' : 'Show Your Career Path'}
+                </button>
+                {isCareerPathVisible && (
+                  <div className="text-sm text-gray-600">
+                    <div className="font-medium mb-2">Your Career Path:</div>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Follow the connections between career options</li>
+                      <li>Click on a skill to see recommended actions</li>
+                      <li>Complete all actions before progressing</li>
+                    </ul>
+                    <div className="flex flex-col space-y-2 mt-3">
+                      <button
+                        onClick={() => setIsSubmitted(false)}
+                        className="w-full text-blue-600 border border-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors text-sm"
+                      >
+                        Edit Profile
+                      </button>
+                      <button
+                        onClick={handleSaveTree}
+                        disabled={isSaving}
+                        className="w-full bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
+                      >
+                        {isSaving ? 'Saving...' : 'Save Tree to My Path'}
+                      </button>
+                      {saveSuccess && (
+                        <div className="text-xs text-green-600 font-medium mt-1 text-center">
+                          Tree saved successfully!
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
               
               {/* XP Progress */}

@@ -60,6 +60,7 @@ export default function EnhancedSkillsTree() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isLearningPathOpen, setIsLearningPathOpen] = useState(true); // State to manage the visibility of the learning path
   const searchParams = useSearchParams();
   const treeId = searchParams?.get('treeId') || null;
 
@@ -260,14 +261,24 @@ export default function EnhancedSkillsTree() {
           >
             <Background color="#f8fafc" gap={16} size={1} />
             <Controls />
-            <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100 flex flex-col space-y-4">
+            <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100 flex flex-col space-y-2">
               <div className="text-sm text-gray-600">
-                <div className="font-medium mb-2">Your Learning Path:</div>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Follow the connections between skills</li>
-                  <li>Click on a skill to see recommended actions</li>
-                  <li>Complete all actions before progressing</li>
-                </ul>
+                <div className="font-medium mb-2 flex justify-between items-center">
+                  <span>Your Learning Path:</span>
+                  <button 
+                    onClick={() => setIsLearningPathOpen(!isLearningPathOpen)} 
+                    className="text-blue-600 hover:underline"
+                  >
+                    {isLearningPathOpen ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                {isLearningPathOpen && (
+                  <ul className="list-disc pl-1 space-y-1">
+                    <li>Follow the connections between skills</li>
+                    <li>Click on a skill to see recommended actions</li>
+                    <li>Complete all actions before progressing</li>
+                  </ul>
+                )}
                 <div className="flex flex-col space-y-2 mt-3">
                   <button
                     onClick={() => setIsSubmitted(false)}
