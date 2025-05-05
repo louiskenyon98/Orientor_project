@@ -48,10 +48,12 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",  # Frontend development server
     "http://localhost:8000",  # Backend when served 
-    "https://navigo-explorer.vercel.app",  # Production frontend (if applicable)
+    "https://navigo-explorer.vercel.app",  # Production frontend
     "http://localhost:5173",  # Vite development server
     "https://localhost:3000",  # HTTPS local development
     "https://localhost:5173",  # HTTPS Vite development
+    "https://*.up.railway.app",  # Railway domains
+    "https://*.railway.app",    # Railway domains
 ]
 
 app.add_middleware(
