@@ -138,29 +138,13 @@ async def root():
 #         logger.error(f"Health check failed: {str(e)}")
 #         return {"status": "error", "detail": str(e)}
 
-@app.get("/api/health")
+@app.get("/health")
 async def health_check():
     try:
-        logger.info("Health check endpoint called")
-        # Check if the application is properly initialized
-        if not app:
-            logger.error("FastAPI app not initialized")
-            return {"status": "error", "detail": "Application not initialized"}
-        
-        # Check if routers are registered
-        if not app.routes:
-            logger.error("No routes registered")
-            return {"status": "error", "detail": "No routes registered"}
-            
-        logger.info("Health check passed successfully")
-        return {
-            "status": "healthy",
-            "message": "Service is running",
-            "routes": len(app.routes),
-            "docs_url": "/docs"
-        }
+        # Basic health check without model dependency
+        return {"status": "healthy", "message": "Service is running"}
     except Exception as e:
-        logger.error(f"Health check failed with error: {str(e)}")
+        logger.error(f"Health check failed: {str(e)}")
         return {"status": "error", "detail": str(e)}
 
 # In your startup event
@@ -189,5 +173,10 @@ def load_models():
         # Don't raise the exception, just log it
         pass
 
+# if __name__ == "__main__":
+#     uvicorn.run("app.main:app", host="0.0.0.0", port=8000) #, reload=True)
+
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000) #, reload=True)
+    port = int(os.environ.get("PORT", 8000))  # Use Railway-assigned port
+    print(f"🚀 Starting app on port {port}")
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port)
