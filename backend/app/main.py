@@ -140,35 +140,38 @@ async def root():
 
 @app.get("/api/health")
 async def health_check():
-    #     if Path("/app/.model_loading").exists():
-    #     raise HTTPException(status_code=503, detail="Service warming up")
-    # return {"status": "healthy"}
     try:
-        # Basic health check without model dependency
-        return {"status": "healthy", "message": "Service is running"}
+        logger.info("Health check endpoint called")
+        # Check if the application is properly initialized
+        if not app:
+            logger.error("FastAPI app not initialized")
+            return {"status": "error", "detail": "Application not initialized"}
+        
+        # Check if routers are registered
+        if not app.routes:
+            logger.error("No routes registered")
+            return {"status": "error", "detail": "No routes registered"}
+            
+        logger.info("Health check passed successfully")
+        return {
+            "status": "healthy",
+            "message": "Service is running",
+            "routes": len(app.routes),
+            "docs_url": "/docs"
+        }
     except Exception as e:
-        logger.error(f"Health check failed: {str(e)}")
+        logger.error(f"Health check failed with error: {str(e)}")
         return {"status": "error", "detail": str(e)}
 
 # In your startup event
 @app.on_event("startup")
 async def startup_event():
-#         load_models()
-
-
-# # In your FastAPI app
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     handlers=[
-#         RotatingFileHandler('app.log', maxBytes=10000000, backupCount=5),
-#         logging.StreamHandler()
-#     ]
-# )
     try:
+        logger.info("Application startup initiated")
         load_models()
+        logger.info("Application startup completed successfully")
     except Exception as e:
-        logger.error(f"Error loading models: {str(e)}")
+        logger.error(f"Error during startup: {str(e)}")
         # Don't fail startup if models fail to load
         pass
 
