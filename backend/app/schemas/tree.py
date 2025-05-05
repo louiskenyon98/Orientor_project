@@ -87,6 +87,7 @@ class UserProgressBase(BaseModel):
     total_xp: int
     level: int
     last_completed_node: Optional[str] = None
+    completed_actions: Optional[Dict[str, List[bool]]] = None
 
 class UserProgressCreate(UserProgressBase):
     pass
@@ -94,6 +95,7 @@ class UserProgressCreate(UserProgressBase):
 class UserProgressUpdate(BaseModel):
     xp_gained: int
     node_id: str
+    completed_actions: Optional[Dict[str, List[bool]]] = None
 
 class UserProgress(UserProgressBase):
     id: str

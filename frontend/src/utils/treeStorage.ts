@@ -27,6 +27,7 @@ interface UserProgress {
   total_xp: number;
   level: number;
   last_completed_node: string | null;
+  completed_actions: { [key: string]: boolean[] } | null;
   last_updated: string;
 }
 
@@ -128,7 +129,7 @@ export async function fetchNodeNotes(nodeId: string) {
 }
 
 // Update user XP when completing an action
-export async function updateUserXP(nodeId: string, xpGained = 10) {
+export async function updateUserXP(nodeId: string, xpGained = 10, completedActions?: { [key: string]: boolean[] }) {
   const token = localStorage.getItem('access_token');
   if (!token) {
     throw new Error('Authentication required');
@@ -142,7 +143,8 @@ export async function updateUserXP(nodeId: string, xpGained = 10) {
     },
     body: JSON.stringify({
       node_id: nodeId,
-      xp_gained: xpGained
+      xp_gained: xpGained,
+      completed_actions: completedActions
     })
   });
 

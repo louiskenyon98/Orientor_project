@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { motion, AnimatePresence } from 'framer-motion';
 import NoteModal from '../ui/NoteModal';
-import { updateUserXP } from '../../utils/treeStorage';
+import { updateUserXP, getUserProgress } from '../../utils/treeStorage';
 import confetti from 'canvas-confetti';
 
 // Animation variants for nodes
@@ -155,6 +155,27 @@ export function SkillNode({ data, id, selected }: NodeProps) {
   // Calculate tooltip position
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0, placement: 'right' });
 
+  // Load completed actions from backend when component mounts
+  useEffect(() => {
+    const loadCompletedActions = async () => {
+      try {
+        const progress = await getUserProgress();
+        if (progress.completed_actions && progress.completed_actions[id]) {
+          setCompletedActions(progress.completed_actions[id]);
+        } else {
+          // Initialize with false for each action
+          setCompletedActions(new Array(data.actions?.length || 0).fill(false));
+        }
+      } catch (err) {
+        console.error('Error loading completed actions:', err);
+        // Initialize with false for each action
+        setCompletedActions(new Array(data.actions?.length || 0).fill(false));
+      }
+    };
+
+    loadCompletedActions();
+  }, [id, data.actions?.length]);
+
   useEffect(() => {
     if (showActions && nodeRef.current) {
       const nodeRect = nodeRef.current.getBoundingClientRect();
@@ -214,9 +235,9 @@ export function SkillNode({ data, id, selected }: NodeProps) {
     newCompletedActions[index] = !newCompletedActions[index];
     setCompletedActions(newCompletedActions);
     
-    // If action is being marked as completed, update XP
-    if (newCompletedActions[index]) {
-      try {
+    try {
+      // If action is being marked as completed, update XP and save completed actions
+      if (newCompletedActions[index]) {
         // Trigger confetti effect
         if (nodeRef.current) {
           const nodeRect = nodeRef.current.getBoundingClientRect();
@@ -229,12 +250,21 @@ export function SkillNode({ data, id, selected }: NodeProps) {
             }
           });
         }
-        
-        // Update XP in the backend
-        await updateUserXP(id);
-      } catch (err) {
-        console.error('Error updating XP:', err);
       }
+      
+      console.log('Sending completed actions to backend:', {
+        nodeId: id,
+        completedActions: { [id]: newCompletedActions }
+      });
+      
+      // Update XP and save completed actions in the backend
+      const response = await updateUserXP(id, 10, { [id]: newCompletedActions });
+      console.log('Backend response:', response);
+      
+    } catch (err) {
+      console.error('Error updating action completion:', err);
+      // Revert the state if the update failed
+      setCompletedActions(completedActions);
     }
   };
   

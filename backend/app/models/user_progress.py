@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..utils.database import Base
+import json
 
 class UserProgress(Base):
     __tablename__ = "user_progress"
@@ -11,7 +12,13 @@ class UserProgress(Base):
     total_xp = Column(Integer, default=0, nullable=False)
     level = Column(Integer, default=1, nullable=False)
     last_completed_node = Column(String(100), nullable=True)
+    completed_actions = Column(JSON, nullable=True, default=dict)  # Store completed actions as JSON with default empty dict
     last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relationship
-    user = relationship("User", back_populates="progress", uselist=False) 
+    user = relationship("User", back_populates="progress", uselist=False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.completed_actions is None:
+            self.completed_actions = {} 
