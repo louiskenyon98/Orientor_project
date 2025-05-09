@@ -48,6 +48,10 @@ export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState('basic');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [rawInputs, setRawInputs] = useState({
+        skills: '',
+        interests: ''
+    });
     const [profile, setProfile] = useState<Profile>({
         user_id: 0,
         name: null,
@@ -93,6 +97,11 @@ export default function ProfilePage() {
                 });
                 console.log('Profile data received:', response.data);
                 setProfile(response.data);
+                // Initialize raw inputs with existing arrays
+                setRawInputs({
+                    skills: response.data.skills?.join(', ') || '',
+                    interests: response.data.interests?.join(', ') || ''
+                });
             } catch (err) {
                 const error = err as ApiError;
                 console.error('Error fetching profile:', error.response?.data || error.message);
@@ -107,38 +116,45 @@ export default function ProfilePage() {
         try {
             const token = localStorage.getItem('access_token');
             
+            // Process arrays before sending
+            const processedProfile = {
+                ...profile,
+                skills: rawInputs.skills ? rawInputs.skills.split(',').map(item => item.trim()).filter(item => item !== '') : [],
+                interests: rawInputs.interests ? rawInputs.interests.split(',').map(item => item.trim()).filter(item => item !== '') : []
+            };
+
             // Create a clean profile object with all fields
             const cleanProfile = {
-                user_id: profile.user_id,
+                user_id: processedProfile.user_id,
                 // Basic Info
-                name: profile.name || null,
-                age: profile.age || null,
-                sex: profile.sex || null,
-                country: profile.country || null,
-                state_province: profile.state_province || null,
+                name: processedProfile.name || null,
+                age: processedProfile.age || null,
+                sex: processedProfile.sex || null,
+                country: processedProfile.country || null,
+                state_province: processedProfile.state_province || null,
                 
                 // Academic Info
-                major: profile.major || null,
-                year: profile.year || null,
-                gpa: profile.gpa || null,
-                learning_style: profile.learning_style || null,
+                major: processedProfile.major || null,
+                year: processedProfile.year || null,
+                gpa: processedProfile.gpa || null,
+                learning_style: processedProfile.learning_style || null,
                 
                 // Personal Info
-                hobbies: profile.hobbies || null,
-                unique_quality: profile.unique_quality || null,
-                story: profile.story || null,
-                favorite_movie: profile.favorite_movie || null,
-                favorite_book: profile.favorite_book || null,
-                favorite_celebrities: profile.favorite_celebrities || null,
+                hobbies: processedProfile.hobbies || null,
+                unique_quality: processedProfile.unique_quality || null,
+                story: processedProfile.story || null,
+                favorite_movie: processedProfile.favorite_movie || null,
+                favorite_book: processedProfile.favorite_book || null,
+                favorite_celebrities: processedProfile.favorite_celebrities || null,
                 
                 // Career Info (used for embedding)
-                job_title: profile.job_title || null,
-                industry: profile.industry || null,
-                years_experience: profile.years_experience || null,
-                education_level: profile.education_level || null,
-                career_goals: profile.career_goals || null,
-                skills: profile.skills || [],
-                interests: profile.interests || []
+                job_title: processedProfile.job_title || null,
+                industry: processedProfile.industry || null,
+                years_experience: processedProfile.years_experience || null,
+                education_level: processedProfile.education_level || null,
+                career_goals: processedProfile.career_goals || null,
+                skills: processedProfile.skills,
+                interests: processedProfile.interests
             };
 
             // Update user info
@@ -196,9 +212,16 @@ export default function ProfilePage() {
     };
 
     const handleArrayChange = (field: 'interests' | 'skills') => (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.stopPropagation(); // Stop event propagation
+        e.stopPropagation();
         const value = e.target.value;
-        // Split by comma and trim each item, but preserve spaces within each item
+        setRawInputs(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleArrayBlur = (field: 'interests' | 'skills') => () => {
+        const value = rawInputs[field];
         const array = value ? value.split(',').map(item => item.trim()).filter(item => item !== '') : [];
         setProfile(prev => ({
             ...prev,
@@ -469,19 +492,11 @@ export default function ProfilePage() {
                                             </label>
                                             <input
                                                 type="text"
-                                                value={Array.isArray(profile.skills) ? profile.skills.join(', ') : ''}
+                                                value={rawInputs.skills}
                                                 onChange={handleArrayChange('skills')}
-                                                onKeyDown={(e) => {
-                                                    e.stopPropagation();
-                                                }}
-                                                onKeyPress={(e) => {
-                                                    e.stopPropagation();
-                                                }}
-                                                onKeyUp={(e) => {
-                                                    e.stopPropagation();
-                                                }}
+                                                onBlur={handleArrayBlur('skills')}
+                                                placeholder="e.g., Python, Data Analysis, Machine Learning"
                                                 className="input"
-                                                placeholder="e.g., Python, JavaScript, Project Management"
                                             />
                                         </div>
                                         <div className="md:col-span-2">
@@ -490,19 +505,11 @@ export default function ProfilePage() {
                                             </label>
                                             <input
                                                 type="text"
-                                                value={Array.isArray(profile.interests) ? profile.interests.join(', ') : ''}
+                                                value={rawInputs.interests}
                                                 onChange={handleArrayChange('interests')}
-                                                onKeyDown={(e) => {
-                                                    e.stopPropagation();
-                                                }}
-                                                onKeyPress={(e) => {
-                                                    e.stopPropagation();
-                                                }}
-                                                onKeyUp={(e) => {
-                                                    e.stopPropagation();
-                                                }}
+                                                onBlur={handleArrayBlur('interests')}
+                                                placeholder="e.g., AI, Web Development, Design"
                                                 className="input"
-                                                placeholder="e.g., AI, Web Development, Data Science"
                                             />
                                         </div>
                                     </div>
