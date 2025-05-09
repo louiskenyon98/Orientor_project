@@ -47,6 +47,14 @@ export interface UserSkills {
   digital_literacy: number;
   critical_thinking: number;
   problem_solving: number;
+  analytical_thinking: number;
+  attention_to_detail: number;
+  collaboration: number;
+  adaptability: number;
+  independence: number;
+  evaluation: number;
+  decision_making: number;
+  stress_tolerance: number;
 }
 
 export interface Note {

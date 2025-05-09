@@ -13,6 +13,14 @@ class UserSkill(Base):
     digital_literacy = Column(Float, nullable=True)
     critical_thinking = Column(Float, nullable=True)
     problem_solving = Column(Float, nullable=True)
+    analytical_thinking = Column(Float, nullable=True)
+    attention_to_detail = Column(Float, nullable=True)
+    collaboration = Column(Float, nullable=True)
+    adaptability = Column(Float, nullable=True)
+    independence = Column(Float, nullable=True)
+    evaluation = Column(Float, nullable=True)
+    decision_making = Column(Float, nullable=True)
+    stress_tolerance = Column(Float, nullable=True)
     last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relationships

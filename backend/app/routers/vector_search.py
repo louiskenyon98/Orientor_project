@@ -137,7 +137,7 @@ class SearchResponse(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str
-    top_k: Optional[int] = 5
+    top_k: Optional[int] = 30
 
 class SuggestedPeer(BaseModel):
     user_id: int
@@ -328,16 +328,8 @@ async def save_search_result(
             role_digital_literacy=recommendation.role_digital_literacy,
             role_critical_thinking=recommendation.role_critical_thinking,
             role_problem_solving=recommendation.role_problem_solving,
-            analytical_thinking=recommendation.analytical_thinking,
-            attention_to_detail=recommendation.attention_to_detail,
-            collaboration=recommendation.collaboration,
-            adaptability=recommendation.adaptability,
-            independence=recommendation.independence,
-            evaluation=recommendation.evaluation,
-            decision_making=recommendation.decision_making,
-            stress_tolerance=recommendation.stress_tolerance
+            all_fields=recommendation.all_fields
         )
-        print(f'stress_tolerance: {recommendation.stress_tolerance}')
         db.add(new_recommendation)
         db.commit()
         db.refresh(new_recommendation)
@@ -404,4 +396,24 @@ async def get_suggested_peers(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get suggested peers"
-        ) 
+        )
+
+@router.get("/debug")
+async def debug_index():
+    """
+    Debug endpoint to check Pinecone index configuration
+    """
+    try:
+        index = get_pinecone_index()
+        stats = index.describe_index_stats()
+        return {
+            "status": "success",
+            "stats": stats,
+            "index_name": "oasis-minilm-index"
+        }
+    except Exception as e:
+        logger.error(f"Debug check failed: {str(e)}", exc_info=True)
+        return {
+            "status": "error",
+            "error": str(e)
+        } 

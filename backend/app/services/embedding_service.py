@@ -164,7 +164,7 @@ logger.info(f"All models loaded: {MODELS_LOADED}")
 def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFrame]:
     """
     Preprocess user profile data for embedding generation.
-    Only uses career-related fields for embedding generation.
+    Uses all available profile fields for a more comprehensive embedding.
     """
     try:
         # Debug logging
@@ -184,8 +184,30 @@ def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFra
         skills = clean_array(profile_data.get("skills", []))
         interests = clean_array(profile_data.get("interests", []))
         
-        # Create DataFrame with only career-related fields
+        # Create DataFrame with all profile fields
         user_df = pd.DataFrame([{
+            # Basic Info
+            "Name": profile_data.get("name", "Unknown"),
+            "Age": profile_data.get("age", 0),
+            "Sex": profile_data.get("sex", "Unknown"),
+            "Country": profile_data.get("country", "Unknown"),
+            "State/Province": profile_data.get("state_province", "Unknown"),
+            
+            # Academic Info
+            "Major": profile_data.get("major", "Unknown"),
+            "Year": profile_data.get("year", 0),
+            "GPA": profile_data.get("gpa", 0.0),
+            "Learning Style": profile_data.get("learning_style", "Unknown"),
+            
+            # Personal Info
+            "Hobbies": profile_data.get("hobbies", ""),
+            "Unique Quality": profile_data.get("unique_quality", ""),
+            "Story": profile_data.get("story", ""),
+            "Favorite Movie": profile_data.get("favorite_movie", ""),
+            "Favorite Book": profile_data.get("favorite_book", ""),
+            "Favorite Celebrities": profile_data.get("favorite_celebrities", ""),
+            
+            # Career Info
             "Job Title": profile_data.get("job_title", "Unknown"),
             "Industry": profile_data.get("industry", "Unknown"),
             "Years Experience": profile_data.get("years_experience", 0),
@@ -221,6 +243,28 @@ def generate_embedding(profile_data: Dict[str, Any]) -> Optional[np.ndarray]:
 
         # Convert DataFrame to text for SentenceTransformer
         text_data = " ".join([
+            # Basic Info
+            f"Name: {processed_data['Name'].iloc[0]}",
+            f"Age: {processed_data['Age'].iloc[0]}",
+            f"Sex: {processed_data['Sex'].iloc[0]}",
+            f"Country: {processed_data['Country'].iloc[0]}",
+            f"State/Province: {processed_data['State/Province'].iloc[0]}",
+            
+            # Academic Info
+            f"Major: {processed_data['Major'].iloc[0]}",
+            f"Year: {processed_data['Year'].iloc[0]}",
+            f"GPA: {processed_data['GPA'].iloc[0]}",
+            f"Learning Style: {processed_data['Learning Style'].iloc[0]}",
+            
+            # Personal Info
+            f"Hobbies: {processed_data['Hobbies'].iloc[0]}",
+            f"Unique Quality: {processed_data['Unique Quality'].iloc[0]}",
+            f"Story: {processed_data['Story'].iloc[0]}",
+            f"Favorite Movie: {processed_data['Favorite Movie'].iloc[0]}",
+            f"Favorite Book: {processed_data['Favorite Book'].iloc[0]}",
+            f"Favorite Celebrities: {processed_data['Favorite Celebrities'].iloc[0]}",
+            
+            # Career Info
             f"Job Title: {processed_data['Job Title'].iloc[0]}",
             f"Industry: {processed_data['Industry'].iloc[0]}",
             f"Years Experience: {processed_data['Years Experience'].iloc[0]}",

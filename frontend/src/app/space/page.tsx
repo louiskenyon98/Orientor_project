@@ -160,7 +160,7 @@ export default function SpacePage() {
 
                     <div className="mt-8">
                       <h3 className="text-lg font-semibold mb-2">Cognitive Traits & Work Characteristics</h3>
-                      <ResponsiveContainer width="100%" height={250}>
+                      <ResponsiveContainer width="100%" height={300}>
                         <BarChart
                           data={extractChartData(selectedRecommendation)}
                           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
@@ -169,7 +169,9 @@ export default function SpacePage() {
                           <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                           <YAxis domain={[0, 5]} />
                           <Tooltip />
-                          <Bar dataKey="value" fill="#8884d8" />
+                          <Legend />
+                          <Bar name="Role Requirements" dataKey="role" fill="#8884d8" />
+                          <Bar name="Your Traits" dataKey="user" fill="#82ca9d" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>

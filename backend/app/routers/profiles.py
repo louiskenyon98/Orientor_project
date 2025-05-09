@@ -46,6 +46,14 @@ class ProfileResponse(BaseModel):
     education_level: Optional[str] = None
     career_goals: Optional[str] = None
     skills: Optional[List[str]] = None
+    analytical_thinking: Optional[float] = None
+    attention_to_detail: Optional[float] = None
+    collaboration: Optional[float] = None
+    adaptability: Optional[float] = None
+    independence: Optional[float] = None
+    evaluation: Optional[float] = None
+    decision_making: Optional[float] = None
+    stress_tolerance: Optional[float] = None
 
     class Config:
         from_attributes = True
@@ -79,6 +87,15 @@ class ProfileUpdate(BaseModel):
     digital_literacy: Optional[float] = Field(None, ge=0, le=5)
     critical_thinking: Optional[float] = Field(None, ge=0, le=5)
     problem_solving: Optional[float] = Field(None, ge=0, le=5)
+    # Add cognitive traits
+    analytical_thinking: Optional[float] = Field(None, ge=0, le=5)
+    attention_to_detail: Optional[float] = Field(None, ge=0, le=5)
+    collaboration: Optional[float] = Field(None, ge=0, le=5)
+    adaptability: Optional[float] = Field(None, ge=0, le=5)
+    independence: Optional[float] = Field(None, ge=0, le=5)
+    evaluation: Optional[float] = Field(None, ge=0, le=5)
+    decision_making: Optional[float] = Field(None, ge=0, le=5)
+    stress_tolerance: Optional[float] = Field(None, ge=0, le=5)
     # Job-related fields for embeddings
     job_title: Optional[str] = None
     industry: Optional[str] = None
@@ -104,13 +121,21 @@ def get_profile(current_user: User = Depends(get_current_user), db: Session = De
         skills = db.query(UserSkill).filter(UserSkill.user_id == current_user.id).first()
         response = ProfileResponse.model_validate(profile)
         
-        # Add skills to response if they exist
+        # Add all skills to response if they exist
         if skills:
             response.creativity = skills.creativity
             response.leadership = skills.leadership
             response.digital_literacy = skills.digital_literacy
             response.critical_thinking = skills.critical_thinking
             response.problem_solving = skills.problem_solving
+            response.analytical_thinking = skills.analytical_thinking
+            response.attention_to_detail = skills.attention_to_detail
+            response.collaboration = skills.collaboration
+            response.adaptability = skills.adaptability
+            response.independence = skills.independence
+            response.evaluation = skills.evaluation
+            response.decision_making = skills.decision_making
+            response.stress_tolerance = skills.stress_tolerance
         
         return response
     except Exception as e:
@@ -139,7 +164,15 @@ def update_profile(
             "leadership": profile_data.leadership,
             "digital_literacy": profile_data.digital_literacy,
             "critical_thinking": profile_data.critical_thinking,
-            "problem_solving": profile_data.problem_solving
+            "problem_solving": profile_data.problem_solving,
+            "analytical_thinking": profile_data.analytical_thinking,
+            "attention_to_detail": profile_data.attention_to_detail,
+            "collaboration": profile_data.collaboration,
+            "adaptability": profile_data.adaptability,
+            "independence": profile_data.independence,
+            "evaluation": profile_data.evaluation,
+            "decision_making": profile_data.decision_making,
+            "stress_tolerance": profile_data.stress_tolerance
         }
         
         # Get existing skills or create new
@@ -155,7 +188,11 @@ def update_profile(
         
         # Convert to dict excluding the skill fields and unset values
         profile_fields = profile_data.dict(
-            exclude={"creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving"},
+            exclude={
+                "creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving",
+                "analytical_thinking", "attention_to_detail", "collaboration", "adaptability",
+                "independence", "evaluation", "decision_making", "stress_tolerance"
+            },
             exclude_unset=True
         )
         
@@ -170,11 +207,21 @@ def update_profile(
         
         # Build response with combined data
         response = ProfileResponse.model_validate(profile)
+        
+        # Add all skills to response
         response.creativity = skills.creativity
         response.leadership = skills.leadership
         response.digital_literacy = skills.digital_literacy
         response.critical_thinking = skills.critical_thinking
         response.problem_solving = skills.problem_solving
+        response.analytical_thinking = skills.analytical_thinking
+        response.attention_to_detail = skills.attention_to_detail
+        response.collaboration = skills.collaboration
+        response.adaptability = skills.adaptability
+        response.independence = skills.independence
+        response.evaluation = skills.evaluation
+        response.decision_making = skills.decision_making
+        response.stress_tolerance = skills.stress_tolerance
         
         # Generate user embedding based on profile data
         try:
@@ -213,6 +260,42 @@ def update_profile(
         logger.error(f"Error updating profile: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+
+@router.get("/{user_id}", response_model=ProfileResponse)
+def get_user_profile(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get profile information for a specific user."""
+    try:
+        logger.info(f"Attempting to get profile for user ID: {user_id}")
+        profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        
+        if not profile:
+            logger.info(f"No profile found for user ID: {user_id}, creating a new one")
+            # Create a new profile if it doesn't exist
+            profile = UserProfile(user_id=user_id)
+            db.add(profile)
+            db.commit()
+            db.refresh(profile)
+        
+        # Get user skills
+        skills = db.query(UserSkill).filter(UserSkill.user_id == user_id).first()
+        response = ProfileResponse.model_validate(profile)
+        
+        # Add skills to response if they exist
+        if skills:
+            response.creativity = skills.creativity
+            response.leadership = skills.leadership
+            response.digital_literacy = skills.digital_literacy
+            response.critical_thinking = skills.critical_thinking
+            response.problem_solving = skills.problem_solving
+        
+        return response
+    except Exception as e:
+        logger.error(f"Error retrieving profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving profile: {str(e)}")
 
 # Add module-level debug message after routes are defined
 logger.debug("Initializing profiles router module")

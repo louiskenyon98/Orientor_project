@@ -48,6 +48,15 @@ interface Profile {
     digital_literacy: number | null;
     critical_thinking: number | null;
     problem_solving: number | null;
+    // Cognitive traits
+    analytical_thinking: number | null;
+    attention_to_detail: number | null;
+    collaboration: number | null;
+    adaptability: number | null;
+    independence: number | null;
+    evaluation: number | null;
+    decision_making: number | null;
+    stress_tolerance: number | null;
 }
 
 export default function ProfilePage() {
@@ -86,7 +95,15 @@ export default function ProfilePage() {
         leadership: null,
         digital_literacy: null,
         critical_thinking: null,
-        problem_solving: null
+        problem_solving: null,
+        analytical_thinking: null,
+        attention_to_detail: null,
+        collaboration: null,
+        adaptability: null,
+        independence: null,
+        evaluation: null,
+        decision_making: null,
+        stress_tolerance: null
     });
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -159,7 +176,16 @@ export default function ProfilePage() {
                 leadership: profile.leadership === null || profile.leadership === undefined ? null : Number(profile.leadership),
                 digital_literacy: profile.digital_literacy === null || profile.digital_literacy === undefined ? null : Number(profile.digital_literacy),
                 critical_thinking: profile.critical_thinking === null || profile.critical_thinking === undefined ? null : Number(profile.critical_thinking),
-                problem_solving: profile.problem_solving === null || profile.problem_solving === undefined ? null : Number(profile.problem_solving)
+                problem_solving: profile.problem_solving === null || profile.problem_solving === undefined ? null : Number(profile.problem_solving),
+                // Convert cognitive traits to numbers
+                analytical_thinking: profile.analytical_thinking === null || profile.analytical_thinking === undefined ? null : Number(profile.analytical_thinking),
+                attention_to_detail: profile.attention_to_detail === null || profile.attention_to_detail === undefined ? null : Number(profile.attention_to_detail),
+                collaboration: profile.collaboration === null || profile.collaboration === undefined ? null : Number(profile.collaboration),
+                adaptability: profile.adaptability === null || profile.adaptability === undefined ? null : Number(profile.adaptability),
+                independence: profile.independence === null || profile.independence === undefined ? null : Number(profile.independence),
+                evaluation: profile.evaluation === null || profile.evaluation === undefined ? null : Number(profile.evaluation),
+                decision_making: profile.decision_making === null || profile.decision_making === undefined ? null : Number(profile.decision_making),
+                stress_tolerance: profile.stress_tolerance === null || profile.stress_tolerance === undefined ? null : Number(profile.stress_tolerance)
             };
 
             // Create a clean profile object with all fields
@@ -186,14 +212,31 @@ export default function ProfilePage() {
                 favorite_book: processedProfile.favorite_book || null,
                 favorite_celebrities: processedProfile.favorite_celebrities || null,
                 
-                // Career Info (used for embedding)
+                // Career Info
                 job_title: processedProfile.job_title || null,
                 industry: processedProfile.industry || null,
                 years_experience: processedProfile.years_experience || null,
                 education_level: processedProfile.education_level || null,
                 career_goals: processedProfile.career_goals || null,
                 skills: processedProfile.skills,
-                interests: processedProfile.interests
+                interests: processedProfile.interests,
+                
+                // Skill scores
+                creativity: processedProfile.creativity,
+                leadership: processedProfile.leadership,
+                digital_literacy: processedProfile.digital_literacy,
+                critical_thinking: processedProfile.critical_thinking,
+                problem_solving: processedProfile.problem_solving,
+                
+                // Cognitive traits
+                analytical_thinking: processedProfile.analytical_thinking,
+                attention_to_detail: processedProfile.attention_to_detail,
+                collaboration: processedProfile.collaboration,
+                adaptability: processedProfile.adaptability,
+                independence: processedProfile.independence,
+                evaluation: processedProfile.evaluation,
+                decision_making: processedProfile.decision_making,
+                stress_tolerance: processedProfile.stress_tolerance
             };
 
             // Update user info
@@ -321,6 +364,17 @@ export default function ProfilePage() {
                                     } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
                                 >
                                     Career
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('personal')}
+                                    className={`${
+                                        activeTab === 'personal'
+                                            ? 'border-secondary-teal text-secondary-teal'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    Personal
                                 </button>
                                 <button
                                     type="button"
@@ -557,6 +611,198 @@ export default function ProfilePage() {
                                                 className="input"
                                             />
                                         </div>
+                                        <div className="md:col-span-2">
+                                            <h3 className="text-lg font-medium text-neutral-lightgray mb-4">Skill Scores</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Creativity: {profile.creativity || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.creativity || 0}
+                                                        onChange={handleProfileChange('creativity')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Leadership: {profile.leadership || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.leadership || 0}
+                                                        onChange={handleProfileChange('leadership')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Digital Literacy: {profile.digital_literacy || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.digital_literacy || 0}
+                                                        onChange={handleProfileChange('digital_literacy')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Critical Thinking: {profile.critical_thinking || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.critical_thinking || 0}
+                                                        onChange={handleProfileChange('critical_thinking')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Problem Solving: {profile.problem_solving || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.problem_solving || 0}
+                                                        onChange={handleProfileChange('problem_solving')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <h3 className="text-lg font-medium text-neutral-lightgray mb-4">Cognitive Traits</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Analytical Thinking: {profile.analytical_thinking || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.analytical_thinking || 0}
+                                                        onChange={handleProfileChange('analytical_thinking')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Attention to Detail: {profile.attention_to_detail || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.attention_to_detail || 0}
+                                                        onChange={handleProfileChange('attention_to_detail')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Collaboration: {profile.collaboration || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.collaboration || 0}
+                                                        onChange={handleProfileChange('collaboration')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Adaptability: {profile.adaptability || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.adaptability || 0}
+                                                        onChange={handleProfileChange('adaptability')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Independence: {profile.independence || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.independence || 0}
+                                                        onChange={handleProfileChange('independence')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Evaluation: {profile.evaluation || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.evaluation || 0}
+                                                        onChange={handleProfileChange('evaluation')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Decision Making: {profile.decision_making || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.decision_making || 0}
+                                                        onChange={handleProfileChange('decision_making')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                        Stress Tolerance: {profile.stress_tolerance || 0}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        value={profile.stress_tolerance || 0}
+                                                        onChange={handleProfileChange('stress_tolerance')}
+                                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.5"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -586,6 +832,114 @@ export default function ProfilePage() {
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 className="input"
                                                 placeholder="Leave blank to keep current password"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'personal' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Hobbies
+                                            </label>
+                                            <textarea
+                                                value={profile.hobbies || ''}
+                                                onChange={handleProfileChange('hobbies')}
+                                                className="input"
+                                                placeholder="Your hobbies"
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Unique Quality
+                                            </label>
+                                            <textarea
+                                                value={profile.unique_quality || ''}
+                                                onChange={handleProfileChange('unique_quality')}
+                                                className="input"
+                                                placeholder="What makes you unique?"
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Your Story
+                                            </label>
+                                            <textarea
+                                                value={profile.story || ''}
+                                                onChange={handleProfileChange('story')}
+                                                className="input"
+                                                placeholder="Tell us your story"
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Favorite Movie
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.favorite_movie || ''}
+                                                onChange={handleProfileChange('favorite_movie')}
+                                                className="input"
+                                                placeholder="Your favorite movie"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Favorite Book
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.favorite_book || ''}
+                                                onChange={handleProfileChange('favorite_book')}
+                                                className="input"
+                                                placeholder="Your favorite book"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Role Model
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.favorite_celebrities || ''}
+                                                onChange={handleProfileChange('favorite_celebrities')}
+                                                className="input"
+                                                placeholder="Your role model or favorite celebrity"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Learning Style
+                                            </label>
+                                            <select
+                                                value={profile.learning_style || ''}
+                                                onChange={handleProfileChange('learning_style')}
+                                                className="input bg-gray-100"
+                                            >
+                                                <option value="">Select your learning style</option>
+                                                <option value="Visual">Visual</option>
+                                                <option value="Auditory">Auditory</option>
+                                                <option value="Reading/Writing">Reading/Writing</option>
+                                                <option value="Kinesthetic">Kinesthetic</option>
+                                            </select>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Interests
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={rawInputs.interests}
+                                                onChange={handleArrayChange('interests')}
+                                                onBlur={handleArrayBlur('interests')}
+                                                placeholder="e.g., AI, Web Development, Design"
+                                                className="input"
                                             />
                                         </div>
                                     </div>

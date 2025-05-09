@@ -1,3 +1,8 @@
+import pandas as pd
+import numpy as np
+import os
+from pinecone import Pinecone
+
 def build_user_vector(user_df_row, pca, encoder, scaler, ohe, embedder_model):
     # 1. Embed text
     text_fields = ['Story', 'Interests', 'Hobbies', 'Unique Quality', 'Learning Style',

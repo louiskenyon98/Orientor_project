@@ -30,7 +30,7 @@ export default async function handler(
   }
 
   try {
-    const { limit = 10 } = req.query;
+    const { limit = 30 } = req.query;
     const url = `/careers/recommendations`;
     console.log('Proxying request to:', `${BACKEND_API_URL}${url}`);
     

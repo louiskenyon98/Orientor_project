@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 from ..utils.database import get_db
 from app.routers.user import get_current_user
-from ..models import User, SavedRecommendation, UserNote, UserSkill
+from ..models import User, SavedRecommendation, UserNote, UserSkill, UserProfile
 from ..schemas.space import (
     SavedRecommendationCreate, SavedRecommendation as SavedRecommendationSchema,
     UserNoteCreate, UserNoteUpdate, UserNote as UserNoteSchema,
@@ -75,14 +75,6 @@ def create_saved_recommendation(
         role_digital_literacy=recommendation.role_digital_literacy,
         role_critical_thinking=recommendation.role_critical_thinking,
         role_problem_solving=recommendation.role_problem_solving,
-        analytical_thinking=recommendation.analytical_thinking,
-        attention_to_detail=recommendation.attention_to_detail,
-        collaboration=recommendation.collaboration,
-        adaptability=recommendation.adaptability,
-        independence=recommendation.independence,
-        evaluation=recommendation.evaluation,
-        decision_making=recommendation.decision_making,
-        stress_tolerance=recommendation.stress_tolerance,
         all_fields=recommendation.all_fields
     )
     
@@ -104,7 +96,7 @@ def get_saved_recommendations(
     
     logger.info(f"Found {len(recommendations)} recommendations for user {current_user.id}")
     
-    # Get the user's skills from UserSkill table
+    # Get the user's skills and cognitive traits
     user_skills = db.query(UserSkill).filter(UserSkill.user_id == current_user.id).first()
     
     result = []
@@ -117,41 +109,31 @@ def get_saved_recommendations(
         
         # Build skill comparison if both user and role skills are available
         skill_comparison = None
-        if user_skills and (user_skills.creativity is not None or user_skills.leadership is not None or \
-           user_skills.digital_literacy is not None or user_skills.critical_thinking is not None or \
-           user_skills.problem_solving is not None):
+        if user_skills:
+            # Add user's cognitive traits to the recommendation
+            rec.user_analytical_thinking = user_skills.analytical_thinking
+            rec.user_attention_to_detail = user_skills.attention_to_detail
+            rec.user_collaboration = user_skills.collaboration
+            rec.user_adaptability = user_skills.adaptability
+            rec.user_independence = user_skills.independence
+            rec.user_evaluation = user_skills.evaluation
+            rec.user_decision_making = user_skills.decision_making
+            rec.user_stress_tolerance = user_skills.stress_tolerance
             
-            # Log user skills
-            logger.info(f"User skills: creativity={user_skills.creativity}, leadership={user_skills.leadership}, "
-                       f"digital_literacy={user_skills.digital_literacy}, critical_thinking={user_skills.critical_thinking}, "
-                       f"problem_solving={user_skills.problem_solving}")
-            
-            # Build comparison dict
-            comparison = {}
-            for skill in ["creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving"]:
-                role_skill_name = f"role_{skill}"
+            # Build skill comparison
+            if (user_skills.creativity is not None or user_skills.leadership is not None or \
+                user_skills.digital_literacy is not None or user_skills.critical_thinking is not None or \
+                user_skills.problem_solving is not None):
                 
-                comparison[skill] = SkillComparison(
-                    user_skill=getattr(user_skills, skill),
-                    role_skill=getattr(rec, role_skill_name)
-                )
-            
-            skill_comparison = SkillsComparison(**comparison)
-            logger.info(f"Created skill comparison for recommendation {rec.id}")
-        else:
-            logger.info(f"User has no skills set, cannot create skill comparison")
-        
-        # Create cognitive traits object
-        cognitive_traits = CognitiveTraits(
-            analytical_thinking=rec.analytical_thinking,
-            attention_to_detail=rec.attention_to_detail,
-            collaboration=rec.collaboration,
-            adaptability=rec.adaptability,
-            independence=rec.independence,
-            evaluation=rec.evaluation,
-            decision_making=rec.decision_making,
-            stress_tolerance=rec.stress_tolerance
-        )
+                comparison = {}
+                for skill in ["creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving"]:
+                    role_skill_name = f"role_{skill}"
+                    comparison[skill] = SkillComparison(
+                        user_skill=getattr(user_skills, skill),
+                        role_skill=getattr(rec, role_skill_name)
+                    )
+                
+                skill_comparison = SkillsComparison(**comparison)
         
         # Create recommendation with notes
         recommendation_with_notes = RecommendationWithNotes(
@@ -166,14 +148,26 @@ def get_saved_recommendations(
             role_digital_literacy=rec.role_digital_literacy,
             role_critical_thinking=rec.role_critical_thinking,
             role_problem_solving=rec.role_problem_solving,
+            analytical_thinking=rec.analytical_thinking,
+            attention_to_detail=rec.attention_to_detail,
+            collaboration=rec.collaboration,
+            adaptability=rec.adaptability,
+            independence=rec.independence,
+            evaluation=rec.evaluation,
+            decision_making=rec.decision_making,
+            stress_tolerance=rec.stress_tolerance,
+            user_analytical_thinking=rec.user_analytical_thinking,
+            user_attention_to_detail=rec.user_attention_to_detail,
+            user_collaboration=rec.user_collaboration,
+            user_adaptability=rec.user_adaptability,
+            user_independence=rec.user_independence,
+            user_evaluation=rec.user_evaluation,
+            user_decision_making=rec.user_decision_making,
+            user_stress_tolerance=rec.user_stress_tolerance,
             saved_at=rec.saved_at,
             notes=notes,
-            skill_comparison=skill_comparison,
-            cognitive_traits=cognitive_traits
+            skill_comparison=skill_comparison
         )
-        
-        # Log the complete structure
-        logger.info(f"Added recommendation: id={rec.id}, label={rec.label}, has_skill_comparison={skill_comparison is not None}")
         
         result.append(recommendation_with_notes)
     
@@ -319,7 +313,11 @@ def update_user_skills(
     
     # Update skill values if provided
     updated = False
-    for field in ["creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving"]:
+    for field in [
+        "creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving",
+        "analytical_thinking", "attention_to_detail", "collaboration", "adaptability",
+        "independence", "evaluation", "decision_making", "stress_tolerance"
+    ]:
         value = getattr(skills, field)
         if value is not None:
             setattr(user_skill, field, value)
@@ -335,7 +333,15 @@ def update_user_skills(
         leadership=user_skill.leadership,
         digital_literacy=user_skill.digital_literacy,
         critical_thinking=user_skill.critical_thinking,
-        problem_solving=user_skill.problem_solving
+        problem_solving=user_skill.problem_solving,
+        analytical_thinking=user_skill.analytical_thinking,
+        attention_to_detail=user_skill.attention_to_detail,
+        collaboration=user_skill.collaboration,
+        adaptability=user_skill.adaptability,
+        independence=user_skill.independence,
+        evaluation=user_skill.evaluation,
+        decision_making=user_skill.decision_making,
+        stress_tolerance=user_skill.stress_tolerance
     )
 
 # ===== Special Endpoints =====

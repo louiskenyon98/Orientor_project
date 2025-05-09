@@ -7,14 +7,14 @@ class UserProfile(Base):
     __tablename__ = "user_profiles"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
-    name = Column(String(255))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
+    name = Column(String, nullable=True)
     age = Column(Integer)
     sex = Column(String(50))
-    major = Column(String(255))
-    year = Column(Integer)
+    major = Column(String, nullable=True)
+    year = Column(Integer, nullable=True)
     gpa = Column(Float)
-    hobbies = Column(Text)
+    hobbies = Column(Text, nullable=True)
     country = Column(String(255))
     state_province = Column(String(255))
     unique_quality = Column(Text)
@@ -23,7 +23,7 @@ class UserProfile(Base):
     favorite_book = Column(String(255))
     favorite_celebrities = Column(Text)  # Stored as comma-separated values
     learning_style = Column(String(50))  # Visual, Auditory, Reading/Writing, Kinesthetic
-    interests = Column(ARRAY(String))
+    interests = Column(Text, nullable=True)
     
     # Career-related fields
     job_title = Column(String)
@@ -33,7 +33,7 @@ class UserProfile(Base):
     career_goals = Column(String)
     skills = Column(ARRAY(String))
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     
     user = relationship("User", back_populates="profile") 

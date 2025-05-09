@@ -18,11 +18,8 @@ parent_dir = current_dir.parent
 sys.path.append(str(parent_dir))
 
 from app.utils.database import SessionLocal
-from app.utils.embeddings import (
-    generate_and_store_embeddings,
-    find_and_store_similar_peers,
-    refresh_all_embeddings_and_peers
-)
+from app.services.embedding_service import generate_embedding, store_embedding
+from app.models import UserProfile
 
 # Configure logging
 logging.basicConfig(
@@ -70,85 +67,64 @@ def update_user_embedding(db, user_id: int, embedding: List[float]):
     db.execute(query, {"embedding": vector_str, "user_id": user_id})
     db.commit()
 
-def main(model_name: str = 'sentence-transformers/all-MiniLM-L6-v2'):
-    """Main function to generate and store embeddings"""
+def generate_embeddings_for_all_users():
+    """Generate embeddings for all users in the database."""
     try:
-        # Initialize the model
-        logger.info(f"Loading model: {model_name}")
-        model = SentenceTransformer(model_name)
-        
-        # Create database session
         db = SessionLocal()
+        profiles = db.query(UserProfile).all()
         
-        # Get user profiles
-        profiles = get_user_profiles(db)
         logger.info(f"Found {len(profiles)} profiles to process")
         
-        # Process each profile
         for profile in profiles:
             try:
-                # Combine all available text fields
-                text_fields = []
-                
-                # Add basic profile information
-                if profile.name:
-                    text_fields.append(f"Name: {profile.name}")
-                if profile.major:
-                    text_fields.append(f"Major: {profile.major}")
-                if profile.year:
-                    text_fields.append(f"Year: {profile.year}")
-                if profile.gpa:
-                    text_fields.append(f"GPA: {profile.gpa}")
-                
-                # Add interests and hobbies
-                if profile.hobbies:
-                    text_fields.append(f"Hobbies: {profile.hobbies}")
-                
-                # Add location information
-                if profile.country:
-                    text_fields.append(f"Country: {profile.country}")
-                if profile.state_province:
-                    text_fields.append(f"State/Province: {profile.state_province}")
-                
-                # Add personal information
-                if profile.unique_quality:
-                    text_fields.append(f"Unique Quality: {profile.unique_quality}")
-                if profile.story:
-                    text_fields.append(f"Story: {profile.story}")
-                
-                # Combine all text fields
-                text = " ".join(text_fields)
-                
-                if not text.strip():
-                    logger.warning(f"No data available for user {profile.user_id}")
-                    continue
+                # Create profile data dictionary
+                profile_data = {
+                    "name": profile.name,
+                    "age": profile.age,
+                    "sex": profile.sex,
+                    "major": profile.major,
+                    "year": profile.year,
+                    "gpa": profile.gpa,
+                    "hobbies": profile.hobbies,
+                    "country": profile.country,
+                    "state_province": profile.state_province,
+                    "unique_quality": profile.unique_quality,
+                    "story": profile.story,
+                    "favorite_movie": profile.favorite_movie,
+                    "favorite_book": profile.favorite_book,
+                    "favorite_celebrities": profile.favorite_celebrities,
+                    "learning_style": profile.learning_style,
+                    "interests": profile.interests,
+                    "job_title": profile.job_title,
+                    "industry": profile.industry,
+                    "years_experience": profile.years_experience,
+                    "education_level": profile.education_level,
+                    "career_goals": profile.career_goals,
+                    "skills": profile.skills
+                }
                 
                 # Generate embedding
-                embedding = generate_embedding(text, model)
-                if embedding:
-                    # Update database
-                    update_user_embedding(db, profile.user_id, embedding)
-                    logger.info(f"Updated embedding for user {profile.user_id} with text: {text[:100]}...")
+                embedding = generate_embedding(profile_data)
+                if embedding is not None:
+                    # Store embedding
+                    success = store_embedding(db, profile.user_id, embedding)
+                    if success:
+                        logger.info(f"Successfully generated and stored embedding for user {profile.user_id}")
+                    else:
+                        logger.error(f"Failed to store embedding for user {profile.user_id}")
                 else:
-                    logger.warning(f"Could not generate embedding for user {profile.user_id}")
+                    logger.error(f"Failed to generate embedding for user {profile.user_id}")
                     
             except Exception as e:
-                logger.error(f"Error processing user {profile.user_id}: {str(e)}")
-                logger.error(f"Text fields: {text_fields}")
+                logger.error(f"Error processing profile for user {profile.user_id}: {str(e)}")
                 continue
         
-        logger.info("Embedding generation completed")
+        logger.info("Finished processing all profiles")
         
     except Exception as e:
-        logger.error(f"Error in main function: {str(e)}")
-        raise
+        logger.error(f"Error in generate_embeddings_for_all_users: {str(e)}")
     finally:
         db.close()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate embeddings for user profiles')
-    parser.add_argument('--model', type=str, default='sentence-transformers/all-MiniLM-L6-v2',
-                      help='Sentence transformer model to use')
-    args = parser.parse_args()
-    
-    main(args.model) 
+    generate_embeddings_for_all_users() 

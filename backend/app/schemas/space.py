@@ -22,7 +22,15 @@ class SavedRecommendationBase(BaseModel):
     evaluation: Optional[float] = None
     decision_making: Optional[float] = None
     stress_tolerance: Optional[float] = None
-    all_fields: Optional[Dict[str, str]] = None  # ✅ New addition to support full parsed info
+    user_analytical_thinking: Optional[float] = None
+    user_attention_to_detail: Optional[float] = None
+    user_collaboration: Optional[float] = None
+    user_adaptability: Optional[float] = None
+    user_independence: Optional[float] = None
+    user_evaluation: Optional[float] = None
+    user_decision_making: Optional[float] = None
+    user_stress_tolerance: Optional[float] = None
+    all_fields: Optional[Dict[str, str]] = None
 
 class SavedRecommendationCreate(SavedRecommendationBase):
     pass
@@ -64,6 +72,14 @@ class UserSkillBase(BaseModel):
     digital_literacy: Optional[float] = Field(None, ge=0, le=5)
     critical_thinking: Optional[float] = Field(None, ge=0, le=5)
     problem_solving: Optional[float] = Field(None, ge=0, le=5)
+    analytical_thinking: Optional[float] = Field(None, ge=0, le=5)
+    attention_to_detail: Optional[float] = Field(None, ge=0, le=5)
+    collaboration: Optional[float] = Field(None, ge=0, le=5)
+    adaptability: Optional[float] = Field(None, ge=0, le=5)
+    independence: Optional[float] = Field(None, ge=0, le=5)
+    evaluation: Optional[float] = Field(None, ge=0, le=5)
+    decision_making: Optional[float] = Field(None, ge=0, le=5)
+    stress_tolerance: Optional[float] = Field(None, ge=0, le=5)
 
 class UserSkillUpdate(UserSkillBase):
     pass
@@ -94,7 +110,6 @@ class CognitiveTraits(BaseModel):
 class RecommendationWithNotes(SavedRecommendation):
     notes: List[UserNote] = []
     skill_comparison: Optional[SkillsComparison] = None
-    cognitive_traits: Optional[CognitiveTraits] = None
     class Config:
         orm_mode = True
         from_attributes = True 

@@ -4,11 +4,13 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict
 from datetime import datetime
 from ..utils.database import get_db
-from ..utils.embeddings import recommend_careers_for_user
+from ..services.embedding_service import generate_embedding
+from ..services.career_recommendation_service import get_pinecone_career_recommendations
 from ..models import User, UserRecommendation, SavedRecommendation
 from ..routers.user import get_current_user
 from ..schemas.space import SavedRecommendationCreate
 import logging
+from ..models import UserProfile
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 logger = logging.getLogger(__name__)
@@ -65,7 +67,7 @@ class SwipeResponse(BaseModel):
 
 @router.get("", response_model=RecommendationsResponse)
 def get_career_recommendations(
-    limit: int = Query(5, gt=0, le=20),
+    limit: int = Query(30, gt=0, le=30),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -78,8 +80,49 @@ def get_career_recommendations(
         
         existing_codes = [rec[0] for rec in existing_recommendations]
         
-        # Get recommendations from the embedding model
-        recommendations = recommend_careers_for_user(current_user.id, db, top_k=limit + len(existing_codes))
+        # Get user profile
+        profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User profile not found"
+            )
+        
+        # Generate embedding from profile
+        profile_data = {
+            "name": profile.name,
+            "age": profile.age,
+            "sex": profile.sex,
+            "major": profile.major,
+            "year": profile.year,
+            "gpa": profile.gpa,
+            "hobbies": profile.hobbies,
+            "country": profile.country,
+            "state_province": profile.state_province,
+            "unique_quality": profile.unique_quality,
+            "story": profile.story,
+            "favorite_movie": profile.favorite_movie,
+            "favorite_book": profile.favorite_book,
+            "favorite_celebrities": profile.favorite_celebrities,
+            "learning_style": profile.learning_style,
+            "interests": profile.interests,
+            "job_title": profile.job_title,
+            "industry": profile.industry,
+            "years_experience": profile.years_experience,
+            "education_level": profile.education_level,
+            "career_goals": profile.career_goals,
+            "skills": profile.skills
+        }
+        
+        embedding = generate_embedding(profile_data)
+        if not embedding:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate embedding"
+            )
+        
+        # Get recommendations from Pinecone
+        recommendations = get_pinecone_career_recommendations(embedding, limit + len(existing_codes))
         
         # Filter out already seen recommendations
         filtered_recommendations = [

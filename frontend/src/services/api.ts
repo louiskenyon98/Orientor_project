@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
 });
 
 // Function to get career recommendations for the Find Your Way tab
-export const getCareerRecommendations = async (limit = 10) => {
+export const getCareerRecommendations = async (limit = 30) => {
   try {
     console.log('Fetching career recommendations from:', `${API_URL}/careers/recommendations?limit=${limit}`);
     const response = await api.get(`/careers/recommendations?limit=${limit}`);

@@ -39,7 +39,7 @@ const FindYourWay: React.FC = () => {
   const fetchCareerRecommendations = async () => {
     try {
       setLoading(true);
-      const data = await getCareerRecommendations(5); // Fetch 30 recommendations
+      const data = await getCareerRecommendations(30); // Fetch 30 recommendations
       setCareers(data as CareerRecommendation[]);
       setCurrentIndex(0);
       setError(null);

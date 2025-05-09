@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @router.get("/recommendations", response_model=List[Dict[str, Any]])
 def read_career_recommendations(
-    limit: int = Query(5, gt=0, le=30),
+    limit: int = Query(30, gt=0, le=30),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

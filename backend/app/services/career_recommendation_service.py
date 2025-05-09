@@ -60,7 +60,8 @@ DEFAULT_USER_EMBEDDINGS = {
 
 def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
     """
-    Get the embedding for a user by generating it on-the-fly
+    Get the embedding for a user by first trying to use the stored embedding,
+    then falling back to generating it on-the-fly
     
     Args:
         db: Database session
@@ -70,7 +71,48 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         User embedding or None if not found
     """
     try:
-        # Get user profile
+        # First try to get the stored embedding from the database
+        query = text("""
+            SELECT embedding, name, job_title, industry, skills, interests
+            FROM user_profiles
+            WHERE user_id = :user_id
+        """)
+        result = db.execute(query, {"user_id": user_id}).fetchone()
+        
+        if result:
+            logger.info(f"Found user profile for user {user_id}:")
+            logger.info(f"Name: {result.name}")
+            logger.info(f"Job Title: {result.job_title}")
+            logger.info(f"Industry: {result.industry}")
+            logger.info(f"Skills: {result.skills}")
+            logger.info(f"Interests: {result.interests}")
+            
+            if result.embedding:
+                logger.info(f"Found stored embedding for user {user_id}")
+                # Parse the embedding from the database
+                if isinstance(result.embedding, str):
+                    try:
+                        # Handle string representation of list
+                        embedding = [float(x) for x in result.embedding.strip('[]').split(',')]
+                        logger.info(f"Successfully parsed stored embedding for user {user_id}")
+                        logger.info(f"Embedding size: {len(embedding)}")
+                        logger.info(f"First 5 values: {embedding[:5]}")
+                        return embedding
+                    except Exception as e:
+                        logger.error(f"Error parsing stored embedding: {str(e)}")
+                elif isinstance(result.embedding, list):
+                    logger.info(f"Using stored embedding list for user {user_id}")
+                    logger.info(f"Embedding size: {len(result.embedding)}")
+                    logger.info(f"First 5 values: {result.embedding[:5]}")
+                    return result.embedding
+            else:
+                logger.warning(f"No stored embedding found for user {user_id}")
+        else:
+            logger.warning(f"No user profile found for user {user_id}")
+        
+        logger.info(f"Generating new embedding for user {user_id}")
+        
+        # If no stored embedding, get user profile and generate new embedding
         profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
         if not profile:
             logger.warning(f"No profile found for user {user_id}")
@@ -90,17 +132,32 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
 
         # Generate embedding from profile data
         profile_data = {
+            "name": profile.name,
+            "age": profile.age,
+            "sex": profile.sex,
+            "major": profile.major,
+            "year": profile.year,
+            "gpa": profile.gpa,
+            "hobbies": clean_array(profile.hobbies),
+            "country": profile.country,
+            "state_province": profile.state_province,
+            "unique_quality": profile.unique_quality,
+            "story": profile.story,
+            "favorite_movie": profile.favorite_movie,
+            "favorite_book": profile.favorite_book,
+            "favorite_celebrities": profile.favorite_celebrities,
+            "learning_style": profile.learning_style,
+            "interests": clean_array(profile.interests),
             "job_title": profile.job_title,
             "industry": profile.industry,
             "years_experience": profile.years_experience,
             "education_level": profile.education_level,
             "career_goals": profile.career_goals,
-            "skills": clean_array(profile.skills),
-            "interests": clean_array(profile.interests)
+            "skills": clean_array(profile.skills)
         }
         
         # Add debug logging
-        logger.info(f"Generating embedding for user {user_id} with profile data:")
+        logger.info(f"Generating new embedding for user {user_id} with profile data:")
         logger.info(f"Job Title: {profile_data['job_title']}")
         logger.info(f"Industry: {profile_data['industry']}")
         logger.info(f"Skills: {profile_data['skills']}")
@@ -108,7 +165,9 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         
         embedding = generate_embedding(profile_data)
         if embedding is not None:
-            logger.info(f"Generated embedding for user {user_id}")
+            logger.info(f"Generated new embedding for user {user_id}")
+            logger.info(f"Embedding size: {len(embedding)}")
+            logger.info(f"First 5 values: {embedding[:5]}")
             return embedding.tolist()
             
         # If embedding generation fails, try to get a pre-generated embedding
@@ -207,31 +266,44 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         
         # Log the embedding size and first few values for debugging
         logger.info(f"Query embedding size: {len(embedding)}")
-        logger.info(f"First 5 embedding values: {embedding[:5]}")
+        logger.info(f"First 30 embedding values: {embedding[:30]}")
         
-        # Query Pinecone
+        # Query Pinecone with explicit limit
         try:
+            logger.info(f"Querying Pinecone with limit={limit}")
             query_results = index.query(
                 namespace="",
                 vector=embedding,
-                top_k=limit,
+                top_k=limit,  # Explicitly set to requested limit
                 include_metadata=True
             )
             logger.info(f"Received query results from Pinecone: {type(query_results)}")
+            
+            # Log the raw response for debugging
+            logger.info(f"Raw Pinecone response: {query_results}")
+            
+            # Check if we got the expected number of results
+            matches = []
+            if isinstance(query_results, dict):
+                matches = query_results.get('matches', [])
+            elif hasattr(query_results, 'matches'):
+                matches = query_results.matches
+            elif hasattr(query_results, 'result') and hasattr(query_results.result, 'matches'):
+                matches = query_results.result.matches
+            
+            logger.info(f"Found {len(matches)} matches from Pinecone")
+            if len(matches) < limit:
+                logger.warning(f"Got fewer matches ({len(matches)}) than requested ({limit})")
+            
+            # Log each match for debugging
+            for i, match in enumerate(matches):
+                match_id = match.get('id', None) if isinstance(match, dict) else getattr(match, 'id', None)
+                match_score = match.get('score', 0.0) if isinstance(match, dict) else getattr(match, 'score', 0.0)
+                logger.info(f"Match {i+1}: ID={match_id}, Score={match_score}")
+            
         except Exception as e:
             logger.error(f"Error querying Pinecone: {str(e)}")
             return []
-        
-        # Extract matches from the response, handling different response formats
-        matches = []
-        if isinstance(query_results, dict):
-            matches = query_results.get('matches', [])
-        elif hasattr(query_results, 'matches'):
-            matches = query_results.matches
-        elif hasattr(query_results, 'result') and hasattr(query_results.result, 'matches'):
-            matches = query_results.result.matches
-        
-        logger.info(f"Found {len(matches)} matches from Pinecone")
         
         if not matches:
             logger.warning("No matches found in Pinecone response")
@@ -284,6 +356,7 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
                 "metadata": parsed_fields
             }
             recommendations.append(recommendation)
+            logger.info(f"Added recommendation {i+1}: {title} (score: {match_score})")
         
         logger.info(f"Prepared {len(recommendations)} career recommendations")
         return recommendations
@@ -291,7 +364,7 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         logger.error(f"Error getting Pinecone career recommendations: {str(e)}")
         return []
 
-def get_career_recommendations_fallback(limit: int = 5) -> List[Dict[str, Any]]:
+def get_career_recommendations_fallback(limit: int = 30) -> List[Dict[str, Any]]:
     """
     Get random career recommendations as a fallback
     
