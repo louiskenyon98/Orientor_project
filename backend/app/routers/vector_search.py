@@ -328,6 +328,14 @@ async def save_search_result(
             role_digital_literacy=recommendation.role_digital_literacy,
             role_critical_thinking=recommendation.role_critical_thinking,
             role_problem_solving=recommendation.role_problem_solving,
+            analytical_thinking=recommendation.analytical_thinking,
+            attention_to_detail=recommendation.attention_to_detail,
+            collaboration=recommendation.collaboration,
+            adaptability=recommendation.adaptability,
+            independence=recommendation.independence,
+            evaluation=recommendation.evaluation,
+            decision_making=recommendation.decision_making,
+            stress_tolerance=recommendation.stress_tolerance,
             all_fields=recommendation.all_fields
         )
         db.add(new_recommendation)
