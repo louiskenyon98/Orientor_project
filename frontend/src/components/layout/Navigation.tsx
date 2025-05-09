@@ -103,17 +103,16 @@ export default function Navigation() {
                     >
                       Enhanced Skills Path
                     </Link>
-                    <Link 
+                    {/* <Link 
                       href="/resume-studio" 
                       className={`block px-4 py-2 text-sm ${pathname === '/resume-studio' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
                       Resume Studio
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
               )}
             </div>
-            
             {/* Workspace Dropdown */}
             <div className="relative">
               <button 

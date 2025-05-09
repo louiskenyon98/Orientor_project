@@ -203,6 +203,7 @@ export default function MainLayout({
                                                     >
                                                         Enhanced Skills Path
                                                     </Link>
+                                                    {/* Resume Studio Link - Commented out for AWS deployment
                                                     <Link
                                                         href="/cv"
                                                         className={`block px-4 py-2 text-sm ${pathname === '/cv' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
@@ -210,6 +211,7 @@ export default function MainLayout({
                                                     >
                                                         Resume Studio
                                                     </Link>
+                                                    */}
                                                 </div>
                                             </div>
                                         )}
@@ -373,13 +375,6 @@ export default function MainLayout({
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">school</span>
                                             Enhanced Skills Path
-                                        </Link>
-                                        <Link 
-                                            href="/cv" 
-                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/cv' ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
-                                        >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">description</span>
-                                            Resume Builder
                                         </Link>
                                         <div className="border-t border-gray-200 dark:border-gray-700 mt-1"></div>
                                         
