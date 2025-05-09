@@ -159,12 +159,6 @@ def update_profile(
             exclude_unset=True
         )
         
-        # Handle skills and interests conversion from string to array
-        if "skills" in profile_fields and isinstance(profile_fields["skills"], str):
-            profile_fields["skills"] = [skill.strip() for skill in profile_fields["skills"].split(",") if skill.strip()]
-        if "interests" in profile_fields and isinstance(profile_fields["interests"], str):
-            profile_fields["interests"] = [interest.strip() for interest in profile_fields["interests"].split(",") if interest.strip()]
-        
         # Update profile fields
         logger.info(f"Updating profile fields: {list(profile_fields.keys())}")
         for field, value in profile_fields.items():

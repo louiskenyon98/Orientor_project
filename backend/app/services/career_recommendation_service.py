@@ -76,6 +76,18 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
             logger.warning(f"No profile found for user {user_id}")
             return None
             
+        # Clean and format skills and interests
+        def clean_array(arr):
+            if not arr:
+                return []
+            if isinstance(arr, str):
+                # Split by comma and clean each item
+                return [item.strip() for item in arr.split(',') if item.strip()]
+            if isinstance(arr, list):
+                # Clean each item without splitting characters
+                return [item.strip() for item in arr if item and isinstance(item, str)]
+            return []
+
         # Generate embedding from profile data
         profile_data = {
             "job_title": profile.job_title,
@@ -83,9 +95,16 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
             "years_experience": profile.years_experience,
             "education_level": profile.education_level,
             "career_goals": profile.career_goals,
-            "skills": profile.skills if isinstance(profile.skills, list) else [profile.skills] if profile.skills else [],
-            "interests": profile.interests if isinstance(profile.interests, list) else [profile.interests] if profile.interests else []
+            "skills": clean_array(profile.skills),
+            "interests": clean_array(profile.interests)
         }
+        
+        # Add debug logging
+        logger.info(f"Generating embedding for user {user_id} with profile data:")
+        logger.info(f"Job Title: {profile_data['job_title']}")
+        logger.info(f"Industry: {profile_data['industry']}")
+        logger.info(f"Skills: {profile_data['skills']}")
+        logger.info(f"Interests: {profile_data['interests']}")
         
         embedding = generate_embedding(profile_data)
         if embedding is not None:
@@ -104,22 +123,23 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
             logger.warning(f"Could not load pre-generated embedding: {str(e)}")
         
         # If all else fails, use a default embedding based on interests
-        if profile.interests:
-            interests = profile.interests.lower() if isinstance(profile.interests, str) else " ".join(profile.interests).lower()
-            if "tech" in interests or "software" in interests or "programming" in interests:
+        if profile_data['interests']:
+            interests = " ".join(profile_data['interests']).lower()
+            logger.info(f"Using interests-based default embedding: {interests}")
+            if any(term in interests for term in ["tech", "software", "programming"]):
                 return DEFAULT_USER_EMBEDDINGS["tech"]
-            elif "art" in interests or "design" in interests or "creative" in interests:
+            elif any(term in interests for term in ["art", "design", "creative"]):
                 return DEFAULT_USER_EMBEDDINGS["creative"]
-            elif "business" in interests or "management" in interests or "finance" in interests:
+            elif any(term in interests for term in ["business", "management", "finance"]):
                 return DEFAULT_USER_EMBEDDINGS["business"]
-            elif "science" in interests or "research" in interests:
+            elif any(term in interests for term in ["science", "research"]):
                 return DEFAULT_USER_EMBEDDINGS["science"]
-            elif "health" in interests or "medical" in interests:
+            elif any(term in interests for term in ["health", "medical"]):
                 return DEFAULT_USER_EMBEDDINGS["healthcare"]
         
         # If no profile or no matching interests, use a random default embedding
         embedding = random.choice(list(DEFAULT_USER_EMBEDDINGS.values()))
-        logger.info(f"Using default embedding for user {user_id}")
+        logger.info(f"Using random default embedding for user {user_id}")
         return embedding
         
     except Exception as e:
@@ -185,8 +205,9 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         if isinstance(embedding, np.ndarray):
             embedding = embedding.tolist()
         
-        # Log the embedding size for debugging
+        # Log the embedding size and first few values for debugging
         logger.info(f"Query embedding size: {len(embedding)}")
+        logger.info(f"First 5 embedding values: {embedding[:5]}")
         
         # Query Pinecone
         try:

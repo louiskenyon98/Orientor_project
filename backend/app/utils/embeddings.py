@@ -11,6 +11,7 @@ import time
 import pandas as pd
 import pinecone
 import json
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

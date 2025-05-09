@@ -35,13 +35,19 @@ interface Profile {
     favorite_celebrities: string | null;
     learning_style: string | null;
     interests: string[] | null;
-    // New career fields
+    // Career fields
     job_title: string | null;
     industry: string | null;
     years_experience: number | null;
     education_level: string | null;
     career_goals: string | null;
     skills: string[] | null;
+    // Skill scores
+    creativity: number | null;
+    leadership: number | null;
+    digital_literacy: number | null;
+    critical_thinking: number | null;
+    problem_solving: number | null;
 }
 
 export default function ProfilePage() {
@@ -75,7 +81,12 @@ export default function ProfilePage() {
         years_experience: null,
         education_level: null,
         career_goals: null,
-        skills: null
+        skills: null,
+        creativity: null,
+        leadership: null,
+        digital_literacy: null,
+        critical_thinking: null,
+        problem_solving: null
     });
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -96,12 +107,28 @@ export default function ProfilePage() {
                     }
                 });
                 console.log('Profile data received:', response.data);
+                
+                // First set the profile data
                 setProfile(response.data);
-                // Initialize raw inputs with existing arrays
+                
+                // Then properly format and set the raw inputs
+                const formattedSkills = Array.isArray(response.data.skills) 
+                    ? response.data.skills.join(', ')
+                    : '';
+                    
+                const formattedInterests = Array.isArray(response.data.interests)
+                    ? response.data.interests.join(', ')
+                    : '';
+                
                 setRawInputs({
-                    skills: response.data.skills?.join(', ') || '',
-                    interests: response.data.interests?.join(', ') || ''
+                    skills: formattedSkills,
+                    interests: formattedInterests
                 });
+                setProfile(prev => ({
+                    ...prev,
+                    skills: response.data.skills || [],
+                    interests: response.data.interests || []
+                }));
             } catch (err) {
                 const error = err as ApiError;
                 console.error('Error fetching profile:', error.response?.data || error.message);
@@ -116,11 +143,23 @@ export default function ProfilePage() {
         try {
             const token = localStorage.getItem('access_token');
             
-            // Process arrays before sending
+            // Process arrays and skill scores before sending
             const processedProfile = {
                 ...profile,
-                skills: rawInputs.skills ? rawInputs.skills.split(',').map(item => item.trim()).filter(item => item !== '') : [],
-                interests: rawInputs.interests ? rawInputs.interests.split(',').map(item => item.trim()).filter(item => item !== '') : []
+                skills: rawInputs.skills
+                    .split(',')
+                    .map(item => item.trim())
+                    .filter(item => item !== ''),
+                interests: rawInputs.interests
+                    .split(',')
+                    .map(item => item.trim())
+                    .filter(item => item !== ''),
+                // Convert skill scores to numbers or null
+                creativity: profile.creativity === null || profile.creativity === undefined ? null : Number(profile.creativity),
+                leadership: profile.leadership === null || profile.leadership === undefined ? null : Number(profile.leadership),
+                digital_literacy: profile.digital_literacy === null || profile.digital_literacy === undefined ? null : Number(profile.digital_literacy),
+                critical_thinking: profile.critical_thinking === null || profile.critical_thinking === undefined ? null : Number(profile.critical_thinking),
+                problem_solving: profile.problem_solving === null || profile.problem_solving === undefined ? null : Number(profile.problem_solving)
             };
 
             // Create a clean profile object with all fields
@@ -222,7 +261,13 @@ export default function ProfilePage() {
 
     const handleArrayBlur = (field: 'interests' | 'skills') => () => {
         const value = rawInputs[field];
-        const array = value ? value.split(',').map(item => item.trim()).filter(item => item !== '') : [];
+        // Split by comma, trim each item, and filter out empty strings
+        const array = value
+            .split(',')
+            .map(item => item.trim())
+            .filter(item => item !== '');
+        
+        // Update the profile with the processed array
         setProfile(prev => ({
             ...prev,
             [field]: array
@@ -501,7 +546,7 @@ export default function ProfilePage() {
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                                Interests (comma-separated)
+                                                Interests
                                             </label>
                                             <input
                                                 type="text"

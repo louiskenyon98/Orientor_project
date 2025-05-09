@@ -170,6 +170,20 @@ def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFra
         # Debug logging
         logger.info(f"Received profile data keys: {list(profile_data.keys())}")
         
+        # Clean and format arrays
+        def clean_array(arr):
+            if not arr:
+                return []
+            if isinstance(arr, str):
+                return [item.strip() for item in arr.split(',') if item.strip()]
+            if isinstance(arr, list):
+                return [item.strip() for item in arr if item and isinstance(item, str)]
+            return []
+        
+        # Clean arrays
+        skills = clean_array(profile_data.get("skills", []))
+        interests = clean_array(profile_data.get("interests", []))
+        
         # Create DataFrame with only career-related fields
         user_df = pd.DataFrame([{
             "Job Title": profile_data.get("job_title", "Unknown"),
@@ -177,12 +191,15 @@ def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFra
             "Years Experience": profile_data.get("years_experience", 0),
             "Education Level": profile_data.get("education_level", "Unknown"),
             "Career Goals": profile_data.get("career_goals", ""),
-            "Skills": ",".join(profile_data.get("skills", [])),
-            "Interests": ",".join(profile_data.get("interests", []))
+            "Skills": ", ".join(skills),
+            "Interests": ", ".join(interests)
         }])
         
         # Debug logging
         logger.info(f"Created DataFrame with columns: {list(user_df.columns)}")
+        logger.info(f"Skills: {skills}")
+        logger.info(f"Interests: {interests}")
+        
         return user_df
     except Exception as e:
         logger.error(f"Error preprocessing user profile data: {str(e)}")
