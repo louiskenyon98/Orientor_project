@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 import ast
 import subprocess
+from app.models.user_profile import UserProfile
+from app.services.embedding_service import generate_embedding
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -56,7 +58,7 @@ def cosine_similarity(a: List[float], b: List[float]) -> float:
 
 def get_users_with_embeddings(db: Session) -> List[Dict[str, Any]]:
     """
-    Get all users with embeddings
+    Get all users and generate their embeddings on-the-fly
     
     Args:
         db: Database session
@@ -65,22 +67,30 @@ def get_users_with_embeddings(db: Session) -> List[Dict[str, Any]]:
         List of user data including embeddings
     """
     try:
-        query = text("""
-            SELECT user_id, embedding
-            FROM user_profiles
-            WHERE embedding IS NOT NULL
-        """)
-        
-        result = db.execute(query).fetchall()
+        # Get all user profiles
+        profiles = db.query(UserProfile).all()
         users = []
         
-        for row in result:
-            users.append({
-                "user_id": row.user_id,
-                "embedding": row.embedding
-            })
+        for profile in profiles:
+            # Generate embedding for this profile
+            profile_data = {
+                "job_title": profile.job_title,
+                "industry": profile.industry,
+                "years_experience": profile.years_experience,
+                "education_level": profile.education_level,
+                "career_goals": profile.career_goals,
+                "skills": profile.skills if profile.skills else [],
+                "interests": profile.interests if isinstance(profile.interests, str) else " ".join(profile.interests) if profile.interests else ""
+            }
+            
+            embedding = generate_embedding(profile_data)
+            if embedding is not None:
+                users.append({
+                    "user_id": profile.user_id,
+                    "embedding": embedding
+                })
         
-        logger.info(f"Found {len(users)} users with embeddings")
+        logger.info(f"Generated embeddings for {len(users)} users")
         return users
     except Exception as e:
         logger.error(f"Error getting users with embeddings: {str(e)}")
@@ -100,29 +110,32 @@ def find_similar_peers(db: Session, user_id: int, embedding: List[float], top_n:
         List of tuples (peer_id, similarity_score)
     """
     try:
-        # Get all other users with embeddings
-        query = text("""
-            SELECT user_id, embedding
-            FROM user_profiles
-            WHERE user_id != :user_id AND embedding IS NOT NULL
-        """)
-        
-        other_users = db.execute(query, {"user_id": user_id}).fetchall()
+        # Get all other users
+        other_profiles = db.query(UserProfile).filter(UserProfile.user_id != user_id).all()
         
         # Calculate similarities
         similarities = []
-        for other_user in other_users:
+        for profile in other_profiles:
             try:
-                # Parse embeddings
-                user_embedding = np.array(embedding, dtype=float)
-                other_embedding = parse_embedding(other_user.embedding)
+                # Generate embedding for this profile
+                profile_data = {
+                    "job_title": profile.job_title,
+                    "industry": profile.industry,
+                    "years_experience": profile.years_experience,
+                    "education_level": profile.education_level,
+                    "career_goals": profile.career_goals,
+                    "skills": profile.skills if profile.skills else [],
+                    "interests": profile.interests if isinstance(profile.interests, str) else " ".join(profile.interests) if profile.interests else ""
+                }
                 
-                if other_embedding:
+                other_embedding = generate_embedding(profile_data)
+                if other_embedding is not None:
                     other_embedding = np.array(other_embedding, dtype=float)
+                    user_embedding = np.array(embedding, dtype=float)
                     similarity = cosine_similarity(user_embedding, other_embedding)
-                    similarities.append((other_user.user_id, similarity))
+                    similarities.append((profile.user_id, similarity))
             except Exception as e:
-                logger.error(f"Error calculating similarity for user {other_user.user_id}: {str(e)}")
+                logger.error(f"Error calculating similarity for user {profile.user_id}: {str(e)}")
                 continue
         
         # Sort by similarity and get top N

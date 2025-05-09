@@ -60,6 +60,11 @@ def get_suggested_peers(
         # Convert to list of PeerResponse objects
         result = []
         for peer in suggested_peers:
+            # Convert interests to string if it's a list
+            interests = peer.interests
+            if isinstance(interests, list):
+                interests = " ".join(interests)
+            
             result.append({
                 "user_id": peer.user_id,
                 "name": peer.name,
@@ -67,7 +72,7 @@ def get_suggested_peers(
                 "year": peer.year,
                 "similarity": peer.similarity,
                 "hobbies": peer.hobbies,
-                "interests": peer.interests
+                "interests": interests
             })
         
         return result

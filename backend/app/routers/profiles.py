@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 from pydantic import BaseModel, Field
 import logging
 from app.utils.database import get_db
@@ -32,7 +32,7 @@ class ProfileResponse(BaseModel):
     favorite_book: Optional[str] = None
     favorite_celebrities: Optional[str] = None
     learning_style: Optional[str] = None
-    interests: Optional[str] = None
+    interests: Optional[Union[str, List[str]]] = None
     # Add skill fields
     creativity: Optional[float] = None
     leadership: Optional[float] = None
@@ -72,7 +72,7 @@ class ProfileUpdate(BaseModel):
     favorite_book: Optional[str] = None
     favorite_celebrities: Optional[str] = None
     learning_style: Optional[str] = None
-    interests: Optional[str] = None
+    interests: Optional[Union[str, List[str]]] = None
     # Add skill fields
     creativity: Optional[float] = Field(None, ge=0, le=5)
     leadership: Optional[float] = Field(None, ge=0, le=5)

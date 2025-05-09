@@ -34,15 +34,18 @@ interface Profile {
     favorite_book: string | null;
     favorite_celebrities: string | null;
     learning_style: string | null;
-    interests: string | null;
-    creativity: number | null;
-    leadership: number | null;
-    digital_literacy: number | null;
-    critical_thinking: number | null;
-    problem_solving: number | null;
+    interests: string[] | null;
+    // New career fields
+    job_title: string | null;
+    industry: string | null;
+    years_experience: number | null;
+    education_level: string | null;
+    career_goals: string | null;
+    skills: string[] | null;
 }
 
 export default function ProfilePage() {
+    const [activeTab, setActiveTab] = useState('basic');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [profile, setProfile] = useState<Profile>({
@@ -63,11 +66,12 @@ export default function ProfilePage() {
         favorite_celebrities: null,
         learning_style: null,
         interests: null,
-        creativity: null,
-        leadership: null,
-        digital_literacy: null,
-        critical_thinking: null,
-        problem_solving: null
+        job_title: null,
+        industry: null,
+        years_experience: null,
+        education_level: null,
+        career_goals: null,
+        skills: null
     });
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
@@ -102,6 +106,41 @@ export default function ProfilePage() {
         e.preventDefault();
         try {
             const token = localStorage.getItem('access_token');
+            
+            // Create a clean profile object with all fields
+            const cleanProfile = {
+                user_id: profile.user_id,
+                // Basic Info
+                name: profile.name || null,
+                age: profile.age || null,
+                sex: profile.sex || null,
+                country: profile.country || null,
+                state_province: profile.state_province || null,
+                
+                // Academic Info
+                major: profile.major || null,
+                year: profile.year || null,
+                gpa: profile.gpa || null,
+                learning_style: profile.learning_style || null,
+                
+                // Personal Info
+                hobbies: profile.hobbies || null,
+                unique_quality: profile.unique_quality || null,
+                story: profile.story || null,
+                favorite_movie: profile.favorite_movie || null,
+                favorite_book: profile.favorite_book || null,
+                favorite_celebrities: profile.favorite_celebrities || null,
+                
+                // Career Info (used for embedding)
+                job_title: profile.job_title || null,
+                industry: profile.industry || null,
+                years_experience: profile.years_experience || null,
+                education_level: profile.education_level || null,
+                career_goals: profile.career_goals || null,
+                skills: profile.skills || [],
+                interests: profile.interests || []
+            };
+
             // Update user info
             if (email || password) {
                 await axios.put(
@@ -117,9 +156,9 @@ export default function ProfilePage() {
             }
 
             // Update profile info
-            await axios.put(
+            const response = await axios.put(
                 `${cleanApiUrl}/profiles/update`,
-                profile,
+                cleanProfile,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -132,16 +171,17 @@ export default function ProfilePage() {
             setError(null);
         } catch (err) {
             const error = err as ApiError;
+            console.error('Profile update error:', error.response?.data);
             setError(error.response?.data?.detail || 'Update failed');
             setMessage(null);
         }
     };
 
     const handleProfileChange = (field: keyof Profile) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        let value: string | number | null = e.target.value;
+        let value: string | number | string[] | null = e.target.value;
         
         // Convert numeric fields
-        if (['age', 'year'].includes(field) && value !== '') {
+        if (['age', 'year', 'years_experience'].includes(field) && value !== '') {
             value = parseInt(value) || null;
         } else if (field === 'gpa' && value !== '') {
             value = parseFloat(value) || null;
@@ -152,6 +192,15 @@ export default function ProfilePage() {
         setProfile(prev => ({
             ...prev,
             [field]: value
+        }));
+    };
+
+    const handleArrayChange = (field: 'interests' | 'skills') => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const array = value ? value.split(',').map(item => item.trim()).filter(item => item !== '') : [];
+        setProfile(prev => ({
+            ...prev,
+            [field]: array
         }));
     };
 
@@ -167,392 +216,333 @@ export default function ProfilePage() {
                 
                 <div className="card">
                     <form onSubmit={handleUpdate} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Account Settings Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold text-secondary-teal mb-4">Account Settings</h3>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Email Address
-                                    </label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="input"
-                                        placeholder="your@email.com"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        New Password
-                                    </label>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="input"
-                                        placeholder="Leave blank to keep current password"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Basic Information Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold text-secondary-purple mb-4">Basic Information</h3>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Full Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.name || ''}
-                                        onChange={handleProfileChange('name')}
-                                        className="input"
-                                        placeholder="Your full name"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Age
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={profile.age || ''}
-                                        onChange={handleProfileChange('age')}
-                                        className="input"
-                                        placeholder="Your age"
-                                        min="0"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Sex
-                                    </label>
-                                    <select
-                                        value={profile.sex || ''}
-                                        onChange={handleProfileChange('sex')}
-                                        className="input bg-gray-100"
-                                    >
-                                        <option value="">Select your sex</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                        <option value="Prefer not to say">Prefer not to say</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Academic Information Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold text-secondary-teal mb-4">Academic Information</h3>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Major
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.major || ''}
-                                        onChange={handleProfileChange('major')}
-                                        className="input"
-                                        placeholder="Your field of study"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Year
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={profile.year || ''}
-                                        onChange={handleProfileChange('year')}
-                                        className="input"
-                                        placeholder="Current year of study"
-                                        min="1"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        GPA
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={profile.gpa || ''}
-                                        onChange={handleProfileChange('gpa')}
-                                        className="input"
-                                        placeholder="Your GPA"
-                                        step="0.01"
-                                        min="0"
-                                        max="4.0"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Location Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold text-secondary-purple mb-4">Location</h3>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Country
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.country || ''}
-                                        onChange={handleProfileChange('country')}
-                                        className="input"
-                                        placeholder="Your country"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        State/Province
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.state_province || ''}
-                                        onChange={handleProfileChange('state_province')}
-                                        className="input"
-                                        placeholder="Your state or province"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Personal Details Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold text-secondary-teal mb-4">Personal Details</h3>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Hobbies
-                                    </label>
-                                    <textarea
-                                        value={profile.hobbies || ''}
-                                        onChange={handleProfileChange('hobbies')}
-                                        className="input"
-                                        placeholder="What are your hobbies? (comma-separated)"
-                                        rows={3}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Unique Quality
-                                    </label>
-                                    <textarea
-                                        value={profile.unique_quality || ''}
-                                        onChange={handleProfileChange('unique_quality')}
-                                        className="input"
-                                        placeholder="What makes you unique?"
-                                        rows={3}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Your Story
-                                    </label>
-                                    <textarea
-                                        value={profile.story || ''}
-                                        onChange={handleProfileChange('story')}
-                                        className="input"
-                                        placeholder="Tell us your story"
-                                        rows={4}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Preferences Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-xl font-semibold text-secondary-purple mb-4">Preferences</h3>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Favorite Movie
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.favorite_movie || ''}
-                                        onChange={handleProfileChange('favorite_movie')}
-                                        className="input"
-                                        placeholder="What's your favorite movie?"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Favorite Book
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.favorite_book || ''}
-                                        onChange={handleProfileChange('favorite_book')}
-                                        className="input"
-                                        placeholder="What's your favorite book?"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Role Models
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={profile.favorite_celebrities || ''}
-                                        onChange={handleProfileChange('favorite_celebrities')}
-                                        className="input"
-                                        placeholder="Who inspires you? (comma-separated)"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Learning Style
-                                    </label>
-                                    <select
-                                        value={profile.learning_style || ''}
-                                        onChange={handleProfileChange('learning_style')}
-                                        className="input bg-gray-100"
-                                    >
-                                        <option value="">Select your learning style</option>
-                                        <option value="Visual">Visual</option>
-                                        <option value="Auditory">Auditory</option>
-                                        <option value="Reading/Writing">Reading/Writing</option>
-                                        <option value="Kinesthetic">Kinesthetic</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                        Interests
-                                    </label>
-                                    <textarea
-                                        value={profile.interests || ''}
-                                        onChange={handleProfileChange('interests')}
-                                        className="input"
-                                        placeholder="What are your interests? (comma-separated)"
-                                        rows={3}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Add Skills Section after Preferences */}
-                            <div className="space-y-4 md:col-span-2">
-                                <h3 className="text-xl font-semibold text-secondary-teal mb-4">Skills Assessment</h3>
-                                <p className="text-sm text-neutral-400 mb-4">
-                                    Rate your skills from 1-5 (5 being the highest). These ratings will be used for career path comparisons.
-                                </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                            Creativity
-                                        </label>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                step="1"
-                                                value={profile.creativity || 1}
-                                                onChange={handleProfileChange('creativity')}
-                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <span className="ml-2 text-neutral-300 w-5 text-center">
-                                                {profile.creativity || 1}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                            Leadership
-                                        </label>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                step="1"
-                                                value={profile.leadership || 1}
-                                                onChange={handleProfileChange('leadership')}
-                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <span className="ml-2 text-neutral-300 w-5 text-center">
-                                                {profile.leadership || 1}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                            Digital Literacy
-                                        </label>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                step="1"
-                                                value={profile.digital_literacy || 1}
-                                                onChange={handleProfileChange('digital_literacy')}
-                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <span className="ml-2 text-neutral-300 w-5 text-center">
-                                                {profile.digital_literacy || 1}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                            Critical Thinking
-                                        </label>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                step="1"
-                                                value={profile.critical_thinking || 1}
-                                                onChange={handleProfileChange('critical_thinking')}
-                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <span className="ml-2 text-neutral-300 w-5 text-center">
-                                                {profile.critical_thinking || 1}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                            Problem Solving
-                                        </label>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                step="1"
-                                                value={profile.problem_solving || 1}
-                                                onChange={handleProfileChange('problem_solving')}
-                                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                            />
-                                            <span className="ml-2 text-neutral-300 w-5 text-center">
-                                                {profile.problem_solving || 1}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Tabs */}
+                        <div className="border-b border-gray-200">
+                            <nav className="-mb-px flex space-x-8">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('basic')}
+                                    className={`${
+                                        activeTab === 'basic'
+                                            ? 'border-secondary-teal text-secondary-teal'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    Basic Info
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('academic')}
+                                    className={`${
+                                        activeTab === 'academic'
+                                            ? 'border-secondary-teal text-secondary-teal'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    Academic
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('career')}
+                                    className={`${
+                                        activeTab === 'career'
+                                            ? 'border-secondary-teal text-secondary-teal'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    Career
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('account')}
+                                    className={`${
+                                        activeTab === 'account'
+                                            ? 'border-secondary-teal text-secondary-teal'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    Account
+                                </button>
+                            </nav>
                         </div>
 
-                        <div className="pt-4">
+                        {/* Tab Content */}
+                        <div className="mt-6">
+                            {activeTab === 'basic' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Full Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.name || ''}
+                                                onChange={handleProfileChange('name')}
+                                                className="input"
+                                                placeholder="Your full name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Age
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={profile.age || ''}
+                                                onChange={handleProfileChange('age')}
+                                                className="input"
+                                                placeholder="Your age"
+                                                min="0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Sex
+                                            </label>
+                                            <select
+                                                value={profile.sex || ''}
+                                                onChange={handleProfileChange('sex')}
+                                                className="input bg-gray-100"
+                                            >
+                                                <option value="">Select your sex</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                                <option value="Prefer not to say">Prefer not to say</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Country
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.country || ''}
+                                                onChange={handleProfileChange('country')}
+                                                className="input"
+                                                placeholder="Your country"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'academic' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Major
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.major || ''}
+                                                onChange={handleProfileChange('major')}
+                                                className="input"
+                                                placeholder="Your major"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Year
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={profile.year || ''}
+                                                onChange={handleProfileChange('year')}
+                                                className="input"
+                                                placeholder="Your year"
+                                                min="1"
+                                                max="4"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                GPA
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={profile.gpa || ''}
+                                                onChange={handleProfileChange('gpa')}
+                                                className="input"
+                                                placeholder="Your GPA"
+                                                step="0.01"
+                                                min="0"
+                                                max="4"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Learning Style
+                                            </label>
+                                            <select
+                                                value={profile.learning_style || ''}
+                                                onChange={handleProfileChange('learning_style')}
+                                                className="input bg-gray-100"
+                                            >
+                                                <option value="">Select your learning style</option>
+                                                <option value="Visual">Visual</option>
+                                                <option value="Auditory">Auditory</option>
+                                                <option value="Reading/Writing">Reading/Writing</option>
+                                                <option value="Kinesthetic">Kinesthetic</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'career' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Job Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.job_title || ''}
+                                                onChange={handleProfileChange('job_title')}
+                                                className="input"
+                                                placeholder="Your current or desired job title"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Industry
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={profile.industry || ''}
+                                                onChange={handleProfileChange('industry')}
+                                                className="input"
+                                                placeholder="Your industry"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Years of Experience
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={profile.years_experience || ''}
+                                                onChange={handleProfileChange('years_experience')}
+                                                className="input"
+                                                placeholder="Years of experience"
+                                                min="0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Education Level
+                                            </label>
+                                            <select
+                                                value={profile.education_level || ''}
+                                                onChange={handleProfileChange('education_level')}
+                                                className="input bg-gray-100"
+                                            >
+                                                <option value="">Select your education level</option>
+                                                <option value="High School">High School</option>
+                                                <option value="Associate's Degree">Associate's Degree</option>
+                                                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                                <option value="Master's Degree">Master's Degree</option>
+                                                <option value="Doctorate">Doctorate</option>
+                                            </select>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Career Goals
+                                            </label>
+                                            <textarea
+                                                value={profile.career_goals || ''}
+                                                onChange={handleProfileChange('career_goals')}
+                                                className="input"
+                                                placeholder="Describe your career goals"
+                                                rows={3}
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Skills (comma-separated)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={Array.isArray(profile.skills) ? profile.skills.join(', ') : ''}
+                                                onChange={handleArrayChange('skills')}
+                                                className="input"
+                                                placeholder="e.g., Python, JavaScript, Project Management"
+                                            />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Interests (comma-separated)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={Array.isArray(profile.interests) ? profile.interests.join(', ') : ''}
+                                                onChange={handleArrayChange('interests')}
+                                                className="input"
+                                                placeholder="e.g., AI, Web Development, Data Science"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'account' && (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                Email Address
+                                            </label>
+                                            <input
+                                                type="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                className="input"
+                                                placeholder="your@email.com"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-neutral-lightgray mb-1">
+                                                New Password
+                                            </label>
+                                            <input
+                                                type="password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="input"
+                                                placeholder="Leave blank to keep current password"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Error and Success Messages */}
+                        {error && (
+                            <div className="text-red-500 text-sm mt-4 p-3 bg-red-900/20 border border-red-500 rounded-lg">
+                                {typeof error === 'string' ? error : 'An error occurred'}
+                            </div>
+                        )}
+                        {message && (
+                            <div className="text-green-500 text-sm mt-4 p-3 bg-green-900/20 border border-green-500 rounded-lg">
+                                {message}
+                            </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <div className="flex justify-end">
                             <button
                                 type="submit"
-                                className="btn btn-primary w-full md:w-auto"
+                                className="btn-primary"
                             >
                                 Save Changes
                             </button>
                         </div>
                     </form>
-
-                    {error && (
-                        <div className="mt-4 p-3 bg-red-900/20 border border-secondary-coral text-secondary-coral rounded-lg">
-                            {error}
-                        </div>
-                    )}
-                    {message && (
-                        <div className="mt-4 p-3 bg-green-900/20 border border-secondary-teal text-secondary-teal rounded-lg">
-                            {message}
-                        </div>
-                    )}
                 </div>
             </div>
         </MainLayout>

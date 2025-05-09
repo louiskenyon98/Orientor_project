@@ -9,6 +9,8 @@ import random
 from .peer_matching_service import parse_embedding
 import pinecone
 import re
+from app.models.user_profile import UserProfile
+from app.services.embedding_service import generate_embedding
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -58,7 +60,7 @@ DEFAULT_USER_EMBEDDINGS = {
 
 def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
     """
-    Get the embedding for a user
+    Get the embedding for a user by generating it on-the-fly
     
     Args:
         db: Database session
@@ -68,90 +70,58 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         User embedding or None if not found
     """
     try:
-        query = text("""
-            SELECT embedding
-            FROM user_profiles
-            WHERE user_id = :user_id
-        """)
-        
-        result = db.execute(query, {"user_id": user_id}).fetchone()
-        
-        if not result or not result.embedding:
-            logger.warning(f"No embedding found for user {user_id}")
+        # Get user profile
+        profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        if not profile:
+            logger.warning(f"No profile found for user {user_id}")
+            return None
             
-            # Try to get a pre-generated embedding from the ML pipeline first
-            try:
-                # Try to load a pre-generated embedding from the models directory
-                embedding_path = os.path.join(MODEL_DIR, f"user_{user_id}_embedding.pkl")
-                if os.path.exists(embedding_path):
-                    with open(embedding_path, 'rb') as f:
-                        user_embedding = pickle.load(f)
-                    logger.info(f"Loaded pre-generated embedding for user {user_id}")
-                    return user_embedding
-            except Exception as e:
-                logger.warning(f"Could not load pre-generated embedding: {str(e)}")
-            
-            # Try to get user interests to select a default embedding
-            query = text("""
-                SELECT interests
-                FROM user_profiles
-                WHERE user_id = :user_id
-            """)
-            
-            result = db.execute(query, {"user_id": user_id}).fetchone()
-            
-            # If we have interests, choose a default embedding based on interests
-            if result and result.interests:
-                interests = result.interests.lower()
-                if "tech" in interests or "software" in interests or "programming" in interests:
-                    return DEFAULT_USER_EMBEDDINGS["tech"]
-                elif "art" in interests or "design" in interests or "creative" in interests:
-                    return DEFAULT_USER_EMBEDDINGS["creative"]
-                elif "business" in interests or "management" in interests or "finance" in interests:
-                    return DEFAULT_USER_EMBEDDINGS["business"]
-                elif "science" in interests or "research" in interests:
-                    return DEFAULT_USER_EMBEDDINGS["science"]
-                elif "health" in interests or "medical" in interests:
-                    return DEFAULT_USER_EMBEDDINGS["healthcare"]
-            
-            # If no profile or no matching interests, use a random default embedding
-            embedding = random.choice(list(DEFAULT_USER_EMBEDDINGS.values()))
-            logger.info(f"Using default embedding for user {user_id}")
-            return embedding
+        # Generate embedding from profile data
+        profile_data = {
+            "job_title": profile.job_title,
+            "industry": profile.industry,
+            "years_experience": profile.years_experience,
+            "education_level": profile.education_level,
+            "career_goals": profile.career_goals,
+            "skills": profile.skills if profile.skills else [],
+            "interests": profile.interests if profile.interests else []
+        }
         
-        # Parse the embedding from the database
-        embedding = parse_embedding(result.embedding)
-        
-        # Log the embedding size for debugging
-        logger.info(f"Retrieved embedding for user {user_id} with size {len(embedding)}")
-        
-        # Get the Pinecone index's dimension
+        embedding = generate_embedding(profile_data)
+        if embedding is not None:
+            logger.info(f"Generated embedding for user {user_id}")
+            return embedding.tolist()
+            
+        # If embedding generation fails, try to get a pre-generated embedding
         try:
-            pinecone_api_key = os.getenv("PINECONE_API_KEY")
-            if pinecone_api_key:
-                pinecone.init(api_key=pinecone_api_key, environment=os.getenv("PINECONE_ENVIRONMENT"))
-                index = pinecone.Index("oasis-minilm-index")
-                
-                # For Pinecone v3+, we need to ensure the embedding size matches
-                # the index's dimension. If we can't determine it, we'll use a default.
-                default_dim = 384  # all-MiniLM-L6-v2 default dimension
-                
-                # Check if embedding size needs adjustment
-                if len(embedding) != default_dim:
-                    logger.warning(f"Embedding size {len(embedding)} doesn't match expected dimension {default_dim}")
-                    
-                    # If smaller, pad with zeros
-                    if len(embedding) < default_dim:
-                        logger.info(f"Padding embedding from {len(embedding)} to {default_dim}")
-                        embedding = embedding + [0.0] * (default_dim - len(embedding))
-                    # If larger, truncate
-                    elif len(embedding) > default_dim:
-                        logger.info(f"Truncating embedding from {len(embedding)} to {default_dim}")
-                        embedding = embedding[:default_dim]
+            embedding_path = os.path.join(MODEL_DIR, f"user_{user_id}_embedding.pkl")
+            if os.path.exists(embedding_path):
+                with open(embedding_path, 'rb') as f:
+                    user_embedding = pickle.load(f)
+                logger.info(f"Loaded pre-generated embedding for user {user_id}")
+                return user_embedding
         except Exception as e:
-            logger.warning(f"Error checking Pinecone dimension: {str(e)}")
+            logger.warning(f"Could not load pre-generated embedding: {str(e)}")
         
+        # If all else fails, use a default embedding based on interests
+        if profile.interests:
+            interests = profile.interests.lower()
+            if "tech" in interests or "software" in interests or "programming" in interests:
+                return DEFAULT_USER_EMBEDDINGS["tech"]
+            elif "art" in interests or "design" in interests or "creative" in interests:
+                return DEFAULT_USER_EMBEDDINGS["creative"]
+            elif "business" in interests or "management" in interests or "finance" in interests:
+                return DEFAULT_USER_EMBEDDINGS["business"]
+            elif "science" in interests or "research" in interests:
+                return DEFAULT_USER_EMBEDDINGS["science"]
+            elif "health" in interests or "medical" in interests:
+                return DEFAULT_USER_EMBEDDINGS["healthcare"]
+        
+        # If no profile or no matching interests, use a random default embedding
+        embedding = random.choice(list(DEFAULT_USER_EMBEDDINGS.values()))
+        logger.info(f"Using default embedding for user {user_id}")
         return embedding
+        
     except Exception as e:
         logger.error(f"Error getting user embedding: {str(e)}")
         return None

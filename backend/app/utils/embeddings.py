@@ -17,7 +17,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Define paths to the fine-tuned models
-MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
+MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 
+                         "data_n_notebook", "siamese_pipeline", "mlruns", "models")
 PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca384_Siamese.pkl")
 SCALER_MODEL_PATH = os.path.join(MODELS_DIR, "scaler_Siamese.pkl")
 OHE_MODEL_PATH = os.path.join(MODELS_DIR, "ohe_Siamese.pkl")
@@ -36,13 +37,39 @@ DEFAULT_MODEL_NAME = 'sentence-transformers/all-MiniLM-L6-v2'
 def load_processing_models():
     """Load the preprocessing models (scaler, one-hot encoder, PCA)"""
     try:
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"MODELS_DIR: {MODELS_DIR}")
+        print(f"PCA_MODEL_PATH: {PCA_MODEL_PATH}")
+        print(f"SCALER_MODEL_PATH: {SCALER_MODEL_PATH}")
+        print(f"OHE_MODEL_PATH: {OHE_MODEL_PATH}")
+        
+        print(f"Does PCA model exist? {os.path.exists(PCA_MODEL_PATH)}")
+        print(f"Does Scaler model exist? {os.path.exists(SCALER_MODEL_PATH)}")
+        print(f"Does OHE model exist? {os.path.exists(OHE_MODEL_PATH)}")
+        
+        if not os.path.exists(PCA_MODEL_PATH):
+            print(f"PCA model not found at: {PCA_MODEL_PATH}")
+            raise FileNotFoundError(f"PCA model not found at: {PCA_MODEL_PATH}")
+        if not os.path.exists(SCALER_MODEL_PATH):
+            print(f"Scaler model not found at: {SCALER_MODEL_PATH}")
+            raise FileNotFoundError(f"Scaler model not found at: {SCALER_MODEL_PATH}")
+        if not os.path.exists(OHE_MODEL_PATH):
+            print(f"OHE model not found at: {OHE_MODEL_PATH}")
+            raise FileNotFoundError(f"OHE model not found at: {OHE_MODEL_PATH}")
+            
         scaler = joblib.load(SCALER_MODEL_PATH)
+        print("Successfully loaded scaler model")
+        
         ohe = joblib.load(OHE_MODEL_PATH)
+        print("Successfully loaded OHE model")
+        
         pca = joblib.load(PCA_MODEL_PATH)
-        logger.info("Successfully loaded preprocessing models")
+        print("Successfully loaded PCA model")
+        
+        print("Successfully loaded all preprocessing models")
         return scaler, ohe, pca
     except Exception as e:
-        logger.error(f"Error loading preprocessing models: {str(e)}")
+        print(f"Error loading preprocessing models: {str(e)}")
         raise
 
 def get_embedding_model(use_finetuned: bool = True) -> Any:
@@ -155,7 +182,7 @@ def generate_embedding_for_profile(profile: UserProfile) -> List[float]:
 
 def generate_and_store_embeddings(db: Session) -> int:
     """
-    Generate embeddings for users without them and store in the database.
+    Generate embeddings for users and store them as pickle files.
     Returns the count of profiles processed.
     """
     if not SENTENCE_TRANSFORMERS_AVAILABLE:
@@ -163,37 +190,39 @@ def generate_and_store_embeddings(db: Session) -> int:
         return 0
     
     try:
-        # Fetch profiles that need embeddings
-        profiles = db.query(UserProfile).filter(text("embedding IS NULL")).all()
+        # Fetch all profiles
+        profiles = db.query(UserProfile).all()
         
         if not profiles:
-            logger.info("No profiles found that need embeddings.")
+            logger.info("No profiles found.")
             return 0
         
         logger.info(f"Generating embeddings for {len(profiles)} profiles...")
         count = 0
         
         for profile in profiles:
-            # Generate embedding
-            embedding_vector = generate_embedding_for_profile(profile)
-            
-            # Update database with the embedding
-            db.execute(
-                text("UPDATE user_profiles SET embedding = :embedding WHERE id = :id"),
-                {"embedding": embedding_vector, "id": profile.id}
-            )
-            count += 1
-            
-            # Log progress periodically
-            if count % 10 == 0:
-                logger.info(f"Processed {count}/{len(profiles)} profiles...")
+            try:
+                # Generate embedding
+                embedding_vector = generate_embedding_for_profile(profile)
+                
+                # Store embedding as pickle file
+                embedding_path = os.path.join(MODELS_DIR, f"user_{profile.user_id}_embedding.pkl")
+                with open(embedding_path, 'wb') as f:
+                    pickle.dump(embedding_vector, f)
+                
+                count += 1
+                
+                # Log progress periodically
+                if count % 10 == 0:
+                    logger.info(f"Processed {count}/{len(profiles)} profiles...")
+            except Exception as e:
+                logger.error(f"Error processing profile {profile.id}: {str(e)}")
+                continue
         
-        db.commit()
         logger.info(f"Successfully generated embeddings for {count} profiles.")
         return count
         
     except Exception as e:
-        db.rollback()
         logger.error(f"Error generating embeddings: {str(e)}")
         raise
 
@@ -203,56 +232,82 @@ def find_and_store_similar_peers(db: Session, batch_size: int = 100, top_n: int 
     Returns the count of users processed.
     """
     try:
-        # Get all users with embeddings
-        user_ids_query = db.execute(
-            text("SELECT user_id FROM user_profiles WHERE embedding IS NOT NULL")
-        )
-        user_ids = [row[0] for row in user_ids_query.fetchall()]
+        # Get all users
+        profiles = db.query(UserProfile).all()
         
-        if not user_ids:
-            logger.info("No users found with embeddings.")
+        if not profiles:
+            logger.info("No users found.")
             return 0
         
-        logger.info(f"Finding similar peers for {len(user_ids)} users...")
+        logger.info(f"Finding similar peers for {len(profiles)} users...")
         total_processed = 0
         
         # Process in batches to avoid memory issues
-        for i in range(0, len(user_ids), batch_size):
-            batch = user_ids[i:i+batch_size]
+        for i in range(0, len(profiles), batch_size):
+            batch = profiles[i:i+batch_size]
             
-            for uid in batch:
-                # Find top N similar users using cosine similarity
-                similar_users = db.execute(
-                    text("""
-                        SELECT up2.user_id,
-                               1 - (up1.embedding <=> up2.embedding) AS similarity
-                        FROM user_profiles up1
-                        JOIN user_profiles up2 ON up1.user_id != up2.user_id
-                        WHERE up1.user_id = :user_id
-                          AND up2.embedding IS NOT NULL
-                        ORDER BY similarity DESC
-                        LIMIT :limit
-                    """),
-                    {"user_id": uid, "limit": top_n}
-                ).fetchall()
-                
-                # Store results
-                for peer_id, similarity in similar_users:
-                    db.execute(
-                        text("""
-                            INSERT INTO suggested_peers (user_id, suggested_id, similarity)
-                            VALUES (:user_id, :suggested_id, :similarity)
-                            ON CONFLICT (user_id, suggested_id) 
-                            DO UPDATE SET similarity = :similarity, updated_at = NOW()
-                        """),
-                        {"user_id": uid, "suggested_id": peer_id, "similarity": similarity}
-                    )
-                
-                total_processed += 1
+            for profile in batch:
+                try:
+                    # Generate embedding for this profile
+                    profile_data = {
+                        "job_title": profile.job_title,
+                        "industry": profile.industry,
+                        "years_experience": profile.years_experience,
+                        "education_level": profile.education_level,
+                        "career_goals": profile.career_goals,
+                        "skills": profile.skills if profile.skills else [],
+                        "interests": profile.interests if profile.interests else []
+                    }
+                    
+                    embedding = generate_embedding_for_profile(profile)
+                    if embedding is None:
+                        continue
+                    
+                    # Find similar users
+                    similar_users = []
+                    for other_profile in profiles:
+                        if other_profile.user_id == profile.user_id:
+                            continue
+                            
+                        other_data = {
+                            "job_title": other_profile.job_title,
+                            "industry": other_profile.industry,
+                            "years_experience": other_profile.years_experience,
+                            "education_level": other_profile.education_level,
+                            "career_goals": other_profile.career_goals,
+                            "skills": other_profile.skills if other_profile.skills else [],
+                            "interests": other_profile.interests if other_profile.interests else []
+                        }
+                        
+                        other_embedding = generate_embedding_for_profile(other_profile)
+                        if other_embedding is not None:
+                            similarity = cosine_similarity(embedding, other_embedding)
+                            similar_users.append((other_profile.user_id, similarity))
+                    
+                    # Sort by similarity and get top N
+                    similar_users.sort(key=lambda x: x[1], reverse=True)
+                    similar_users = similar_users[:top_n]
+                    
+                    # Store results
+                    for peer_id, similarity in similar_users:
+                        db.execute(
+                            text("""
+                                INSERT INTO suggested_peers (user_id, suggested_id, similarity)
+                                VALUES (:user_id, :suggested_id, :similarity)
+                                ON CONFLICT (user_id, suggested_id) 
+                                DO UPDATE SET similarity = :similarity, updated_at = NOW()
+                            """),
+                            {"user_id": profile.user_id, "suggested_id": peer_id, "similarity": similarity}
+                        )
+                    
+                    total_processed += 1
+                except Exception as e:
+                    logger.error(f"Error processing user {profile.user_id}: {str(e)}")
+                    continue
             
             # Commit after each batch
             db.commit()
-            logger.info(f"Processed {total_processed}/{len(user_ids)} users...")
+            logger.info(f"Processed {total_processed}/{len(profiles)} users...")
         
         logger.info(f"Successfully found similar peers for {total_processed} users.")
         return total_processed
@@ -386,10 +441,6 @@ def refresh_all_embeddings_and_peers(db: Session) -> Dict[str, int]:
     start_time = time.time()
     
     try:
-        # Clear existing embeddings
-        db.execute(text("UPDATE user_profiles SET embedding = NULL"))
-        db.commit()
-        
         # Clear existing peer suggestions
         db.execute(text("DELETE FROM suggested_peers"))
         db.commit()

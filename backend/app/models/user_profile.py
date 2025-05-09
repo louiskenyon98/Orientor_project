@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, Float, ARRAY, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..utils.database import Base
@@ -23,7 +23,16 @@ class UserProfile(Base):
     favorite_book = Column(String(255))
     favorite_celebrities = Column(Text)  # Stored as comma-separated values
     learning_style = Column(String(50))  # Visual, Auditory, Reading/Writing, Kinesthetic
-    interests = Column(Text)  # Stored as comma-separated values
+    interests = Column(ARRAY(String))
+    
+    # Career-related fields
+    job_title = Column(String)
+    industry = Column(String)
+    years_experience = Column(Integer)
+    education_level = Column(String)
+    career_goals = Column(String)
+    skills = Column(ARRAY(String))
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
