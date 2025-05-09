@@ -217,9 +217,9 @@ export default function CareerTree() {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+    <div className="w-full h-[calc(100vh-6rem)] bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col">
       <motion.div 
-        className="p-4 text-2xl font-light text-gray-800 border-b border-gray-100"
+        className="p-4 text-2xl font-light text-gray-800 dark:text-gray-100 border-b border-gray-100 dark:border-gray-700"
         initial="hidden"
         animate="visible"
         variants={titleVariants}
@@ -228,10 +228,10 @@ export default function CareerTree() {
       
       {!isSubmitted ? (
         <div className="flex-1 p-6 flex flex-col items-center justify-center">
-          <div className="max-w-2xl w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-medium text-gray-800 mb-4">Tell us about yourself</h2>
+          <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h2 className="text-xl font-medium text-gray-800 dark:text-gray-100 mb-4">Tell us about your career journey</h2>
             <textarea 
-              className="w-full h-40 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-40 p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
               placeholder={PROFILE_PLACEHOLDER}
               value={profile}
               onChange={(e) => setProfile(e.target.value)}
@@ -242,7 +242,7 @@ export default function CareerTree() {
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 disabled={isLoading}
               >
-                Generate Career Tree
+                Generate Career Path
               </button>
             </div>
           </div>
@@ -290,47 +290,46 @@ export default function CareerTree() {
             maxZoom={2}
             proOptions={{ hideAttribution: true }}
           >
-            
-            <Background color="#f8fafc" gap={16} size={1} />
-            <Controls />
-            <Panel position="top-right" className="bg-white p-3 rounded-lg shadow-md border border-gray-100 flex flex-col space-y-4">
-              <div className="flex flex-col">
-                <button 
-                  onClick={() => setIsCareerPathVisible(!isCareerPathVisible)} 
-                  className="text-sm text-blue-600 mb-2"
-                >
-                  {isCareerPathVisible ? 'Hide Your Career Path' : 'Show Your Career Path'}
-                </button>
+            <Background color="#f8fafc" gap={16} size={1} className="dark:bg-gray-800" />
+            <Controls className="dark:bg-gray-800 dark:text-gray-100" />
+            <Panel position="top-right" className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 flex flex-col space-y-2">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                <div className="font-medium mb-2 flex justify-between items-center">
+                  <span>Your Career Path:</span>
+                  <button 
+                    onClick={() => setIsCareerPathVisible(!isCareerPathVisible)} 
+                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {isCareerPathVisible ? 'Hide' : 'Show'}
+                  </button>
+                </div>
                 {isCareerPathVisible && (
-                  <div className="text-sm text-gray-600">
-                    <div className="font-medium mb-2">Your Career Path:</div>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Follow the connections between career options</li>
-                      <li>Click on a skill to see recommended actions</li>
-                      <li>Complete all actions before progressing</li>
-                    </ul>
-                    <div className="flex flex-col space-y-2 mt-3">
-                      <button
-                        onClick={() => setIsSubmitted(false)}
-                        className="w-full text-blue-600 border border-blue-600 px-2 py-1 rounded-md hover:bg-blue-50 transition-colors text-sm"
-                      >
-                        Edit Profile
-                      </button>
-                      <button
-                        onClick={handleSaveTree}
-                        disabled={isSaving}
-                        className="w-full bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
-                      >
-                        {isSaving ? 'Saving...' : 'Save Tree to My Path'}
-                      </button>
-                      {saveSuccess && (
-                        <div className="text-xs text-green-600 font-medium mt-1 text-center">
-                          Tree saved successfully!
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Follow the connections between career options</li>
+                    <li>Click on a skill to see recommended actions</li>
+                    <li>Complete all actions before progressing</li>
+                  </ul>
                 )}
+                <div className="flex flex-col space-y-2 mt-3">
+                  <button
+                    onClick={() => setIsSubmitted(false)}
+                    className="w-full text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 px-2 py-1 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={handleSaveTree}
+                    disabled={isSaving}
+                    className="w-full bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Tree to My Path'}
+                  </button>
+                  {saveSuccess && (
+                    <div className="text-xs text-green-600 dark:text-green-400 font-medium mt-1 text-center">
+                      Tree saved successfully!
+                    </div>
+                  )}
+                </div>
               </div>
               
               {/* XP Progress */}

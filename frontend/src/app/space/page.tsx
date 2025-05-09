@@ -88,7 +88,7 @@ export default function SpacePage() {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">My Space</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">My Space</h1>
         
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -97,28 +97,28 @@ export default function SpacePage() {
         ) : error ? (
           <div className="text-red-500 text-center">{error}</div>
         ) : recommendations.length === 0 ? (
-          <div className="text-center text-gray-500">No saved recommendations yet.</div>
+          <div className="text-center text-gray-500 dark:text-gray-400">No saved recommendations yet.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold mb-4">Saved Recommendations</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Saved Recommendations</h2>
               <div className="space-y-4">
                 {recommendations.map((rec) => (
                   <div
                     key={rec.id}
                     className={`p-4 rounded-lg cursor-pointer ${
                       selectedRecommendation?.id === rec.id
-                        ? 'bg-blue-100 border-2 border-blue-500'
-                        : 'bg-white border border-gray-200 hover:border-blue-300'
+                        ? 'bg-blue-100 dark:bg-blue-900 border-2 border-blue-500 dark:border-blue-400'
+                        : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500'
                     }`}
                   >
                     <div onClick={() => handleRecommendationSelect(rec)}>
-                      <h3 className="font-medium">{rec.label}</h3>
-                      <p className="text-sm text-gray-500">{rec.oasis_code}</p>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{rec.label}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{rec.oasis_code}</p>
                     </div>
                     <button
                       onClick={() => rec.id && handleDeleteRecommendation(rec.id)}
-                      className="mt-2 text-gray-200 hover:text-gray-700 text-sm font-medium"
+                      className="mt-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm font-medium"
                     >
                       Delete
                     </button>
@@ -130,28 +130,28 @@ export default function SpacePage() {
             <div className="md:col-span-2">
               {selectedRecommendation && (
                 <>
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-2xl font-bold mb-4">{selectedRecommendation.label}</h2>
-                    <p className="text-gray-600 mb-4">{selectedRecommendation.description}</p>
+                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">{selectedRecommendation.label}</h2>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">{selectedRecommendation.description}</p>
                     
                     {selectedRecommendation.main_duties && (
                       <div className="mb-6">
-                        <h3 className="text-lg font-semibold mb-2">Main Duties</h3>
-                        <p className="text-gray-700">{selectedRecommendation.main_duties}</p>
+                        <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Main Duties</h3>
+                        <p className="text-gray-700 dark:text-gray-300">{selectedRecommendation.main_duties}</p>
                       </div>
                     )}
 
                     {selectedRecommendation.skill_comparison && (
                       <div className="mt-8">
-                        <h3 className="text-lg font-semibold mb-2">Skill Comparison</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Skill Comparison</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <RadarChart data={extractSkillData(selectedRecommendation.skill_comparison)}>
-                            <PolarGrid />
-                            <PolarAngleAxis dataKey="subject" />
-                            <PolarRadiusAxis angle={30} domain={[0, 5]} />
+                            <PolarGrid stroke="#374151" />
+                            <PolarAngleAxis dataKey="subject" stroke="#6B7280" />
+                            <PolarRadiusAxis angle={30} domain={[0, 5]} stroke="#6B7280" />
                             <Radar name="Job Skills" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
                             <Radar name="My Skills" dataKey="B" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
-                            <Tooltip />
+                            <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '0.375rem', color: '#F3F4F6' }} />
                             <Legend />
                           </RadarChart>
                         </ResponsiveContainer>
@@ -159,16 +159,16 @@ export default function SpacePage() {
                     )}
 
                     <div className="mt-8">
-                      <h3 className="text-lg font-semibold mb-2">Cognitive Traits & Work Characteristics</h3>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Cognitive Traits & Work Characteristics</h3>
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart
                           data={extractChartData(selectedRecommendation)}
                           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                         >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                          <YAxis domain={[0, 5]} />
-                          <Tooltip />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#6B7280' }} />
+                          <YAxis domain={[0, 5]} tick={{ fill: '#6B7280' }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '0.375rem', color: '#F3F4F6' }} />
                           <Legend />
                           <Bar name="Role Requirements" dataKey="role" fill="#8884d8" />
                           <Bar name="Your Traits" dataKey="user" fill="#82ca9d" />
@@ -178,8 +178,8 @@ export default function SpacePage() {
 
                     {selectedRecommendation.all_fields && (
                       <div className="mt-6">
-                        <h3 className="text-lg font-semibold mb-2">Additional Details</h3>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-neutral-500">
+                        <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Additional Details</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
                           {Object.entries(selectedRecommendation.all_fields).map(([key, value]) => (
                             <div key={key} className="flex gap-1">
                               <span className="font-medium">{key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:</span>

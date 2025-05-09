@@ -57,21 +57,21 @@ const NotesSection: React.FC<NotesSectionProps> = ({ recommendation }) => {
   };
 
   return (
-    <div className="card">
-      <h2 className="text-2xl font-bold mb-4">Notes</h2>
+    <div className="mt-8">
+      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Notes</h3>
       
       {/* Add new note */}
       <div className="mb-6">
         <textarea
-          className="w-full p-3 rounded-lg bg-neutral-100/50 border border-neutral-100/30 focus:border-primary-teal/50 focus:ring-1 focus:ring-primary-teal/50"
-          rows={3}
-          placeholder="Add a note..."
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
+          placeholder="Add a new note..."
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+          rows={3}
         />
         <button
-          className="mt-2 px-4 py-2 bg-primary-teal/20 text-primary-teal rounded-lg hover:bg-primary-teal/30 transition-colors"
           onClick={handleAddNote}
+          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           Add Note
         </button>
@@ -79,29 +79,29 @@ const NotesSection: React.FC<NotesSectionProps> = ({ recommendation }) => {
       
       {/* Notes list */}
       <div className="space-y-4">
-        {notes.map(note => (
-          <div key={note.id} className="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700/30">
+        {notes.map((note) => (
+          <div key={note.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
             {editingNoteId === note.id ? (
               <div>
                 <textarea
-                  className="w-full p-3 rounded-lg bg-neutral-800/50 border border-neutral-700/30 focus:border-primary-teal/50 focus:ring-1 focus:ring-primary-teal/50"
-                  rows={3}
                   value={editingContent}
                   onChange={(e) => setEditingContent(e.target.value)}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-100"
+                  rows={3}
                 />
-                <div className="mt-2 space-x-2">
+                <div className="mt-2 flex space-x-2">
                   <button
-                    className="px-3 py-1 bg-primary-teal/20 text-primary-teal rounded-lg hover:bg-primary-teal/30 transition-colors"
                     onClick={() => handleEditNote(note.id)}
+                    className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Save
                   </button>
                   <button
-                    className="px-3 py-1 bg-neutral-700/50 text-neutral-300 rounded-lg hover:bg-neutral-700/70 transition-colors"
                     onClick={() => {
                       setEditingNoteId(null);
                       setEditingContent('');
                     }}
+                    className="px-3 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Cancel
                   </button>
@@ -109,26 +109,28 @@ const NotesSection: React.FC<NotesSectionProps> = ({ recommendation }) => {
               </div>
             ) : (
               <div>
-                <p className="text-neutral-300">{note.content}</p>
-                <div className="mt-2 text-sm text-neutral-500">
-                  {new Date(note.created_at).toLocaleDateString()}
-                </div>
-                <div className="mt-2 space-x-2">
-                  <button
-                    className="px-3 py-1 bg-neutral-700/50 text-neutral-300 rounded-lg hover:bg-neutral-700/70 transition-colors"
-                    onClick={() => {
-                      setEditingNoteId(note.id);
-                      setEditingContent(note.content);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
-                    onClick={() => handleDeleteNote(note.id)}
-                  >
-                    Delete
-                  </button>
+                <p className="text-gray-700 dark:text-gray-200">{note.content}</p>
+                <div className="mt-2 flex justify-between items-center">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(note.created_at).toLocaleDateString()}
+                  </span>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingNoteId(note.id);
+                        setEditingContent(note.content);
+                      }}
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteNote(note.id)}
+                      className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

@@ -89,8 +89,8 @@ export default function TreePathPage() {
       <MainLayout>
         <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">My Tree Paths</h1>
-            <p className="mt-2 text-lg text-gray-600">Loading your saved trees...</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">My Tree Paths</h1>
+            <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">Loading your saved trees...</p>
           </div>
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
@@ -138,9 +138,9 @@ export default function TreePathPage() {
           
           {/* If no tree paths */}
           {treePaths.length === 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
               <svg 
-                className="w-16 h-16 text-gray-400 mx-auto mb-4" 
+                className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" 
                 xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 24 24" 
                 fill="none" 
@@ -151,8 +151,8 @@ export default function TreePathPage() {
               >
                 <path d="M12 22V6M9 18H15M5 12H19M4 7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7Z" />
               </svg>
-              <h2 className="text-xl font-medium text-gray-800 mb-2">No Saved Trees</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-xl font-medium text-gray-800 dark:text-gray-100 mb-2">No Saved Trees</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Visit the Career Explorer or Enhanced Skills Path to create and save trees
               </p>
               <div className="flex justify-center space-x-4">
@@ -176,7 +176,7 @@ export default function TreePathPage() {
           {treePaths.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {treePaths.map((path) => (
-                <div key={path.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                <div key={path.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
                   {/* Preview */}
                   {generateTreePreview(path.tree_type)}
                   
@@ -184,10 +184,10 @@ export default function TreePathPage() {
                   <div className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                           {path.tree_type === 'career' ? 'Career Path' : 'Skills Path'}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           Saved on {format(new Date(path.created_at), 'MMMM d, yyyy')}
                         </p>
                       </div>
@@ -195,15 +195,15 @@ export default function TreePathPage() {
                       {/* Tree type badge */}
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         path.tree_type === 'career' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-green-100 text-green-800'
+                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
+                          : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                       }`}>
                         {path.tree_type}
                       </span>
                     </div>
                     
                     {/* Path stats (simplified) */}
-                    <div className="mt-4 text-sm text-gray-600">
+                    <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
                       <div className="flex items-center">
                         <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -221,13 +221,13 @@ export default function TreePathPage() {
                           pathname: path.tree_type === 'career' ? '/career' : '/enhanced-skills',
                           query: { treeId: path.id }
                         }}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                       >
                         View {path.tree_type} tree
                       </Link>
                       <button
                         onClick={() => handleDeleteTreePath(path.id)}
-                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium"
                       >
                         Delete
                       </button>
