@@ -6,15 +6,67 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 import pickle
 import random
+import json
 from .peer_matching_service import parse_embedding
 import pinecone
 import re
 from app.models.user_profile import UserProfile
 from app.services.embedding_service import generate_embedding
-
+import ast
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def try_parse_float(value: Any) -> Optional[float]:
+    try:
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            return float(value.strip())
+        return None
+    except (ValueError, AttributeError, TypeError):
+        return None
+
+
+def extract_fields_from_text(text: str) -> Dict[str, str]:
+    fields = {}
+
+    # Try parsing as JSON (stringified dict from Pinecone metadata['text'])
+    if isinstance(text, str):
+        text = text.strip()
+        if text.startswith('{') and text.endswith('}'):  # basic JSON-like heuristic
+            try:
+                parsed = ast.literal_eval(text) if "'" in text else json.loads(text)
+                if isinstance(parsed, dict):
+                    for k, v in parsed.items():
+                        key_clean = (
+                            k.strip()
+                             .replace(" ", "_")
+                             .replace("-", "_")
+                             .replace("__", "_")
+                             .lower()
+                        )
+                        fields[key_clean] = str(v).strip()
+                    return fields
+            except Exception as e:
+                print(f"[extract_fields_from_text] JSON parse failed: {e}")
+
+    # Fallback to regex-based parsing
+    text = text.replace("\xa0", " ")
+    field_pattern = re.compile(r'([\w\s\-:]+):\s+([^.:|]+(?:\|[^.:]+)*)')
+    matches = field_pattern.findall(text)
+
+    for key, value in matches:
+        key_clean = (
+            key.strip()
+            .replace(" ", "_")
+            .replace("-", "_")
+            .replace("__", "_")
+            .lower()
+        )
+        fields[key_clean] = value.strip()
+
+    return fields
 
 # Path to ML models
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models")
@@ -205,31 +257,67 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         logger.error(f"Error getting user embedding: {str(e)}")
         return None
 
-def extract_fields_from_text(text: str) -> Dict[str, str]:
-    """
-    Extract fields from text metadata in Pinecone records
-    
-    Args:
-        text: Raw text metadata from Pinecone
-        
-    Returns:
-        Dictionary of extracted fields
-    """
-    parsed_fields = {}
-    field_pattern = re.compile(r'([\w\s\-:]+):\s+([^.:|]+(?:\|[^.:]+)*)')
-    matches = field_pattern.findall(text)
-    
-    for key, value in matches:
-        key_clean = (
-            key.strip()
-            .replace(" ", "_")
-            .replace("-", "_")
-            .replace("__", "_")
-            .lower()
-        )
-        parsed_fields[key_clean] = value.strip()
-    
-    return parsed_fields
+# def extract_fields_from_text(text: str) -> Dict[str, str]:
+#     """
+#     Extracts all key-value pairs from the raw Pinecone embedded text using robust pattern matching.
+#     """
+#     fields = {}
+
+#     # Replace unusual whitespace with normal space
+#     text = text.replace("\xa0", " ")
+
+#     # Normalize common field delimiters
+#     field_pattern = re.compile(r'([\w\s\-:]+):\s+([^.:|]+(?:\|[^.:]+)*)')
+#     matches = field_pattern.findall(text)
+
+#     for key, value in matches:
+#         key_clean = (
+#             key.strip()
+#             .replace(" ", "_")
+#             .replace("-", "_")
+#             .replace("__", "_")
+#             .lower()
+#         )
+#         fields[key_clean] = value.strip()
+
+#     # Extract cognitive traits using a more specific pattern
+#     cognitive_traits = [
+#         "analytical_thinking",
+#         "attention_to_detail",
+#         "collaboration",
+#         "adaptability",
+#         "independence",
+#         "evaluation",
+#         "decision_making",
+#         "stress_tolerance"
+#     ]
+
+#     for trait in cognitive_traits:
+#         # Try both with and without underscores
+#         trait_name = trait.replace("_", " ").title()
+#         pattern = f"{trait_name}:\\s*(\\d+)"
+#         match = re.search(pattern, text, re.IGNORECASE)
+#         if match:
+#             fields[trait] = match.group(1)
+
+#     # Extract role requirements
+#     role_requirements = [
+#         "creativity",
+#         "leadership",
+#         "digital_literacy",
+#         "critical_thinking",
+#         "problem_solving"
+#     ]
+
+#     for requirement in role_requirements:
+#         requirement_name = requirement.replace("_", " ").title()
+#         pattern = f"{requirement_name}:\\s*(\\d+)"
+#         match = re.search(pattern, text, re.IGNORECASE)
+#         if match:
+#             fields[requirement] = match.group(1)
+
+#     logger.info(f"Extracted fields: {fields}")
+#     return fields
 
 def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30) -> List[Dict[str, Any]]:
     """
@@ -260,29 +348,19 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         # Get the index
         index = pc.Index("oasis-minilm-index")
         
-        # Ensure embedding is the right format and size - handle numpy arrays
+        # Ensure embedding is the right format and size
         if isinstance(embedding, np.ndarray):
             embedding = embedding.tolist()
         
-        # Log the embedding size and first few values for debugging
-        logger.info(f"Query embedding size: {len(embedding)}")
-        logger.info(f"First 30 embedding values: {embedding[:30]}")
-        
-        # Query Pinecone with explicit limit
+        # Query Pinecone
         try:
-            logger.info(f"Querying Pinecone with limit={limit}")
             query_results = index.query(
                 namespace="",
                 vector=embedding,
-                top_k=limit,  # Explicitly set to requested limit
+                top_k=limit,
                 include_metadata=True
             )
-            logger.info(f"Received query results from Pinecone: {type(query_results)}")
             
-            # Log the raw response for debugging
-            logger.info(f"Raw Pinecone response: {query_results}")
-            
-            # Check if we got the expected number of results
             matches = []
             if isinstance(query_results, dict):
                 matches = query_results.get('matches', [])
@@ -291,75 +369,68 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             elif hasattr(query_results, 'result') and hasattr(query_results.result, 'matches'):
                 matches = query_results.result.matches
             
-            logger.info(f"Found {len(matches)} matches from Pinecone")
-            if len(matches) < limit:
-                logger.warning(f"Got fewer matches ({len(matches)}) than requested ({limit})")
+            if not matches:
+                logger.warning("No matches found in Pinecone response")
+                return []
             
-            # Log each match for debugging
+            # Extract results
+            recommendations = []
             for i, match in enumerate(matches):
+                # Handle different match formats
                 match_id = match.get('id', None) if isinstance(match, dict) else getattr(match, 'id', None)
                 match_score = match.get('score', 0.0) if isinstance(match, dict) else getattr(match, 'score', 0.0)
-                logger.info(f"Match {i+1}: ID={match_id}, Score={match_score}")
+                
+                if not match_id:
+                    continue
+                    
+                # Extract OASIS code from the ID
+                oasis_code = match_id.split('-')[1] if '-' in match_id else match_id
+                
+                # Get metadata
+                metadata = {}
+                if isinstance(match, dict):
+                    metadata = match.get('metadata', {})
+                elif hasattr(match, 'metadata'):
+                    metadata = match.metadata
+                
+                # Parse text for additional fields
+                text = metadata.get('text', '') if isinstance(metadata, dict) else getattr(metadata, 'text', '')
+                parsed_fields = extract_fields_from_text(text)
+                logger.info(f'Extracted fields from text: {parsed_fields}')
+                
+                # Create result object with all fields
+                recommendation = {
+                    "id": i + 1,
+                    "oasis_code": oasis_code,
+                    "title": parsed_fields.get("oasis_label__final_x", "") or parsed_fields.get("label", "") or f"Job {oasis_code}",
+                    "description": parsed_fields.get("lead_statement", "") or parsed_fields.get("description", "") or "No description available",
+                    "main_duties": parsed_fields.get("main_duties", ""),
+                    "score": float(match_score),
+                    "creativity": try_parse_float(parsed_fields.get("creativity")),
+                    "leadership": try_parse_float(parsed_fields.get("leadership")),
+                    "digital_literacy": try_parse_float(parsed_fields.get("digital_literacy")),
+                    "critical_thinking": try_parse_float(parsed_fields.get("critical_thinking")),
+                    "problem_solving": try_parse_float(parsed_fields.get("problem_solving")),
+                    "analytical_thinking": try_parse_float(parsed_fields.get("analytical_thinking")),
+                    "attention_to_detail": try_parse_float(parsed_fields.get("attention_to_detail")),
+                    "collaboration": try_parse_float(parsed_fields.get("collaboration")),
+                    "adaptability": try_parse_float(parsed_fields.get("adaptability")),
+                    "independence": try_parse_float(parsed_fields.get("independence")),
+                    "evaluation": try_parse_float(parsed_fields.get("evaluation")),
+                    "decision_making": try_parse_float(parsed_fields.get("decision_making")),
+                    "stress_tolerance": try_parse_float(parsed_fields.get("stress_tolerance")),
+                    "all_fields": parsed_fields
+                }
+                
+                logger.info(f'Created recommendation object: {recommendation}')
+                recommendations.append(recommendation)
+            
+            return recommendations
             
         except Exception as e:
             logger.error(f"Error querying Pinecone: {str(e)}")
             return []
-        
-        if not matches:
-            logger.warning("No matches found in Pinecone response")
-            return []
-        
-        # Extract results
-        recommendations = []
-        for i, match in enumerate(matches):
-            # Handle different match formats - dictionary or object
-            match_id = match.get('id', None) if isinstance(match, dict) else getattr(match, 'id', None)
-            match_score = match.get('score', 0.0) if isinstance(match, dict) else getattr(match, 'score', 0.0)
             
-            if not match_id:
-                logger.warning(f"Match at index {i} has no ID, skipping")
-                continue
-                
-            # Extract OASIS code from the ID
-            if '-' in match_id:
-                oasis_code = match_id.split('-')[1]
-            else:
-                oasis_code = match_id
-                
-            # Skip entries without oasis_code
-            if not oasis_code:
-                logger.warning(f"Could not extract OASIS code from match ID: {match_id}")
-                continue
-            
-            # Get metadata, handling different formats
-            metadata = {}
-            if isinstance(match, dict):
-                metadata = match.get('metadata', {})
-            elif hasattr(match, 'metadata'):
-                metadata = match.metadata
-            
-            # Parse text for additional fields
-            text = metadata.get('text', '') if isinstance(metadata, dict) else getattr(metadata, 'text', '')
-            parsed_fields = extract_fields_from_text(text)
-            
-            # Create result object with fallbacks for missing fields
-            title = parsed_fields.get("oasis_label__final_x", "") or parsed_fields.get("label", "") or f"Job {oasis_code}"
-            description = parsed_fields.get("lead_statement", "") or parsed_fields.get("description", "") or "No description available"
-            
-            recommendation = {
-                "id": i + 1,  # Use sequential IDs for the swipe interface
-                "oasis_code": oasis_code,
-                "title": title,
-                "description": description,
-                "score": float(match_score),
-                "main_duties": parsed_fields.get("main_duties", ""),
-                "metadata": parsed_fields
-            }
-            recommendations.append(recommendation)
-            logger.info(f"Added recommendation {i+1}: {title} (score: {match_score})")
-        
-        logger.info(f"Prepared {len(recommendations)} career recommendations")
-        return recommendations
     except Exception as e:
         logger.error(f"Error getting Pinecone career recommendations: {str(e)}")
         return []
@@ -428,7 +499,7 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
 
 def save_career_recommendation(db: Session, user_id: int, career_id: int) -> bool:
     """
-    Save a career recommendation for a user
+    Save a career recommendation for a user with all fields
     
     Args:
         db: Database session
@@ -439,21 +510,26 @@ def save_career_recommendation(db: Session, user_id: int, career_id: int) -> boo
         True if successful, False otherwise
     """
     try:
+        logger.info(f"Starting save_career_recommendation for user {user_id}, career_id {career_id}")
+        
         # Try to get the career details from Pinecone first
-        # This is needed because career_id in swipe interface might not match the real ID
-        # We need to look it up in the recommendations first
         recommendations = get_career_recommendations(db, user_id, 30)
+        logger.info(f"Got {len(recommendations)} recommendations")
         
         career_details = next((c for c in recommendations if c["id"] == career_id), None)
         
         if not career_details:
             logger.error(f"Career ID {career_id} not found in recommendations for user {user_id}")
             return False
+            
+        logger.info(f"Found career details: {career_details}")
         
         # Generate an oasis code from the Pinecone result
         oasis_code = career_details.get("oasis_code", f"career_{career_id}")
         if not oasis_code.startswith("career_"):
             oasis_code = f"career_{oasis_code}"
+        
+        logger.info(f"Using oasis_code: {oasis_code}")
         
         # Check if already saved
         query = text("""
@@ -468,47 +544,98 @@ def save_career_recommendation(db: Session, user_id: int, career_id: int) -> boo
             logger.info(f"Career {oasis_code} already saved for user {user_id}")
             return True
         
-        # Insert new saved recommendation with required fields
+        # Insert new saved recommendation with all fields
         query = text("""
-            INSERT INTO saved_recommendations 
-            (user_id, oasis_code, label, description)
-            VALUES (:user_id, :oasis_code, :label, :description)
+            INSERT INTO saved_recommendations (
+                user_id, oasis_code, label, description, main_duties,
+                role_creativity, role_leadership, role_digital_literacy,
+                role_critical_thinking, role_problem_solving,
+                analytical_thinking, attention_to_detail, collaboration,
+                adaptability, independence, evaluation, decision_making,
+                stress_tolerance, all_fields
+            ) VALUES (
+                :user_id, :oasis_code, :label, :description, :main_duties,
+                :role_creativity, :role_leadership, :role_digital_literacy,
+                :role_critical_thinking, :role_problem_solving,
+                :analytical_thinking, :attention_to_detail, :collaboration,
+                :adaptability, :independence, :evaluation, :decision_making,
+                :stress_tolerance, :all_fields
+            )
         """)
         
-        db.execute(query, {
+        # Use the pre-extracted fields from career_details with try_parse_float for numeric fields
+        values = {
             "user_id": user_id,
             "oasis_code": oasis_code,
-            "label": career_details["title"],
-            "description": career_details["description"]
-        })
-        db.commit()
+            "label": career_details.get("title", ""),
+            "description": career_details.get("description", ""),
+            "main_duties": career_details.get("main_duties", ""),
+            "role_creativity": try_parse_float(career_details.get("creativity")),
+            "role_leadership": try_parse_float(career_details.get("leadership")),
+            "role_digital_literacy": try_parse_float(career_details.get("digital_literacy")),
+            "role_critical_thinking": try_parse_float(career_details.get("critical_thinking")),
+            "role_problem_solving": try_parse_float(career_details.get("problem_solving")),
+            "analytical_thinking": try_parse_float(career_details.get("analytical_thinking")),
+            "attention_to_detail": try_parse_float(career_details.get("attention_to_detail")),
+            "collaboration": try_parse_float(career_details.get("collaboration")),
+            "adaptability": try_parse_float(career_details.get("adaptability")),
+            "independence": try_parse_float(career_details.get("independence")),
+            "evaluation": try_parse_float(career_details.get("evaluation")),
+            "decision_making": try_parse_float(career_details.get("decision_making")),
+            "stress_tolerance": try_parse_float(career_details.get("stress_tolerance")),
+            "all_fields": json.dumps(career_details.get("all_fields", {}))
+        }
+        logger.info(f"Preparing to save career with values: {values}")
         
-        logger.info(f"Saved career {oasis_code} for user {user_id}")
-        return True
+        try:
+            db.execute(query, values)
+            db.commit()
+            logger.info(f"Successfully saved career {oasis_code} for user {user_id}")
+            return True
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Database error while saving career: {str(e)}")
+            raise
+            
     except Exception as e:
         db.rollback()
-        logger.error(f"Error saving career recommendation: {str(e)}")
+        logger.error(f"Error in save_career_recommendation: {str(e)}")
         return False
 
 def get_saved_careers(db: Session, user_id: int) -> List[Dict[str, Any]]:
     """
-    Get saved career recommendations for a user
+    Get saved career recommendations for a user with all fields
     
     Args:
         db: Database session
         user_id: ID of the user
         
     Returns:
-        List of saved career recommendations
+        List of saved career recommendations with all fields
     """
     try:
-        # Get all saved recommendations for the user
+        # Get all saved recommendations for the user with all fields
         query = text("""
             SELECT 
                 sr.id as id,
                 sr.oasis_code as oasis_code,
                 sr.label as title,
                 sr.description as description,
+                sr.main_duties as main_duties,
+                sr.role_creativity as role_creativity,
+                sr.role_leadership as role_leadership,
+                sr.role_digital_literacy as role_digital_literacy,
+                sr.role_critical_thinking as role_critical_thinking,
+                sr.role_problem_solving as role_problem_solving,
+                sr.analytical_thinking as analytical_thinking,
+                sr.attention_to_detail as attention_to_detail,
+                sr.collaboration as collaboration,
+                sr.adaptability as adaptability,
+                sr.independence as independence,
+                sr.evaluation as evaluation,
+                sr.decision_making as decision_making,
+                sr.stress_tolerance as stress_tolerance,
+                sr.all_fields as all_fields,
                 sr.saved_at as saved_at
             FROM saved_recommendations sr
             WHERE sr.user_id = :user_id
@@ -519,43 +646,42 @@ def get_saved_careers(db: Session, user_id: int) -> List[Dict[str, Any]]:
         
         saved_careers = []
         for row in result:
-            # Check if this is from the "Find Your Way" tab
-            if row.oasis_code and row.oasis_code.startswith("career_"):
+            # Convert all_fields from JSON string to dict if it exists
+            all_fields = {}
+            if row.all_fields:
                 try:
-                    # Extract career_id from oasis_code
-                    career_id = row.oasis_code.split("_")[1]
-                    
-                    saved_careers.append({
-                        "id": row.id,
-                        "oasis_code": row.oasis_code,
-                        "title": row.title,
-                        "description": row.description,
-                        "saved_at": row.saved_at,
-                        "source": "find_your_way"
-                    })
-                except (ValueError, IndexError):
-                    # Not a valid career ID, treat as regular recommendation
-                    saved_careers.append({
-                        "id": row.id,
-                        "oasis_code": row.oasis_code,
-                        "title": row.title,
-                        "description": row.description,
-                        "saved_at": row.saved_at,
-                        "source": "recommendation"
-                    })
-            else:
-                # Regular recommendation
-                saved_careers.append({
-                    "id": row.id,
-                    "oasis_code": row.oasis_code,
-                    "title": row.title,
-                    "description": row.description,
-                    "saved_at": row.saved_at,
-                    "source": "recommendation"
-                })
+                    all_fields = json.loads(row.all_fields)
+                except json.JSONDecodeError:
+                    logger.error(f"Error decoding all_fields JSON for career {row.id}")
+            
+            career = {
+                "id": row.id,
+                "oasis_code": row.oasis_code,
+                "title": row.title,
+                "description": row.description,
+                "main_duties": row.main_duties,
+                "role_creativity": row.role_creativity,
+                "role_leadership": row.role_leadership,
+                "role_digital_literacy": row.role_digital_literacy,
+                "role_critical_thinking": row.role_critical_thinking,
+                "role_problem_solving": row.role_problem_solving,
+                "analytical_thinking": row.analytical_thinking,
+                "attention_to_detail": row.attention_to_detail,
+                "collaboration": row.collaboration,
+                "adaptability": row.adaptability,
+                "independence": row.independence,
+                "evaluation": row.evaluation,
+                "decision_making": row.decision_making,
+                "stress_tolerance": row.stress_tolerance,
+                "all_fields": all_fields,
+                "saved_at": row.saved_at,
+                "source": "find_your_way" if row.oasis_code and row.oasis_code.startswith("career_") else "recommendation"
+            }
+            saved_careers.append(career)
+            logger.info(f"Retrieved career: {career['title']} with fields: {career}")
         
         logger.info(f"Retrieved {len(saved_careers)} saved careers for user {user_id}")
         return saved_careers
     except Exception as e:
         logger.error(f"Error getting saved careers: {str(e)}")
-        return [] 
+        return []

@@ -11,6 +11,7 @@ from ..routers.user import get_current_user
 from ..schemas.space import SavedRecommendationCreate
 import logging
 from ..models import UserProfile
+import re
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 logger = logging.getLogger(__name__)
@@ -60,10 +61,65 @@ class SwipeRequest(BaseModel):
     decision_making: Optional[float] = None
     all_fields: Optional[Dict[str, str]] = None
 
+    class Config:
+        from_attributes = True
+
 class SwipeResponse(BaseModel):
     success: bool
     saved_id: Optional[int] = None
     message: str
+
+def try_parse_float(value: str) -> Optional[float]:
+    """Try to parse a string to float, return None if fails"""
+    try:
+        return float(value.strip())
+    except (ValueError, AttributeError):
+        return None
+
+def extract_fields_from_text(text: str) -> Dict[str, str]:
+    """
+    Extracts all key-value pairs from the raw Pinecone embedded text using robust pattern matching.
+    """
+    fields = {}
+
+    # Replace unusual whitespace with normal space
+    text = text.replace("\xa0", " ")
+
+    # Normalize common field delimiters
+    field_pattern = re.compile(r'([\w\s\-:]+):\s+([^.:|]+(?:\|[^.:]+)*)')
+    matches = field_pattern.findall(text)
+
+    for key, value in matches:
+        key_clean = (
+            key.strip()
+            .replace(" ", "_")
+            .replace("-", "_")
+            .replace("__", "_")
+            .lower()
+        )
+        fields[key_clean] = value.strip()
+
+    # Extract cognitive traits using a more specific pattern
+    cognitive_traits = [
+        "analytical_thinking",
+        "attention_to_detail",
+        "collaboration",
+        "adaptability",
+        "independence",
+        "evaluation",
+        "decision_making",
+        "stress_tolerance"
+    ]
+
+    for trait in cognitive_traits:
+        # Try both with and without underscores
+        trait_name = trait.replace("_", " ").title()
+        pattern = f"{trait_name}:\\s*(\\d+)"
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            fields[trait] = match.group(1)
+
+    return fields
 
 @router.get("", response_model=RecommendationsResponse)
 def get_career_recommendations(
@@ -197,28 +253,45 @@ def swipe_recommendation(
                     message="This recommendation was already saved"
                 )
             
-            # Create new recommendation
+            # Extract fields from text
+            full_text = ""
+            if swipe.lead_statement:
+                full_text += swipe.lead_statement + " "
+            if swipe.main_duties:
+                full_text += swipe.main_duties
+                
+            parsed_fields = extract_fields_from_text(full_text)
+            
+            # Create new recommendation with extracted fields
             new_recommendation = SavedRecommendation(
                 user_id=current_user.id,
                 oasis_code=swipe.oasis_code,
                 label=swipe.label,
                 description=swipe.lead_statement,
                 main_duties=swipe.main_duties,
-                role_creativity=swipe.creativity,
-                role_leadership=swipe.leadership,
-                role_digital_literacy=swipe.digital_literacy,
-                role_critical_thinking=swipe.critical_thinking,
-                role_problem_solving=swipe.problem_solving,
-                analytical_thinking=swipe.analytical_thinking,
-                attention_to_detail=swipe.attention_to_detail,
-                collaboration=swipe.collaboration,
-                adaptability=swipe.adaptability,
-                independence=swipe.independence,
-                evaluation=swipe.evaluation,
-                decision_making=swipe.decision_making,
-                stress_tolerance=swipe.stress_tolerance,
-                all_fields=swipe.all_fields
+                role_creativity=try_parse_float(parsed_fields.get("creativity")),
+                role_leadership=try_parse_float(parsed_fields.get("leadership")),
+                role_digital_literacy=try_parse_float(parsed_fields.get("digital_literacy")),
+                role_critical_thinking=try_parse_float(parsed_fields.get("critical_thinking")),
+                role_problem_solving=try_parse_float(parsed_fields.get("problem_solving")),
+                analytical_thinking=try_parse_float(parsed_fields.get("analytical_thinking")),
+                attention_to_detail=try_parse_float(parsed_fields.get("attention_to_detail")),
+                collaboration=try_parse_float(parsed_fields.get("collaboration")),
+                adaptability=try_parse_float(parsed_fields.get("adaptability")),
+                independence=try_parse_float(parsed_fields.get("independence")),
+                evaluation=try_parse_float(parsed_fields.get("evaluation")),
+                decision_making=try_parse_float(parsed_fields.get("decision_making")),
+                stress_tolerance=try_parse_float(parsed_fields.get("stress_tolerance")),
+                all_fields=parsed_fields
             )
+            
+            # Log the values being saved for debugging
+            logger.info(f"Saving recommendation with values:")
+            logger.info(f"Oasis Code: {swipe.oasis_code}")
+            logger.info(f"Label: {swipe.label}")
+            logger.info(f"Lead Statement: {swipe.lead_statement}")
+            logger.info(f"Main Duties: {swipe.main_duties}")
+            logger.info(f"Parsed Fields: {parsed_fields}")
             
             db.add(new_recommendation)
             db.commit()

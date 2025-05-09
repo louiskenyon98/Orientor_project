@@ -17,6 +17,7 @@ from typing import List, Optional, Dict
 from sqlalchemy import text
 
 
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
