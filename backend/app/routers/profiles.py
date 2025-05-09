@@ -159,6 +159,12 @@ def update_profile(
             exclude_unset=True
         )
         
+        # Handle skills and interests conversion from string to array
+        if "skills" in profile_fields and isinstance(profile_fields["skills"], str):
+            profile_fields["skills"] = [skill.strip() for skill in profile_fields["skills"].split(",") if skill.strip()]
+        if "interests" in profile_fields and isinstance(profile_fields["interests"], str):
+            profile_fields["interests"] = [interest.strip() for interest in profile_fields["interests"].split(",") if interest.strip()]
+        
         # Update profile fields
         logger.info(f"Updating profile fields: {list(profile_fields.keys())}")
         for field, value in profile_fields.items():
@@ -185,8 +191,8 @@ def update_profile(
                 "years_experience": profile_data.years_experience if profile_data.years_experience else 0,
                 "education_level": profile_data.education_level if profile_data.education_level else "",
                 "career_goals": profile_data.career_goals if profile_data.career_goals else "",
-                "skills": profile_data.skills if profile_data.skills else [],
-                "interests": profile_data.interests if profile_data.interests else ""
+                "skills": profile_fields.get("skills", []),
+                "interests": profile_fields.get("interests", [])
             }
             
             # Process embedding generation

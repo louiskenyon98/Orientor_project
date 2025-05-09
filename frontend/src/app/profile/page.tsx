@@ -196,7 +196,9 @@ export default function ProfilePage() {
     };
 
     const handleArrayChange = (field: 'interests' | 'skills') => (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation(); // Stop event propagation
         const value = e.target.value;
+        // Split by comma and trim each item, but preserve spaces within each item
         const array = value ? value.split(',').map(item => item.trim()).filter(item => item !== '') : [];
         setProfile(prev => ({
             ...prev,
@@ -469,6 +471,15 @@ export default function ProfilePage() {
                                                 type="text"
                                                 value={Array.isArray(profile.skills) ? profile.skills.join(', ') : ''}
                                                 onChange={handleArrayChange('skills')}
+                                                onKeyDown={(e) => {
+                                                    e.stopPropagation();
+                                                }}
+                                                onKeyPress={(e) => {
+                                                    e.stopPropagation();
+                                                }}
+                                                onKeyUp={(e) => {
+                                                    e.stopPropagation();
+                                                }}
                                                 className="input"
                                                 placeholder="e.g., Python, JavaScript, Project Management"
                                             />
@@ -481,6 +492,15 @@ export default function ProfilePage() {
                                                 type="text"
                                                 value={Array.isArray(profile.interests) ? profile.interests.join(', ') : ''}
                                                 onChange={handleArrayChange('interests')}
+                                                onKeyDown={(e) => {
+                                                    e.stopPropagation();
+                                                }}
+                                                onKeyPress={(e) => {
+                                                    e.stopPropagation();
+                                                }}
+                                                onKeyUp={(e) => {
+                                                    e.stopPropagation();
+                                                }}
                                                 className="input"
                                                 placeholder="e.g., AI, Web Development, Data Science"
                                             />

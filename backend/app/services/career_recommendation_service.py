@@ -83,8 +83,8 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
             "years_experience": profile.years_experience,
             "education_level": profile.education_level,
             "career_goals": profile.career_goals,
-            "skills": profile.skills if profile.skills else [],
-            "interests": profile.interests if profile.interests else []
+            "skills": profile.skills if isinstance(profile.skills, list) else [profile.skills] if profile.skills else [],
+            "interests": profile.interests if isinstance(profile.interests, list) else [profile.interests] if profile.interests else []
         }
         
         embedding = generate_embedding(profile_data)
@@ -105,7 +105,7 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         
         # If all else fails, use a default embedding based on interests
         if profile.interests:
-            interests = profile.interests.lower()
+            interests = profile.interests.lower() if isinstance(profile.interests, str) else " ".join(profile.interests).lower()
             if "tech" in interests or "software" in interests or "programming" in interests:
                 return DEFAULT_USER_EMBEDDINGS["tech"]
             elif "art" in interests or "design" in interests or "creative" in interests:
@@ -172,8 +172,14 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             logger.error("Pinecone API key or environment not set")
             return []
         
-        pinecone.init(api_key=pinecone_api_key, environment=pinecone_environment)
-        index = pinecone.Index("oasis-minilm-index")
+        # Initialize Pinecone client
+        pc = pinecone.Pinecone(
+            api_key=pinecone_api_key,
+            environment=pinecone_environment
+        )
+        
+        # Get the index
+        index = pc.Index("oasis-minilm-index")
         
         # Ensure embedding is the right format and size - handle numpy arrays
         if isinstance(embedding, np.ndarray):
