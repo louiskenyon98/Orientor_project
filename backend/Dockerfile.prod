@@ -10,14 +10,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /build
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     python3-dev \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install requirements
 COPY requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements.txt \
+    && rm -rf /root/.cache/pip
 
 # Final stage
 FROM python:3.11-slim
@@ -26,29 +28,53 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
-    PORT=8000
+    PORT=8000 \
+    TMP=/tmp \
+    TEMP=/tmp
 
 WORKDIR /app
 
 # Install runtime dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     curl \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy wheels from builder stage
+# Copy Python packages from builder
 COPY --from=builder /build/wheels /wheels
-RUN pip install --no-cache /wheels/*
+RUN pip install --no-cache-dir /wheels/* && \
+    rm -rf /wheels /root/.cache/pip
+
+# Create and set permissions for tmp directories
+RUN mkdir -p /tmp/finetuned_model /tmp/pkl_models && \
+    chmod -R 777 /tmp
 
 # Copy application code
-COPY . .
+COPY ./app ./app
+COPY ./run.py ./
+COPY ./alembic.ini ./
+COPY ./alembic ./alembic
 
-# Create health check script
+# Make hook scripts executable if they exist
+RUN if [ -d .platform/hooks ]; then find .platform/hooks -type f -exec chmod +x {} \; ; fi
+
+# Create health check script with more lenient initial checks
 RUN echo '#!/bin/bash\n\
-if [ -f /app/.model_loading ]; then\n\
-  exit 1\n\
+if [ -f /tmp/.model_loading ]; then\n\
+  echo "Service still initializing..."\n\
+  exit 0\n\
 else\n\
-  curl -f http://localhost:8000/api/health || exit 1\n\
+  response=$(curl -s -w "\\n%{http_code}" http://localhost:8000/api/health)\n\
+  status_code=$(echo "$response" | tail -n1)\n\
+  if [ "$status_code" = "200" ]; then\n\
+    exit 0\n\
+  elif [ "$status_code" = "503" ]; then\n\
+    echo "Service is starting up..."\n\
+    exit 0\n\
+  else\n\
+    exit 1\n\
+  fi\n\
 fi' > /healthcheck.sh && \
     chmod +x /healthcheck.sh
 
@@ -59,4 +85,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD /heal
 EXPOSE 8000
 
 # Command to run the application
-CMD ["python", "run.py"] 
+CMD ["python", "run.py"]

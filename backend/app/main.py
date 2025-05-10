@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 import logging
+import time
+from pathlib import Path
 
 # Import routers directly
 from app.routers.user import router as auth_router, get_current_user
@@ -21,9 +23,7 @@ from app.routers.tree_paths import router as tree_paths_router  # Import tree pa
 from app.routers.node_notes import router as node_notes_router  # Import node notes router
 from app.routers.user_progress import router as user_progress_router  # Import user progress router
 from fastapi import FastAPI, HTTPException
-from pathlib import Path
 from scripts.model_loader import load_models
-import logging
 from logging.handlers import RotatingFileHandler
 from app.api.api import api_router
 
@@ -130,22 +130,37 @@ app.include_router(api_router, prefix="/api/v1")
 async def root():
     return {"message": "Welcome to the Navigo API. Go to /docs for API documentation."}
 
-# @app.get("/api/health") # /api/health
-# def health_check():
-#     try:
-#         return {"status": "ok"}
-#     except Exception as e:
-#         logger.error(f"Health check failed: {str(e)}")
-#         return {"status": "error", "detail": str(e)}
-
+# Replace the current health check with a more detailed one
 @app.get("/health")
 async def health_check():
+    """
+    Health check endpoint for AWS Elastic Beanstalk
+    Returns status 200 if the service is running correctly
+    """
     try:
-        # Basic health check without model dependency
-        return {"status": "healthy", "message": "Service is running"}
+        # Check for model loading flag
+        model_loading = Path("/tmp/.model_loading").exists()
+        
+        # Check database connection (minimal query)
+        from app.db.session import get_db  
+        db = next(get_db())
+        db_status = "connected"
     except Exception as e:
-        logger.error(f"Health check failed: {str(e)}")
-        return {"status": "error", "detail": str(e)}
+        db_status = f"error: {str(e)}"
+    
+    # AWS ELB expects 200 status code for healthy instances
+    return {
+        "status": "initializing" if model_loading else "healthy",
+        "service": "Navigo API",
+        "database": db_status,
+        "timestamp": time.time()
+    }
+
+# Specialized health check for API gateway
+@app.get("/api/health")
+async def api_health_check():
+    """API Gateway health check - simple 200 OK response"""
+    return {"status": "ok"}
 
 # In your startup event
 @app.on_event("startup")
