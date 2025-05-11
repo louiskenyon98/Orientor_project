@@ -5,6 +5,144 @@ import { useRouter, usePathname } from 'next/navigation';
 import XPProgress from '../ui/XPProgress';
 import DarkModeToggle from '../ui/DarkModeToggle';
 
+// Composants pour les menus déroulants
+const ProfileDropdown = ({ pathname }: { pathname: string | null }) => {
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const profileMenuRef = useRef<HTMLDivElement>(null);
+
+    // Fermer le menu lorsqu'on clique en dehors
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+                setProfileMenuOpen(false);
+            }
+        }
+        
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    return (
+        <div className="relative inline-block text-left" ref={profileMenuRef}>
+            <button
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
+                    ${pathname === '/profile' || pathname?.startsWith('/profile/')
+                        ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
+                    }`}
+            >
+                Profile
+                <svg
+                    className={`ml-1 h-4 w-4 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            
+            {profileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 z-40">
+                    <div className="py-1" role="menu" aria-orientation="vertical">
+                        <Link
+                            href="/profile"
+                            onClick={() => setProfileMenuOpen(false)}
+                            className={`block px-4 py-2 text-sm ${pathname === '/profile' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                            role="menuitem"
+                        >
+                            Informations générales
+                        </Link>
+                        <Link
+                            href="/profile/holland-results"
+                            onClick={() => setProfileMenuOpen(false)}
+                            className={`block px-4 py-2 text-sm ${pathname === '/profile/holland-results' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                            role="menuitem"
+                        >
+                            Résultats RIASEC
+                        </Link>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Composant pour le menu déroulant du profil mobile
+const MobileProfileMenu = ({
+    pathname,
+    setMoreMenuOpen,
+    setCareerMenuOpen,
+    setWorkspaceMenuOpen
+}: {
+    pathname: string | null;
+    setMoreMenuOpen: (open: boolean) => void;
+    setCareerMenuOpen: (open: boolean) => void;
+    setWorkspaceMenuOpen: (open: boolean) => void;
+}) => {
+    const [profileMobileMenuOpen, setProfileMobileMenuOpen] = useState(false);
+    const profileMobileMenuRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+    
+    // Fermer le menu lorsqu'on clique en dehors
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (profileMobileMenuRef.current && !profileMobileMenuRef.current.contains(event.target as Node)) {
+                setProfileMobileMenuOpen(false);
+            }
+        }
+        
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+    
+    return (
+        <div className="relative" ref={profileMobileMenuRef}>
+            <button
+                className={`flex flex-col items-center text-xs w-full ${pathname === '/profile' || pathname?.startsWith('/profile/') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+                onClick={() => {
+                    setMoreMenuOpen(false);
+                    setCareerMenuOpen(false);
+                    setWorkspaceMenuOpen(false);
+                    setProfileMobileMenuOpen(!profileMobileMenuOpen);
+                }}
+            >
+                <span className="material-icons-outlined">person</span>
+                <span>Profile</span>
+            </button>
+            
+            {/* Menu du profil pour mobile */}
+            {profileMobileMenuOpen && (
+                <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div className="py-1">
+                        <Link
+                            href="/profile"
+                            onClick={() => setProfileMobileMenuOpen(false)}
+                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/profile' ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                        >
+                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">account_circle</span>
+                            Informations générales
+                        </Link>
+                        <Link
+                            href="/profile/holland-results"
+                            onClick={() => setProfileMobileMenuOpen(false)}
+                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/profile/holland-results' ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                        >
+                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">psychology</span>
+                            Résultats RIASEC
+                        </Link>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 export default function MainLayout({ 
     children, 
     showNav = true 
@@ -291,16 +429,7 @@ export default function MainLayout({
                                 {/* Dark Mode Toggle - Added to the left of Profile */}
                                 <DarkModeToggle />
                                 
-                                <Link 
-                                    href="/profile"
-                                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
-                                        ${pathname === '/profile' 
-                                            ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
-                                            : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
-                                        }`}
-                                >
-                                    Profile
-                                </Link>
+                                <ProfileDropdown pathname={pathname} />
                                 
                                 <button 
                                     onClick={handleLogout}
@@ -475,13 +604,12 @@ export default function MainLayout({
                             </div>
                         )}
                         </div>
-                        <Link 
-                            href="/profile" 
-                            className={`flex flex-col items-center text-xs ${pathname === '/profile' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
-                        >
-                            <span className="material-icons-outlined">person</span>
-                            <span>Profile</span>
-                        </Link>
+                        <MobileProfileMenu
+                            pathname={pathname}
+                            setMoreMenuOpen={setMoreMenuOpen}
+                            setCareerMenuOpen={setCareerMenuOpen}
+                            setWorkspaceMenuOpen={setWorkspaceMenuOpen}
+                        />
                     </div>
                 </div>
             )}

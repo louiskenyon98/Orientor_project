@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from ..utils.database import get_db
 from ..routers.user import get_current_user
+from ..services.llm_service import LLMService
 from uuid import uuid4
 import uuid  # Ajout de l'import complet du module uuid
 import logging
@@ -584,7 +585,6 @@ async def get_test_score(
     except HTTPException:
         raise
     except Exception as e:
-        db.rollback()
         logger.error(f"Erreur lors du calcul du score: {str(e)}", exc_info=True)
         # En cas d'erreur, retourner des valeurs par défaut pour permettre au frontend de continuer
         return {
@@ -597,3 +597,232 @@ async def get_test_score(
             "top_3_code": "RIA",
             "personality_description": "Profil par défaut: Vous êtes une personne équilibrée avec des intérêts variés."
         }
+
+@router.get("/user-results", response_model=ScoreResponse)
+async def get_user_latest_results(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Récupère les résultats les plus récents du test Holland Code (RIASEC) pour l'utilisateur connecté.
+    """
+    logger.info(f"Récupération des résultats RIASEC pour l'utilisateur: {current_user.id}")
+    try:
+        # Récupérer le résultat le plus récent pour l'utilisateur
+        # Créer un UUID déterministe basé sur l'ID utilisateur
+        # Cela garantit que le même utilisateur aura toujours le même UUID
+        user_id_str = str(current_user.id)
+        # Créer un UUID v5 basé sur l'ID utilisateur (namespace UUID + ID utilisateur)
+        namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
+        user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+        
+        logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+        
+        query = text("""
+            SELECT
+                r.r_score, r.i_score, r.a_score, r.s_score, r.e_score, r.c_score,
+                r.top_3_code, r.created_at, r.attempt_id
+            FROM gca_results r
+            WHERE r.user_id = :user_id
+            ORDER BY r.created_at DESC
+            LIMIT 1
+        """)
+        
+        result = db.execute(query, {"user_id": user_uuid}).fetchone()
+        
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Aucun résultat de test Holland trouvé pour cet utilisateur"
+            )
+        
+        # Récupérer la description de la personnalité dominante
+        personality_description = None
+        if result.top_3_code:
+            personality_query = text("""
+                SELECT description
+                FROM gca_personalities
+                WHERE initial = :initial
+            """)
+            
+            personality_result = db.execute(personality_query, {
+                "initial": result.top_3_code[0]
+            }).fetchone()
+            
+            if personality_result:
+                personality_description = personality_result.description
+        
+        return {
+            "r_score": float(result.r_score),
+            "i_score": float(result.i_score),
+            "a_score": float(result.a_score),
+            "s_score": float(result.s_score),
+            "e_score": float(result.e_score),
+            "c_score": float(result.c_score),
+            "top_3_code": result.top_3_code,
+            "personality_description": personality_description
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des résultats de l'utilisateur: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la récupération des résultats: {str(e)}"
+        )
+
+@router.get("/profile-description", response_model=Dict[str, str])
+async def get_profile_description(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Génère une description personnalisée du profil RIASEC de l'utilisateur
+    en utilisant un LLM et en intégrant d'autres données du profil.
+    """
+    try:
+        # Créer un UUID déterministe basé sur l'ID utilisateur
+        user_id_str = str(current_user.id)
+        namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
+        user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+        
+        logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+        
+        # 1. Récupérer les scores RIASEC les plus récents
+        riasec_query = text("""
+            SELECT
+                r.r_score, r.i_score, r.a_score, r.s_score, r.e_score, r.c_score,
+                r.top_3_code
+            FROM gca_results r
+            WHERE r.user_id = :user_id
+            ORDER BY r.created_at DESC
+            LIMIT 1
+        """)
+        
+        riasec_result = db.execute(riasec_query, {"user_id": user_uuid}).fetchone()
+        
+        if not riasec_result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Aucun résultat de test Holland trouvé pour cet utilisateur"
+            )
+        
+        # 2. Récupérer les données du profil utilisateur
+        profile_query = text("""
+            SELECT * FROM user_profiles
+            WHERE user_id = :user_id
+        """)
+        
+        profile_result = db.execute(profile_query, {"user_id": str(current_user.id)}).fetchone()
+        
+        # Convertir le résultat en dictionnaire de manière sécurisée
+        user_profile = {}
+        if profile_result:
+            # Utiliser _asdict() si disponible, sinon créer un dictionnaire manuellement
+            try:
+                if hasattr(profile_result, '_asdict'):
+                    user_profile = profile_result._asdict()
+                else:
+                    # Récupérer les noms de colonnes et créer un dictionnaire
+                    columns = profile_result.keys() if hasattr(profile_result, 'keys') else []
+                    for col in columns:
+                        user_profile[col] = getattr(profile_result, col)
+            except Exception as e:
+                logger.error(f"Erreur lors de la conversion du profil en dictionnaire: {str(e)}")
+        
+        # 3. Récupérer les compétences de l'utilisateur
+        skills_query = text("""
+            SELECT
+                id, user_id, creativity, leadership, digital_literacy,
+                critical_thinking, problem_solving, analytical_thinking,
+                attention_to_detail, collaboration, adaptability,
+                independence, evaluation, decision_making, stress_tolerance
+            FROM user_skills
+            WHERE user_id = :user_id
+        """)
+        
+        skills_results = db.execute(skills_query, {"user_id": str(current_user.id)}).fetchall()
+        
+        # Convertir les résultats en liste de dictionnaires de manière sécurisée
+        user_skills = []
+        if skills_results:
+            for row in skills_results:
+                skill_dict = {}
+                try:
+                    if hasattr(row, '_asdict'):
+                        skill_dict = row._asdict()
+                    else:
+                        # Récupérer les noms de colonnes et créer un dictionnaire
+                        columns = row.keys() if hasattr(row, 'keys') else []
+                        for col in columns:
+                            skill_dict[col] = getattr(row, col)
+                    user_skills.append(skill_dict)
+                except Exception as e:
+                    logger.error(f"Erreur lors de la conversion d'une compétence en dictionnaire: {str(e)}")
+        
+        # 4. Récupérer les recommandations sauvegardées
+        recommendations_query = text("""
+            SELECT
+                id, user_id, label, description, main_duties, oasis_code,
+                role_creativity, role_leadership, role_digital_literacy,
+                role_critical_thinking, role_problem_solving, analytical_thinking,
+                attention_to_detail, collaboration, adaptability, independence,
+                evaluation, decision_making, stress_tolerance
+            FROM saved_recommendations
+            WHERE user_id = :user_id
+            ORDER BY saved_at DESC
+            LIMIT 5
+        """)
+        
+        recommendations_results = db.execute(recommendations_query, {"user_id": str(current_user.id)}).fetchall()
+        
+        # Convertir les résultats en liste de dictionnaires de manière sécurisée
+        saved_recommendations = []
+        if recommendations_results:
+            for row in recommendations_results:
+                rec_dict = {}
+                try:
+                    if hasattr(row, '_asdict'):
+                        rec_dict = row._asdict()
+                    else:
+                        # Récupérer les noms de colonnes et créer un dictionnaire
+                        columns = row.keys() if hasattr(row, 'keys') else []
+                        for col in columns:
+                            rec_dict[col] = getattr(row, col)
+                    saved_recommendations.append(rec_dict)
+                except Exception as e:
+                    logger.error(f"Erreur lors de la conversion d'une recommandation en dictionnaire: {str(e)}")
+        
+        # 5. Préparer les scores RIASEC pour le LLM
+        riasec_scores = {
+            "r_score": float(riasec_result.r_score),
+            "i_score": float(riasec_result.i_score),
+            "a_score": float(riasec_result.a_score),
+            "s_score": float(riasec_result.s_score),
+            "e_score": float(riasec_result.e_score),
+            "c_score": float(riasec_result.c_score)
+        }
+        
+        # 6. Générer la description personnalisée avec le LLM
+        try:
+            description = await LLMService.generate_holland_profile_description(
+                riasec_scores=riasec_scores,
+                top_3_code=riasec_result.top_3_code,
+                user_profile=user_profile,
+                user_skills=user_skills,
+                saved_recommendations=saved_recommendations
+            )
+        except Exception as llm_error:
+            logger.error(f"Erreur lors de l'appel au service LLM: {str(llm_error)}")
+            # Utiliser une description de secours en cas d'erreur
+            description = await LLMService.fallback_description(riasec_result.top_3_code)
+        
+        return {"description": description}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la génération de la description du profil: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la génération de la description du profil: {str(e)}"
+        )

@@ -103,9 +103,31 @@ const hollandTestService = {
     }
   },
 
+  // Récupérer les derniers résultats du test Holland pour l'utilisateur connecté
+  getUserLatestResults: async (): Promise<ScoreResponse> => {
+    try {
+      const response = await api.get<ScoreResponse>(`${HOLLAND_TEST_API}/user-results`);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des résultats du test:', error);
+      throw error;
+    }
+  },
+
+  // Récupérer la description personnalisée du profil basée sur les résultats RIASEC
+  getProfileDescription: async (): Promise<string> => {
+    try {
+      const response = await api.get<{ description: string }>(`${HOLLAND_TEST_API}/profile-description`);
+      return response.data.description;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la description du profil:', error);
+      throw error;
+    }
+  },
+
   // Générer un nouvel ID de tentative
   generateAttemptId: (): string => {
-    return crypto.randomUUID ? crypto.randomUUID() : 
+    return crypto.randomUUID ? crypto.randomUUID() :
       'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
         const r = Math.random() * 16 | 0;
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
