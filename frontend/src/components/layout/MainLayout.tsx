@@ -204,6 +204,13 @@ export default function MainLayout({
                                                         Enhanced Skills Path
                                                     </Link>
                                                     <Link
+                                                        href="/holland-test"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/holland-test' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        role="menuitem"
+                                                    >
+                                                        Test Holland (RIASEC)
+                                                    </Link>
+                                                    <Link
                                                         href="/case-study-journey"
                                                         className={`block px-4 py-2 text-sm ${pathname === '/case-study-journey' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
                                                     >
@@ -381,6 +388,17 @@ export default function MainLayout({
                                         >
                                             <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">school</span>
                                             Enhanced Skills Path
+                                        </Link>
+                                        <Link
+                                            href="/holland-test"
+                                            className={`flex items-center px-4 py-3 text-sm ${
+                                                pathname === '/holland-test'
+                                                    ? 'text-gray-900 font-medium dark:text-gray-100'
+                                                    : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'
+                                            }`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">psychology</span>
+                                            Test Holland (RIASEC)
                                         </Link>
                                         <div className="border-t border-gray-200 dark:border-gray-700 mt-1"></div>
                                         
