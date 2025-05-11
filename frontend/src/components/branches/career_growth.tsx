@@ -10,7 +10,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { motion } from 'framer-motion';
-import {SkillNode} from '@/components/branches/career_growth_skill';
+import { SkillNode } from '@/components/branches/career_growth_skill';
 import { MarkerType } from 'reactflow';
 
 function getNodeStyle(type: string) {
@@ -27,7 +27,7 @@ function getNodeStyle(type: string) {
 function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
-  let yGap = 250;
+  let yGap = 350;
   let xGap = 300;
   let skillMap: Record<string, { x: number, y: number }> = {};
 
@@ -46,6 +46,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
       id,
       type: 'default',
       position,
+      draggable: true,
       data: {
         label: (
           <motion.div
@@ -87,27 +88,31 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
     }
 
     node.nextSkills?.forEach((child: SkillNode, index: number) => {
+      const verticalNudge = child.reachableJobs?.length ? 0.3 : 0; // offset if outcome will push it down visually
       queue.push({
         node: child,
-        depth: depth + 1,
+        depth: depth + 1 + verticalNudge,
         column: column + index - Math.floor((node.nextSkills?.length ?? 1) / 2),
         parentId: id,
       });
     });
 
-    if (node.reachableJobs && node.reachableJobs.length > 0) {
+    if (node.reachableJobs?.length) {
       const jobId = `${id}-outcome`;
       const metaSkillId = `${id}-meta-skill`;
       const finalId = `${id}-final-outcome`;
 
-      const jobY = position.y + 150;
-      const metaY = jobY + 150;
-      const finalY = metaY + 150;
+      // const jobY = position.y + 150;
+      const siblingOffset = (node.id.endsWith('-1') ? -1 : node.id.endsWith('-x') ? 1 : 0) * 60;
+      const jobY = position.y + 180 + siblingOffset;
+      const metaY = jobY + 100;
+      const finalY = metaY + 100;
 
       nodes.push({
         id: jobId,
         type: 'default',
         position: { x: position.x, y: jobY },
+        draggable: true,
         data: {
           label: (
             <motion.div
@@ -142,7 +147,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
         },
       });
 
-      if (node.nextSkills && node.nextSkills.length > 0) {
+      if (node.nextSkills?.length) {
         edges.push({
           id: `${jobId}-${metaSkillId}`,
           source: jobId,
@@ -182,98 +187,98 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
   }
   return { nodes, edges };
 }
-
 const root: SkillNode = {
   id: 'root',
-  skillDescription: 'Root, initial condition of the user',
+  skillDescription: 'You’re just starting to explore. You’re curious—and that’s powerful.',
   nextSkills: [
     {
       id: 's1',
-      skillDescription: 'You listen and help',
-      improvementSuggestion: 'Show some support to others',
-      taskSuggestion: 'Organize a peer support circle',
+      skillDescription: 'You listen and support others',
+      improvementSuggestion: 'Practice noticing and validating people’s feelings',
+      taskSuggestion: 'Organize a peer support activity at school or online',
       nextSkills: [
         {
           id: 's1-1',
-          skillDescription: 'You step up when others need it',
-          taskSuggestion: 'Coordinate a community event',
+          skillDescription: 'You take initiative when others need it',
+          taskSuggestion: 'Coordinate a mental wellness week or empathy circle',
           reachableJobs: [
-            { jobTitle: 'Youth Counselor', jobDomain: 'Community Services', requiredSkills: [] },
+            { jobTitle: 'Community Builder', jobDomain: 'Human Connection & Wellbeing', requiredSkills: [] },
+            { jobTitle: 'Peer Mentor', jobDomain: 'Support & Guidance', requiredSkills: [] },
           ],
         }
       ]
     },
     {
       id: 's2',
-      skillDescription: 'You thrive in fast-paced settings',
-      improvementSuggestion: 'Improve your stress tolerance',
-      taskSuggestion: 'Take a First Aid or CPR course',
+      skillDescription: 'You stay sharp under pressure',
+      improvementSuggestion: 'Find moments of calm while being active',
+      taskSuggestion: 'Join a first aid or crisis simulation workshop',
       nextSkills: [
         {
           id: 's2-1',
-          skillDescription: 'You act fast in emergencies',
-          taskSuggestion: 'Join a local emergency preparedness drill',
+          skillDescription: 'You act quickly and think clearly in urgent moments',
+          taskSuggestion: 'Help lead a safety or preparedness event',
           reachableJobs: [
-            { jobTitle: 'Paramedic', jobDomain: 'Emergency Services', requiredSkills: [] },
-            { jobTitle: 'Disaster Response Officer', jobDomain: 'Crisis Management', requiredSkills: [] }
+            { jobTitle: 'Resilience Coordinator', jobDomain: 'Crisis & Safety', requiredSkills: [] },
+            { jobTitle: 'Field Organizer', jobDomain: 'Rapid Response & Logistics', requiredSkills: [] }
           ],
         }
       ]
     },
     {
       id: 's3',
-      skillDescription: 'You express ideas clearly',
-      improvementSuggestion: 'Improve communication skills',
-      taskSuggestion: 'Host a lunch & learn session at school or work',
+      skillDescription: 'You express yourself clearly',
+      improvementSuggestion: 'Experiment with different ways to explain your thoughts',
+      taskSuggestion: 'Host a lunch & learn on a topic that excites you',
       nextSkills: [
         {
           id: 's3-1',
-          skillDescription: 'You understand your audience deeply',
-          taskSuggestion: 'Interview people from different backgrounds about their needs',
+          skillDescription: 'You adapt your message for different people',
+          taskSuggestion: 'Interview people and present what you learned in a visual way',
           reachableJobs: [
-            { jobTitle: 'UX Designer', jobDomain: 'Tech & Accessibility', requiredSkills: [] },
-            { jobTitle: 'Workshop Facilitator', jobDomain: 'Adult Learning & Training', requiredSkills: [] },
+            { jobTitle: 'Youth Communicator', jobDomain: 'Storytelling & Public Engagement', requiredSkills: [] },
+            { jobTitle: 'Workshop Host', jobDomain: 'Community Learning Spaces', requiredSkills: [] },
           ]
         },
         {
           id: 's3-x',
-          skillDescription: 'You act fast in emergencies', // link with s2-1
-          taskSuggestion: 'Join an emergency simulation',
+          skillDescription: 'You communicate in moments that matter', // linked with s2-1
+          taskSuggestion: 'Design instructions or communication for a group under pressure',
           reachableJobs: [
-            { jobTitle: 'First Response Coordinator', jobDomain: 'Crisis Planning', requiredSkills: [] }
+            { jobTitle: 'First Response Communicator', jobDomain: 'Emergency Planning', requiredSkills: [] }
           ]
         }
       ]
     },
     {
       id: 's4',
-      skillDescription: 'You write with clarity and voice',
-      improvementSuggestion: 'Improve your writing skills',
-      taskSuggestion: 'Publish 3 thought pieces on a topic you care about',
+      skillDescription: 'You write with clarity and meaning',
+      improvementSuggestion: 'Refine your writing by asking for feedback',
+      taskSuggestion: 'Write 3 posts on a theme that matters to you and share them',
       nextSkills: [
         {
           id: 's4-1',
-          skillDescription: 'You shape ideas into structured arguments',
-          taskSuggestion: 'Debate or present at a local event or Toastmasters club',
+          skillDescription: 'You shape your ideas to influence and inform others',
+          taskSuggestion: 'Participate in a youth debate or writing contest',
           reachableJobs: [
-            { jobTitle: 'Content Creator', jobDomain: 'Digital Media', requiredSkills: [] },
-            { jobTitle: 'Technical Writer', jobDomain: 'Documentation & Manuals', requiredSkills: [] },
+            { jobTitle: 'Content Creator', jobDomain: 'Media & Communication', requiredSkills: [] },
+            { jobTitle: 'Information Architect', jobDomain: 'Learning & Documentation', requiredSkills: [] },
           ],
           nextSkills: [
             {
               id: 's4-1-a',
-              skillDescription: 'You craft narratives that inspire action',
-              taskSuggestion: 'Build a campaign with a clear call to action',
+              skillDescription: 'You tell stories that move people to act',
+              taskSuggestion: 'Create a campaign with a message you care about',
               reachableJobs: [
-                { jobTitle: 'Brand Storyteller', jobDomain: 'Strategic Marketing', requiredSkills: [] },
+                { jobTitle: 'Campaign Storyteller', jobDomain: 'Civic Engagement & Awareness', requiredSkills: [] },
               ]
             },
             {
               id: 's4-1-b',
-              skillDescription: 'You simplify technical language for wide audiences',
-              taskSuggestion: 'Write a user manual for a product you use',
+              skillDescription: 'You make complicated things easy to grasp',
+              taskSuggestion: 'Write an illustrated how-to or zine on something technical',
               reachableJobs: [
-                { jobTitle: 'UX Writer', jobDomain: 'Product Design', requiredSkills: [] },
+                { jobTitle: 'Clarity Designer', jobDomain: 'Education & Product Design', requiredSkills: [] },
               ]
             }
           ]
@@ -282,6 +287,7 @@ const root: SkillNode = {
     }
   ]
 };
+
 
 export default function SkillTreeFlow() {
   const { nodes, edges } = convertToFlowGraph(root);

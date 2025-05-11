@@ -203,6 +203,12 @@ export default function MainLayout({
                                                     >
                                                         Enhanced Skills Path
                                                     </Link>
+                                                    <Link
+                                                        href="/case-study-journey"
+                                                        className={`block px-4 py-2 text-sm ${pathname === '/case-study-journey' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+                                                    >
+                                                        Étude de Cas Navigo
+                                                    </Link>
                                                     {/* Resume Studio Link - Commented out for AWS deployment
                                                     <Link
                                                         href="/cv"
