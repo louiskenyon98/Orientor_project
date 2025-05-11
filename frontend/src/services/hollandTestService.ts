@@ -115,9 +115,24 @@ const hollandTestService = {
   },
 
   // Récupérer la description personnalisée du profil basée sur les résultats RIASEC
-  getProfileDescription: async (): Promise<string> => {
+  getProfileDescription: async (regenerate: boolean = false): Promise<string> => {
     try {
-      const response = await api.get<{ description: string }>(`${HOLLAND_TEST_API}/profile-description`);
+      const response = await api.get<{ description: string }>(
+        `${HOLLAND_TEST_API}/profile-description?regenerate=${regenerate}`
+      );
+      return response.data.description;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la description du profil:', error);
+      throw error;
+    }
+  },
+  
+  // Récupérer la description personnalisée pour un utilisateur spécifique
+  getUserProfileDescription: async (userId: string, regenerate: boolean = false): Promise<string> => {
+    try {
+      const response = await api.get<{ description: string }>(
+        `${HOLLAND_TEST_API}/profile-description/${userId}?regenerate=${regenerate}`
+      );
       return response.data.description;
     } catch (error) {
       console.error('Erreur lors de la récupération de la description du profil:', error);

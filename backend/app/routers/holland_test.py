@@ -679,6 +679,29 @@ async def get_profile_description(
     """
     Génère une description personnalisée du profil RIASEC de l'utilisateur
     en utilisant un LLM et en intégrant d'autres données du profil.
+    
+    Cette route est maintenue pour la compatibilité avec les versions antérieures.
+    Elle redirige vers le nouvel endpoint avec l'ID utilisateur.
+    """
+    return await get_user_profile_description(current_user.id, False, db, current_user)
+
+@router.get("/profile-description/{user_id}", response_model=Dict[str, str])
+async def get_user_profile_description(
+    user_id: str,
+    regenerate: bool = False,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Génère une description personnalisée du profil RIASEC de l'utilisateur
+    en utilisant un LLM et en intégrant d'autres données du profil.
+    
+    Args:
+        user_id: L'ID de l'utilisateur dont on veut la description
+        regenerate: Si True, force la régénération de la description même si elle existe déjà
+        
+    Returns:
+        Un dictionnaire contenant la description du profil
     """
     try:
         # Créer un UUID déterministe basé sur l'ID utilisateur
@@ -803,6 +826,11 @@ async def get_profile_description(
             "c_score": float(riasec_result.c_score)
         }
         
+        # Vérifier si une description existe déjà dans le profil utilisateur
+        if not regenerate and user_profile and user_profile.get("personal_analysis"):
+            logger.info(f"Utilisation de la description existante pour l'utilisateur {user_id}")
+            return {"description": user_profile.get("personal_analysis")}
+        
         # 6. Générer la description personnalisée avec le LLM
         try:
             description = await LLMService.generate_holland_profile_description(
@@ -812,6 +840,41 @@ async def get_profile_description(
                 user_skills=user_skills,
                 saved_recommendations=saved_recommendations
             )
+            
+            # Sauvegarder la description dans le profil utilisateur
+            try:
+                # Vérifier si le profil existe
+                if user_profile:
+                    # Mettre à jour le profil existant
+                    update_query = text("""
+                        UPDATE user_profiles
+                        SET personal_analysis = :personal_analysis
+                        WHERE user_id = :user_id
+                    """)
+                    
+                    db.execute(update_query, {
+                        "user_id": str(current_user.id),
+                        "personal_analysis": description
+                    })
+                else:
+                    # Créer un nouveau profil
+                    insert_query = text("""
+                        INSERT INTO user_profiles (user_id, personal_analysis)
+                        VALUES (:user_id, :personal_analysis)
+                    """)
+                    
+                    db.execute(insert_query, {
+                        "user_id": str(current_user.id),
+                        "personal_analysis": description
+                    })
+                
+                db.commit()
+                logger.info(f"Description sauvegardée dans le profil de l'utilisateur {user_id}")
+            except Exception as db_error:
+                logger.error(f"Erreur lors de la sauvegarde de la description: {str(db_error)}")
+                db.rollback()
+                # Continuer même en cas d'erreur de sauvegarde
+        
         except Exception as llm_error:
             logger.error(f"Erreur lors de l'appel au service LLM: {str(llm_error)}")
             # Utiliser une description de secours en cas d'erreur

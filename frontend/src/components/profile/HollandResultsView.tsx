@@ -73,6 +73,7 @@ const HollandResultsView: React.FC<HollandResultsViewProps> = ({ userId }) => {
   const [score, setScore] = useState<ScoreResponse | null>(null);
   const [personalizedDescription, setPersonalizedDescription] = useState<string | null>(null);
   const [loadingDescription, setLoadingDescription] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   useEffect(() => {
     const fetchLatestResults = async () => {
@@ -95,10 +96,10 @@ const HollandResultsView: React.FC<HollandResultsViewProps> = ({ userId }) => {
   useEffect(() => {
     // Récupérer la description personnalisée si nous avons les scores
     if (score && !personalizedDescription && !loadingDescription) {
-      const fetchPersonalizedDescription = async () => {
+      const fetchPersonalizedDescription = async (regenerate: boolean = false) => {
         try {
           setLoadingDescription(true);
-          const description = await hollandTestService.getProfileDescription();
+          const description = await hollandTestService.getProfileDescription(regenerate);
           setPersonalizedDescription(description);
           setLoadingDescription(false);
         } catch (err) {
@@ -231,13 +232,36 @@ const HollandResultsView: React.FC<HollandResultsViewProps> = ({ userId }) => {
       {loadingDescription ? (
         <div className="flex items-center justify-center h-32">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-          <span className="ml-3 text-gray-600 dark:text-gray-400">Génération de votre profil personnalisé...</span>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">
+            {regenerating ? "Régénération de votre profil personnalisé..." : "Génération de votre profil personnalisé..."}
+          </span>
         </div>
       ) : personalizedDescription ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-            Votre profil personnalisé
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+              Votre profil personnalisé
+            </h3>
+            <button
+              onClick={async () => {
+                setRegenerating(true);
+                try {
+                  setLoadingDescription(true);
+                  const description = await hollandTestService.getProfileDescription(true);
+                  setPersonalizedDescription(description);
+                } catch (err) {
+                  console.error('Erreur lors de la régénération de la description:', err);
+                } finally {
+                  setLoadingDescription(false);
+                  setRegenerating(false);
+                }
+              }}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+              disabled={loadingDescription}
+            >
+              Régénérer la description
+            </button>
+          </div>
           <div className="prose dark:prose-invert max-w-none">
             <p className="whitespace-pre-line">{personalizedDescription}</p>
           </div>
