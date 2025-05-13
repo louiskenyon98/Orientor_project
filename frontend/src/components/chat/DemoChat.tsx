@@ -54,7 +54,7 @@ export default function DemoChat() {
       const isMentor = messages[currentIndex].sender === 'mentor';
       setShowTyping(isMentor);
 
-      const delay = isMentor ? 5000 : 0;
+      const delay = isMentor ? 300 : 0;
 
       setTimeout(() => {
         setVisibleMessages((prev) => [...prev, messages[currentIndex]]);

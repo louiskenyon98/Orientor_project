@@ -44,8 +44,8 @@ export default function JobSwipeCard() {
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-4">
-      <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Your Match</h2>
-      <p className="text-sm text-neutral-600 text-center mb-2 max-w-xs">
+      <h2 className="text-4xl font-bold text-gray-900 mb-2 text-center">Your Match based on your profile</h2>
+      <p className="text-3sm text-neutral-600 text-center mb-2 max-w-xs">
         Swipe through careers you might love.
       </p>
 

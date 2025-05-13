@@ -11,6 +11,16 @@ import CareerTechTree from '@/components/branches/Career_evolution';
 import DemoChat from '@/components/chat/DemoChat';
 import JobSwipeCard from '@/components/chat/swipe_recommendation';
 import SkillSpiderChart from './SkillSpiderChart';
+import { useState } from 'react';
+
+// Données fictives pour le constructeur de CV
+const resumeTemplates = [
+  { id: 1, name: "Professionnel", color: "#2c3e50" },
+  { id: 2, name: "Créatif", color: "#8e44ad" },
+  { id: 3, name: "Minimaliste", color: "#7f8c8d" },
+];
+
+
 export default function LandingPage() {
   const router = useRouter();
 
@@ -164,6 +174,20 @@ export default function LandingPage() {
         </div>
       </section>
       
+      {/* Demo Chat Section */}
+      <main className="min-h-screen bg-gradient-to-b from-gray-0 to-white">
+        <div className="container mx-auto px-2 py-4">
+          <h1 className="text-4xl font-bold text-center mb-4 text-gray-900">
+            Talk to Navigo, and get him to know yourself
+          </h1>
+          <p className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
+            The chat isn't just a bot—it's a reflection partner. It helps you dig deeper into your interests, reflect on experiences, and receive tailored guidance, in a calm and exploratory tone.
+          </p>
+          <div className="max-w-2xl mx-auto">
+            <DemoChat />
+          </div>
+        </div>
+      </main>
 
       <div className="max-w-1xl mx-auto bg-transparent">
         <JobSwipeCard />
@@ -191,44 +215,18 @@ export default function LandingPage() {
         <CareerTechTree />
       </section>
 
-      {/* Demo Chat Section */}
-      <main className="min-h-screen bg-gradient-to-b from-gray-0 to-white">
-        <div className="container mx-auto px-2 py-4">
-          <h1 className="text-4xl font-bold text-center mb-4 text-gray-900">
-            Talk to Navigo
-          </h1>
-          <p className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
-            The chat isn't just a bot—it's a reflection partner. It helps you dig deeper into your interests, reflect on experiences, and receive tailored guidance, in a calm and exploratory tone.
-          </p>
-          <div className="max-w-2xl mx-auto">
-            <DemoChat />
-          </div>
-        </div>
-      </main>
-
-      {/* Skills Gap Section */}
       <section className="section mt-16 mb-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">Understand Your Path, Bridge the Gap</h2>
-        <div className="text-center text-neutral-600 max-w-2xl mx-auto mb-12">
-          <p className="text-lg">
-            Our AI compares your current skills against career profiles defined by over 100 variables — including skills, tasks, abilities, interests, and general requirements.
-          </p>
-          <p className="text-lg mt-4">
-            Once you save the careers you aspire to, our AI analyzes how far you are from these roles. It doesn't just stop there — it recommends actionable steps, tailored learning paths, and personal challenges to help you close the gap between your current profile and your dream career.
-          </p>
-          <p className="text-lg mt-4">
-            With every step, you're not just imagining your future — you're actively building it.
-          </p>
-        </div>
-        
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">
+          Bridge Your Skills Gap
+        </h2>
+        <p className="text-center text-neutral-600 max-w-2xl mx-auto mb-12 text-lg">
+          See how your current skills stack up—and what steps will take you closer to your dream role.
+        </p>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left Column - Text */}
+          {/* Left Column - Steps */}
           <div className="space-y-8">
-            <h3 className="text-2xl font-bold text-primary-teal">Your Journey, Made Visible</h3>
-            <p className="text-neutral-600">
-              Our AI doesn't just show you the dream — it shows you the work. It compares where you are today to where you want to be, and guides you step-by-step to bridge the gap.
-            </p>
-            
+            <h3 className="text-2xl font-bold text-primary-teal">How It Works</h3>
             <ul className="space-y-6">
               <li className="flex items-start">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-1">
@@ -237,11 +235,11 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Save Your Dream Careers</h4>
-                  <p className="text-gray-600 mt-1">Identify the roles that inspire you and add them to your personal space.</p>
+                  <h4 className="font-medium text-gray-900">Pick Your Goals</h4>
+                  <p className="text-gray-600 mt-1 text-sm">Save the careers you’re aiming for.</p>
                 </div>
               </li>
-              
+
               <li className="flex items-start">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-green-100 flex items-center justify-center mr-3 mt-1">
                   <svg className="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor">
@@ -249,11 +247,11 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Compare Your Skills</h4>
-                  <p className="text-gray-600 mt-1">See where you currently stand across 100+ skill and ability dimensions.</p>
+                  <h4 className="font-medium text-gray-900">See Where You Stand</h4>
+                  <p className="text-gray-600 mt-1 text-sm">Compare your skills with real-world expectations.</p>
                 </div>
               </li>
-              
+
               <li className="flex items-start">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-purple-100 flex items-center justify-center mr-3 mt-1">
                   <svg className="h-4 w-4 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
@@ -261,11 +259,11 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Visualize the Gap</h4>
-                  <p className="text-gray-600 mt-1">Discover how far you are from your goals — clearly, visually, and personalized.</p>
+                  <h4 className="font-medium text-gray-900">Track the Gap</h4>
+                  <p className="text-gray-600 mt-1 text-sm">Get a clear view of what’s missing—and what’s next.</p>
                 </div>
               </li>
-              
+
               <li className="flex items-start">
                 <div className="flex-shrink-0 h-6 w-6 rounded-full bg-yellow-100 flex items-center justify-center mr-3 mt-1">
                   <svg className="h-4 w-4 text-yellow-600" viewBox="0 0 20 20" fill="currentColor">
@@ -273,18 +271,14 @@ export default function LandingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Get Actionable Guidance</h4>
-                  <p className="text-gray-600 mt-1">Receive personalized recommendations and challenges to help you bridge the distance.</p>
+                  <h4 className="font-medium text-gray-900">Get Next Steps</h4>
+                  <p className="text-gray-600 mt-1 text-sm">Receive tailored challenges and learning paths.</p>
                 </div>
               </li>
             </ul>
-            
-            <Link href="/register" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-teal hover:bg-primary-teal/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-teal">
-              See How You Compare
-            </Link>
           </div>
-          
-          {/* Right Column - Spider Chart */}
+
+          {/* Right Column - Chart */}
           <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Skills Gap Analysis</h3>
             <SkillSpiderChart />
@@ -292,99 +286,128 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Resume Section */}
-      <section className="section mt-16 mb-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">Turn Your Growth Into a Resume</h2>
-        <div className="text-center text-neutral-600 max-w-2xl mx-auto mb-12">
-          <p className="text-lg">
-            As you explore careers, refine your skills, and grow through challenges, our AI quietly builds a resume for you — gathering everything you accomplish into a beautiful, professional document, ready to launch your future.
-          </p>
-          <p className="text-lg mt-4">
-            Your story, your skills, your evolution — transformed into a resume that speaks for you.
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left Column - Text */}
-          <div className="space-y-8 order-2 md:order-1">
-            <h3 className="text-2xl font-bold text-primary-teal">Professionally Crafted, Automatically Updated</h3>
-            <p className="text-neutral-600">
-              No more stress over resume formatting or wondering what to highlight. As you interact with Navigo, we capture your growth journey and transform it into a compelling professional narrative.
+
+      {/* Section: Recommended School Programs */}
+        <section className="section bg-white mt-12">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold gradient-text">Explore Programs That Match Your Growth</h2>
+            <p className="text-neutral-600 mt-4 max-w-2xl mx-auto">
+              As your skills grow, so do your options. Based on your aspirations, here are curated school programs designed to accelerate your journey. Each one builds on the strengths you’re developing in Navigo.
             </p>
-            
-            <ul className="space-y-6">
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-purple/20 flex items-center justify-center mr-3 mt-1">
-                  <svg className="h-4 w-4 text-primary-purple" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">Automatic Updates</h4>
-                  <p className="text-gray-600 mt-1">Your resume evolves as you do, reflecting new skills and accomplishments in real-time.</p>
-                </div>
-              </li>
-              
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-primary-teal/20 flex items-center justify-center mr-3 mt-1">
-                  <svg className="h-4 w-4 text-primary-teal" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">Professional Design</h4>
-                  <p className="text-gray-600 mt-1">Beautiful templates that highlight your strengths and present you at your best.</p>
-                </div>
-              </li>
-              
-              <li className="flex items-start">
-                <div className="flex-shrink-0 h-6 w-6 rounded-full bg-accent-amber/20 flex items-center justify-center mr-3 mt-1">
-                  <svg className="h-4 w-4 text-accent-amber" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900">Export Ready</h4>
-                  <p className="text-gray-600 mt-1">Download your resume in multiple formats whenever you need it for applications.</p>
-                </div>
-              </li>
-            </ul>
-            
-            <Link href="/register" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-purple hover:bg-primary-purple/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-purple">
-              Start Building Your Resume
-            </Link>
-            <p className="text-sm text-gray-500 mt-2">No templates, no stress — just your journey, captured and elevated.</p>
           </div>
-          
-          {/* Right Column - Resume Image */}
-          <motion.div 
-            className="order-1 md:order-2"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary-purple/30 to-primary-teal/30 rounded-lg blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
-              <div className="relative bg-white rounded-lg transform transition duration-500 group-hover:scale-[1.01] group-hover:-rotate-1">
-                <Image
-                  src="/images/resume.jpeg"
-                  width={600}
-                  height={800}
-                  alt="Professional resume created automatically"
-                  className="rounded-lg shadow-lg"
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="bg-white/90 px-4 py-2 rounded-md shadow-md">
-                    <p className="text-sm font-medium text-gray-700">Built Automatically. Updated Live as You Grow.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+            {[
+              {
+                id: 1,
+                name: "Université de Montréal",
+                program: "Informatique - Intelligence Artificielle",
+                duration: "2 ans",
+                cost: "8,500 € / an",
+                skills: ["Machine Learning", "Deep Learning", "Python", "TensorFlow"],
+                rating: 4.8,
+              },
+              {
+                id: 2,
+                name: "École Polytechnique",
+                program: "Génie Logiciel",
+                duration: "3 ans",
+                cost: "7,800 € / an",
+                skills: ["Développement Web", "Java", "Architecture Logicielle", "DevOps"],
+                rating: 4.6,
+              },
+              {
+                id: 3,
+                name: "HEC Paris",
+                program: "Management des Technologies",
+                duration: "1 an",
+                cost: "12,000 € / an",
+                skills: ["Gestion de Projet", "Business Intelligence", "Leadership", "Innovation"],
+                rating: 4.7,
+              },
+            ].map(program => (
+              <div key={program.id} className="bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800">{program.name}</h3>
+                    <p className="text-primary-purple mt-1 font-medium">{program.program}</p>
+                  </div>
+                  <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">{program.rating}/5</span>
+                </div>
+                <hr className="my-4" />
+                <div className="text-left space-y-2">
+                  <p className="text-sm text-gray-600"><strong>Durée:</strong> {program.duration}</p>
+                  <p className="text-sm text-gray-600"><strong>Coût:</strong> {program.cost}</p>
+                  <div>
+                    <p className="text-sm text-gray-600 font-medium">Compétences:</p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {program.skills.map((skill, i) => (
+                        <span key={i} className="bg-white border px-2 py-1 text-xs rounded-md text-gray-700">{skill}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
+                <button className="mt-4 w-full py-2 text-sm font-medium bg-primary-teal text-white rounded-md hover:bg-primary-teal/90 transition">En savoir plus</button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+      {/* Section: Resume Builder */}
+      <section className="min-h-screen py-16 bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-800">
+            Build your resume
+          </h2>
+
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Choose a model</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="rounded-md overflow-hidden border border-gray-200">
+                <div className="h-32" style={{ backgroundColor: '#2c3e50' }} />
+                <p className="text-center py-2 font-medium text-gray-700">Professional</p>
+              </div>
+              <div className="rounded-md overflow-hidden border border-gray-200">
+                <div className="h-32" style={{ backgroundColor: '#8e44ad' }} />
+                <p className="text-center py-2 font-medium text-gray-700">Creative</p>
+              </div>
+              <div className="rounded-md overflow-hidden border border-gray-200">
+                <div className="h-32" style={{ backgroundColor: '#7f8c8d' }} />
+                <p className="text-center py-2 font-medium text-gray-700">Minimaliste</p>
               </div>
             </div>
-          </motion.div>
+
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">Your information is ready for integration</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Based on your background and skills, we've prepared a CV tailored to your profile.
+            </p>
+
+            <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700 bg-gray-100 p-4 rounded-md mb-8">
+              <li>Your technical and cross-disciplinary skills</li>
+              <li>Your recommended training path</li>
+              <li>Suggested projects to strengthen your profile</li>
+              <li>Optimized keywords for ATS (application tracking systems)</li>
+            </ul>
+
+            <div className="text-center">
+              <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium">
+              Generate my CV
+              </button>
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <button
+              className="border border-gray-300 px-5 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              Retour au début
+            </button>
+          </div>
         </div>
       </section>
-  
+
       {/* CTA Section */}
       <section className="section">
         <div className="bg-gradient-primary p-[1px] rounded-lg shadow-glow-purple">
