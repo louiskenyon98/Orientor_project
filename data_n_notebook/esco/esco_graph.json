@@ -1,258 +1,388 @@
 {
   "nodes": [
     {
-      "id": "occupation::key_16708",
-      "label": "real estate investor",
+      "id": "occupation::key_17704",
+      "label": "data analyst",
       "type": "occupation"
     },
     {
-      "id": "escooccupation::key_16905",
-      "label": "key_16905",
-      "type": "escooccupation"
-    },
-    {
-      "id": "iscogroup::key_256",
-      "label": "Real estate agents and property managers",
+      "id": "iscogroup::key_147",
+      "label": "Systems analysts",
       "type": "iscogroup"
     },
     {
-      "id": "iscogroup::key_252",
-      "label": "Business services agents",
+      "id": "iscogroup::key_146",
+      "label": "Software and applications developers and analysts",
       "type": "iscogroup"
     },
     {
-      "id": "iscogroup::key_240",
-      "label": "Business and administration associate professionals",
+      "id": "iscogroup::key_145",
+      "label": "Information and communications technology professionals",
       "type": "iscogroup"
     },
     {
-      "id": "iscogroup::key_184",
-      "label": "Technicians and associate professionals",
+      "id": "iscogroup::key_58",
+      "label": "Professionals",
       "type": "iscogroup"
     },
     {
-      "id": "skill::key_4544",
-      "label": "banking activities",
+      "id": "skill::key_1438",
+      "label": "information structure",
       "type": "skill"
     },
     {
-      "id": "skill::key_7386",
-      "label": "real estate market",
+      "id": "skill::key_2335",
+      "label": "business intelligence",
       "type": "skill"
     },
     {
-      "id": "skill::key_11020",
-      "label": "property law",
+      "id": "skill::key_3315",
+      "label": "data mining",
       "type": "skill"
     },
     {
-      "id": "skill::key_11476",
-      "label": "modern portfolio theory",
+      "id": "skill::key_4050",
+      "label": "documentation types",
       "type": "skill"
     },
     {
-      "id": "skill::key_1373",
-      "label": "collect property financial information",
+      "id": "skill::key_4165",
+      "label": "visual presentation techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_5214",
-      "label": "provide cost benefit analysis reports",
+      "id": "skill::key_7047",
+      "label": "information extraction",
       "type": "skill"
     },
     {
-      "id": "skill::key_6016",
-      "label": "estimate profitability",
+      "id": "skill::key_8223",
+      "label": "statistics",
       "type": "skill"
     },
     {
-      "id": "skill::key_6781",
-      "label": "maintain records of financial transactions",
+      "id": "skill::key_9362",
+      "label": "information categorisation",
       "type": "skill"
     },
     {
-      "id": "skill::key_7509",
-      "label": "obtain financial information",
+      "id": "skill::key_9656",
+      "label": "resource description framework query language",
       "type": "skill"
     },
     {
-      "id": "skill::key_9603",
-      "label": "examine the conditions of buildings",
+      "id": "skill::key_9870",
+      "label": "query languages",
       "type": "skill"
     },
     {
-      "id": "skill::key_10919",
-      "label": "value properties",
+      "id": "skill::key_10287",
+      "label": "information confidentiality",
       "type": "skill"
     },
     {
-      "id": "skill::key_11371",
-      "label": "compare property values",
+      "id": "skill::key_11999",
+      "label": "unstructured data",
       "type": "skill"
     },
     {
-      "id": "skill::key_13767",
-      "label": "perform property market research",
+      "id": "skill::key_12362",
+      "label": "data quality assessment",
       "type": "skill"
     },
     {
-      "id": "skill::key_14699",
-      "label": "handle financial transactions",
+      "id": "skill::key_15084",
+      "label": "data models",
       "type": "skill"
     },
     {
-      "id": "skill::key_5519",
-      "label": "energy performance of buildings",
+      "id": "skill::key_1626",
+      "label": "normalise data",
       "type": "skill"
     },
     {
-      "id": "skill::key_6615",
-      "label": "building codes",
+      "id": "skill::key_2732",
+      "label": "use data processing techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_7484",
-      "label": "project management",
+      "id": "skill::key_2900",
+      "label": "interpret current data",
       "type": "skill"
     },
     {
-      "id": "skill::key_7842",
-      "label": "cadastral taxation",
+      "id": "skill::key_3787",
+      "label": "establish data processes",
       "type": "skill"
     },
     {
-      "id": "skill::key_12212",
-      "label": "actuarial science",
+      "id": "skill::key_4011",
+      "label": "execute analytical mathematical calculations",
       "type": "skill"
     },
     {
-      "id": "skill::key_12892",
-      "label": "tax legislation",
+      "id": "skill::key_4348",
+      "label": "apply statistical analysis techniques",
       "type": "skill"
     },
     {
-      "id": "skill::key_13756",
-      "label": "concurrent estate",
+      "id": "skill::key_4869",
+      "label": "perform data mining",
       "type": "skill"
     },
     {
-      "id": "skill::key_1374",
-      "label": "trace financial transactions",
+      "id": "skill::key_4990",
+      "label": "use databases",
       "type": "skill"
     },
     {
-      "id": "skill::key_5858",
-      "label": "attend trade fairs",
+      "id": "skill::key_5121",
+      "label": "integrate ICT data",
       "type": "skill"
     },
     {
-      "id": "skill::key_6739",
-      "label": "negotiate with property owners",
+      "id": "skill::key_5160",
+      "label": "analyse big data",
       "type": "skill"
     },
     {
-      "id": "skill::key_6899",
-      "label": "communicate with banking professionals",
+      "id": "skill::key_5289",
+      "label": "handle data samples",
       "type": "skill"
     },
     {
-      "id": "skill::key_7757",
-      "label": "supervise property development projects",
+      "id": "skill::key_5675",
+      "label": "perform data cleansing",
       "type": "skill"
     },
     {
-      "id": "skill::key_8066",
-      "label": "prepare inventory of properties",
+      "id": "skill::key_5913",
+      "label": "define data quality criteria",
       "type": "skill"
     },
     {
-      "id": "skill::key_9116",
-      "label": "provide information on properties",
+      "id": "skill::key_7490",
+      "label": "implement data quality processes",
       "type": "skill"
     },
     {
-      "id": "skill::key_12429",
-      "label": "plan buildings maintenance work",
+      "id": "skill::key_7952",
+      "label": "collect ICT data",
       "type": "skill"
     },
     {
-      "id": "skill::key_9167",
-      "label": "financial markets",
+      "id": "skill::key_10012",
+      "label": "manage data",
       "type": "skill"
     },
     {
-      "id": "skill::key_13625",
-      "label": "financial jurisdiction",
+      "id": "skill::key_2441",
+      "label": "web analytics",
       "type": "skill"
     },
     {
-      "id": "skill::key_8678",
-      "label": "market research",
+      "id": "skill::key_2736",
+      "label": "MDX",
       "type": "skill"
     },
     {
-      "id": "skill::key_7377",
-      "label": "international commercial transactions rules",
+      "id": "skill::key_2750",
+      "label": "information architecture",
       "type": "skill"
+    },
+    {
+      "id": "skill::key_4730",
+      "label": "XQuery",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_4957",
+      "label": "database",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_6401",
+      "label": "SPARQL",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10293",
+      "label": "LDAP",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10420",
+      "label": "data storage",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10877",
+      "label": "online analytical processing",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11497",
+      "label": "cloud technologies",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_12105",
+      "label": "LINQ",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_13603",
+      "label": "Hadoop",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_14564",
+      "label": "N1QL",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_1919",
+      "label": "gather data for forensic purposes",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_2616",
+      "label": "use spreadsheets software",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_6036",
+      "label": "manage quantitative data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_6602",
+      "label": "store digital data and systems",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10425",
+      "label": "manage data collection systems",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11882",
+      "label": "deliver visual presentation of data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11965",
+      "label": "report analysis results",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_12706",
+      "label": "manage cloud data and storage",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_14894",
+      "label": "create data models",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_4933",
+      "label": "mathematics",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_7658",
+      "label": "task algorithmisation",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10706",
+      "label": "statistical analysis system software",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_14088",
+      "label": "ICT performance analysis methods",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_9953",
+      "label": "data mining methods",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10587",
+      "label": "database management systems",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_7094",
+      "label": "audit techniques",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_13532",
+      "label": "product data management",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_9369",
+      "label": "forensic intelligence",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_1973",
+      "label": "gather data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_3669",
+      "label": "perform data analysis",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_8456",
+      "label": "conduct quantitative research",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_10289",
+      "label": "inspect data",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_4002",
+      "label": "analyse information processes",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_7229",
+      "label": "collection management",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_9668",
+      "label": "financial analysis",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_14091",
+      "label": "scientific research methodology",
+      "type": "skill"
+    },
+    {
+      "id": "skillgroup::key_737",
+      "label": "database and network design and administration",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_1012",
+      "label": "managing, gathering and storing digital data",
+      "type": "skillgroup"
     },
     {
       "id": "skillgroup::key_910",
       "label": "gathering information from physical or electronic sources",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_880",
-      "label": "monitoring operational activities",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_693",
-      "label": "finance, banking and insurance",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_1125",
-      "label": "preparing financial documents, records, reports, or budgets",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_749",
-      "label": "electricity and energy",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_1069",
-      "label": "developing professional relationships or networks",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_1137",
-      "label": "estimating resource needs",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_764",
-      "label": "building and civil engineering",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_866",
-      "label": "negotiating and managing contracts and agreements",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_1101",
-      "label": "communicating with colleagues and clients",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_701",
-      "label": "law",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_697",
-      "label": "wholesale and retail sales",
       "type": "skillgroup"
     },
     {
@@ -261,8 +391,43 @@
       "type": "skillgroup"
     },
     {
-      "id": "skillgroup::key_887",
-      "label": "directing, supervising and coordinating projects",
+      "id": "skillgroup::key_738",
+      "label": "software and applications development and analysis",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_1211",
+      "label": "monitoring developments in area of expertise",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_1230",
+      "label": "analysing business operations",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_1246",
+      "label": "performing calculations",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_681",
+      "label": "library, information and archival studies",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_646",
+      "label": "audio-visual techniques and media production",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_896",
+      "label": "analysing and evaluating information and data",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_727",
+      "label": "mathematics",
       "type": "skillgroup"
     },
     {
@@ -271,88 +436,58 @@
       "type": "skillgroup"
     },
     {
-      "id": "skillgroup::key_852",
-      "label": "maintaining operational records",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_695",
-      "label": "marketing and advertising",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_867",
-      "label": "monitoring safety or security",
-      "type": "skillgroup"
-    },
-    {
-      "id": "skillgroup::key_950",
-      "label": "assessing land or real estate",
-      "type": "skillgroup"
-    },
-    {
       "id": "skillgroup::key_728",
       "label": "statistics",
       "type": "skillgroup"
     },
     {
-      "id": "skillgroup::key_1222",
-      "label": "planning production processes",
+      "id": "skillgroup::key_1043",
+      "label": "conducting academic or market research",
       "type": "skillgroup"
     },
     {
-      "id": "skillgroup::key_1153",
-      "label": "executing financial transactions",
+      "id": "skillgroup::key_829",
+      "label": "protection of persons and property",
       "type": "skillgroup"
     },
     {
-      "id": "skill::key_13080",
-      "label": "skillgroup::key_13080",
+      "id": "skillgroup::key_693",
+      "label": "finance, banking and insurance",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_926",
+      "label": "managing information",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_1081",
+      "label": "presenting research or technical information",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_1088",
+      "label": "documenting technical designs, procedures, problems or activities",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_698",
+      "label": "work skills",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skillgroup::key_634",
+      "label": "education science",
+      "type": "skillgroup"
+    },
+    {
+      "id": "skill::key_12976",
+      "label": "skillgroup::key_12976",
       "type": "skill"
     },
     {
-      "id": "skill::key_6337",
-      "label": "skillgroup::key_6337",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_11965",
-      "label": "skillgroup::key_11965",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_2634",
-      "label": "skillgroup::key_2634",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_6036",
-      "label": "skillgroup::key_6036",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_11600",
-      "label": "skillgroup::key_11600",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7923",
-      "label": "skillgroup::key_7923",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7869",
-      "label": "skillgroup::key_7869",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_7591",
-      "label": "skillgroup::key_7591",
-      "type": "skill"
-    },
-    {
-      "id": "skill::key_11565",
-      "label": "skillgroup::key_11565",
+      "id": "skill::key_2846",
+      "label": "skillgroup::key_2846",
       "type": "skill"
     },
     {
@@ -361,455 +496,640 @@
       "type": "skill"
     },
     {
-      "id": "skill::key_10289",
-      "label": "skillgroup::key_10289",
+      "id": "skill::key_6679",
+      "label": "skillgroup::key_6679",
       "type": "skill"
     },
     {
-      "id": "skill::key_3669",
-      "label": "skillgroup::key_3669",
+      "id": "skill::key_7406",
+      "label": "skillgroup::key_7406",
       "type": "skill"
     },
     {
-      "id": "skill::key_12878",
-      "label": "skillgroup::key_12878",
+      "id": "skill::key_9749",
+      "label": "skillgroup::key_9749",
       "type": "skill"
     },
     {
-      "id": "skill::key_6786",
-      "label": "skillgroup::key_6786",
+      "id": "skill::key_2634",
+      "label": "skillgroup::key_2634",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_5129",
+      "label": "skillgroup::key_5129",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_8371",
+      "label": "skillgroup::key_8371",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_3135",
+      "label": "skillgroup::key_3135",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_7139",
+      "label": "skillgroup::key_7139",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_13563",
+      "label": "skillgroup::key_13563",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_11565",
+      "label": "skillgroup::key_11565",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_12104",
+      "label": "skillgroup::key_12104",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_3568",
+      "label": "skillgroup::key_3568",
+      "type": "skill"
+    },
+    {
+      "id": "skill::key_3244",
+      "label": "skillgroup::key_3244",
       "type": "skill"
     }
   ],
   "edges": [
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_4544",
+      "source": "occupation::key_17704",
+      "target": "skill::key_1438",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_7386",
+      "source": "occupation::key_17704",
+      "target": "skill::key_2335",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_11020",
+      "source": "occupation::key_17704",
+      "target": "skill::key_3315",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_11476",
+      "source": "occupation::key_17704",
+      "target": "skill::key_4050",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_1373",
+      "source": "occupation::key_17704",
+      "target": "skill::key_4165",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_5214",
+      "source": "occupation::key_17704",
+      "target": "skill::key_7047",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_6016",
+      "source": "occupation::key_17704",
+      "target": "skill::key_8223",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_6781",
+      "source": "occupation::key_17704",
+      "target": "skill::key_9362",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_7509",
+      "source": "occupation::key_17704",
+      "target": "skill::key_9656",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_9603",
+      "source": "occupation::key_17704",
+      "target": "skill::key_9870",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_10919",
+      "source": "occupation::key_17704",
+      "target": "skill::key_10287",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_11371",
+      "source": "occupation::key_17704",
+      "target": "skill::key_11999",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_13767",
+      "source": "occupation::key_17704",
+      "target": "skill::key_12362",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_14699",
+      "source": "occupation::key_17704",
+      "target": "skill::key_15084",
       "type": "essential"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_5519",
+      "source": "occupation::key_17704",
+      "target": "skill::key_1626",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_2732",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_2900",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_3787",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_4011",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_4348",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_4869",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_4990",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_5121",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_5160",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_5289",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_5675",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_5913",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_7490",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_7952",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_10012",
+      "type": "essential"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_2441",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_6615",
+      "source": "occupation::key_17704",
+      "target": "skill::key_2736",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_7484",
+      "source": "occupation::key_17704",
+      "target": "skill::key_2750",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_7842",
+      "source": "occupation::key_17704",
+      "target": "skill::key_4730",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_12212",
+      "source": "occupation::key_17704",
+      "target": "skill::key_4957",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_12892",
+      "source": "occupation::key_17704",
+      "target": "skill::key_6401",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_13756",
+      "source": "occupation::key_17704",
+      "target": "skill::key_10293",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_1374",
+      "source": "occupation::key_17704",
+      "target": "skill::key_10420",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_5858",
+      "source": "occupation::key_17704",
+      "target": "skill::key_10877",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_6739",
+      "source": "occupation::key_17704",
+      "target": "skill::key_11497",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_6899",
+      "source": "occupation::key_17704",
+      "target": "skill::key_12105",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_7757",
+      "source": "occupation::key_17704",
+      "target": "skill::key_13603",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_8066",
+      "source": "occupation::key_17704",
+      "target": "skill::key_14564",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_9116",
+      "source": "occupation::key_17704",
+      "target": "skill::key_1919",
       "type": "optional"
     },
     {
-      "source": "occupation::key_16708",
-      "target": "skill::key_12429",
+      "source": "occupation::key_17704",
+      "target": "skill::key_2616",
       "type": "optional"
     },
     {
-      "source": "escooccupation::key_16905",
-      "target": "occupation::key_16708",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "iscogroup::key_256",
-      "target": "escooccupation::key_16905",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "iscogroup::key_252",
-      "target": "iscogroup::key_256",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "iscogroup::key_240",
-      "target": "iscogroup::key_252",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "iscogroup::key_184",
-      "target": "iscogroup::key_240",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_7509",
-      "target": "skill::key_9167",
+      "source": "occupation::key_17704",
+      "target": "skill::key_6036",
       "type": "optional"
     },
     {
-      "source": "skill::key_7509",
-      "target": "skill::key_13625",
+      "source": "occupation::key_17704",
+      "target": "skill::key_6602",
       "type": "optional"
     },
     {
-      "source": "skill::key_13767",
-      "target": "skill::key_8678",
+      "source": "occupation::key_17704",
+      "target": "skill::key_10425",
       "type": "optional"
     },
     {
-      "source": "skill::key_1374",
-      "target": "skill::key_7377",
+      "source": "occupation::key_17704",
+      "target": "skill::key_11882",
       "type": "optional"
     },
     {
-      "source": "skillgroup::key_910",
-      "target": "skill::key_1373",
+      "source": "occupation::key_17704",
+      "target": "skill::key_11965",
+      "type": "optional"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_12706",
+      "type": "optional"
+    },
+    {
+      "source": "occupation::key_17704",
+      "target": "skill::key_14894",
+      "type": "optional"
+    },
+    {
+      "source": "iscogroup::key_147",
+      "target": "occupation::key_17704",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_910",
-      "target": "skill::key_7509",
+      "source": "iscogroup::key_146",
+      "target": "iscogroup::key_147",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_880",
-      "target": "skill::key_1374",
+      "source": "iscogroup::key_145",
+      "target": "iscogroup::key_146",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_693",
-      "target": "skill::key_4544",
+      "source": "iscogroup::key_58",
+      "target": "iscogroup::key_145",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_693",
-      "target": "skill::key_9167",
+      "source": "skill::key_3315",
+      "target": "skill::key_9953",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_693",
-      "target": "skill::key_11476",
+      "source": "skill::key_9656",
+      "target": "skill::key_9870",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_9656",
+      "target": "skill::key_6401",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_693",
-      "target": "skill::key_13625",
+      "source": "skill::key_9656",
+      "target": "skill::key_12105",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_1125",
-      "target": "skill::key_5214",
+      "source": "skill::key_9656",
+      "target": "skill::key_14564",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_1125",
-      "target": "skill::key_6781",
+      "source": "skill::key_9870",
+      "target": "skill::key_2736",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_749",
-      "target": "skill::key_5519",
+      "source": "skill::key_9870",
+      "target": "skill::key_4730",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_1069",
-      "target": "skill::key_5858",
+      "source": "skill::key_9870",
+      "target": "skill::key_6401",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_1137",
-      "target": "skill::key_6016",
+      "source": "skill::key_9870",
+      "target": "skill::key_9656",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_764",
-      "target": "skill::key_6615",
+      "source": "skill::key_9870",
+      "target": "skill::key_10293",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_866",
-      "target": "skill::key_6739",
+      "source": "skill::key_9870",
+      "target": "skill::key_12105",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_1101",
-      "target": "skill::key_6899",
+      "source": "skill::key_9870",
+      "target": "skill::key_14564",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_701",
-      "target": "skill::key_7377",
+      "source": "skill::key_1626",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_2732",
+      "target": "skill::key_1919",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_701",
-      "target": "skill::key_11020",
+      "source": "skill::key_2732",
+      "target": "skill::key_1973",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_701",
-      "target": "skill::key_12892",
+      "source": "skill::key_2732",
+      "target": "skill::key_5160",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_701",
-      "target": "skill::key_13756",
+      "source": "skill::key_2900",
+      "target": "skill::key_15084",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_3787",
+      "target": "skill::key_1626",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_697",
-      "target": "skill::key_7386",
+      "source": "skill::key_4011",
+      "target": "skill::key_4933",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4348",
+      "target": "skill::key_7658",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4348",
+      "target": "skill::key_8223",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4348",
+      "target": "skill::key_10706",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4348",
+      "target": "skill::key_14088",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4869",
+      "target": "skill::key_3315",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4869",
+      "target": "skill::key_9953",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4869",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4990",
+      "target": "skill::key_4957",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4990",
+      "target": "skill::key_10587",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_4990",
+      "target": "skill::key_2732",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_694",
-      "target": "skill::key_7484",
+      "source": "skill::key_4990",
+      "target": "skill::key_4869",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_887",
-      "target": "skill::key_7757",
+      "source": "skill::key_4990",
+      "target": "skill::key_7490",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_692",
-      "target": "skill::key_7842",
+      "source": "skill::key_5675",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_7490",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_7952",
+      "target": "skill::key_10425",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_852",
-      "target": "skill::key_8066",
+      "source": "skill::key_10012",
+      "target": "skill::key_7094",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_10012",
+      "target": "skill::key_13532",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_10012",
+      "target": "skill::key_10425",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_695",
-      "target": "skill::key_8678",
+      "source": "skill::key_10012",
+      "target": "skill::key_14894",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_867",
-      "target": "skill::key_9603",
+      "source": "skill::key_1919",
+      "target": "skill::key_9369",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_1973",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_2732",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_3669",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_5160",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_5289",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_8456",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_10289",
+      "type": "essential"
+    },
+    {
+      "source": "skill::key_6036",
+      "target": "skill::key_4002",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_6602",
+      "target": "skill::key_2732",
       "type": "is_parent_of"
     },
     {
-      "source": "skillgroup::key_950",
-      "target": "skill::key_10919",
-      "type": "is_parent_of"
+      "source": "skill::key_10425",
+      "target": "skill::key_7229",
+      "type": "optional"
     },
     {
-      "source": "skillgroup::key_950",
-      "target": "skill::key_11371",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skillgroup::key_950",
-      "target": "skill::key_13767",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skillgroup::key_728",
-      "target": "skill::key_12212",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skillgroup::key_1222",
-      "target": "skill::key_12429",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skillgroup::key_1153",
-      "target": "skill::key_14699",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_13080",
-      "target": "skill::key_1373",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_6337",
-      "target": "skill::key_1373",
-      "type": "is_parent_of"
+      "source": "skill::key_11882",
+      "target": "skill::key_4165",
+      "type": "optional"
     },
     {
       "source": "skill::key_11965",
-      "target": "skill::key_5214",
+      "target": "skill::key_9668",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_11965",
+      "target": "skill::key_14091",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_14894",
+      "target": "skill::key_15084",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_1973",
+      "target": "skill::key_1919",
       "type": "is_parent_of"
     },
     {
-      "source": "skill::key_2634",
-      "target": "skill::key_6016",
+      "source": "skill::key_1973",
+      "target": "skill::key_7952",
       "type": "is_parent_of"
     },
     {
-      "source": "skill::key_2634",
-      "target": "skill::key_14699",
-      "type": "is_parent_of"
+      "source": "skill::key_3669",
+      "target": "skill::key_10706",
+      "type": "optional"
     },
     {
-      "source": "skill::key_6036",
-      "target": "skill::key_6337",
-      "type": "is_parent_of"
+      "source": "skill::key_3669",
+      "target": "skill::key_14088",
+      "type": "optional"
     },
     {
-      "source": "skill::key_6036",
-      "target": "skill::key_7869",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_11600",
-      "target": "skill::key_6337",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_7923",
-      "target": "skill::key_6739",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_7869",
-      "target": "skill::key_6781",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_7591",
-      "target": "skill::key_9116",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_11565",
-      "target": "skill::key_9116",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_11565",
-      "target": "skill::key_11965",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_8161",
-      "target": "skill::key_9603",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_8161",
-      "target": "skill::key_11371",
-      "type": "is_parent_of"
-    },
-    {
-      "source": "skill::key_10289",
-      "target": "skill::key_11965",
+      "source": "skill::key_3669",
+      "target": "skill::key_5160",
       "type": "is_parent_of"
     },
     {
@@ -818,13 +1138,478 @@
       "type": "is_parent_of"
     },
     {
-      "source": "skill::key_12878",
-      "target": "skill::key_12429",
+      "source": "skill::key_10289",
+      "target": "skill::key_11999",
+      "type": "optional"
+    },
+    {
+      "source": "skill::key_10289",
+      "target": "skill::key_11965",
       "type": "is_parent_of"
     },
     {
-      "source": "skill::key_6786",
-      "target": "skill::key_12429",
+      "source": "skillgroup::key_737",
+      "target": "skill::key_1438",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_2441",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_2750",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_3315",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_4957",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_7047",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_7658",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_9953",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_10287",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_10420",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_10587",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_10877",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_11497",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_11999",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_737",
+      "target": "skill::key_15084",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_1626",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_2616",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_2732",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_3669",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_3787",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_4869",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_4990",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_5121",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_5675",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_6036",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1012",
+      "target": "skill::key_6602",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_910",
+      "target": "skill::key_1919",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_910",
+      "target": "skill::key_1973",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_910",
+      "target": "skill::key_5289",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_910",
+      "target": "skill::key_7952",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_694",
+      "target": "skill::key_2335",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_694",
+      "target": "skill::key_13532",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_2736",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_4730",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_6401",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_9656",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_9870",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_10293",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_12105",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_13603",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_14088",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_738",
+      "target": "skill::key_14564",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1211",
+      "target": "skill::key_2900",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1230",
+      "target": "skill::key_4002",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1246",
+      "target": "skill::key_4011",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_681",
+      "target": "skill::key_4050",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_681",
+      "target": "skill::key_7229",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_681",
+      "target": "skill::key_9362",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_646",
+      "target": "skill::key_4165",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_896",
+      "target": "skill::key_4348",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_896",
+      "target": "skill::key_5160",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_896",
+      "target": "skill::key_10289",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_727",
+      "target": "skill::key_4933",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_692",
+      "target": "skill::key_7094",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_728",
+      "target": "skill::key_8223",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_728",
+      "target": "skill::key_10706",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1043",
+      "target": "skill::key_8456",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_829",
+      "target": "skill::key_9369",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_693",
+      "target": "skill::key_9668",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_926",
+      "target": "skill::key_10012",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_926",
+      "target": "skill::key_10425",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_926",
+      "target": "skill::key_12706",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_926",
+      "target": "skill::key_14894",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1081",
+      "target": "skill::key_11882",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_1088",
+      "target": "skill::key_11965",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_698",
+      "target": "skill::key_12362",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skillgroup::key_634",
+      "target": "skill::key_14091",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_12976",
+      "target": "skill::key_2616",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2846",
+      "target": "skill::key_2732",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2846",
+      "target": "skill::key_4002",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2846",
+      "target": "skill::key_5160",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2846",
+      "target": "skill::key_5289",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2846",
+      "target": "skill::key_8371",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2846",
+      "target": "skill::key_10289",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_8161",
+      "target": "skill::key_2732",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_8161",
+      "target": "skill::key_5160",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_8161",
+      "target": "skill::key_8371",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_6679",
+      "target": "skill::key_2846",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_7406",
+      "target": "skill::key_2900",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_7406",
+      "target": "skill::key_4933",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_9749",
+      "target": "skill::key_4002",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2634",
+      "target": "skill::key_4011",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_2634",
+      "target": "skill::key_4348",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_5129",
+      "target": "skill::key_4011",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_8371",
+      "target": "skill::key_5160",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_3135",
+      "target": "skill::key_5913",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_7139",
+      "target": "skill::key_6036",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_7139",
+      "target": "skill::key_9749",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_13563",
+      "target": "skill::key_10287",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_11565",
+      "target": "skill::key_11965",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_12104",
+      "target": "skill::key_12362",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_3568",
+      "target": "skill::key_12706",
+      "type": "is_parent_of"
+    },
+    {
+      "source": "skill::key_3244",
+      "target": "skill::key_13603",
       "type": "is_parent_of"
     }
   ]

@@ -15,26 +15,22 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-      //   // Check if user has a theme preference in localStorage
-      //   const storedTheme = localStorage.getItem('theme');
+    // Check if user has a theme preference in localStorage
+    const storedTheme = localStorage.getItem('theme');
     
-      //   // Check if user has a system preference
-      //   const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-      //   // Set initial theme based on stored preference or system preference
-      //   setIsDarkMode(storedTheme === 'dark' || (!storedTheme && systemPreference));
-        
-      //   // Apply the theme to the document
-      //   if (isDarkMode) {
-      //     document.documentElement.classList.add('dark');
-      //   } else {
-      //     document.documentElement.classList.remove('dark');
-      //   }
-      // }, [isDarkMode]);
-    // Force light mode
-    setIsDarkMode(false);
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
+    // Check if user has a system preference
+    const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+    // Set initial theme based on stored preference or system preference
+    const initialDarkMode = storedTheme === 'dark' || (!storedTheme && systemPreference);
+    setIsDarkMode(initialDarkMode);
+      
+    // Apply the theme to the document
+    if (initialDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, []);
 
   const toggleDarkMode = () => {

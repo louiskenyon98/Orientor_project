@@ -69,3 +69,8 @@ problem_n_solution.txt
 backend/app/models/*.pkl
 backend/app/models/finetuned_model/
 backend/app/models/finetuned_model_quantized/
+
+# Fonts
+# Start of Selection
+frontend/public/fonts/
+# End of Selection

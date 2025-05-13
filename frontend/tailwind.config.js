@@ -14,6 +14,7 @@ module.exports = {
           teal: '#59C2C9',
           purple: '#7D5BA6',
           lilac: '#A78BDA',
+          green: '#2d7b46', // Nouvelle couleur CTA
         },
         // Accent colors
         accent: {
@@ -30,8 +31,19 @@ module.exports = {
           500: '#718096',
           600: '#4A5568',
           700: '#2D3748',
-          800: '#1A202C',
+          800: '#1A1A1A', // Couleur de texte principale
           900: '#171923',
+        },
+        // Thème clair et sombre
+        light: {
+          background: '#e6f0e5', // Fond vert menthe
+          text: '#1a1a1a',
+          cta: '#2d7b46',
+        },
+        dark: {
+          background: '#1a2e19', // Version sombre du vert menthe
+          text: '#e6e6e6',
+          cta: '#3d9d5a', // Version plus claire du CTA pour le mode sombre
         },
       },
       backgroundImage: {
@@ -40,7 +52,8 @@ module.exports = {
         'grid-pattern': "url('/patterns/grid.svg')",
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['departure', 'system-ui', 'sans-serif'],
+        mono: ['departure', 'monospace'],
         serif: ['Playfair Display', 'serif'],
       },
       boxShadow: {
@@ -51,6 +64,7 @@ module.exports = {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'float': 'float 6s ease-in-out infinite',
         'grow': 'grow 0.3s ease-out',
+        'pulse-subtle': 'pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         fadeIn: {
@@ -64,6 +78,10 @@ module.exports = {
         grow: {
           '0%': { transform: 'scaleX(0)' },
           '100%': { transform: 'scaleX(1)' },
+        },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.85' },
         },
       },
       typography: {

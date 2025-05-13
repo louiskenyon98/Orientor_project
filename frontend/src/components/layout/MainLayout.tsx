@@ -46,7 +46,7 @@ const ProfileDropdown = ({ pathname }: { pathname: string | null }) => {
             </button>
             
             {profileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 z-40">
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-light-background dark:bg-dark-background ring-1 ring-black ring-opacity-5 z-40">
                     <div className="py-1" role="menu" aria-orientation="vertical">
                         <Link
                             href="/profile"
@@ -118,7 +118,7 @@ const MobileProfileMenu = ({
             
             {/* Menu du profil pour mobile */}
             {profileMobileMenuOpen && (
-                <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="absolute bottom-full right-0 mb-2 w-48 bg-light-background dark:bg-dark-background rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div className="py-1">
                         <Link
                             href="/profile"
@@ -254,17 +254,17 @@ export default function MainLayout({
     console.log('Rendering layout with isLoggedIn:', isLoggedIn);
 
     return (
-        <div className="min-h-screen flex flex-col dark:bg-gray-950 dark:text-gray-100">
+        <div className="min-h-screen flex flex-col bg-light-background dark:bg-gray-950 dark:text-gray-100">
             {/* Desktop Navigation Bar - Only visible on larger screens */}
             {isLoggedIn && (
-                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm hidden md:block">
+                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-light-background/90 dark:bg-dark-background/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm hidden md:block font-departure">
                     <div className="max-w-7xl mx-auto px-8">
                         <div className="flex justify-between h-16">
                             {/* Left Side - Logo and Primary Navigation */}
                             <div className="flex items-center space-x-8">
                                 {/* Logo */}
                                 <Link href="/" className="flex-shrink-0 flex items-center">
-                                    <span className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+                                    <span className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 font-departure">
                                         Navigo
                                     </span>
                                 </Link>
@@ -273,7 +273,7 @@ export default function MainLayout({
                                 <div className="flex items-center space-x-1">
                                     <Link 
                                         href="/chat" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out font-departure
                                             ${pathname === '/chat' 
                                                 ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
                                                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
@@ -284,7 +284,7 @@ export default function MainLayout({
                                     
                                     <Link 
                                         href="/peers" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out
+                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out font-departure
                                             ${pathname === '/peers' 
                                                 ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
                                                 : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
@@ -298,7 +298,7 @@ export default function MainLayout({
                                     <div className="relative" ref={careerMenuRef}>
                                         <button 
                                             onClick={toggleCareerDropdown}
-                                            className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center
+                                            className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center font-departure
                                                 ${isCareerPath
                                                     ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
                                                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
@@ -311,46 +311,46 @@ export default function MainLayout({
                                         </button>
                                         
                                         {careerMenuOpen && (
-                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 z-40">
+                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-light-background dark:bg-dark-background ring-1 ring-black ring-opacity-5 z-40">
                                                 <div className="py-1" role="menu" aria-orientation="vertical">
                                                     <Link
                                                         href="/vector-search"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/vector-search' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/vector-search' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
                                                         role="menuitem"
                                                     >
                                                         Career Insights
                                                     </Link>
                                                     <Link
                                                         href="/find-your-way"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/find-your-way' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/find-your-way' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
                                                         role="menuitem"
                                                     >
                                                         Pathway Explorer
                                                     </Link>
                                                     <Link
                                                         href="/career"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/career' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/career' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
                                                         role="menuitem"
                                                     >
                                                         Career Explorer
                                                     </Link>
                                                     <Link
                                                         href="/enhanced-skills"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/enhanced-skills' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/enhanced-skills' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
                                                         role="menuitem"
                                                     >
                                                         Enhanced Skills Path
                                                     </Link>
                                                     <Link
                                                         href="/holland-test"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/holland-test' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/holland-test' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
                                                         role="menuitem"
                                                     >
                                                         Test Holland (RIASEC)
                                                     </Link>
                                                     <Link
                                                         href="/case-study-journey"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/case-study-journey' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/case-study-journey' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
                                                     >
                                                         Étude de Cas Navigo
                                                     </Link>
@@ -373,7 +373,7 @@ export default function MainLayout({
                                         <button
                                             type="button"
                                             onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-                                            className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors duration-150 ease-in-out"
+                                            className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors duration-150 ease-in-out font-departure"
                                         >
                                             Workspace
                                             <svg
@@ -391,11 +391,11 @@ export default function MainLayout({
                                             </svg>
                                         </button>
 
-                                        <div className={`absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${workspaceMenuOpen ? 'block' : 'hidden'}`}>
+                                        <div className={`absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-light-background dark:bg-dark-background shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${workspaceMenuOpen ? 'block' : 'hidden'}`}>
                                             <div className="py-1">
                                             <Link
                                                 href="/space"
-                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out font-departure
                                                 ${pathname === '/space'
                                                     ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
                                                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
@@ -405,7 +405,7 @@ export default function MainLayout({
                                             </Link>
                                             <Link
                                                 href="/tree-path"
-                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out font-departure
                                                 ${pathname === '/tree-path'
                                                     ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
                                                     : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
@@ -433,7 +433,7 @@ export default function MainLayout({
                                 
                                 <button 
                                     onClick={handleLogout}
-                                    className="px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-red-600 hover:bg-red-50 dark:text-gray-300 dark:hover:text-red-400 dark:hover:bg-gray-800 transition-colors duration-150 ease-in-out"
+                                    className="px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-red-600 hover:bg-red-50 dark:text-gray-300 dark:hover:text-red-400 dark:hover:bg-gray-800 transition-colors duration-150 ease-in-out font-departure"
                                 >
                                     Sign Out
                                 </button>
@@ -450,18 +450,18 @@ export default function MainLayout({
 
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
             {isLoggedIn && (
-                <div className="fixed bottom-0 left-0 right-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 md:hidden z-50">
+                <div className="fixed bottom-0 left-0 right-0 w-full bg-light-background dark:bg-dark-background border-t border-gray-200 dark:border-gray-800 md:hidden z-50 font-departure">
                     <div className="grid grid-cols-5 py-2">
                         <Link 
                             href="/chat" 
-                            className={`flex flex-col items-center text-xs ${pathname === '/chat' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/chat' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
                         >
                             <span className="material-icons-outlined">chat</span>
                             <span>Chat</span>
                         </Link>
                         <Link 
                             href="/peers" 
-                            className={`flex flex-col items-center text-xs ${pathname === '/peers' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/peers' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
                         >
                             <span className="material-icons-outlined">people</span>
                             <span>Peers</span>
@@ -470,7 +470,7 @@ export default function MainLayout({
                         {/* More menu button */}
                         <div className="relative">
                             <button 
-                                className="flex flex-col items-center w-full text-xs text-gray-600 dark:text-gray-400"
+                                className="flex flex-col items-center w-full text-xs text-gray-600 dark:text-gray-400 font-departure"
                                 onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                                 aria-label="More options"
                             >
@@ -482,7 +482,7 @@ export default function MainLayout({
                             {moreMenuOpen && (
                                 <div 
                                     ref={moreMenuRef}
-                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-light-background dark:bg-dark-background rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
                                 >
                                     <div className="py-1">
                                         {/* Dropdown menu items with dark mode styles */}

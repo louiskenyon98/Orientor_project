@@ -24,19 +24,15 @@ from app.routers.holland_test import router as holland_test_router  # Import Hol
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
 from scripts.model_loader import load_models
-import logging
 from logging.handlers import RotatingFileHandler
 from app.api.api import api_router
+from .utils.logging_config import setup_logging
 
 
 # from app.routers.resume import router as resume_router  # Commented out resume router
 
-# Configure logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Set up logging
+logger = setup_logging()
 
 # Create FastAPI app
 app = FastAPI(
@@ -131,6 +127,7 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
+    logger.info("Root endpoint called")
     return {"message": "Welcome to the Navigo API. Go to /docs for API documentation."}
 
 # @app.get("/api/health") # /api/health

@@ -35,7 +35,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
       </head>
       <Providers>
-        <body className="min-h-screen bg-white dark:bg-black text-neutral-700 dark:text-gray-200 antialiased">
+        <body className="min-h-screen bg-light-background dark:bg-dark-background text-neutral-700 dark:text-gray-200 antialiased">
           {/* Background patterns */}
           <div 
             className="fixed inset-0 -z-10 bg-[url('/patterns/branch.svg')] bg-repeat opacity-90 dark:opacity-300"

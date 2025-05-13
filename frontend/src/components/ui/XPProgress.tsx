@@ -53,41 +53,35 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
         <div className="h-2 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
-        <span className="text-xs text-gray-400 dark:text-gray-500">Loading...</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500 font-departure">Loading...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`text-xs text-red-500 dark:text-red-400 ${className}`}>
+      <div className={`text-xs text-red-500 dark:text-red-400 font-departure ${className}`}>
         Error loading XP
       </div>
     );
   }
+
   return (
     <div className={`flex items-center ${className}`}>
-      {/* Level Badge */}
-      <div className="flex-shrink-0 w-8 h-8 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-sm font-medium">
-        {level}
+      {/* Capsule-style level indicator */}
+      <div className="flex items-center bg-light-background/80 dark:bg-dark-background/80 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 shadow-sm">
+        <span className="text-sm font-departure font-medium text-gray-800 dark:text-gray-200">🧭 Level {level} – {xpInCurrentLevel}/{xpRequiredForNextLevel} XP</span>
       </div>
       
       {/* XP Progress Bar */}
-      <div className="ml-4 flex-1">
-        <div className="flex items-center justify-start gap-2 text-xs mb-1">
-          <span className="font-medium text-gray-700 dark:text-gray-200">Level {level}</span>
-          <span className="text-gray-500 dark:text-gray-400">
-            {xpInCurrentLevel}/{xpRequiredForNextLevel} XP
-            {nextThreshold ? ` to Lvl ${level + 1} ` : ' (Max)'}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div className="ml-3 w-24">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
           <div
-            className="bg-blue-600 dark:bg-blue-500 rounded-full h-2 transition-all duration-500 ease-out"
+            className="bg-blue-600 dark:bg-blue-500 rounded-full h-2 transition-all duration-500 ease-out animate-pulse-subtle"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
       </div>
     </div>
   );
-} 
+}

@@ -238,14 +238,19 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
             interests = " ".join(profile_data['interests']).lower()
             logger.info(f"Using interests-based default embedding: {interests}")
             if any(term in interests for term in ["tech", "software", "programming"]):
+                logger.info(f"Using tech default embedding for user {user_id}")
                 return DEFAULT_USER_EMBEDDINGS["tech"]
             elif any(term in interests for term in ["art", "design", "creative"]):
+                logger.info(f"Using creative default embedding for user {user_id}")
                 return DEFAULT_USER_EMBEDDINGS["creative"]
             elif any(term in interests for term in ["business", "management", "finance"]):
+                logger.info(f"Using business default embedding for user {user_id}")
                 return DEFAULT_USER_EMBEDDINGS["business"]
             elif any(term in interests for term in ["science", "research"]):
+                logger.info(f"Using science default embedding for user {user_id}")
                 return DEFAULT_USER_EMBEDDINGS["science"]
             elif any(term in interests for term in ["health", "medical"]):
+                logger.info(f"Using healthcare default embedding for user {user_id}")
                 return DEFAULT_USER_EMBEDDINGS["healthcare"]
         
         # If no profile or no matching interests, use a random default embedding
@@ -339,6 +344,8 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             logger.error("Pinecone API key or environment not set")
             return []
         
+        logger.info(f"Initializing Pinecone with environment: {pinecone_environment}")
+        
         # Initialize Pinecone client
         pc = pinecone.Pinecone(
             api_key=pinecone_api_key,
@@ -347,10 +354,14 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         
         # Get the index
         index = pc.Index("oasis-minilm-index")
+        logger.info("Got Pinecone index")
         
         # Ensure embedding is the right format and size
         if isinstance(embedding, np.ndarray):
             embedding = embedding.tolist()
+        
+        logger.info(f"Querying Pinecone with embedding size: {len(embedding)}")
+        logger.info(f"First 5 values of query embedding: {embedding[:5]}")
         
         # Query Pinecone
         try:
@@ -360,6 +371,8 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
                 top_k=limit,
                 include_metadata=True
             )
+            
+            logger.info(f"Got query results from Pinecone: {query_results}")
             
             matches = []
             if isinstance(query_results, dict):
@@ -372,6 +385,8 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             if not matches:
                 logger.warning("No matches found in Pinecone response")
                 return []
+            
+            logger.info(f"Found {len(matches)} matches in Pinecone response")
             
             # Extract results
             recommendations = []
@@ -478,19 +493,25 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
     """
     try:
         # Get user embedding
+        logger.info(f"Getting career recommendations for user {user_id}")
         embedding = get_user_embedding(db, user_id)
         
         if not embedding:
             logger.warning(f"No embedding found for user {user_id}, using fallback recommendations")
             return get_career_recommendations_fallback(limit)
         
+        logger.info(f"Got embedding for user {user_id}, size: {len(embedding)}")
+        logger.info(f"First 5 values of embedding: {embedding[:5]}")
+        
         # Try to get Pinecone recommendations
         recommendations = get_pinecone_career_recommendations(embedding, limit)
         
-        # Fall back to random recommendations if Pinecone fails
         if not recommendations:
             logger.warning(f"Pinecone recommendations failed for user {user_id}, using fallback")
             recommendations = get_career_recommendations_fallback(limit)
+        else:
+            logger.info(f"Got {len(recommendations)} recommendations from Pinecone")
+            logger.info(f"First recommendation: {recommendations[0] if recommendations else 'None'}")
         
         return recommendations
     except Exception as e:

@@ -21,3 +21,11 @@ tart your development server: If you haven't already, make sure your development
 directory: Orientor_project
 npm start
 
+- Run the graph
+    
+    **Be in:** (orientor) (base) philippebeliveau@philippes-MacBook-Pro esco %
+    
+    python [runner.py](http://runner.py/)  
+    
+    python -m http.server 8000
+
