@@ -202,8 +202,8 @@ const root: SkillNode = {
           skillDescription: 'You take initiative when others need it',
           taskSuggestion: 'Coordinate a mental wellness week or empathy circle',
           reachableJobs: [
-            { jobTitle: 'Community Builder', jobDomain: 'Human Connection & Wellbeing', requiredSkills: [] },
-            { jobTitle: 'Peer Mentor', jobDomain: 'Support & Guidance', requiredSkills: [] },
+            { jobTitle: 'Trusted Friend', jobDomain: 'People & Emotions', requiredSkills: [] },
+            { jobTitle: 'Go-To Listener', jobDomain: 'Support & Empathy', requiredSkills: [] },
           ],
         }
       ]
@@ -219,8 +219,8 @@ const root: SkillNode = {
           skillDescription: 'You act quickly and think clearly in urgent moments',
           taskSuggestion: 'Help lead a safety or preparedness event',
           reachableJobs: [
-            { jobTitle: 'Resilience Coordinator', jobDomain: 'Crisis & Safety', requiredSkills: [] },
-            { jobTitle: 'Field Organizer', jobDomain: 'Rapid Response & Logistics', requiredSkills: [] }
+            { jobTitle: 'Calm-in-the-Storm', jobDomain: 'Urgent Situations', requiredSkills: [] },
+            { jobTitle: 'Fast Thinker', jobDomain: 'Quick Action', requiredSkills: [] }
           ],
         }
       ]
@@ -236,16 +236,16 @@ const root: SkillNode = {
           skillDescription: 'You adapt your message for different people',
           taskSuggestion: 'Interview people and present what you learned in a visual way',
           reachableJobs: [
-            { jobTitle: 'Youth Communicator', jobDomain: 'Storytelling & Public Engagement', requiredSkills: [] },
-            { jobTitle: 'Workshop Host', jobDomain: 'Community Learning Spaces', requiredSkills: [] },
+            { jobTitle: 'Clear Speaker', jobDomain: 'Ideas & Expression', requiredSkills: [] },
+            { jobTitle: 'Learning Spark', jobDomain: 'Group Learning', requiredSkills: [] },
           ]
         },
         {
           id: 's3-x',
-          skillDescription: 'You communicate in moments that matter', // linked with s2-1
+          skillDescription: 'You communicate in moments that matter',
           taskSuggestion: 'Design instructions or communication for a group under pressure',
           reachableJobs: [
-            { jobTitle: 'First Response Communicator', jobDomain: 'Emergency Planning', requiredSkills: [] }
+            { jobTitle: 'Calm Voice', jobDomain: 'Critical Communication', requiredSkills: [] }
           ]
         }
       ]
@@ -261,8 +261,8 @@ const root: SkillNode = {
           skillDescription: 'You shape your ideas to influence and inform others',
           taskSuggestion: 'Participate in a youth debate or writing contest',
           reachableJobs: [
-            { jobTitle: 'Content Creator', jobDomain: 'Media & Communication', requiredSkills: [] },
-            { jobTitle: 'Information Architect', jobDomain: 'Learning & Documentation', requiredSkills: [] },
+            { jobTitle: 'Thought Sharer', jobDomain: 'Writing & Media', requiredSkills: [] },
+            { jobTitle: 'Idea Organizer', jobDomain: 'Clarity & Knowledge', requiredSkills: [] },
           ],
           nextSkills: [
             {
@@ -270,7 +270,7 @@ const root: SkillNode = {
               skillDescription: 'You tell stories that move people to act',
               taskSuggestion: 'Create a campaign with a message you care about',
               reachableJobs: [
-                { jobTitle: 'Campaign Storyteller', jobDomain: 'Civic Engagement & Awareness', requiredSkills: [] },
+                { jobTitle: 'Voice for a Cause', jobDomain: 'Social Impact', requiredSkills: [] },
               ]
             },
             {
@@ -278,7 +278,7 @@ const root: SkillNode = {
               skillDescription: 'You make complicated things easy to grasp',
               taskSuggestion: 'Write an illustrated how-to or zine on something technical',
               reachableJobs: [
-                { jobTitle: 'Clarity Designer', jobDomain: 'Education & Product Design', requiredSkills: [] },
+                { jobTitle: 'Explainer-in-Chief', jobDomain: 'Learning Design', requiredSkills: [] },
               ]
             }
           ]
