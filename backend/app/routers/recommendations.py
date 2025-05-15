@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict
+import numpy as np
 from datetime import datetime
 from ..utils.database import get_db
-from ..services.embedding_service import generate_embedding
+from ..services.embedding_service import get_user_embedding
 from ..services.career_recommendation_service import get_pinecone_career_recommendations
 from ..models import User, UserRecommendation, SavedRecommendation
 from ..routers.user import get_current_user
@@ -123,7 +124,7 @@ def extract_fields_from_text(text: str) -> Dict[str, str]:
 
 @router.get("", response_model=RecommendationsResponse)
 def get_career_recommendations(
-    limit: int = Query(30, gt=0, le=30),
+    limit: int = Query(10, gt=0, le=10),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -136,50 +137,33 @@ def get_career_recommendations(
         
         existing_codes = [rec[0] for rec in existing_recommendations]
         
-        # Get user profile
-        profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
-        if not profile:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User profile not found"
-            )
+        # Get user embedding directly from embedding service
+        user_embedding = get_user_embedding(db, current_user.id)
         
-        # Generate embedding from profile
-        profile_data = {
-            "name": profile.name,
-            "age": profile.age,
-            "sex": profile.sex,
-            "major": profile.major,
-            "year": profile.year,
-            "gpa": profile.gpa,
-            "hobbies": profile.hobbies,
-            "country": profile.country,
-            "state_province": profile.state_province,
-            "unique_quality": profile.unique_quality,
-            "story": profile.story,
-            "favorite_movie": profile.favorite_movie,
-            "favorite_book": profile.favorite_book,
-            "favorite_celebrities": profile.favorite_celebrities,
-            "learning_style": profile.learning_style,
-            "interests": profile.interests,
-            "job_title": profile.job_title,
-            "industry": profile.industry,
-            "years_experience": profile.years_experience,
-            "education_level": profile.education_level,
-            "career_goals": profile.career_goals,
-            "skills": profile.skills
-        }
+        # Si aucun embedding trouvé, essayer avec la conversion UUID
+        if user_embedding is None:
+            logger.info(f"No embedding found with regular ID, trying with UUID conversion")
+            user_embedding = get_user_embedding(db, current_user.id, convert_to_uuid=True)
         
-        embedding = generate_embedding(profile_data)
-        if not embedding:
+        if user_embedding is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to generate embedding"
+                detail="No embedding found for user profile"
             )
         
-        # Get recommendations from Pinecone
-        recommendations = get_pinecone_career_recommendations(embedding, limit + len(existing_codes))
+        # Ensure embedding is in the right format for Pinecone
+        if user_embedding is not None:
+            # Convert numpy array to list if needed
+            if isinstance(user_embedding, np.ndarray):
+                user_embedding = user_embedding.tolist()
+            
+            # Log embedding details for debugging
+            logger.info(f"Embedding format: {type(user_embedding)}, length: {len(user_embedding)}")
+            logger.info(f"First 5 values: {user_embedding[:5]}")
         
+        # Get recommendations from Pinecone using the embedding
+        recommendations = get_pinecone_career_recommendations(user_embedding, limit + len(existing_codes))
+        # logger.info(f"Recommendations: {recommendations}")
         # Filter out already seen recommendations
         filtered_recommendations = [
             rec for rec in recommendations 

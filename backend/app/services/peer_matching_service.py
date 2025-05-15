@@ -7,7 +7,7 @@ from sqlalchemy import text
 import ast
 import subprocess
 from app.models.user_profile import UserProfile
-from app.services.embedding_service import generate_embedding
+from app.services.embedding_service import generate_embedding, store_embedding
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -85,6 +85,8 @@ def get_users_with_embeddings(db: Session) -> List[Dict[str, Any]]:
             
             embedding = generate_embedding(profile_data)
             if embedding is not None:
+                # Store the embedding in the database
+                store_embedding(db, profile.user_id, embedding)
                 users.append({
                     "user_id": profile.user_id,
                     "embedding": embedding
@@ -130,6 +132,8 @@ def find_similar_peers(db: Session, user_id: int, embedding: List[float], top_n:
                 
                 other_embedding = generate_embedding(profile_data)
                 if other_embedding is not None:
+                    # Store the embedding in the database
+                    store_embedding(db, profile.user_id, other_embedding)
                     other_embedding = np.array(other_embedding, dtype=float)
                     user_embedding = np.array(embedding, dtype=float)
                     similarity = cosine_similarity(user_embedding, other_embedding)

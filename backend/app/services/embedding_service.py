@@ -13,6 +13,9 @@ import joblib
 import boto3
 from pathlib import Path
 from sklearn.decomposition import PCA
+import threading
+import ast
+import uuid
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +37,7 @@ else:
     PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca256.pkl")
 
 # Define the model name
-MODEL_NAME = "llama-text-embed-v2"
+MODEL_NAME = "intfloat/e5-base-v2"
 
 class EmbeddingModel(nn.Module):
     def __init__(self, base_model, output_dim=768):
@@ -62,53 +65,76 @@ def download_from_s3(s3_key: str, local_path: str):
         logger.error(f"Error downloading {s3_key}: {str(e)}")
         raise
 
-def load_models():
-    """Load embedding model and PCA model if available."""
-    global EMBEDDING_MODEL, TOKENIZER, PCA_MODEL, MODELS_LOADED, USE_PCA
+# Initialize model state
+class ModelState:
+    def __init__(self):
+        self.embedding_model = None
+        self.tokenizer = None
+        self.pca_model = None
+        self.models_loaded = False
+        self.use_pca = False
+        self._lock = threading.Lock()
     
-    try:
-        # Load llama-text-embed-v2 model and tokenizer
-        TOKENIZER = AutoTokenizer.from_pretrained(MODEL_NAME)
-        base_model = AutoModel.from_pretrained(MODEL_NAME)
-        EMBEDDING_MODEL = EmbeddingModel(base_model, output_dim=768)
-        EMBEDDING_MODEL.eval()  # Set to evaluation mode
-        logger.info(f"Embedding model {MODEL_NAME} loaded successfully with 768-dim output")
-        
-        # Try to load PCA model if it exists
-        try:
-            if IS_PRODUCTION:
-                ensure_model_directory()
-                download_from_s3("models/pca256.pkl", PCA_MODEL_PATH)
+    def load_models(self):
+        """Load models with proper error handling and retry logic."""
+        with self._lock:
+            if self.models_loaded:
+                return True
+                
+            max_retries = 3
+            retry_count = 0
             
-            PCA_MODEL = joblib.load(PCA_MODEL_PATH)
-            logger.info("PCA model loaded successfully")
-            USE_PCA = True
-        except Exception as e:
-            logger.warning(f"PCA model not found or could not be loaded: {str(e)}")
-            logger.info("Creating new PCA model for dimension reduction")
-            PCA_MODEL = PCA(n_components=256)
-            USE_PCA = False
-        
-        MODELS_LOADED = True
-        logger.info("Models loaded successfully")
-        
-    except Exception as e:
-        logger.error(f"Error loading models: {str(e)}")
-        EMBEDDING_MODEL = None
-        TOKENIZER = None
-        PCA_MODEL = None
-        MODELS_LOADED = False
-        USE_PCA = False
+            while retry_count < max_retries:
+                try:
+                    # Load llama-text-embed-v2 model and tokenizer
+                    self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+                    base_model = AutoModel.from_pretrained(MODEL_NAME)
+                    self.embedding_model = EmbeddingModel(base_model, output_dim=768)
+                    self.embedding_model.eval()  # Set to evaluation mode
+                    logger.info(f"Embedding model {MODEL_NAME} loaded successfully with 768-dim output")
+                    
+                    # Try to load PCA model if it exists
+                    try:
+                        if IS_PRODUCTION:
+                            ensure_model_directory()
+                            download_from_s3("models/pca256.pkl", PCA_MODEL_PATH)
+                        
+                        self.pca_model = joblib.load(PCA_MODEL_PATH)
+                        logger.info("PCA model loaded successfully")
+                        self.use_pca = True
+                    except Exception as e:
+                        logger.warning(f"PCA model not found or could not be loaded: {str(e)}")
+                        logger.info("Creating new PCA model for dimension reduction")
+                        self.pca_model = PCA(n_components=256)
+                        self.use_pca = False
+                    
+                    self.models_loaded = True
+                    logger.info("Models loaded successfully")
+                    return True
+                    
+                except Exception as e:
+                    retry_count += 1
+                    logger.error(f"Error loading models (attempt {retry_count}/{max_retries}): {str(e)}")
+                    if retry_count < max_retries:
+                        logger.info("Retrying model loading...")
+                        continue
+                    else:
+                        logger.error("Failed to load models after maximum retries")
+                        self.embedding_model = None
+                        self.tokenizer = None
+                        self.pca_model = None
+                        self.models_loaded = False
+                        self.use_pca = False
+                        return False
+    
+    def ensure_models_loaded(self):
+        """Ensure models are loaded, loading them if necessary."""
+        if not self.models_loaded:
+            return self.load_models()
+        return True
 
-# Initialize models
-EMBEDDING_MODEL = None
-TOKENIZER = None
-PCA_MODEL = None
-MODELS_LOADED = False
-USE_PCA = False
-
-# Load models on module import
-load_models()
+# Create a single instance of ModelState
+model_state = ModelState()
 
 # --- Core Functions ---
 
@@ -361,8 +387,9 @@ def generate_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] =
     Returns:
         Numpy array containing the embedding vector
     """
-    if not MODELS_LOADED:
-        logger.error("Models not loaded, cannot generate embedding.")
+    # Ensure models are loaded
+    if not model_state.ensure_models_loaded():
+        logger.error("Failed to load models, cannot generate embedding.")
         return None
 
     try:
@@ -373,9 +400,9 @@ def generate_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] =
             return None
             
         # Tokenize and generate embeddings
-        inputs = TOKENIZER(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        inputs = model_state.tokenizer(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
         with torch.no_grad():
-            embedding = EMBEDDING_MODEL(**inputs).numpy()
+            embedding = model_state.embedding_model(**inputs).numpy()
         
         logger.info(f"Generated embedding with shape {embedding.shape}")
         
@@ -452,3 +479,90 @@ def process_user_embedding(db: Session, user_id: int, profile_data: Dict[str, An
     except Exception as e:
         logger.error(f"Error processing user embedding: {str(e)}")
         return False
+
+def get_user_embedding(db: Session, user_id: int, convert_to_uuid: bool = False) -> Optional[np.ndarray]:
+    """
+    Get the user's existing embedding from the database.
+    
+    Args:
+        db: Database session
+        user_id: User ID (integer)
+        convert_to_uuid: Whether to convert the user_id to UUID format for querying
+        
+    Returns:
+        Numpy array containing the embedding vector or None if not found
+    """
+    try:
+        # Si conversion en UUID demandée, créer l'UUID
+        query_id = user_id
+        if convert_to_uuid:
+            user_id_str = str(user_id)
+            namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
+            query_id = str(uuid.uuid5(namespace_uuid, user_id_str))
+            logger.info(f"ID utilisateur original: {user_id_str}, UUID généré pour requête: {query_id}")
+        
+        # Query the user_profiles table for the embedding
+        query = text("""
+            SELECT embedding
+            FROM user_profiles
+            WHERE user_id = :user_id
+        """)
+        result = db.execute(query, {"user_id": query_id}).fetchone()
+        
+        if not result or not result.embedding:
+            logger.warning(f"No embedding found for user {user_id} (query_id: {query_id})")
+            return None
+            
+        # Parse the embedding from the database
+        embedding = parse_embedding(result.embedding)
+        if embedding is None:
+            logger.error(f"Failed to parse embedding for user {user_id} (query_id: {query_id})")
+            return None
+            
+        logger.info(f"Successfully retrieved embedding for user {user_id} (query_id: {query_id})")
+        return np.array(embedding)
+        
+    except Exception as e:
+        logger.error(f"Error getting user embedding for user {user_id}: {str(e)}")
+        return None
+
+def parse_embedding(embedding_data: Any) -> Optional[np.ndarray]:
+    """
+    Parse embedding data into a numpy array.
+    
+    Args:
+        embedding_data: Embedding data from the database
+        
+    Returns:
+        Numpy array or None if parsing fails
+    """
+    try:
+        if isinstance(embedding_data, (list, np.ndarray)):
+            return np.array(embedding_data)
+        elif isinstance(embedding_data, str):
+            # Handle string representation of list
+            embedding_data = embedding_data.strip()
+            if embedding_data.startswith('[') and embedding_data.endswith(']'):
+                return np.array([float(x) for x in embedding_data[1:-1].split(',')])
+            else:
+                # Try using ast.literal_eval for safer parsing
+                return np.array(ast.literal_eval(embedding_data))
+        else:
+            logger.error(f"Unexpected embedding type: {type(embedding_data)}")
+            return None
+    except Exception as e:
+        logger.error(f"Error parsing embedding: {str(e)}")
+        return None
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    """
+    Calculate cosine similarity between two vectors.
+    
+    Args:
+        a: First vector
+        b: Second vector
+        
+    Returns:
+        Cosine similarity score (between -1 and 1)
+    """
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))

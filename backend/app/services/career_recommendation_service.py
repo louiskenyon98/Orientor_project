@@ -8,10 +8,11 @@ import pickle
 import random
 import json
 from .peer_matching_service import parse_embedding
+from .embedding_service import get_user_embedding
 import pinecone
 import re
 from app.models.user_profile import UserProfile
-from app.services.embedding_service import generate_embedding
+from app.services.embedding_service import generate_embedding, store_embedding
 import ast
 import uuid
 # Configure logging
@@ -50,7 +51,8 @@ def extract_fields_from_text(text: str) -> Dict[str, str]:
                         fields[key_clean] = str(v).strip()
                     return fields
             except Exception as e:
-                print(f"[extract_fields_from_text] JSON parse failed: {e}")
+                # print(f"[extract_fields_from_text] JSON parse failed: {e}")
+                pass
 
     # Fallback to regex-based parsing
     text = text.replace("\xa0", " ")
@@ -96,42 +98,42 @@ CAREER_OPTIONS = [
     {"id": 6, "title": "Cybersecurity Specialist", "description": "Protects systems from threats and vulnerabilities. Conducts security assessments, monitors systems, and responds to incidents.", "domain": "technology"},
     {"id": 7, "title": "Cloud Architect", "description": "Designs and implements cloud computing solutions. Creates robust, scalable, and secure cloud infrastructure.", "domain": "technology"},
     
-    # Business Domain
-    {"id": 8, "title": "Product Manager", "description": "Oversees product development from conception to launch. Coordinates teams, sets roadmaps, and ensures products meet user needs.", "domain": "business"},
-    {"id": 9, "title": "Digital Marketing Manager", "description": "Develops and implements online marketing strategies. Uses SEO, social media, content marketing, and analytics to drive growth.", "domain": "business"},
-    {"id": 10, "title": "Business Analyst", "description": "Analyzes business needs and helps implement solutions. Bridges the gap between business stakeholders and technology teams.", "domain": "business"},
-    {"id": 11, "title": "Financial Analyst", "description": "Analyzes financial data and market trends to guide investment decisions and business strategy.", "domain": "business"},
-    {"id": 12, "title": "Management Consultant", "description": "Helps organizations improve performance through analysis of existing problems and development of plans for improvement.", "domain": "business"},
+    # # Business Domain
+    # {"id": 8, "title": "Product Manager", "description": "Oversees product development from conception to launch. Coordinates teams, sets roadmaps, and ensures products meet user needs.", "domain": "business"},
+    # {"id": 9, "title": "Digital Marketing Manager", "description": "Develops and implements online marketing strategies. Uses SEO, social media, content marketing, and analytics to drive growth.", "domain": "business"},
+    # {"id": 10, "title": "Business Analyst", "description": "Analyzes business needs and helps implement solutions. Bridges the gap between business stakeholders and technology teams.", "domain": "business"},
+    # {"id": 11, "title": "Financial Analyst", "description": "Analyzes financial data and market trends to guide investment decisions and business strategy.", "domain": "business"},
+    # {"id": 12, "title": "Management Consultant", "description": "Helps organizations improve performance through analysis of existing problems and development of plans for improvement.", "domain": "business"},
     
-    # Healthcare Domain
-    {"id": 13, "title": "Medical Researcher", "description": "Conducts research to improve human health, developing new treatments and understanding diseases.", "domain": "healthcare"},
-    {"id": 14, "title": "Nurse Practitioner", "description": "Provides advanced nursing care, often serving as primary healthcare providers.", "domain": "healthcare"},
-    {"id": 15, "title": "Health Informatics Specialist", "description": "Manages and analyzes healthcare data to improve patient care and operational efficiency.", "domain": "healthcare"},
-    {"id": 16, "title": "Biomedical Engineer", "description": "Designs and develops medical equipment and devices to solve clinical problems.", "domain": "healthcare"},
+    # # Healthcare Domain
+    # {"id": 13, "title": "Medical Researcher", "description": "Conducts research to improve human health, developing new treatments and understanding diseases.", "domain": "healthcare"},
+    # {"id": 14, "title": "Nurse Practitioner", "description": "Provides advanced nursing care, often serving as primary healthcare providers.", "domain": "healthcare"},
+    # {"id": 15, "title": "Health Informatics Specialist", "description": "Manages and analyzes healthcare data to improve patient care and operational efficiency.", "domain": "healthcare"},
+    # {"id": 16, "title": "Biomedical Engineer", "description": "Designs and develops medical equipment and devices to solve clinical problems.", "domain": "healthcare"},
     
-    # Education Domain
-    {"id": 17, "title": "Educational Technologist", "description": "Develops and implements technology solutions for educational settings to enhance learning.", "domain": "education"},
-    {"id": 18, "title": "Curriculum Developer", "description": "Creates educational content and programs based on research, standards, and educational theory.", "domain": "education"},
-    {"id": 19, "title": "Higher Education Administrator", "description": "Manages operations, programs, and services at colleges and universities.", "domain": "education"},
+    # # Education Domain
+    # {"id": 17, "title": "Educational Technologist", "description": "Develops and implements technology solutions for educational settings to enhance learning.", "domain": "education"},
+    # {"id": 18, "title": "Curriculum Developer", "description": "Creates educational content and programs based on research, standards, and educational theory.", "domain": "education"},
+    # {"id": 19, "title": "Higher Education Administrator", "description": "Manages operations, programs, and services at colleges and universities.", "domain": "education"},
     
-    # Creative Domain
-    {"id": 20, "title": "Content Creator", "description": "Produces engaging digital content across various platforms including video, audio, and written material.", "domain": "creative"},
-    {"id": 21, "title": "Game Developer", "description": "Designs and creates video games, combining technical skills with creative storytelling.", "domain": "creative"},
-    {"id": 22, "title": "Digital Artist", "description": "Creates visual art using digital tools and technologies for various media and applications.", "domain": "creative"},
+    # # Creative Domain
+    # {"id": 20, "title": "Content Creator", "description": "Produces engaging digital content across various platforms including video, audio, and written material.", "domain": "creative"},
+    # {"id": 21, "title": "Game Developer", "description": "Designs and creates video games, combining technical skills with creative storytelling.", "domain": "creative"},
+    # {"id": 22, "title": "Digital Artist", "description": "Creates visual art using digital tools and technologies for various media and applications.", "domain": "creative"},
     
-    # Science & Research Domain
-    {"id": 23, "title": "Environmental Scientist", "description": "Studies environmental conditions and develops solutions to environmental problems.", "domain": "science"},
-    {"id": 24, "title": "Research Scientist", "description": "Conducts experiments and investigations to expand scientific knowledge in a specific field.", "domain": "science"},
-    {"id": 25, "title": "Data Analyst", "description": "Collects, processes, and performs statistical analyses on large datasets to identify patterns and trends.", "domain": "science"},
+    # # Science & Research Domain
+    # {"id": 23, "title": "Environmental Scientist", "description": "Studies environmental conditions and develops solutions to environmental problems.", "domain": "science"},
+    # {"id": 24, "title": "Research Scientist", "description": "Conducts experiments and investigations to expand scientific knowledge in a specific field.", "domain": "science"},
+    # {"id": 25, "title": "Data Analyst", "description": "Collects, processes, and performs statistical analyses on large datasets to identify patterns and trends.", "domain": "science"},
     
-    # Engineering Domain
-    {"id": 26, "title": "Civil Engineer", "description": "Designs and oversees construction of infrastructure projects like buildings, roads, and bridges.", "domain": "engineering"},
-    {"id": 27, "title": "Mechanical Engineer", "description": "Designs, develops, and tests mechanical devices and systems.", "domain": "engineering"},
-    {"id": 28, "title": "Electrical Engineer", "description": "Designs and develops electrical systems and equipment for various applications.", "domain": "engineering"},
+    # # Engineering Domain
+    # {"id": 26, "title": "Civil Engineer", "description": "Designs and oversees construction of infrastructure projects like buildings, roads, and bridges.", "domain": "engineering"},
+    # {"id": 27, "title": "Mechanical Engineer", "description": "Designs, develops, and tests mechanical devices and systems.", "domain": "engineering"},
+    # {"id": 28, "title": "Electrical Engineer", "description": "Designs and develops electrical systems and equipment for various applications.", "domain": "engineering"},
     
-    # Finance Domain
-    {"id": 29, "title": "Investment Banker", "description": "Helps companies and governments raise capital and provides financial advisory services.", "domain": "finance"},
-    {"id": 30, "title": "Financial Planner", "description": "Helps individuals and organizations create strategies to achieve financial goals.", "domain": "finance"}
+    # # Finance Domain
+    # {"id": 29, "title": "Investment Banker", "description": "Helps companies and governments raise capital and provides financial advisory services.", "domain": "finance"},
+    # {"id": 30, "title": "Financial Planner", "description": "Helps individuals and organizations create strategies to achieve financial goals.", "domain": "finance"}
 ]
 
 # Mapping of domains to career IDs for quick lookup
@@ -172,221 +174,8 @@ DEFAULT_USER_EMBEDDINGS = {
     "finance": create_domain_embedding(seed=49)  # Finance focused
 }
 
-def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
-    """
-    Get the embedding for a user by first trying to use the stored embedding,
-    then falling back to generating it on-the-fly
-    
-    Args:
-        db: Database session
-        user_id: ID of the user
-        
-    Returns:
-        User embedding or None if not found
-    """
-    try:
-        # First try to get the stored embedding from the database
-        query = text("""
-            SELECT embedding, name, job_title, industry, skills, interests
-            FROM user_profiles
-            WHERE user_id = :user_id
-        """)
-        result = db.execute(query, {"user_id": user_id}).fetchone()
-        
-        if result:
-            logger.info(f"Found user profile for user {user_id}:")
-            logger.info(f"Name: {result.name}")
-            logger.info(f"Job Title: {result.job_title}")
-            logger.info(f"Industry: {result.industry}")
-            logger.info(f"Skills: {result.skills}")
-            logger.info(f"Interests: {result.interests}")
-            
-            if result.embedding:
-                logger.info(f"Found stored embedding for user {user_id}")
-                # Parse the embedding from the database
-                if isinstance(result.embedding, str):
-                    try:
-                        # Handle string representation of list
-                        embedding = [float(x) for x in result.embedding.strip('[]').split(',')]
-                        logger.info(f"Successfully parsed stored embedding for user {user_id}")
-                        logger.info(f"Embedding size: {len(embedding)}")
-                        logger.info(f"First 5 values: {embedding[:5]}")
-                        return embedding
-                    except Exception as e:
-                        logger.error(f"Error parsing stored embedding: {str(e)}")
-                elif isinstance(result.embedding, list):
-                    logger.info(f"Using stored embedding list for user {user_id}")
-                    logger.info(f"Embedding size: {len(result.embedding)}")
-                    logger.info(f"First 5 values: {result.embedding[:5]}")
-                    return result.embedding
-            else:
-                logger.warning(f"No stored embedding found for user {user_id}")
-        else:
-            logger.warning(f"No user profile found for user {user_id}")
-        
-        logger.info(f"Generating new embedding for user {user_id}")
-        
-        # If no stored embedding, get user profile and generate new embedding
-        profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-        if not profile:
-            logger.warning(f"No profile found for user {user_id}")
-            return None
-            
-        # Clean and format skills and interests
-        def clean_array(arr):
-            if not arr:
-                return []
-            if isinstance(arr, str):
-                # Split by comma and clean each item
-                return [item.strip() for item in arr.split(',') if item.strip()]
-            if isinstance(arr, list):
-                # Clean each item without splitting characters
-                return [item.strip() for item in arr if item and isinstance(item, str)]
-            return []
 
-        # Generate embedding from profile data
-        profile_data = {
-            "name": profile.name,
-            "age": profile.age,
-            "sex": profile.sex,
-            "major": profile.major,
-            "year": profile.year,
-            "gpa": profile.gpa,
-            "hobbies": clean_array(profile.hobbies),
-            "country": profile.country,
-            "state_province": profile.state_province,
-            "unique_quality": profile.unique_quality,
-            "story": profile.story,
-            "favorite_movie": profile.favorite_movie,
-            "favorite_book": profile.favorite_book,
-            "favorite_celebrities": profile.favorite_celebrities,
-            "learning_style": profile.learning_style,
-            "interests": clean_array(profile.interests),
-            "job_title": profile.job_title,
-            "industry": profile.industry,
-            "years_experience": profile.years_experience,
-            "education_level": profile.education_level,
-            "career_goals": profile.career_goals,
-            "skills": clean_array(profile.skills)
-        }
-        
-        # Add debug logging
-        logger.info(f"Generating new embedding for user {user_id} with profile data:")
-        logger.info(f"Job Title: {profile_data['job_title']}")
-        logger.info(f"Industry: {profile_data['industry']}")
-        logger.info(f"Skills: {profile_data['skills']}")
-        logger.info(f"Interests: {profile_data['interests']}")
-        
-        embedding = generate_embedding(profile_data)
-        if embedding is not None:
-            logger.info(f"Generated new embedding for user {user_id}")
-            logger.info(f"Embedding size: {len(embedding)}")
-            logger.info(f"First 5 values: {embedding[:5]}")
-            return embedding.tolist()
-            
-        # If embedding generation fails, try to get a pre-generated embedding
-        try:
-            embedding_path = os.path.join(MODEL_DIR, f"user_{user_id}_embedding.pkl")
-            if os.path.exists(embedding_path):
-                with open(embedding_path, 'rb') as f:
-                    user_embedding = pickle.load(f)
-                logger.info(f"Loaded pre-generated embedding for user {user_id}")
-                return user_embedding
-        except Exception as e:
-            logger.warning(f"Could not load pre-generated embedding: {str(e)}")
-        
-        # If all else fails, use a default embedding based on interests
-        if profile_data['interests']:
-            interests = " ".join(profile_data['interests']).lower()
-            logger.info(f"Using interests-based default embedding: {interests}")
-            if any(term in interests for term in ["tech", "software", "programming"]):
-                logger.info(f"Using tech default embedding for user {user_id}")
-                return DEFAULT_USER_EMBEDDINGS["tech"]
-            elif any(term in interests for term in ["art", "design", "creative"]):
-                logger.info(f"Using creative default embedding for user {user_id}")
-                return DEFAULT_USER_EMBEDDINGS["creative"]
-            elif any(term in interests for term in ["business", "management", "finance"]):
-                logger.info(f"Using business default embedding for user {user_id}")
-                return DEFAULT_USER_EMBEDDINGS["business"]
-            elif any(term in interests for term in ["science", "research"]):
-                logger.info(f"Using science default embedding for user {user_id}")
-                return DEFAULT_USER_EMBEDDINGS["science"]
-            elif any(term in interests for term in ["health", "medical"]):
-                logger.info(f"Using healthcare default embedding for user {user_id}")
-                return DEFAULT_USER_EMBEDDINGS["healthcare"]
-        
-        # If no profile or no matching interests, use a random default embedding
-        embedding = random.choice(list(DEFAULT_USER_EMBEDDINGS.values()))
-        logger.info(f"Using random default embedding for user {user_id}")
-        return embedding
-        
-    except Exception as e:
-        logger.error(f"Error getting user embedding: {str(e)}")
-        return None
-
-# def extract_fields_from_text(text: str) -> Dict[str, str]:
-#     """
-#     Extracts all key-value pairs from the raw Pinecone embedded text using robust pattern matching.
-#     """
-#     fields = {}
-
-#     # Replace unusual whitespace with normal space
-#     text = text.replace("\xa0", " ")
-
-#     # Normalize common field delimiters
-#     field_pattern = re.compile(r'([\w\s\-:]+):\s+([^.:|]+(?:\|[^.:]+)*)')
-#     matches = field_pattern.findall(text)
-
-#     for key, value in matches:
-#         key_clean = (
-#             key.strip()
-#             .replace(" ", "_")
-#             .replace("-", "_")
-#             .replace("__", "_")
-#             .lower()
-#         )
-#         fields[key_clean] = value.strip()
-
-#     # Extract cognitive traits using a more specific pattern
-#     cognitive_traits = [
-#         "analytical_thinking",
-#         "attention_to_detail",
-#         "collaboration",
-#         "adaptability",
-#         "independence",
-#         "evaluation",
-#         "decision_making",
-#         "stress_tolerance"
-#     ]
-
-#     for trait in cognitive_traits:
-#         # Try both with and without underscores
-#         trait_name = trait.replace("_", " ").title()
-#         pattern = f"{trait_name}:\\s*(\\d+)"
-#         match = re.search(pattern, text, re.IGNORECASE)
-#         if match:
-#             fields[trait] = match.group(1)
-
-#     # Extract role requirements
-#     role_requirements = [
-#         "creativity",
-#         "leadership",
-#         "digital_literacy",
-#         "critical_thinking",
-#         "problem_solving"
-#     ]
-
-#     for requirement in role_requirements:
-#         requirement_name = requirement.replace("_", " ").title()
-#         pattern = f"{requirement_name}:\\s*(\\d+)"
-#         match = re.search(pattern, text, re.IGNORECASE)
-#         if match:
-#             fields[requirement] = match.group(1)
-
-#     logger.info(f"Extracted fields: {fields}")
-#     return fields
-
-def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30) -> List[Dict[str, Any]]:
+def get_pinecone_career_recommendations(embedding: List[float], limit: int = 10) -> List[Dict[str, Any]]:
     """
     Get career recommendations using Pinecone vector search
     
@@ -433,7 +222,7 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             
             # Augmenter le nombre de résultats pour permettre une diversification post-traitement
             # Nous récupérons plus de résultats que nécessaire pour pouvoir les filtrer ensuite
-            expanded_limit = min(limit * 3, 100)  # Triple le nombre de résultats, max 100
+            expanded_limit = min(limit * 1, 100)  # Triple le nombre de résultats, max 100
             
             # Utiliser les paramètres de diversité de Pinecone si disponibles
             query_results = index.query(
@@ -445,10 +234,16 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
                 include_values=True,  # Inclure les vecteurs pour post-traitement
                 sparse_vector=None,   # Pourrait être utilisé pour la diversification hybride
                 # Paramètre alpha pour équilibrer pertinence et diversité (si supporté)
-                alpha=0.3  # Valeur entre 0 et 1, où plus la valeur est élevée, plus la diversité est favorisée
+                alpha=0.001  # Valeur entre 0 et 1, où plus la valeur est élevée, plus la diversité est favorisée
             )
             
+            # Log plus détaillé des résultats de Pinecone
             logger.info(f"Got query results from Pinecone: {query_results}")
+            
+            # Vérifier si query_results est None
+            if query_results is None:
+                logger.error("Query results is None - Pinecone query failed")
+                return []
             
             matches = []
             if isinstance(query_results, dict):
@@ -460,9 +255,18 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
             
             if not matches:
                 logger.warning("No matches found in Pinecone response")
+                # Log plus détaillé sur le format de query_results
+                logger.error(f"Query results type: {type(query_results)}")
+                if isinstance(query_results, dict):
+                    logger.error(f"Query results keys: {query_results.keys()}")
                 return []
             
             logger.info(f"Found {len(matches)} matches in Pinecone response")
+            # Log du premier match pour comprendre sa structure
+            if matches:
+                logger.info(f"First match structure: {matches[0]}")
+                if isinstance(matches[0], dict):
+                    logger.info(f"First match keys: {matches[0].keys()}")
             
             # Analyser et diversifier les résultats
             domains = {}
@@ -642,7 +446,7 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         logger.error(f"Error getting Pinecone career recommendations: {str(e)}")
         return []
 
-def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db: Session = None) -> List[Dict[str, Any]]:
+def get_career_recommendations_fallback(limit: int = 10, user_id: int = None, db: Session = None) -> List[Dict[str, Any]]:
     """
     Get personalized career recommendations as a fallback based on user profile
     
@@ -899,50 +703,34 @@ def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db
         logger.error(f"Error getting fallback career recommendations: {str(e)}")
         return []
 
-def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> List[Dict[str, Any]]:
+def get_career_recommendations(db: Session, user_id: int, top_n: int = 5) -> List[Dict[str, Any]]:
     """
-    Get personalized career recommendations for a user
+    Get career recommendations for a user based on their profile embedding.
     
     Args:
         db: Database session
-        user_id: ID of the user
-        limit: Maximum number of recommendations
+        user_id: User ID
+        top_n: Number of recommendations to return
         
     Returns:
         List of career recommendations
     """
     try:
-        # Get user embedding
-        logger.info(f"Getting career recommendations for user {user_id}")
-        embedding = get_user_embedding(db, user_id)
+        # Get user's existing embedding - d'abord avec l'ID normal
+        user_embedding = get_user_embedding(db, user_id)
         
-        if not embedding:
-            logger.warning(f"No embedding found for user {user_id}, using fallback recommendations")
-            return get_career_recommendations_fallback(limit, user_id, db)
-        
-        logger.info(f"Got embedding for user {user_id}, size: {len(embedding)}")
-        logger.info(f"First 5 values of embedding: {embedding[:5]}")
-        
-        # Try to get Pinecone recommendations
-        logger.info(f"Profil utilisateur pour recommandations - user_id={user_id}:")
-        
-        # Récupérer des informations sur le profil pour contextualiser les recommandations
-        profile_query = text("""
-            SELECT job_title, industry, skills, interests, education_level, years_experience
-            FROM user_profiles
-            WHERE user_id = :user_id
-        """)
-        profile = db.execute(profile_query, {"user_id": user_id}).fetchone()
-        
-        if profile:
-            logger.info(f"Job Title: {profile.job_title}")
-            logger.info(f"Industry: {profile.industry}")
-            logger.info(f"Education: {profile.education_level}")
-            logger.info(f"Experience: {profile.years_experience} years")
-        
-        # Récupérer les données RIASEC si disponibles
+        # Si aucun embedding trouvé, essayer avec la conversion UUID
+        if user_embedding is None:
+            logger.info(f"No embedding found with regular ID, trying with UUID conversion")
+            user_embedding = get_user_embedding(db, user_id, convert_to_uuid=True)
+            
+        if user_embedding is None:
+            logger.error(f"Could not get embedding for user {user_id} with either regular ID or UUID")
+            return []
+            
+        # Get RIASEC code for additional filtering
         try:
-            # Convertir l'ID utilisateur en UUID de la même manière que dans holland_test.py
+            # Convert user ID to UUID
             user_id_str = str(user_id)
             namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
             user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
@@ -962,22 +750,112 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
         except Exception as e:
             logger.error(f"Erreur lors de la récupération du code RIASEC: {str(e)}")
             riasec = None
+            
+        # Get all other users' embeddings for comparison
+        users_query = text("""
+            SELECT user_id, embedding, name, job_title, industry, skills, interests
+            FROM user_profiles 
+            WHERE user_id != :user_id AND embedding IS NOT NULL
+        """)
+        other_users = db.execute(users_query, {"user_id": user_id}).fetchall()
         
-        recommendations = get_pinecone_career_recommendations(embedding, limit)
+        if not other_users:
+            logger.warning("No other users found with embeddings")
+            return []
+            
+        # Calculate similarities
+        similarities = []
+        for user in other_users:
+            try:
+                user_embedding = parse_embedding(user.embedding)
+                if user_embedding is None:
+                    continue
+                    
+                # Calculate cosine similarity
+                similarity = cosine_similarity(user_embedding, user_embedding)
+                
+                # Apply RIASEC filtering if available
+                if riasec and riasec.top_3_code:
+                    # Get RIASEC code for this user
+                    other_user_uuid = str(uuid.uuid5(namespace_uuid, str(user.user_id)))
+                    other_riasec_query = text("""
+                        SELECT top_3_code 
+                        FROM gca_results 
+                        WHERE user_id = :user_uuid
+                        ORDER BY created_at DESC
+                        LIMIT 1
+                    """)
+                    other_riasec = db.execute(other_riasec_query, {"user_uuid": other_user_uuid}).fetchone()
+                    
+                    if other_riasec and other_riasec.top_3_code:
+                        # Check if any of the user's top 3 RIASEC codes match
+                        if any(code in riasec.top_3_code for code in other_riasec.top_3_code):
+                            # Boost similarity for RIASEC matches
+                            similarity *= 1.2
+                
+                similarities.append({
+                    "user_id": user.user_id,
+                    "name": user.name,
+                    "job_title": user.job_title,
+                    "industry": user.industry,
+                    "skills": user.skills,
+                    "interests": user.interests,
+                    "similarity": float(similarity)
+                })
+            except Exception as e:
+                logger.error(f"Error calculating similarity for user {user.user_id}: {str(e)}")
+                continue
         
-        if not recommendations:
-            logger.warning(f"Pinecone recommendations failed for user {user_id}, using fallback")
-            recommendations = get_career_recommendations_fallback(limit, user_id, db)
-        else:
-            logger.info(f"Got {len(recommendations)} recommendations from Pinecone")
-            logger.info(f"First recommendation: {recommendations[0] if recommendations else 'None'}")
+        # Sort by similarity and get top N
+        similarities.sort(key=lambda x: x["similarity"], reverse=True)
+        return similarities[:top_n]
         
-        return recommendations
     except Exception as e:
         logger.error(f"Error getting career recommendations: {str(e)}")
-        return get_career_recommendations_fallback(limit, user_id, db)
+        return []
 
-def save_career_recommendation(db: Session, user_id: int, career_id: int) -> bool:
+def parse_embedding(embedding_data: Any) -> Optional[np.ndarray]:
+    """
+    Parse embedding data into a numpy array.
+    
+    Args:
+        embedding_data: Embedding data from the database
+        
+    Returns:
+        Numpy array or None if parsing fails
+    """
+    try:
+        if isinstance(embedding_data, (list, np.ndarray)):
+            return np.array(embedding_data)
+        elif isinstance(embedding_data, str):
+            # Handle string representation of list
+            embedding_data = embedding_data.strip()
+            if embedding_data.startswith('[') and embedding_data.endswith(']'):
+                return np.array([float(x) for x in embedding_data[1:-1].split(',')])
+            else:
+                # Try using ast.literal_eval for safer parsing
+                return np.array(ast.literal_eval(embedding_data))
+        else:
+            logger.error(f"Unexpected embedding type: {type(embedding_data)}")
+            return None
+    except Exception as e:
+        logger.error(f"Error parsing embedding: {str(e)}")
+        return None
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    """
+    Calculate cosine similarity between two vectors.
+    
+    Args:
+        a: First vector
+        b: Second vector
+        
+    Returns:
+        Cosine similarity score (between -1 and 1)
+    """
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+def save_career_recommendation(db: Session, user_id: int, career_id: int, limit: int = 10) -> bool:
     """
     Save a career recommendation for a user with all fields
     
@@ -993,7 +871,7 @@ def save_career_recommendation(db: Session, user_id: int, career_id: int) -> boo
         logger.info(f"Starting save_career_recommendation for user {user_id}, career_id {career_id}")
         
         # Try to get the career details from Pinecone first
-        recommendations = get_career_recommendations(db, user_id, 2)
+        recommendations = get_career_recommendations(db, user_id, limit) # Number of recommendations to get
         logger.info(f"Got {len(recommendations)} recommendations")
         
         career_details = next((c for c in recommendations if c["id"] == career_id), None)
