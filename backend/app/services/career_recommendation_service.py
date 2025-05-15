@@ -142,11 +142,11 @@ for career in CAREER_OPTIONS:
     DOMAIN_TO_CAREERS[domain].append(career["id"])
 
 # Default user embeddings for various interests (to use when a user has no embedding)
-# Using 768 dimensions which is the standard for all-mpnet-base-v2
+# Using 1024 dimensions which is the standard for all-mpnet-base-v2
 # Generating more realistic embeddings with proper normalization and domain-specific characteristics
 
 # Function to create a more realistic embedding vector with domain-specific patterns
-def create_domain_embedding(seed=42, dim=768):
+def create_domain_embedding(seed=42, dim=1024):
     """
     Create a realistic embedding vector with proper normalization.
     Each domain has a unique seed to ensure different but consistent vectors.
@@ -353,7 +353,7 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         
         # Get the index
         # index = pc.Index("oasis-minilm-index")
-        index = pc.Index("oasis-768-index")
+        index = pc.Index("oasis-1024-custom")
         logger.info("Got Pinecone index")
         
         # Ensure embedding is the right format and size

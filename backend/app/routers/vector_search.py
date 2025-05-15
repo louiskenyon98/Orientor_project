@@ -44,7 +44,7 @@ def get_pinecone_index():
             raise ValueError("PINECONE_ENVIRONMENT environment variable is not set")
             
         # index_name = "oasis-minilm-index"
-        index_name = "oasis-768-index"
+        index_name = "oasis-1024-custom"
         
         logger.info(f"Initializing Pinecone with environment: {pinecone_environment}")
         pc = Pinecone(api_key=pinecone_api_key)
@@ -420,7 +420,7 @@ async def debug_index():
             "status": "success",
             "stats": stats,
             # "index_name": "oasis-minilm-index"
-            "index_name": "oasis-768-index"
+            "index_name": "oasis-1024-custom"
         }
     except Exception as e:
         logger.error(f"Debug check failed: {str(e)}", exc_info=True)

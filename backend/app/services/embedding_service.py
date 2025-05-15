@@ -37,10 +37,10 @@ else:
     PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca256.pkl")
 
 # Define the model name
-MODEL_NAME = "intfloat/e5-base-v2"
+MODEL_NAME = "BAAI/bge-large-en-v1.5"
 
 class EmbeddingModel(nn.Module):
-    def __init__(self, base_model, output_dim=768):
+    def __init__(self, base_model, output_dim=1024):
         super().__init__()
         self.base_model = base_model
         self.projection = nn.Linear(base_model.config.hidden_size, output_dim)
@@ -89,9 +89,9 @@ class ModelState:
                     # Load llama-text-embed-v2 model and tokenizer
                     self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
                     base_model = AutoModel.from_pretrained(MODEL_NAME)
-                    self.embedding_model = EmbeddingModel(base_model, output_dim=768)
+                    self.embedding_model = EmbeddingModel(base_model, output_dim=1024)
                     self.embedding_model.eval()  # Set to evaluation mode
-                    logger.info(f"Embedding model {MODEL_NAME} loaded successfully with 768-dim output")
+                    logger.info(f"Embedding model {MODEL_NAME} loaded successfully with 1024-dim output")
                     
                     # Try to load PCA model if it exists
                     try:
@@ -377,7 +377,7 @@ Unique quality: {unique_quality}
 def generate_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] = None) -> Optional[np.ndarray]:
     """
     Generate embedding for a user profile using llama-text-embed-v2.
-    Returns a 768-dimensional embedding.
+    Returns a 1024-dimensional embedding.
     
     Args:
         db: Database session

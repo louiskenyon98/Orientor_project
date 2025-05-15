@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Card, CardContent, CircularProgress, Snackbar, Alert, useMediaQuery, useTheme, IconButton, Chip, Stack } from '@mui/material';
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, PanInfo, animate } from 'framer-motion';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WorkIcon from '@mui/icons-material/Work';
 import StarIcon from '@mui/icons-material/Star';
@@ -66,7 +66,15 @@ const FindYourWay: React.FC = () => {
     } else if (info.offset.x < -swipeThreshold) {
       handleSwipeLeft();
     } else {
-      x.set(0);
+      // Reset position with spring animation
+      animate(x, 0, {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        onComplete: () => {
+          x.set(0);
+        }
+      });
     }
   };
 
@@ -74,18 +82,42 @@ const FindYourWay: React.FC = () => {
     try {
       await saveCareer(career.id);
       setSnackbar({ open: true, message: `Saved "${career.title}" to your space!`, severity: 'success' });
-      x.set(0);
-      setCurrentIndex(prev => prev + 1);
+      // Reset position with spring animation
+      animate(x, 0, {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        onComplete: () => {
+          x.set(0);
+          setCurrentIndex(prev => prev + 1);
+        }
+      });
     } catch (err) {
       setSnackbar({ open: true, message: 'Failed to save career. Please try again.', severity: 'error' });
       console.error(err);
-      x.set(0);
+      // Reset position with spring animation
+      animate(x, 0, {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        onComplete: () => {
+          x.set(0);
+        }
+      });
     }
   };
 
   const handleSwipeLeft = () => {
-    x.set(0);
-    setCurrentIndex(prev => prev + 1);
+    // Reset position with spring animation
+    animate(x, 0, {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+      onComplete: () => {
+        x.set(0);
+        setCurrentIndex(prev => prev + 1);
+      }
+    });
   };
 
   const currentCareer = careers[currentIndex];
@@ -168,7 +200,8 @@ const FindYourWay: React.FC = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            mb: 2
+            mb: 2,
+            overflow: 'hidden'
           }}>
             <motion.div
               drag="x"
@@ -182,8 +215,13 @@ const FindYourWay: React.FC = () => {
                 width: '100%',
                 height: '100%',
                 position: 'absolute',
-                cursor: 'grab'
+                cursor: 'grab',
+                transformOrigin: 'center center',
+                touchAction: 'none'
               }}
+              initial={{ x: 0, rotate: 0 }}
+              animate={{ x: 0, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <Card sx={{ 
                 width: '100%', 
