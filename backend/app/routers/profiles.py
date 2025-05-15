@@ -8,6 +8,8 @@ from app.models import User, UserProfile, UserSkill
 from app.routers.user import get_current_user
 from app.services.embedding_service import process_user_embedding
 from app.services.peer_matching_service import generate_peer_suggestions
+from sqlalchemy.sql import text
+import uuid
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -142,40 +144,38 @@ def get_profile(current_user: User = Depends(get_current_user), db: Session = De
         logger.error(f"Error retrieving profile: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error retrieving profile: {str(e)}")
 
-@router.put("/update", response_model=ProfileResponse)
-def update_profile(
-    profile_data: ProfileUpdate,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+@router.put("/update")
+async def update_profile(
+    profile_update: ProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     try:
         logger.info(f"Attempting to update profile for user ID: {current_user.id}")
+        
+        # Get the current profile
         profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
-        
         if not profile:
-            logger.info(f"No profile found for user ID: {current_user.id}, creating a new one")
-            # Create new profile if it doesn't exist
-            profile = UserProfile(user_id=current_user.id)
-            db.add(profile)
+            raise HTTPException(status_code=404, detail="Profile not found")
         
-        # Extract and remove skill fields from profile data
+        # Extract skill fields from profile update
         skill_fields = {
-            "creativity": profile_data.creativity, 
-            "leadership": profile_data.leadership,
-            "digital_literacy": profile_data.digital_literacy,
-            "critical_thinking": profile_data.critical_thinking,
-            "problem_solving": profile_data.problem_solving,
-            "analytical_thinking": profile_data.analytical_thinking,
-            "attention_to_detail": profile_data.attention_to_detail,
-            "collaboration": profile_data.collaboration,
-            "adaptability": profile_data.adaptability,
-            "independence": profile_data.independence,
-            "evaluation": profile_data.evaluation,
-            "decision_making": profile_data.decision_making,
-            "stress_tolerance": profile_data.stress_tolerance
+            "creativity": profile_update.creativity,
+            "leadership": profile_update.leadership,
+            "digital_literacy": profile_update.digital_literacy,
+            "critical_thinking": profile_update.critical_thinking,
+            "problem_solving": profile_update.problem_solving,
+            "analytical_thinking": profile_update.analytical_thinking,
+            "attention_to_detail": profile_update.attention_to_detail,
+            "collaboration": profile_update.collaboration,
+            "adaptability": profile_update.adaptability,
+            "independence": profile_update.independence,
+            "evaluation": profile_update.evaluation,
+            "decision_making": profile_update.decision_making,
+            "stress_tolerance": profile_update.stress_tolerance
         }
         
-        # Get existing skills or create new
+        # Update user skills
         skills = db.query(UserSkill).filter(UserSkill.user_id == current_user.id).first()
         if not skills:
             skills = UserSkill(user_id=current_user.id)
@@ -186,80 +186,156 @@ def update_profile(
             if value is not None:
                 setattr(skills, field, value)
         
-        # Convert to dict excluding the skill fields and unset values
-        profile_fields = profile_data.dict(
+        # Update profile fields (excluding skill fields)
+        update_data = profile_update.dict(
             exclude={
-                "creativity", "leadership", "digital_literacy", "critical_thinking", "problem_solving",
-                "analytical_thinking", "attention_to_detail", "collaboration", "adaptability",
-                "independence", "evaluation", "decision_making", "stress_tolerance"
+                "creativity", "leadership", "digital_literacy", "critical_thinking",
+                "problem_solving", "analytical_thinking", "attention_to_detail",
+                "collaboration", "adaptability", "independence", "evaluation",
+                "decision_making", "stress_tolerance"
             },
             exclude_unset=True
         )
         
-        # Update profile fields
-        logger.info(f"Updating profile fields: {list(profile_fields.keys())}")
-        for field, value in profile_fields.items():
+        logger.info(f"Updating profile fields: {list(update_data.keys())}")
+        for field, value in update_data.items():
             setattr(profile, field, value)
         
+        # Commit the changes
         db.commit()
         db.refresh(profile)
         db.refresh(skills)
         
-        # Build response with combined data
-        response = ProfileResponse.model_validate(profile)
-        
-        # Add all skills to response
-        response.creativity = skills.creativity
-        response.leadership = skills.leadership
-        response.digital_literacy = skills.digital_literacy
-        response.critical_thinking = skills.critical_thinking
-        response.problem_solving = skills.problem_solving
-        response.analytical_thinking = skills.analytical_thinking
-        response.attention_to_detail = skills.attention_to_detail
-        response.collaboration = skills.collaboration
-        response.adaptability = skills.adaptability
-        response.independence = skills.independence
-        response.evaluation = skills.evaluation
-        response.decision_making = skills.decision_making
-        response.stress_tolerance = skills.stress_tolerance
-        
-        # Generate user embedding based on profile data
+        # Generate new embedding using the centralized service
         try:
-            # Prepare profile data for embedding generation
-            embedding_data = {
-                "job_title": profile_data.job_title if profile_data.job_title else "",
-                "industry": profile_data.industry if profile_data.industry else "",
-                "years_experience": profile_data.years_experience if profile_data.years_experience else 0,
-                "education_level": profile_data.education_level if profile_data.education_level else "",
-                "career_goals": profile_data.career_goals if profile_data.career_goals else "",
-                "skills": profile_fields.get("skills", []),
-                "interests": profile_fields.get("interests", [])
+            # Create a UUID v5 based on the user ID (namespace UUID + user ID)
+            user_id_str = str(current_user.id)
+            namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
+            user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+            
+            logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+            
+            # Fetch RIASEC scores using UUID
+            riasec_query = text("""
+                SELECT r_score, i_score, a_score, s_score, e_score, c_score, top_3_code
+                FROM gca_results 
+                WHERE user_id = :user_id
+                ORDER BY created_at DESC
+                LIMIT 1
+            """)
+            riasec_result = db.execute(riasec_query, {"user_id": user_uuid}).fetchone()
+            
+            # Fetch saved recommendations using integer user_id
+            recommendations_query = text("""
+                SELECT label 
+                FROM saved_recommendations 
+                WHERE user_id = :user_id
+            """)
+            recommendations_result = db.execute(recommendations_query, {"user_id": current_user.id}).fetchall()
+            
+            # Prepare complete profile data for embedding generation
+            profile_data = {
+                "profile": {
+                    "user_id": current_user.id,
+                    "name": profile.name,
+                    "age": profile.age,
+                    "sex": profile.sex,
+                    "major": profile.major,
+                    "year": profile.year,
+                    "gpa": profile.gpa,
+                    "hobbies": profile.hobbies,
+                    "country": profile.country,
+                    "state_province": profile.state_province,
+                    "unique_quality": profile.unique_quality,
+                    "story": profile.story,
+                    "favorite_movie": profile.favorite_movie,
+                    "favorite_book": profile.favorite_book,
+                    "favorite_celebrities": profile.favorite_celebrities,
+                    "learning_style": profile.learning_style,
+                    "interests": profile.interests,
+                    "job_title": profile.job_title,
+                    "industry": profile.industry,
+                    "years_experience": profile.years_experience,
+                    "education_level": profile.education_level,
+                    "career_goals": profile.career_goals,
+                    "skills": profile.skills
+                },
+                "skills": {
+                    "creativity": skills.creativity,
+                    "leadership": skills.leadership,
+                    "digital_literacy": skills.digital_literacy,
+                    "critical_thinking": skills.critical_thinking,
+                    "problem_solving": skills.problem_solving,
+                    "analytical_thinking": skills.analytical_thinking,
+                    "attention_to_detail": skills.attention_to_detail,
+                    "collaboration": skills.collaboration,
+                    "adaptability": skills.adaptability,
+                    "independence": skills.independence,
+                    "evaluation": skills.evaluation,
+                    "decision_making": skills.decision_making,
+                    "stress_tolerance": skills.stress_tolerance
+                }
             }
+
+            # Add RIASEC data if available
+            if riasec_result:
+                profile_data["riasec"] = {
+                    "r_score": float(riasec_result.r_score),
+                    "i_score": float(riasec_result.i_score),
+                    "a_score": float(riasec_result.a_score),
+                    "s_score": float(riasec_result.s_score),
+                    "e_score": float(riasec_result.e_score),
+                    "c_score": float(riasec_result.c_score),
+                    "top_3_code": riasec_result.top_3_code
+                }
+                logger.info(f"RIASEC scores added to profile data: {profile_data['riasec']}")
+            else:
+                logger.warning("No RIASEC scores found for user")
+                profile_data["riasec"] = {}
+
+            # Add saved recommendations if available
+            if recommendations_result:
+                profile_data["saved_recommendations"] = [
+                    {"label": row.label}
+                    for row in recommendations_result
+                ]
+                logger.info(f"Added {len(recommendations_result)} saved recommendations to profile data")
+            else:
+                logger.warning("No saved recommendations found for user")
+                profile_data["saved_recommendations"] = []
             
-            # Process embedding generation
-            embedding_success = process_user_embedding(db, current_user.id, embedding_data)
+            # Log the complete profile data
+            logger.info("Complete profile data for embedding generation:")
+            logger.info(f"Profile data: {profile_data}")
             
-            if embedding_success:
-                logger.info(f"Successfully generated embedding for user ID: {current_user.id}")
+            # Use the centralized embedding service
+            from app.services.embedding_service import process_user_embedding
+            success = process_user_embedding(db, current_user.id, profile_data)
+            
+            if not success:
+                logger.warning(f"Failed to generate embedding for user ID: {current_user.id}")
+            else:
+                logger.info(f"Successfully generated new embedding for user ID: {current_user.id}")
                 
-                # Generate peer suggestions
+                # Generate peer suggestions with the new embedding
+                from app.services.peer_matching_service import generate_peer_suggestions
                 peer_success = generate_peer_suggestions(db, current_user.id)
                 if peer_success:
                     logger.info(f"Successfully generated peer suggestions for user ID: {current_user.id}")
                 else:
                     logger.warning(f"Failed to generate peer suggestions for user ID: {current_user.id}")
-            else:
-                logger.warning(f"Failed to generate embedding for user ID: {current_user.id}")
+                    
         except Exception as e:
             logger.error(f"Error in embedding/peer suggestion process: {str(e)}")
             # Don't fail the profile update if embedding generation fails
         
         logger.info(f"Successfully updated profile for user ID: {current_user.id}")
-        return response
+        return {"message": "Profile updated successfully"}
+        
     except Exception as e:
-        logger.error(f"Error updating profile: {str(e)}")
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+        logger.error(f"Error updating profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{user_id}", response_model=ProfileResponse)
 def get_user_profile(
