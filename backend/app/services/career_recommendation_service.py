@@ -324,68 +324,6 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         logger.error(f"Error getting user embedding: {str(e)}")
         return None
 
-# def extract_fields_from_text(text: str) -> Dict[str, str]:
-#     """
-#     Extracts all key-value pairs from the raw Pinecone embedded text using robust pattern matching.
-#     """
-#     fields = {}
-
-#     # Replace unusual whitespace with normal space
-#     text = text.replace("\xa0", " ")
-
-#     # Normalize common field delimiters
-#     field_pattern = re.compile(r'([\w\s\-:]+):\s+([^.:|]+(?:\|[^.:]+)*)')
-#     matches = field_pattern.findall(text)
-
-#     for key, value in matches:
-#         key_clean = (
-#             key.strip()
-#             .replace(" ", "_")
-#             .replace("-", "_")
-#             .replace("__", "_")
-#             .lower()
-#         )
-#         fields[key_clean] = value.strip()
-
-#     # Extract cognitive traits using a more specific pattern
-#     cognitive_traits = [
-#         "analytical_thinking",
-#         "attention_to_detail",
-#         "collaboration",
-#         "adaptability",
-#         "independence",
-#         "evaluation",
-#         "decision_making",
-#         "stress_tolerance"
-#     ]
-
-#     for trait in cognitive_traits:
-#         # Try both with and without underscores
-#         trait_name = trait.replace("_", " ").title()
-#         pattern = f"{trait_name}:\\s*(\\d+)"
-#         match = re.search(pattern, text, re.IGNORECASE)
-#         if match:
-#             fields[trait] = match.group(1)
-
-#     # Extract role requirements
-#     role_requirements = [
-#         "creativity",
-#         "leadership",
-#         "digital_literacy",
-#         "critical_thinking",
-#         "problem_solving"
-#     ]
-
-#     for requirement in role_requirements:
-#         requirement_name = requirement.replace("_", " ").title()
-#         pattern = f"{requirement_name}:\\s*(\\d+)"
-#         match = re.search(pattern, text, re.IGNORECASE)
-#         if match:
-#             fields[requirement] = match.group(1)
-
-#     logger.info(f"Extracted fields: {fields}")
-#     return fields
-
 def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30) -> List[Dict[str, Any]]:
     """
     Get career recommendations using Pinecone vector search
