@@ -7,11 +7,10 @@ from sqlalchemy import text
 import pickle
 import random
 import json
-from .peer_matching_service import parse_embedding
+from app.services.embedding_service import parse_embedding
 import pinecone
 import re
 from app.models.user_profile import UserProfile
-from app.services.embedding_service import generate_embedding
 import ast
 import uuid
 # Configure logging
@@ -277,7 +276,7 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
         logger.info(f"Skills: {profile_data['skills']}")
         logger.info(f"Interests: {profile_data['interests']}")
         
-        embedding = generate_embedding(profile_data)
+        embedding = parse_embedding(profile_data)
         if embedding is not None:
             logger.info(f"Generated new embedding for user {user_id}")
             logger.info(f"Embedding size: {len(embedding)}")
@@ -839,7 +838,8 @@ def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db
 
 def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> List[Dict[str, Any]]:
     """
-    Get personalized career recommendations for a user
+    Get personalized career recommendations for a user using their existing embedding.
+    If no embedding exists, raises an error.
     
     Args:
         db: Database session
@@ -848,72 +848,53 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
         
     Returns:
         List of career recommendations
+        
+    Raises:
+        ValueError: If no embedding exists for the user
     """
     try:
-        # Get user embedding
+        # Get user embedding from the database
         logger.info(f"Getting career recommendations for user {user_id}")
-        embedding = get_user_embedding(db, user_id)
         
-        if not embedding:
-            logger.warning(f"No embedding found for user {user_id}, using fallback recommendations")
-            return get_career_recommendations_fallback(limit, user_id, db)
-        
-        logger.info(f"Got embedding for user {user_id}, size: {len(embedding)}")
-        logger.info(f"First 5 values of embedding: {embedding[:5]}")
-        
-        # Try to get Pinecone recommendations
-        logger.info(f"Profil utilisateur pour recommandations - user_id={user_id}:")
-        
-        # Récupérer des informations sur le profil pour contextualiser les recommandations
-        profile_query = text("""
-            SELECT job_title, industry, skills, interests, education_level, years_experience
+        # Query the user_profiles table for the embedding
+        query = text("""
+            SELECT embedding
             FROM user_profiles
             WHERE user_id = :user_id
         """)
-        profile = db.execute(profile_query, {"user_id": user_id}).fetchone()
+        result = db.execute(query, {"user_id": user_id}).fetchone()
         
-        if profile:
-            logger.info(f"Job Title: {profile.job_title}")
-            logger.info(f"Industry: {profile.industry}")
-            logger.info(f"Education: {profile.education_level}")
-            logger.info(f"Experience: {profile.years_experience} years")
-        
-        # Récupérer les données RIASEC si disponibles
-        try:
-            # Convertir l'ID utilisateur en UUID de la même manière que dans holland_test.py
-            user_id_str = str(user_id)
-            namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
-            user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+        if not result or not result.embedding:
+            logger.error(f"No embedding found for user {user_id}")
+            raise ValueError(f"No embedding found for user {user_id}. Please complete your profile first.")
             
-            logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+        # Parse the embedding from the database
+        embedding = parse_embedding(result.embedding)
+        if embedding is None:
+            logger.error(f"Failed to parse embedding for user {user_id}")
+            raise ValueError(f"Invalid embedding format for user {user_id}")
             
-            riasec_query = text("""
-                SELECT gr.top_3_code 
-                FROM gca_results gr
-                WHERE gr.user_id = :user_uuid
-                ORDER BY gr.created_at DESC
-                LIMIT 1
-            """)
-            riasec = db.execute(riasec_query, {"user_uuid": user_uuid}).fetchone()
-            if riasec and riasec.top_3_code:
-                logger.info(f"Code RIASEC: {riasec.top_3_code}")
-        except Exception as e:
-            logger.error(f"Erreur lors de la récupération du code RIASEC: {str(e)}")
-            riasec = None
+        logger.info(f"Got embedding for user {user_id}, size: {len(embedding)}")
+        logger.info(f"First 5 values of embedding: {embedding[:5]}")
         
+        # Get recommendations from Pinecone
         recommendations = get_pinecone_career_recommendations(embedding, limit)
         
         if not recommendations:
-            logger.warning(f"Pinecone recommendations failed for user {user_id}, using fallback")
-            recommendations = get_career_recommendations_fallback(limit, user_id, db)
-        else:
-            logger.info(f"Got {len(recommendations)} recommendations from Pinecone")
-            logger.info(f"First recommendation: {recommendations[0] if recommendations else 'None'}")
+            logger.warning(f"No recommendations found from Pinecone for user {user_id}")
+            return []
+            
+        logger.info(f"Got {len(recommendations)} recommendations from Pinecone")
+        logger.info(f"First recommendation: {recommendations[0] if recommendations else 'None'}")
         
         return recommendations
+        
+    except ValueError as e:
+        # Re-raise ValueError for missing/invalid embeddings
+        raise
     except Exception as e:
         logger.error(f"Error getting career recommendations: {str(e)}")
-        return get_career_recommendations_fallback(limit, user_id, db)
+        raise
 
 def save_career_recommendation(db: Session, user_id: int, career_id: int) -> bool:
     """
@@ -931,7 +912,7 @@ def save_career_recommendation(db: Session, user_id: int, career_id: int) -> boo
         logger.info(f"Starting save_career_recommendation for user {user_id}, career_id {career_id}")
         
         # Try to get the career details from Pinecone first
-        recommendations = get_career_recommendations(db, user_id, 2)
+        recommendations = get_career_recommendations(db, user_id, 30)  # Fetch all recommendations
         logger.info(f"Got {len(recommendations)} recommendations")
         
         career_details = next((c for c in recommendations if c["id"] == career_id), None)
