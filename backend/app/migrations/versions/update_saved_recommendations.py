@@ -15,9 +15,13 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-    # We don't need to add career_id as it doesn't match the existing schema
-    pass
+    # Add career_id column to saved_recommendations table
+    op.add_column('saved_recommendations', sa.Column('career_id', sa.Integer(), nullable=True))
+    
+    # Create an index on career_id for better query performance
+    op.create_index(op.f('ix_saved_recommendations_career_id'), 'saved_recommendations', ['career_id'], unique=False)
 
 def downgrade():
-    # Nothing to downgrade
-    pass 
+    # Remove the index and column
+    op.drop_index(op.f('ix_saved_recommendations_career_id'), table_name='saved_recommendations')
+    op.drop_column('saved_recommendations', 'career_id') 

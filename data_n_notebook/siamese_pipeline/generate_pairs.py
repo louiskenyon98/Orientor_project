@@ -13,7 +13,8 @@ try:
     pairs = generate_siamese_pairs_from_cross_indexes(
         users_df=users_df,
         user_index_name="recommendation-index",
-        job_index_name="oasis-minilm-index",
+        # job_index_name="oasis-minilm-index",
+        job_index_name="oasis-768-index",
         top_k=5,
         num_neg=5
     )

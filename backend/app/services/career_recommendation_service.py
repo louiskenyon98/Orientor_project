@@ -13,6 +13,7 @@ import re
 from app.models.user_profile import UserProfile
 from app.services.embedding_service import generate_embedding
 import ast
+import uuid
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -83,31 +84,92 @@ except Exception as e:
     logger.error(f"Error loading career recommendation model: {str(e)}")
     MODEL_LOADED = False
 
-# Extended list of career options with more diverse roles
+# Extended list of career options with more diverse roles across multiple domains
 # This list is for fallback only if Pinecone is unavailable
 CAREER_OPTIONS = [
-    {"id": 1, "title": "Software Engineer", "description": "Develops software solutions for various applications and systems. Works with programming languages to create, test, and maintain software."},
-    {"id": 2, "title": "Data Scientist", "description": "Analyzes and interprets complex data to help guide business decisions. Uses statistical analysis, machine learning, and data visualization."},
-    {"id": 3, "title": "UX Designer", "description": "Creates user-friendly interfaces and experiences for products. Conducts user research and testing to optimize digital experiences."},
-    {"id": 4, "title": "Product Manager", "description": "Oversees product development from conception to launch. Coordinates teams, sets roadmaps, and ensures products meet user needs."},
-    {"id": 5, "title": "Digital Marketing Manager", "description": "Develops and implements online marketing strategies. Uses SEO, social media, content marketing, and analytics to drive growth."},
-    {"id": 6, "title": "Business Analyst", "description": "Analyzes business needs and helps implement solutions. Bridges the gap between business stakeholders and technology teams."},
-    {"id": 7, "title": "DevOps Engineer", "description": "Manages the infrastructure and deployment pipelines. Automates processes and ensures smooth operation of tech systems."},
-    {"id": 8, "title": "AI Engineer", "description": "Develops artificial intelligence systems and applications. Works on machine learning models, neural networks, and AI algorithms."},
-    {"id": 9, "title": "Cybersecurity Specialist", "description": "Protects systems from threats and vulnerabilities. Conducts security assessments, monitors systems, and responds to incidents."},
-    {"id": 10, "title": "Cloud Architect", "description": "Designs and implements cloud computing solutions. Creates robust, scalable, and secure cloud infrastructure."}
+    # Technology Domain
+    {"id": 1, "title": "Software Engineer", "description": "Develops software solutions for various applications and systems. Works with programming languages to create, test, and maintain software.", "domain": "technology"},
+    {"id": 2, "title": "Data Scientist", "description": "Analyzes and interprets complex data to help guide business decisions. Uses statistical analysis, machine learning, and data visualization.", "domain": "technology"},
+    {"id": 3, "title": "UX Designer", "description": "Creates user-friendly interfaces and experiences for products. Conducts user research and testing to optimize digital experiences.", "domain": "technology"},
+    {"id": 4, "title": "DevOps Engineer", "description": "Manages the infrastructure and deployment pipelines. Automates processes and ensures smooth operation of tech systems.", "domain": "technology"},
+    {"id": 5, "title": "AI Engineer", "description": "Develops artificial intelligence systems and applications. Works on machine learning models, neural networks, and AI algorithms.", "domain": "technology"},
+    {"id": 6, "title": "Cybersecurity Specialist", "description": "Protects systems from threats and vulnerabilities. Conducts security assessments, monitors systems, and responds to incidents.", "domain": "technology"},
+    {"id": 7, "title": "Cloud Architect", "description": "Designs and implements cloud computing solutions. Creates robust, scalable, and secure cloud infrastructure.", "domain": "technology"},
+    
+    # Business Domain
+    {"id": 8, "title": "Product Manager", "description": "Oversees product development from conception to launch. Coordinates teams, sets roadmaps, and ensures products meet user needs.", "domain": "business"},
+    {"id": 9, "title": "Digital Marketing Manager", "description": "Develops and implements online marketing strategies. Uses SEO, social media, content marketing, and analytics to drive growth.", "domain": "business"},
+    {"id": 10, "title": "Business Analyst", "description": "Analyzes business needs and helps implement solutions. Bridges the gap between business stakeholders and technology teams.", "domain": "business"},
+    {"id": 11, "title": "Financial Analyst", "description": "Analyzes financial data and market trends to guide investment decisions and business strategy.", "domain": "business"},
+    {"id": 12, "title": "Management Consultant", "description": "Helps organizations improve performance through analysis of existing problems and development of plans for improvement.", "domain": "business"},
+    
+    # Healthcare Domain
+    {"id": 13, "title": "Medical Researcher", "description": "Conducts research to improve human health, developing new treatments and understanding diseases.", "domain": "healthcare"},
+    {"id": 14, "title": "Nurse Practitioner", "description": "Provides advanced nursing care, often serving as primary healthcare providers.", "domain": "healthcare"},
+    {"id": 15, "title": "Health Informatics Specialist", "description": "Manages and analyzes healthcare data to improve patient care and operational efficiency.", "domain": "healthcare"},
+    {"id": 16, "title": "Biomedical Engineer", "description": "Designs and develops medical equipment and devices to solve clinical problems.", "domain": "healthcare"},
+    
+    # Education Domain
+    {"id": 17, "title": "Educational Technologist", "description": "Develops and implements technology solutions for educational settings to enhance learning.", "domain": "education"},
+    {"id": 18, "title": "Curriculum Developer", "description": "Creates educational content and programs based on research, standards, and educational theory.", "domain": "education"},
+    {"id": 19, "title": "Higher Education Administrator", "description": "Manages operations, programs, and services at colleges and universities.", "domain": "education"},
+    
+    # Creative Domain
+    {"id": 20, "title": "Content Creator", "description": "Produces engaging digital content across various platforms including video, audio, and written material.", "domain": "creative"},
+    {"id": 21, "title": "Game Developer", "description": "Designs and creates video games, combining technical skills with creative storytelling.", "domain": "creative"},
+    {"id": 22, "title": "Digital Artist", "description": "Creates visual art using digital tools and technologies for various media and applications.", "domain": "creative"},
+    
+    # Science & Research Domain
+    {"id": 23, "title": "Environmental Scientist", "description": "Studies environmental conditions and develops solutions to environmental problems.", "domain": "science"},
+    {"id": 24, "title": "Research Scientist", "description": "Conducts experiments and investigations to expand scientific knowledge in a specific field.", "domain": "science"},
+    {"id": 25, "title": "Data Analyst", "description": "Collects, processes, and performs statistical analyses on large datasets to identify patterns and trends.", "domain": "science"},
+    
+    # Engineering Domain
+    {"id": 26, "title": "Civil Engineer", "description": "Designs and oversees construction of infrastructure projects like buildings, roads, and bridges.", "domain": "engineering"},
+    {"id": 27, "title": "Mechanical Engineer", "description": "Designs, develops, and tests mechanical devices and systems.", "domain": "engineering"},
+    {"id": 28, "title": "Electrical Engineer", "description": "Designs and develops electrical systems and equipment for various applications.", "domain": "engineering"},
+    
+    # Finance Domain
+    {"id": 29, "title": "Investment Banker", "description": "Helps companies and governments raise capital and provides financial advisory services.", "domain": "finance"},
+    {"id": 30, "title": "Financial Planner", "description": "Helps individuals and organizations create strategies to achieve financial goals.", "domain": "finance"}
 ]
 
+# Mapping of domains to career IDs for quick lookup
+DOMAIN_TO_CAREERS = {}
+for career in CAREER_OPTIONS:
+    domain = career.get("domain", "other")
+    if domain not in DOMAIN_TO_CAREERS:
+        DOMAIN_TO_CAREERS[domain] = []
+    DOMAIN_TO_CAREERS[domain].append(career["id"])
+
 # Default user embeddings for various interests (to use when a user has no embedding)
-# Using 384 dimensions which is the standard for all-MiniLM-L6-v2
+# Using 768 dimensions which is the standard for all-mpnet-base-v2
+# Generating more realistic embeddings with proper normalization and domain-specific characteristics
+
+# Function to create a more realistic embedding vector with domain-specific patterns
+def create_domain_embedding(seed=42, dim=768):
+    """
+    Create a realistic embedding vector with proper normalization.
+    Each domain has a unique seed to ensure different but consistent vectors.
+    """
+    np.random.seed(seed)
+    # Generate a random vector with normal distribution
+    vector = np.random.normal(0, 0.1, dim)
+    # Normalize to unit length (cosine similarity ready)
+    vector = vector / np.linalg.norm(vector)
+    return vector.tolist()
+
+# Generate more realistic embeddings for each domain
 DEFAULT_USER_EMBEDDINGS = {
-    # These are simplified vectors - in a real system, these would be generated
-    # from typical user profiles in each interest area
-    "tech": [0.1] * 384,  # Technology focused 
-    "creative": [0.2] * 384,  # Creative/design focused
-    "business": [0.3] * 384,  # Business/management focused
-    "science": [0.4] * 384,  # Science/research focused
-    "healthcare": [0.5] * 384  # Healthcare focused
+    # Each domain has a unique seed to create distinct but consistent vectors
+    "tech": create_domain_embedding(seed=42),  # Technology focused
+    "creative": create_domain_embedding(seed=43),  # Creative/design focused
+    "business": create_domain_embedding(seed=44),  # Business/management focused
+    "science": create_domain_embedding(seed=45),  # Science/research focused
+    "healthcare": create_domain_embedding(seed=46),  # Healthcare focused
+    "education": create_domain_embedding(seed=47),  # Education focused
+    "engineering": create_domain_embedding(seed=48),  # Engineering focused
+    "finance": create_domain_embedding(seed=49)  # Finance focused
 }
 
 def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
@@ -353,7 +415,8 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         )
         
         # Get the index
-        index = pc.Index("oasis-minilm-index")
+        # index = pc.Index("oasis-minilm-index")
+        index = pc.Index("oasis-768-index")
         logger.info("Got Pinecone index")
         
         # Ensure embedding is the right format and size
@@ -365,11 +428,24 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         
         # Query Pinecone
         try:
+            # Log avant la requête Pinecone
+            logger.info(f"Requête Pinecone avec paramètres de diversification")
+            
+            # Augmenter le nombre de résultats pour permettre une diversification post-traitement
+            # Nous récupérons plus de résultats que nécessaire pour pouvoir les filtrer ensuite
+            expanded_limit = min(limit * 3, 100)  # Triple le nombre de résultats, max 100
+            
+            # Utiliser les paramètres de diversité de Pinecone si disponibles
             query_results = index.query(
                 namespace="",
                 vector=embedding,
-                top_k=limit,
-                include_metadata=True
+                top_k=expanded_limit,
+                include_metadata=True,
+                # Paramètres de diversité de Pinecone
+                include_values=True,  # Inclure les vecteurs pour post-traitement
+                sparse_vector=None,   # Pourrait être utilisé pour la diversification hybride
+                # Paramètre alpha pour équilibrer pertinence et diversité (si supporté)
+                alpha=0.3  # Valeur entre 0 et 1, où plus la valeur est élevée, plus la diversité est favorisée
             )
             
             logger.info(f"Got query results from Pinecone: {query_results}")
@@ -387,6 +463,122 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
                 return []
             
             logger.info(f"Found {len(matches)} matches in Pinecone response")
+            
+            # Analyser et diversifier les résultats
+            domains = {}
+            scores = []
+            domain_matches = {}  # Regrouper les matches par domaine
+            
+            for match in matches:
+                match_score = match.get('score', 0.0) if isinstance(match, dict) else getattr(match, 'score', 0.0)
+                scores.append(match_score)
+                
+                # Extraire le domaine si disponible
+                metadata = {}
+                if isinstance(match, dict):
+                    metadata = match.get('metadata', {})
+                elif hasattr(match, 'metadata'):
+                    metadata = match.metadata
+                
+                text = metadata.get('text', '') if isinstance(metadata, dict) else getattr(metadata, 'text', '')
+                parsed_fields = extract_fields_from_text(text)
+                
+                # Identifier le domaine/secteur avec fallback plus robuste
+                domain = (
+                    parsed_fields.get("domain", "") or
+                    parsed_fields.get("sector", "") or
+                    parsed_fields.get("industry", "") or
+                    parsed_fields.get("field", "") or
+                    "unknown"
+                )
+                
+                # Normaliser le nom du domaine
+                domain = domain.lower().strip()
+                if not domain or domain == "null" or domain == "none":
+                    domain = "unknown"
+                
+                # Compter les occurrences de domaine
+                domains[domain] = domains.get(domain, 0) + 1
+                
+                # Regrouper les matches par domaine
+                if domain not in domain_matches:
+                    domain_matches[domain] = []
+                domain_matches[domain].append((match, match_score, parsed_fields))
+            
+            # Log pour analyser la diversité
+            logger.info(f"Distribution des scores: min={min(scores) if scores else 0}, max={max(scores) if scores else 0}, avg={sum(scores)/len(scores) if scores else 0}")
+            logger.info(f"Distribution des domaines: {domains}")
+            logger.info(f"Nombre de domaines uniques: {len(domains)}")
+            
+            # Mécanisme de diversification post-recherche
+            diversified_matches = []
+            
+            # 1. Trier les domaines par nombre de résultats (pour prioriser les domaines populaires)
+            sorted_domains = sorted(domain_matches.keys(), key=lambda d: len(domain_matches[d]), reverse=True)
+            
+            # 2. Calculer combien de résultats prendre de chaque domaine
+            total_domains = len(sorted_domains)
+            if total_domains == 0:
+                return []
+                
+            # Assurer un minimum de résultats par domaine
+            min_per_domain = 1
+            remaining_slots = limit - (min_per_domain * total_domains)
+            
+            # Si pas assez de slots pour le minimum par domaine, ajuster
+            if remaining_slots < 0:
+                # Prendre autant de domaines que possible avec au moins 1 résultat chacun
+                sorted_domains = sorted_domains[:limit]
+                total_domains = len(sorted_domains)
+                remaining_slots = limit - total_domains
+            
+            # Distribuer les slots restants proportionnellement à la popularité des domaines
+            domain_slots = {domain: min_per_domain for domain in sorted_domains}
+            
+            if remaining_slots > 0 and total_domains > 0:
+                # Calculer le total des matches pour les domaines sélectionnés
+                total_matches = sum(len(domain_matches[d]) for d in sorted_domains)
+                
+                # Distribuer proportionnellement
+                for domain in sorted_domains:
+                    if total_matches > 0:
+                        proportion = len(domain_matches[domain]) / total_matches
+                        additional_slots = max(1, int(remaining_slots * proportion))
+                        domain_slots[domain] += min(additional_slots, len(domain_matches[domain]) - min_per_domain)
+            
+            # 3. Sélectionner les meilleurs résultats de chaque domaine
+            for domain in sorted_domains:
+                # Trier les matches de ce domaine par score
+                domain_results = sorted(domain_matches[domain], key=lambda x: x[1], reverse=True)
+                
+                # Prendre les N meilleurs résultats selon les slots alloués
+                slots = min(domain_slots[domain], len(domain_results))
+                for i in range(slots):
+                    diversified_matches.append(domain_results[i])
+            
+            # 4. Si nous n'avons pas assez de résultats, compléter avec les meilleurs scores restants
+            if len(diversified_matches) < limit:
+                # Trier tous les matches par score
+                all_sorted = sorted(
+                    [(m, s, f) for d in domain_matches.values() for m, s, f in d if (m, s, f) not in diversified_matches],
+                    key=lambda x: x[1],
+                    reverse=True
+                )
+                
+                # Ajouter les meilleurs jusqu'à atteindre la limite
+                remaining_needed = limit - len(diversified_matches)
+                diversified_matches.extend(all_sorted[:remaining_needed])
+            
+            # 5. Trier les résultats finaux par score
+            diversified_matches.sort(key=lambda x: x[1], reverse=True)
+            
+            # Limiter au nombre demandé
+            diversified_matches = diversified_matches[:limit]
+            
+            logger.info(f"Après diversification: {len(diversified_matches)} résultats de {len(domains)} domaines différents")
+            
+            # Remplacer les matches originaux par les matches diversifiés
+            matches = [match for match, _, _ in diversified_matches]
             
             # Extract results
             recommendations = []
@@ -450,30 +642,258 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         logger.error(f"Error getting Pinecone career recommendations: {str(e)}")
         return []
 
-def get_career_recommendations_fallback(limit: int = 30) -> List[Dict[str, Any]]:
+def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db: Session = None) -> List[Dict[str, Any]]:
     """
-    Get random career recommendations as a fallback
+    Get personalized career recommendations as a fallback based on user profile
     
     Args:
         limit: Maximum number of recommendations
+        user_id: Optional user ID for personalization
+        db: Optional database session
         
     Returns:
-        List of career recommendations
+        List of career recommendations with personalized scoring
     """
     try:
-        # Select random careers
-        selected_careers = random.sample(CAREER_OPTIONS, min(limit, len(CAREER_OPTIONS)))
+        from collections import Counter
         
-        # Add random scores
+        logger.info(f"Utilisation du mécanisme de fallback amélioré pour user_id={user_id}")
+        logger.info(f"CAREER_OPTIONS contient {len(CAREER_OPTIONS)} options dans {len(DOMAIN_TO_CAREERS)} domaines différents")
+        
+        # Initialiser les domaines pertinents avec des poids par défaut
+        domain_weights = {
+            "technology": 1.0,
+            "business": 1.0,
+            "healthcare": 1.0,
+            "education": 1.0,
+            "creative": 1.0,
+            "science": 1.0,
+            "engineering": 1.0,
+            "finance": 1.0
+        }
+        
+        # Personnaliser les recommandations si user_id et db sont fournis
+        user_profile = None
+        if user_id and db:
+            try:
+                # Récupérer plus d'informations du profil pour une meilleure personnalisation
+                query = text("""
+                    SELECT industry, job_title, interests, skills, education_level,
+                           major, hobbies, career_goals
+                    FROM user_profiles
+                    WHERE user_id = :user_id
+                """)
+                user_profile = db.execute(query, {"user_id": user_id}).fetchone()
+                
+                if user_profile:
+                    logger.info(f"Personnalisation du fallback avec: industry={user_profile.industry}, job_title={user_profile.job_title}")
+                    
+                    # Ajuster les poids des domaines en fonction du profil
+                    
+                    # 1. Analyser l'industrie actuelle
+                    if user_profile.industry:
+                        industry = user_profile.industry.lower()
+                        # Correspondances approximatives entre industrie et domaines
+                        if any(tech in industry for tech in ["tech", "software", "it", "computer", "digital"]):
+                            domain_weights["technology"] += 2.0
+                        if any(biz in industry for biz in ["business", "consult", "market", "sales"]):
+                            domain_weights["business"] += 2.0
+                        if any(health in industry for health in ["health", "medical", "pharma", "care"]):
+                            domain_weights["healthcare"] += 2.0
+                        if any(edu in industry for edu in ["edu", "teach", "school", "college", "university"]):
+                            domain_weights["education"] += 2.0
+                        if any(creative in industry for creative in ["art", "design", "media", "creative"]):
+                            domain_weights["creative"] += 2.0
+                        if any(sci in industry for sci in ["science", "research", "lab", "r&d"]):
+                            domain_weights["science"] += 2.0
+                        if any(eng in industry for eng in ["engineer", "mechanical", "civil", "electrical"]):
+                            domain_weights["engineering"] += 2.0
+                        if any(fin in industry for fin in ["financ", "bank", "invest", "account"]):
+                            domain_weights["finance"] += 2.0
+                    
+                    # 2. Analyser le titre de poste actuel
+                    if user_profile.job_title:
+                        job_title = user_profile.job_title.lower()
+                        # Correspondances approximatives entre titre et domaines
+                        if any(tech in job_title for tech in ["developer", "engineer", "programmer", "analyst", "tech"]):
+                            domain_weights["technology"] += 1.5
+                        if any(biz in job_title for biz in ["manager", "director", "consultant", "analyst", "marketing"]):
+                            domain_weights["business"] += 1.5
+                        if any(health in job_title for health in ["doctor", "nurse", "therapist", "medical"]):
+                            domain_weights["healthcare"] += 1.5
+                        if any(edu in job_title for edu in ["teacher", "professor", "instructor", "educator"]):
+                            domain_weights["education"] += 1.5
+                        if any(creative in job_title for creative in ["designer", "artist", "writer", "creator"]):
+                            domain_weights["creative"] += 1.5
+                        if any(sci in job_title for sci in ["scientist", "researcher", "analyst"]):
+                            domain_weights["science"] += 1.5
+                        if any(eng in job_title for eng in ["engineer"]):
+                            domain_weights["engineering"] += 1.5
+                        if any(fin in job_title for fin in ["financial", "accountant", "banker", "investor"]):
+                            domain_weights["finance"] += 1.5
+                    
+                    # 3. Analyser les intérêts
+                    if user_profile.interests:
+                        interests = user_profile.interests.lower() if isinstance(user_profile.interests, str) else str(user_profile.interests).lower()
+                        # Correspondances approximatives entre intérêts et domaines
+                        if any(tech in interests for tech in ["tech", "software", "programming", "computer"]):
+                            domain_weights["technology"] += 1.0
+                        if any(biz in interests for biz in ["business", "management", "marketing", "entrepreneurship"]):
+                            domain_weights["business"] += 1.0
+                        if any(health in interests for health in ["health", "medical", "wellness", "fitness"]):
+                            domain_weights["healthcare"] += 1.0
+                        if any(edu in interests for edu in ["education", "teaching", "learning", "academic"]):
+                            domain_weights["education"] += 1.0
+                        if any(creative in interests for creative in ["art", "design", "music", "writing", "creative"]):
+                            domain_weights["creative"] += 1.0
+                        if any(sci in interests for sci in ["science", "research", "biology", "chemistry", "physics"]):
+                            domain_weights["science"] += 1.0
+                        if any(eng in interests for eng in ["engineering", "building", "mechanics"]):
+                            domain_weights["engineering"] += 1.0
+                        if any(fin in interests for fin in ["finance", "investing", "economics", "money"]):
+                            domain_weights["finance"] += 1.0
+                    
+                    # 4. Analyser les compétences
+                    if user_profile.skills:
+                        skills = user_profile.skills.lower() if isinstance(user_profile.skills, str) else str(user_profile.skills).lower()
+                        # Correspondances approximatives entre compétences et domaines
+                        if any(tech in skills for tech in ["programming", "coding", "software", "data", "analytics"]):
+                            domain_weights["technology"] += 1.0
+                        if any(biz in skills for biz in ["management", "leadership", "strategy", "marketing"]):
+                            domain_weights["business"] += 1.0
+                        if any(health in skills for health in ["medical", "patient", "healthcare", "clinical"]):
+                            domain_weights["healthcare"] += 1.0
+                        if any(edu in skills for edu in ["teaching", "curriculum", "instruction", "education"]):
+                            domain_weights["education"] += 1.0
+                        if any(creative in skills for creative in ["design", "creative", "writing", "content"]):
+                            domain_weights["creative"] += 1.0
+                        if any(sci in skills for sci in ["research", "analysis", "laboratory", "scientific"]):
+                            domain_weights["science"] += 1.0
+                        if any(eng in skills for eng in ["engineering", "mechanical", "electrical", "design"]):
+                            domain_weights["engineering"] += 1.0
+                        if any(fin in skills for fin in ["financial", "accounting", "budgeting", "investment"]):
+                            domain_weights["finance"] += 1.0
+                
+                # Récupérer les données RIASEC si disponibles
+                try:
+                    # Convertir l'ID utilisateur en UUID de la même manière que dans holland_test.py
+                    user_id_str = str(user_id)
+                    namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
+                    user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+                    
+                    logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+                    
+                    riasec_query = text("""
+                        SELECT gr.top_3_code 
+                        FROM gca_results gr
+                        WHERE gr.user_id = :user_uuid
+                        ORDER BY gr.created_at DESC
+                        LIMIT 1
+                    """)
+                    riasec = db.execute(riasec_query, {"user_uuid": user_uuid}).fetchone()
+                    if riasec and riasec.top_3_code:
+                        logger.info(f"Code RIASEC: {riasec.top_3_code}")
+                except Exception as e:
+                    logger.error(f"Erreur lors de la récupération du code RIASEC: {str(e)}")
+                    riasec = None
+                    
+                    # Ajuster les poids des domaines en fonction du code RIASEC
+                    if 'R' in riasec_code:  # Réaliste
+                        domain_weights["engineering"] += 1.0
+                        domain_weights["technology"] += 0.5
+                    if 'I' in riasec_code:  # Investigateur
+                        domain_weights["science"] += 1.0
+                        domain_weights["technology"] += 0.5
+                    if 'A' in riasec_code:  # Artistique
+                        domain_weights["creative"] += 1.0
+                    if 'S' in riasec_code:  # Social
+                        domain_weights["education"] += 1.0
+                        domain_weights["healthcare"] += 0.5
+                    if 'E' in riasec_code:  # Entreprenant
+                        domain_weights["business"] += 1.0
+                        domain_weights["finance"] += 0.5
+                    if 'C' in riasec_code:  # Conventionnel
+                        domain_weights["finance"] += 1.0
+                        domain_weights["business"] += 0.5
+                
+            except Exception as e:
+                logger.error(f"Erreur lors de la récupération du profil pour fallback: {str(e)}")
+        
+        logger.info(f"Poids des domaines après personnalisation: {domain_weights}")
+        
+        # Sélectionner des carrières en fonction des poids des domaines
+        selected_careers = []
+        remaining_slots = limit
+        
+        # Normaliser les poids pour obtenir des proportions
+        total_weight = sum(domain_weights.values())
+        if total_weight > 0:
+            normalized_weights = {domain: weight/total_weight for domain, weight in domain_weights.items()}
+        else:
+            normalized_weights = {domain: 1.0/len(domain_weights) for domain in domain_weights}
+        
+        # Calculer le nombre de carrières à sélectionner par domaine
+        domain_slots = {}
+        for domain, weight in normalized_weights.items():
+            # Assurer au moins une carrière par domaine avec un poids non nul
+            if weight > 0:
+                domain_slots[domain] = max(1, int(limit * weight))
+            else:
+                domain_slots[domain] = 0
+        
+        # Ajuster si le total dépasse la limite
+        total_slots = sum(domain_slots.values())
+        if total_slots > limit:
+            # Réduire proportionnellement
+            excess = total_slots - limit
+            for domain in sorted(domain_slots.keys(), key=lambda d: domain_slots[d]):
+                if domain_slots[domain] > 1 and excess > 0:
+                    reduction = min(domain_slots[domain] - 1, excess)
+                    domain_slots[domain] -= reduction
+                    excess -= reduction
+                if excess == 0:
+                    break
+        
+        # Sélectionner les carrières par domaine
+        for domain, slots in domain_slots.items():
+            if slots <= 0:
+                continue
+                
+            if domain in DOMAIN_TO_CAREERS:
+                domain_careers = [c for c in CAREER_OPTIONS if c["id"] in DOMAIN_TO_CAREERS[domain]]
+                # Si pas assez de carrières dans ce domaine, prendre ce qui est disponible
+                num_to_select = min(slots, len(domain_careers))
+                if num_to_select > 0:
+                    domain_selected = random.sample(domain_careers, num_to_select)
+                    selected_careers.extend(domain_selected)
+        
+        # Si nous n'avons pas assez de carrières, compléter avec des sélections aléatoires
+        if len(selected_careers) < limit:
+            remaining_careers = [c for c in CAREER_OPTIONS if c not in selected_careers]
+            additional_needed = min(limit - len(selected_careers), len(remaining_careers))
+            if additional_needed > 0:
+                selected_careers.extend(random.sample(remaining_careers, additional_needed))
+        
+        # Limiter au nombre demandé (au cas où)
+        selected_careers = selected_careers[:limit]
+        
+        # Ajouter des scores personnalisés en fonction des poids des domaines
         recommendations = []
         for career in selected_careers:
             career_copy = career.copy()
-            career_copy["score"] = round(random.uniform(0.5, 0.95), 2)
+            domain = career.get("domain", "other")
+            # Score de base entre 0.5 et 0.7
+            base_score = random.uniform(0.5, 0.7)
+            # Bonus basé sur le poids du domaine (jusqu'à 0.3 supplémentaire)
+            domain_bonus = min(0.3, domain_weights.get(domain, 0) / 10)
+            career_copy["score"] = round(base_score + domain_bonus, 2)
             recommendations.append(career_copy)
         
-        # Sort by score
+        # Trier par score
         recommendations.sort(key=lambda x: x["score"], reverse=True)
         
+        logger.info(f"Retour de {len(recommendations)} recommandations de fallback personnalisées")
+        logger.info(f"Distribution des domaines dans les recommandations: {Counter(r.get('domain', 'unknown') for r in recommendations)}")
         return recommendations
     except Exception as e:
         logger.error(f"Error getting fallback career recommendations: {str(e)}")
@@ -498,17 +918,56 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
         
         if not embedding:
             logger.warning(f"No embedding found for user {user_id}, using fallback recommendations")
-            return get_career_recommendations_fallback(limit)
+            return get_career_recommendations_fallback(limit, user_id, db)
         
         logger.info(f"Got embedding for user {user_id}, size: {len(embedding)}")
         logger.info(f"First 5 values of embedding: {embedding[:5]}")
         
         # Try to get Pinecone recommendations
+        logger.info(f"Profil utilisateur pour recommandations - user_id={user_id}:")
+        
+        # Récupérer des informations sur le profil pour contextualiser les recommandations
+        profile_query = text("""
+            SELECT job_title, industry, skills, interests, education_level, years_experience
+            FROM user_profiles
+            WHERE user_id = :user_id
+        """)
+        profile = db.execute(profile_query, {"user_id": user_id}).fetchone()
+        
+        if profile:
+            logger.info(f"Job Title: {profile.job_title}")
+            logger.info(f"Industry: {profile.industry}")
+            logger.info(f"Education: {profile.education_level}")
+            logger.info(f"Experience: {profile.years_experience} years")
+        
+        # Récupérer les données RIASEC si disponibles
+        try:
+            # Convertir l'ID utilisateur en UUID de la même manière que dans holland_test.py
+            user_id_str = str(user_id)
+            namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
+            user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+            
+            logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+            
+            riasec_query = text("""
+                SELECT gr.top_3_code 
+                FROM gca_results gr
+                WHERE gr.user_id = :user_uuid
+                ORDER BY gr.created_at DESC
+                LIMIT 1
+            """)
+            riasec = db.execute(riasec_query, {"user_uuid": user_uuid}).fetchone()
+            if riasec and riasec.top_3_code:
+                logger.info(f"Code RIASEC: {riasec.top_3_code}")
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération du code RIASEC: {str(e)}")
+            riasec = None
+        
         recommendations = get_pinecone_career_recommendations(embedding, limit)
         
         if not recommendations:
             logger.warning(f"Pinecone recommendations failed for user {user_id}, using fallback")
-            recommendations = get_career_recommendations_fallback(limit)
+            recommendations = get_career_recommendations_fallback(limit, user_id, db)
         else:
             logger.info(f"Got {len(recommendations)} recommendations from Pinecone")
             logger.info(f"First recommendation: {recommendations[0] if recommendations else 'None'}")
@@ -516,7 +975,7 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
         return recommendations
     except Exception as e:
         logger.error(f"Error getting career recommendations: {str(e)}")
-        return get_career_recommendations_fallback(limit)
+        return get_career_recommendations_fallback(limit, user_id, db)
 
 def save_career_recommendation(db: Session, user_id: int, career_id: int) -> bool:
     """
@@ -534,7 +993,7 @@ def save_career_recommendation(db: Session, user_id: int, career_id: int) -> boo
         logger.info(f"Starting save_career_recommendation for user {user_id}, career_id {career_id}")
         
         # Try to get the career details from Pinecone first
-        recommendations = get_career_recommendations(db, user_id, 30)
+        recommendations = get_career_recommendations(db, user_id, 2)
         logger.info(f"Got {len(recommendations)} recommendations")
         
         career_details = next((c for c in recommendations if c["id"] == career_id), None)

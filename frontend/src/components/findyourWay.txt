@@ -1,10 +1,11 @@
+
+
+---------------------------------
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Card, CardContent, CircularProgress, Snackbar, Alert, useMediaQuery, useTheme, IconButton, Chip, Stack } from '@mui/material';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import WorkIcon from '@mui/icons-material/Work';
-import StarIcon from '@mui/icons-material/Star';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { getCareerRecommendations, saveCareer } from '@/services/api';
 
 interface CareerRecommendation {
@@ -110,49 +111,28 @@ const FindYourWay: React.FC = () => {
   };
 
   return (
-    <Box sx={{ 
-      width: '100%', 
-      p: 2, 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center',
-      fontFamily: 'DepartureMono, monospace'
-    }}>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        align="center" 
-        sx={{ 
-          mb: 6, 
-          fontWeight: 'bold', 
-          letterSpacing: 2,
-          fontFamily: 'DepartureMono, monospace',
-          background: 'black',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          textShadow: '0px 2px 4px rgba(0,0,0,0.1)'
-        }}
-      >
-        Discover Your Path
+    <Box sx={{ width: '100%', p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: '"Times New Roman", serif' }}>
+      <Typography variant="h4" component="h1" align="center" sx={{ mb: 6, fontWeight: 'bold', letterSpacing: 1, fontFamily: '"Times New Roman", serif' }}>
+        Swipe Your Way
       </Typography>
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 8 }}>
-          <CircularProgress sx={{ color: '#2196F3' }} />
+          <CircularProgress />
         </Box>
       ) : error ? (
         <Box sx={{ textAlign: 'center', my: 4 }}>
-          <Typography color="error" sx={{ fontFamily: 'DepartureMono, monospace' }}>{error}</Typography>
+          <Typography color="error" sx={{ fontFamily: '"Inter", sans-serif' }}>{error}</Typography>
           <IconButton onClick={fetchCareerRecommendations} color="primary">
             <RefreshIcon />
           </IconButton>
         </Box>
       ) : !hasMoreCareers ? (
         <Box sx={{ textAlign: 'center', my: 4 }}>
-          <Typography variant="h6" gutterBottom sx={{ fontFamily: 'DepartureMono, monospace' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontFamily: '"Inter", sans-serif' }}>
             No more career suggestions
           </Typography>
-          <Typography paragraph color="textSecondary" sx={{ fontFamily: 'DepartureMono, monospace' }}>
+          <Typography paragraph color="textSecondary" sx={{ fontFamily: '"Inter", sans-serif' }}>
             Check back later or refresh to see if we have new recommendations for you.
           </Typography>
           <IconButton onClick={fetchCareerRecommendations} color="primary">
@@ -171,10 +151,6 @@ const FindYourWay: React.FC = () => {
             mb: 2
           }}>
             <motion.div
-              drag="x"
-              dragConstraints={dragConstraints}
-              dragElastic={0.7}
-              onDragEnd={handleDragEnd}
               style={{
                 x,
                 rotate,
@@ -182,82 +158,50 @@ const FindYourWay: React.FC = () => {
                 width: '100%',
                 height: '100%',
                 position: 'absolute',
-                cursor: 'grab'
+                zIndex: 1,
+                borderRadius: 20,
               }}
+              drag="x"
+              dragConstraints={dragConstraints}
+              onDragEnd={handleDragEnd}
+              whileTap={{ scale: 0.95, cursor: 'grabbing' }}
+              whileDrag={{ rotate: 10 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               <Card sx={{ 
                 width: '100%', 
                 height: '100%', 
+                display: 'flex', 
+                flexDirection: 'column',
                 borderRadius: 4,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                border: '1px solid rgba(0,0,0,0.05)'
+                bgcolor: 'rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                position: 'relative',
+                overflow: 'hidden',
               }}>
-                <CardContent sx={{ 
-                  flex: 1, 
-                  p: 3, 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  height: '100%'
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <WorkIcon sx={{ color: '#59C2C9', mr: 1 }} />
-                    <Typography 
-                      variant="h5" 
-                      component="h2" 
-                      sx={{ 
-                        fontWeight: 600, 
-                        fontFamily: 'DepartureMono, monospace',
-                        color: '#2A9D8F'
-                      }}
-                    >
-                      {currentCareer.title}
-                    </Typography>
-                  </Box>
-
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      flex: 1, 
-                      overflow: 'auto', 
-                      mb: 2, 
-                      color: 'text.secondary', 
-                      lineHeight: 1.6,
-                      fontFamily: 'DepartureMono, monospace',
-                      fontSize: '0.95rem'
-                    }}
-                  >
+                <CardContent sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 2, fontFamily: '"Inter", sans-serif' }}>
+                    {currentCareer.title}
+                  </Typography>
+                  <Typography variant="body2" sx={{ flex: 1, overflow: 'auto', mb: 2, color: 'text.secondary', lineHeight: 1.6, fontFamily: '"Inter", sans-serif' }}>
                     {currentCareer.description}
                   </Typography>
                   
+                  {/* Display main duties if available */}
                   {currentCareer.main_duties && (
                     <Box sx={{ mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <TrendingUpIcon sx={{ color: '#59C2C9', mr: 1, fontSize: '1.2rem' }} />
-                        <Typography 
-                          variant="subtitle2" 
-                          sx={{ 
-                            fontWeight: 600,
-                            fontFamily: 'DepartureMono, monospace',
-                            color: '#2A9D8F'
-                          }}
-                        >
-                          Main Duties:
-                        </Typography>
-                      </Box>
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
-                          color: 'text.secondary',
-                          fontFamily: 'DepartureMono, monospace',
-                          pl: 3
-                        }}
-                      >
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, fontFamily: '"Inter", sans-serif' }}>
+                        Main Duties:
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: '"Inter", sans-serif' }}>
                         {currentCareer.main_duties}
                       </Typography>
                     </Box>
                   )}
                   
+                  {/* Display skills chips if available */}
                   {currentCareer.metadata && (
                     <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mb: 2 }}>
                       {getSkills(currentCareer).map((skill, index) => (
@@ -265,14 +209,10 @@ const FindYourWay: React.FC = () => {
                           key={index} 
                           label={skill} 
                           size="small" 
-                          icon={<StarIcon sx={{ fontSize: '0.9rem', color: '#59C2C9' }} />}
                           sx={{ 
-                            bgcolor: 'rgba(89,194,201,0.08)', 
-                            color: '#2A9D8F',
-                            fontFamily: 'DepartureMono, monospace',
-                            '& .MuiChip-icon': {
-                              color: '#59C2C9'
-                            }
+                            bgcolor: 'rgba(25,118,210,0.08)', 
+                            color: 'primary.main',
+                            fontFamily: '"Inter", sans-serif'
                           }} 
                         />
                       ))}
@@ -293,12 +233,11 @@ const FindYourWay: React.FC = () => {
                       variant="caption" 
                       sx={{ 
                         fontWeight: 'bold', 
-                        color: '#59C2C9', 
+                        color: 'text.secondary', 
                         letterSpacing: 1.2, 
                         fontSize: '0.85rem',
                         textTransform: 'uppercase',
-                        fontFamily: 'DepartureMono, monospace',
-                        opacity: 0.8
+                        fontFamily: '"Inter", sans-serif'
                       }}
                     >
                       Swipe to Explore
@@ -309,16 +248,7 @@ const FindYourWay: React.FC = () => {
             </motion.div>
           </Box>
 
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              mt: 4, 
-              textAlign: 'center', 
-              color: 'text.secondary',
-              fontFamily: 'DepartureMono, monospace',
-              letterSpacing: 1
-            }}
-          >
+          <Typography variant="body2" sx={{ mt: 4, textAlign: 'center', color: 'text.secondary', fontFamily: '"Inter", sans-serif' }}>
             {currentIndex + 1} of {careers.length} recommendations
           </Typography>
         </>
@@ -329,14 +259,7 @@ const FindYourWay: React.FC = () => {
         autoHideDuration={4000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert 
-          severity={snackbar.severity} 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          sx={{ 
-            fontFamily: 'DepartureMono, monospace',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-          }}
-        >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })} sx={{ fontFamily: '"Inter", sans-serif' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -345,3 +268,4 @@ const FindYourWay: React.FC = () => {
 };
 
 export default FindYourWay;
+

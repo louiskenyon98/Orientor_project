@@ -6,7 +6,8 @@ load_dotenv()
 
 # === Config ===
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-INDEX_NAME = "oasis-minilm-index"
+# INDEX_NAME = "oasis-minilm-index"
+INDEX_NAME = "oasis-768-index"
 
 def main():
     print(f"🗑️  Deleting all records from Pinecone index: {INDEX_NAME}")

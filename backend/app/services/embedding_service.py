@@ -6,10 +6,13 @@ import pandas as pd
 import numpy as np
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from sentence_transformers import SentenceTransformer
+import torch
+import torch.nn as nn
+from transformers import AutoTokenizer, AutoModel
 import joblib
 import boto3
 from pathlib import Path
+from sklearn.decomposition import PCA
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -23,24 +26,31 @@ S3_BUCKET = os.getenv("S3_BUCKET_NAME", "navigo-finetune-embedder-prod")
 if IS_PRODUCTION:
     # Production paths (AWS EB)
     MODELS_DIR = "/tmp/models"
-    FINETUNED_MODEL_DIR = os.path.join(MODELS_DIR, "finetuned_model")
-    PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca384_Siamese.pkl")
-    SCALER_MODEL_PATH = os.path.join(MODELS_DIR, "scaler_Siamese.pkl")
-    OHE_MODEL_PATH = os.path.join(MODELS_DIR, "ohe_Siamese.pkl")
+    PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca256.pkl")
 else:
     # Development paths (local)
-    MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 
-                             "data_n_notebook", "siamese_pipeline", "mlruns", "models")
-    FINETUNED_MODEL_DIR = os.path.join(MODELS_DIR, "finetuned_model")
-    PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca384_Siamese.pkl")
-    SCALER_MODEL_PATH = os.path.join(MODELS_DIR, "scaler_Siamese.pkl")
-    OHE_MODEL_PATH = os.path.join(MODELS_DIR, "ohe_Siamese.pkl")
+    MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                             "data_n_notebook", "models")
+    PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca256.pkl")
+
+# Define the model name
+MODEL_NAME = "llama-text-embed-v2"
+
+class EmbeddingModel(nn.Module):
+    def __init__(self, base_model, output_dim=768):
+        super().__init__()
+        self.base_model = base_model
+        self.projection = nn.Linear(base_model.config.hidden_size, output_dim)
+        
+    def forward(self, **inputs):
+        outputs = self.base_model(**inputs)
+        embeddings = outputs.last_hidden_state[:, 0, :]  # Use [CLS] token
+        return self.projection(embeddings)
 
 def ensure_model_directory():
     """Ensure the model directory exists in production."""
     if IS_PRODUCTION:
         Path(MODELS_DIR).mkdir(parents=True, exist_ok=True)
-        Path(FINETUNED_MODEL_DIR).mkdir(parents=True, exist_ok=True)
 
 def download_from_s3(s3_key: str, local_path: str):
     """Download a file from S3 to local path."""
@@ -52,231 +62,335 @@ def download_from_s3(s3_key: str, local_path: str):
         logger.error(f"Error downloading {s3_key}: {str(e)}")
         raise
 
-def download_folder_from_s3(s3_prefix: str, local_dir: str):
-    """Download a folder from S3 to local directory."""
-    try:
-        s3 = boto3.client('s3')
-        paginator = s3.get_paginator('list_objects_v2')
-        for page in paginator.paginate(Bucket=S3_BUCKET, Prefix=s3_prefix):
-            for obj in page.get('Contents', []):
-                key = obj['Key']
-                filename = key.split('/')[-1]
-                if filename:  # Avoid empty keys
-                    local_file_path = os.path.join(local_dir, filename)
-                    s3.download_file(S3_BUCKET, key, local_file_path)
-        logger.info(f"Downloaded folder {s3_prefix} to {local_dir}")
-    except Exception as e:
-        logger.error(f"Error downloading folder {s3_prefix}: {str(e)}")
-        raise
-
 def load_models():
-    """Load all models, downloading from S3 if in production."""
-    global EMBEDDING_MODEL, PCA_MODEL, SCALER_MODEL, OHE_MODEL, MODELS_LOADED
+    """Load embedding model and PCA model if available."""
+    global EMBEDDING_MODEL, TOKENIZER, PCA_MODEL, MODELS_LOADED, USE_PCA
     
     try:
-        if IS_PRODUCTION:
-            ensure_model_directory()
-            # Download models from S3
-            download_folder_from_s3("sentence_transformers/", FINETUNED_MODEL_DIR)
-            download_from_s3("siamese_models/pca384_Siamese.pkl", PCA_MODEL_PATH)
-            download_from_s3("siamese_models/scaler_Siamese.pkl", SCALER_MODEL_PATH)
-            download_from_s3("siamese_models/ohe_Siamese.pkl", OHE_MODEL_PATH)
-
-        # Load models
-        EMBEDDING_MODEL = SentenceTransformer(FINETUNED_MODEL_DIR)
-        logger.info("Embedding model loaded successfully")
+        # Load llama-text-embed-v2 model and tokenizer
+        TOKENIZER = AutoTokenizer.from_pretrained(MODEL_NAME)
+        base_model = AutoModel.from_pretrained(MODEL_NAME)
+        EMBEDDING_MODEL = EmbeddingModel(base_model, output_dim=768)
+        EMBEDDING_MODEL.eval()  # Set to evaluation mode
+        logger.info(f"Embedding model {MODEL_NAME} loaded successfully with 768-dim output")
         
-        PCA_MODEL = joblib.load(PCA_MODEL_PATH)
-        logger.info("PCA model loaded successfully")
-        
-        SCALER_MODEL = joblib.load(SCALER_MODEL_PATH)
-        logger.info("Scaler model loaded successfully")
-        
-        OHE_MODEL = joblib.load(OHE_MODEL_PATH)
-        logger.info("OHE model loaded successfully")
+        # Try to load PCA model if it exists
+        try:
+            if IS_PRODUCTION:
+                ensure_model_directory()
+                download_from_s3("models/pca256.pkl", PCA_MODEL_PATH)
+            
+            PCA_MODEL = joblib.load(PCA_MODEL_PATH)
+            logger.info("PCA model loaded successfully")
+            USE_PCA = True
+        except Exception as e:
+            logger.warning(f"PCA model not found or could not be loaded: {str(e)}")
+            logger.info("Creating new PCA model for dimension reduction")
+            PCA_MODEL = PCA(n_components=256)
+            USE_PCA = False
         
         MODELS_LOADED = True
-        logger.info("All models loaded successfully")
+        logger.info("Models loaded successfully")
         
     except Exception as e:
         logger.error(f"Error loading models: {str(e)}")
         EMBEDDING_MODEL = None
+        TOKENIZER = None
         PCA_MODEL = None
-        SCALER_MODEL = None
-        OHE_MODEL = None
         MODELS_LOADED = False
+        USE_PCA = False
 
 # Initialize models
 EMBEDDING_MODEL = None
+TOKENIZER = None
 PCA_MODEL = None
-SCALER_MODEL = None
-OHE_MODEL = None
 MODELS_LOADED = False
+USE_PCA = False
 
 # Load models on module import
 load_models()
 
-# Load models locally
-try:
-    EMBEDDING_MODEL = SentenceTransformer(FINETUNED_MODEL_DIR)
-    logger.info("Embedding model loaded successfully from local directory.")
-except Exception as e:
-    logger.error(f"Error loading embedding model: {str(e)}")
-    EMBEDDING_MODEL = None
-
-try:
-    PCA_MODEL = joblib.load(PCA_MODEL_PATH)
-    logger.info("PCA model loaded successfully from local directory.")
-except Exception as e:
-    logger.error(f"Error loading PCA model: {str(e)}")
-    PCA_MODEL = None
-
-try:
-    SCALER_MODEL = joblib.load(SCALER_MODEL_PATH)
-    logger.info("Scaler model loaded successfully from local directory.")
-except Exception as e:
-    logger.error(f"Error loading scaler model: {str(e)}")
-    SCALER_MODEL = None
-
-try:
-    OHE_MODEL = joblib.load(OHE_MODEL_PATH)
-    logger.info("OHE model loaded successfully from local directory.")
-    # Print the expected feature names
-    if hasattr(OHE_MODEL, 'get_feature_names_out'):
-        feature_names = OHE_MODEL.get_feature_names_out()
-        logger.info(f"OHE model expects features: {feature_names}")
-        # Extract original column names
-        original_cols = set()
-        for feature in feature_names:
-            col_name = feature.split('_')[0]
-            original_cols.add(col_name)
-        logger.info(f"Original columns needed: {original_cols}")
-except Exception as e:
-    logger.error(f"Error loading OHE model: {str(e)}")
-    OHE_MODEL = None
-
-# Flag to check if models loaded
-MODELS_LOADED = all([EMBEDDING_MODEL, PCA_MODEL, OHE_MODEL, SCALER_MODEL])
-logger.info(f"All models loaded: {MODELS_LOADED}")
-
 # --- Core Functions ---
 
-def preprocess_user_profile(profile_data: Dict[str, Any]) -> Optional[pd.DataFrame]:
+def fetch_user_data(db: Session, user_id: int) -> Dict[str, Any]:
     """
-    Preprocess user profile data for embedding generation.
-    Uses all available profile fields for a more comprehensive embedding.
+    Fetch user data from multiple tables to create a comprehensive profile.
+    
+    Args:
+        db: Database session
+        user_id: User ID to fetch data for
+        
+    Returns:
+        Dictionary containing user data from multiple tables
     """
     try:
-        # Debug logging
-        logger.info(f"Received profile data keys: {list(profile_data.keys())}")
+        # Fetch basic profile data
+        profile_query = text("""
+            SELECT * FROM user_profiles WHERE user_id = :user_id
+        """)
+        profile_result = db.execute(profile_query, {"user_id": user_id}).fetchone()
         
-        # Clean and format arrays
-        def clean_array(arr):
-            if not arr:
-                return []
-            if isinstance(arr, str):
-                return [item.strip() for item in arr.split(',') if item.strip()]
-            if isinstance(arr, list):
-                return [item.strip() for item in arr if item and isinstance(item, str)]
-            return []
+        if not profile_result:
+            logger.error(f"No profile found for user {user_id}")
+            return {}
         
-        # Clean arrays
-        skills = clean_array(profile_data.get("skills", []))
-        interests = clean_array(profile_data.get("interests", []))
+        # Convert row to dict
+        profile_data = {key: value for key, value in profile_result._mapping.items()}
         
-        # Create DataFrame with all profile fields
-        user_df = pd.DataFrame([{
-            # Basic Info
-            "Name": profile_data.get("name", "Unknown"),
-            "Age": profile_data.get("age", 0),
-            "Sex": profile_data.get("sex", "Unknown"),
-            "Country": profile_data.get("country", "Unknown"),
-            "State/Province": profile_data.get("state_province", "Unknown"),
+        # Fetch skills data (direct columns with Likert scale ratings)
+        skills_query = text("""
+            SELECT creativity, leadership, digital_literacy, critical_thinking,
+                   problem_solving, analytical_thinking, attention_to_detail,
+                   collaboration, adaptability, independence, evaluation,
+                   decision_making, stress_tolerance
+            FROM users_skills WHERE user_id = :user_id
+        """)
+        skills_result = db.execute(skills_query, {"user_id": user_id}).fetchone()
+        skills_data = {}
+        if skills_result:
+            skills_data = {key: value for key, value in skills_result._mapping.items()}
+        
+        # Fetch RIASEC personality scores
+        riasec_query = text("""
+            SELECT r_score, i_score, a_score, s_score, e_score, c_score, top_3_code
+            FROM gca_results WHERE user_id = :user_id
+        """)
+        riasec_result = db.execute(riasec_query, {"user_id": user_id}).fetchone()
+        riasec_data = {}
+        if riasec_result:
+            riasec_data = {key: value for key, value in riasec_result._mapping.items()}
             
-            # Academic Info
-            "Major": profile_data.get("major", "Unknown"),
-            "Year": profile_data.get("year", 0),
-            "GPA": profile_data.get("gpa", 0.0),
-            "Learning Style": profile_data.get("learning_style", "Unknown"),
+            # Map score columns to full RIASEC names for better readability
+            riasec_mapping = {
+                'r_score': 'realistic',
+                'i_score': 'investigative',
+                'a_score': 'artistic',
+                's_score': 'social',
+                'e_score': 'enterprising',
+                'c_score': 'conventional',
+                'top_3_code': 'top_3_code'
+            }
             
-            # Personal Info
-            "Hobbies": profile_data.get("hobbies", ""),
-            "Unique Quality": profile_data.get("unique_quality", ""),
-            "Story": profile_data.get("story", ""),
-            "Favorite Movie": profile_data.get("favorite_movie", ""),
-            "Favorite Book": profile_data.get("favorite_book", ""),
-            "Favorite Celebrities": profile_data.get("favorite_celebrities", ""),
-            
-            # Career Info
-            "Job Title": profile_data.get("job_title", "Unknown"),
-            "Industry": profile_data.get("industry", "Unknown"),
-            "Years Experience": profile_data.get("years_experience", 0),
-            "Education Level": profile_data.get("education_level", "Unknown"),
-            "Career Goals": profile_data.get("career_goals", ""),
-            "Skills": ", ".join(skills),
-            "Interests": ", ".join(interests)
-        }])
+            # Create a mapped version with full names
+            riasec_data_mapped = {riasec_mapping.get(key, key): value
+                                 for key, value in riasec_data.items()
+                                 if key in riasec_mapping}
+            riasec_data.update(riasec_data_mapped)
         
-        # Debug logging
-        logger.info(f"Created DataFrame with columns: {list(user_df.columns)}")
-        logger.info(f"Skills: {skills}")
-        logger.info(f"Interests: {interests}")
+        # Optionally fetch saved recommendations for behavioral signals
+        recommendations_query = text("""
+            SELECT label, all_fields FROM saved_recommendations WHERE user_id = :user_id
+        """)
+        recommendations_result = db.execute(recommendations_query, {"user_id": user_id}).fetchall()
+        saved_recommendations = []
+        if recommendations_result:
+            saved_recommendations = [
+                {"label": row.label, "fields": row.all_fields}
+                for row in recommendations_result
+            ]
         
-        return user_df
+        # Combine all data
+        combined_data = {
+            "profile": profile_data,
+            "skills": skills_data,
+            "riasec": riasec_data,
+            "saved_recommendations": saved_recommendations
+        }
+        
+        return combined_data
+        
     except Exception as e:
-        logger.error(f"Error preprocessing user profile data: {str(e)}")
+        logger.error(f"Error fetching user data: {str(e)}")
+        return {}
+
+def preprocess_user_profile(db: Session, user_id: int, profile_data: Dict[str, Any] = None) -> Optional[str]:
+    """
+    Preprocess user profile data for embedding generation.
+    Formats data according to the specified template combining multiple data sources.
+    
+    Args:
+        db: Database session
+        user_id: User ID to process
+        profile_data: Optional pre-fetched profile data
+        
+    Returns:
+        Formatted text string for embedding generation
+    """
+    try:
+        # If profile_data is not provided, fetch it from the database
+        if not profile_data:
+            user_data = fetch_user_data(db, user_id)
+            if not user_data:
+                return None
+        else:
+            # If profile_data is provided directly (e.g., for new users), structure it
+            user_data = {
+                "profile": profile_data,
+                "skills": {},  # Default empty skills
+                "riasec": {},  # Default empty RIASEC
+                "saved_recommendations": []
+            }
+            
+            # Try to extract skills if they exist in the provided data
+            if "skills" in profile_data:
+                if isinstance(profile_data["skills"], dict):
+                    user_data["skills"] = profile_data["skills"]
+                elif isinstance(profile_data["skills"], list):
+                    # Convert list to dict with default ratings
+                    user_data["skills"] = {skill: 3 for skill in profile_data["skills"]}
+            
+            # Try to extract RIASEC if it exists
+            if "riasec" in profile_data:
+                user_data["riasec"] = profile_data["riasec"]
+        
+        # Extract profile data
+        profile = user_data.get("profile", {})
+        
+        # Log pour déboguer les données disponibles
+        logger.info(f"Données de profil disponibles pour user_id={user_id}:")
+        important_fields = ["age", "education_level", "major", "career_goals",
+                           "job_title", "industry", "years_experience", "skills",
+                           "interests", "hobbies", "learning_style"]
+        
+        for field in important_fields:
+            value = profile.get(field, "")
+            if isinstance(value, list) and len(value) > 0:
+                logger.info(f"  {field}: {value[:3]}... ({len(value)} éléments)")
+            else:
+                logger.info(f"  {field}: {value}")
+        
+        # Extract basic demographic info
+        age = profile.get("age", "")
+        education_level = profile.get("education_level", "")
+        major = profile.get("major", "")
+        career_goal = profile.get("career_goals", "")
+        learning_style = profile.get("learning_style", "")
+        hobbies = profile.get("hobbies", "")
+        favorite_book = profile.get("favorite_book", "")
+        favorite_celebrity = profile.get("favorite_celebrities", "")
+        
+        # Extract soft skills (top skills with high ratings)
+        skills = user_data.get("skills", {})
+        soft_skills = []
+        
+        # Map of important soft skills to check
+        important_soft_skills = [
+            "creativity", "leadership", "collaboration", "attention_to_detail",
+            "problem_solving", "adaptability", "critical_thinking", "digital_literacy"
+        ]
+        
+        # Add skills with their ratings
+        for skill_name in important_soft_skills:
+            if skill_name in skills and skills[skill_name] is not None:
+                # Format skill name for display (replace underscores with spaces and capitalize)
+                display_name = skill_name.replace('_', ' ').title()
+                soft_skills.append(f"{display_name} level: {skills[skill_name]}")
+        
+        # Extract RIASEC profile (top 3 dimensions)
+        riasec = user_data.get("riasec", {})
+        riasec_items = []
+        
+        if riasec:
+            # Get the main RIASEC scores
+            riasec_scores = {
+                'Realistic': riasec.get('realistic') or riasec.get('r_score'),
+                'Investigative': riasec.get('investigative') or riasec.get('i_score'),
+                'Artistic': riasec.get('artistic') or riasec.get('a_score'),
+                'Social': riasec.get('social') or riasec.get('s_score'),
+                'Enterprising': riasec.get('enterprising') or riasec.get('e_score'),
+                'Conventional': riasec.get('conventional') or riasec.get('c_score')
+            }
+            
+            # Filter out None values and sort by score
+            sorted_riasec = sorted(
+                [(dim, score) for dim, score in riasec_scores.items() if score is not None],
+                key=lambda x: x[1],
+                reverse=True
+            )
+            
+            # If we have a top_3_code, use it to verify our sorting
+            top_3_code = riasec.get('top_3_code')
+            
+            # Take top 3 dimensions
+            for dim, score in sorted_riasec[:3]:
+                riasec_items.append(f"{dim}: {score}")
+        
+        # Extract personal story
+        story = profile.get("story", "")
+        
+        # Extract unique quality
+        unique_quality = profile.get("unique_quality", "")
+        
+        # Format the text according to the specified template
+        formatted_text = f"""User profile:
+Age: {age}. Education level: {education_level}. Major: {major}.
+Career goal: {career_goal}.
+Learning style: {learning_style}.
+Hobbies: {hobbies}.
+Favorite book: {favorite_book}. Favorite celebrity: {favorite_celebrity}.
+
+Soft Skills:
+{". ".join(soft_skills)}.
+
+RIASEC profile:
+{". ".join(riasec_items)}.
+
+Personal story:
+"{story}"
+
+Unique quality: {unique_quality}
+"""
+        
+        logger.info(f"Preprocessed user profile for user {user_id}")
+        return formatted_text
+        
+    except Exception as e:
+        logger.error(f"Error preprocessing user profile: {str(e)}")
         return None
 
-def generate_embedding(profile_data: Dict[str, Any]) -> Optional[np.ndarray]:
+def generate_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] = None) -> Optional[np.ndarray]:
     """
-    Generate embedding for a user profile.
-    Returns a 384-dimensional embedding from SentenceTransformer.
+    Generate embedding for a user profile using llama-text-embed-v2.
+    Returns a 768-dimensional embedding.
+    
+    Args:
+        db: Database session
+        user_id: User ID to generate embedding for
+        profile_data: Optional pre-fetched profile data
+        
+    Returns:
+        Numpy array containing the embedding vector
     """
     if not MODELS_LOADED:
         logger.error("Models not loaded, cannot generate embedding.")
         return None
 
     try:
-        processed_data = preprocess_user_profile(profile_data)
-        if processed_data is None:
+        # Preprocess the user profile into the required format
+        formatted_text = preprocess_user_profile(db, user_id, profile_data)
+        if formatted_text is None:
+            logger.error(f"Failed to preprocess profile for user {user_id}")
             return None
-
-        # Convert DataFrame to text for SentenceTransformer
-        text_data = " ".join([
-            # Basic Info
-            f"Name: {processed_data['Name'].iloc[0]}",
-            f"Age: {processed_data['Age'].iloc[0]}",
-            f"Sex: {processed_data['Sex'].iloc[0]}",
-            f"Country: {processed_data['Country'].iloc[0]}",
-            f"State/Province: {processed_data['State/Province'].iloc[0]}",
             
-            # Academic Info
-            f"Major: {processed_data['Major'].iloc[0]}",
-            f"Year: {processed_data['Year'].iloc[0]}",
-            f"GPA: {processed_data['GPA'].iloc[0]}",
-            f"Learning Style: {processed_data['Learning Style'].iloc[0]}",
-            
-            # Personal Info
-            f"Hobbies: {processed_data['Hobbies'].iloc[0]}",
-            f"Unique Quality: {processed_data['Unique Quality'].iloc[0]}",
-            f"Story: {processed_data['Story'].iloc[0]}",
-            f"Favorite Movie: {processed_data['Favorite Movie'].iloc[0]}",
-            f"Favorite Book: {processed_data['Favorite Book'].iloc[0]}",
-            f"Favorite Celebrities: {processed_data['Favorite Celebrities'].iloc[0]}",
-            
-            # Career Info
-            f"Job Title: {processed_data['Job Title'].iloc[0]}",
-            f"Industry: {processed_data['Industry'].iloc[0]}",
-            f"Years Experience: {processed_data['Years Experience'].iloc[0]}",
-            f"Education Level: {processed_data['Education Level'].iloc[0]}",
-            f"Career Goals: {processed_data['Career Goals'].iloc[0]}",
-            f"Skills: {processed_data['Skills'].iloc[0]}",
-            f"Interests: {processed_data['Interests'].iloc[0]}"
-        ])
-
-        # Generate embedding using SentenceTransformer's encode method
-        embedding = EMBEDDING_MODEL.encode(text_data)
-        return embedding
+        # Tokenize and generate embeddings
+        inputs = TOKENIZER(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        with torch.no_grad():
+            embedding = EMBEDDING_MODEL(**inputs).numpy()
+        
+        logger.info(f"Generated embedding with shape {embedding.shape}")
+        
+        # Analyze embedding statistics
+        embedding_stats = {
+            "min": float(np.min(embedding)),
+            "max": float(np.max(embedding)),
+            "mean": float(np.mean(embedding)),
+            "std": float(np.std(embedding)),
+            "zeros": int(np.sum(embedding == 0)),
+            "unique_values": len(np.unique(embedding))
+        }
+        logger.info(f"Embedding statistics: {embedding_stats}")
+        
+        return embedding[0]  # Return the first (and only) embedding
 
     except Exception as e:
         logger.error(f"Error generating embedding: {str(e)}")
@@ -285,6 +399,14 @@ def generate_embedding(profile_data: Dict[str, Any]) -> Optional[np.ndarray]:
 def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
     """
     Store user embedding in the database.
+    
+    Args:
+        db: Database session
+        user_id: User ID to store embedding for
+        embedding: Numpy array containing the embedding vector
+        
+    Returns:
+        Boolean indicating success or failure
     """
     try:
         # Convert numpy array to list for storage
@@ -293,8 +415,8 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
         # Update the user's profile with the embedding
         db.execute(
             text("""
-                UPDATE user_profiles 
-                SET embedding = :embedding 
+                UPDATE user_profiles
+                SET embedding = :embedding
                 WHERE user_id = :user_id
             """),
             {"embedding": embedding_list, "user_id": user_id}
@@ -308,12 +430,20 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
         db.rollback()
         return False
 
-def process_user_embedding(db: Session, user_id: int, profile_data: Dict[str, Any]) -> bool:
+def process_user_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] = None) -> bool:
     """
     Process user embedding generation and storage.
+    
+    Args:
+        db: Database session
+        user_id: User ID to process
+        profile_data: Optional pre-fetched profile data
+        
+    Returns:
+        Boolean indicating success or failure
     """
     try:
-        embedding = generate_embedding(profile_data)
+        embedding = generate_embedding(db, user_id, profile_data)
         if embedding is None:
             return False
 

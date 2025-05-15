@@ -8,10 +8,10 @@ load_dotenv()
 
 # === Config ===
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-INDEX_NAME = "oasis-minilm-index"
+INDEX_NAME = "oasis-768-index"
 CSV_PATH = "/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/data/KnowlegdeBase/KnowledgeBase.csv"
-BATCH_SIZE = 10
-MAX_TOKENS = 512  # Adjust this based on your model's token limit
+BATCH_SIZE = 5
+MAX_TOKENS = 2048  # Adjust this based on your model's token limit
 
 # ✅ Initialize Pinecone client
 pc = Pinecone(api_key=PINECONE_API_KEY)
@@ -46,10 +46,13 @@ def combine_row_text(row: Dict[str, str]) -> str:
     # Define priority order for fields
     priority_fields = [
         'oasis_code',
+        'Holland Code - 1',
+        'Holland Code - 2',
+        'Holland Code - 3'
         'OaSIS Label - Final_x',
         'Job title text',
         'Main duties',
-        'Employment requirement'
+        'Employment requirement',
     ]
     
     text_parts = []

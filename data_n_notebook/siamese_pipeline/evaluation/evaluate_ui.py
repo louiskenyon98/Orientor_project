@@ -13,7 +13,8 @@ base_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Load Pinecone index
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-index = pc.Index("oasis-minilm-index")
+# index = pc.Index("oasis-minilm-index")
+index = pc.Index("oasis-768-index")
 
 # User input
 st.title("🧠 Job Matching Evaluation")
