@@ -18,7 +18,8 @@ INDEX_NAME = "oasis-384-custom"
 CSV_PATH = "/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/data/KnowlegdeBase/KnowledgeBase.csv"
 BATCH_SIZE = 5
 MAX_TOKENS = 512
-EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
 
 # === Init Pinecone and model ===
 pc = Pinecone(api_key=PINECONE_API_KEY)
@@ -52,6 +53,37 @@ Main duties: {duties}
     """.strip()
 
     return passage
+
+# ... existing code ...
+
+# def combine_row_text(row: Dict[str, str]) -> str:
+#     """Combine row data into a single text string, prioritizing important fields."""
+#     # Define priority order for fields
+#     priority_fields = [
+#         'oasis_code',
+#         'OaSIS Label - Final_x',  # Ensure this is included
+#         'Job title text',
+#         'Main duties',
+#         'Employment requirement',
+#         'top_3_code', 
+#         "Leadership", "Critical Thinking", "Problem Solving", "Analytical Thinking",
+#         "Attention to Detail", "Collaboration", "Evaluation", "Decision Making", "Stress Tolerance"  # Add any other fields you want to prioritize
+#     ]
+    
+#     text_parts = []
+    
+#     # First add priority fields
+#     for field in priority_fields:
+#         if field in row and row[field] and str(row[field]).strip() not in {"", "nan"}:
+#             text_parts.append(f"{field}: {row[field]}")
+    
+#     # Then add remaining fields
+#     for key, value in row.items():
+#         if key not in priority_fields and value and str(value).strip() not in {"", "nan"}:
+#             text_parts.append(f"{key}: {value}")
+
+#     return ". ".join(text_parts).strip()
+
 
 def process_row(row: Dict[str, str], index_num: int, i: int) -> Dict:
     if not row.get("oasis_code"):

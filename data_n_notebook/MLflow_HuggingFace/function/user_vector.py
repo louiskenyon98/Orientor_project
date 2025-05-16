@@ -27,7 +27,7 @@ def query_oasis_index(user_vector, top_k=5, namespace=None):
 
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
     # index = pc.Index("oasis-minilm-index-9xr744g")
-    index = pc.Index("oasis-1024-custom")
+    index = pc.Index("oasis-384-custom")
 
     response = index.query(vector=user_vector.tolist(), top_k=top_k, namespace=namespace, include_metadata=True)
     return response

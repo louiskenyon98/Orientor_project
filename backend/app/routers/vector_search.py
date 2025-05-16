@@ -44,7 +44,7 @@ def get_pinecone_index():
             raise ValueError("PINECONE_ENVIRONMENT environment variable is not set")
             
         # index_name = "oasis-minilm-index"
-        index_name = "oasis-1024-custom"
+        index_name = "oasis-384-custom"
         
         logger.info(f"Initializing Pinecone with environment: {pinecone_environment}")
         pc = Pinecone(api_key=pinecone_api_key)
@@ -153,41 +153,35 @@ class SuggestedPeer(BaseModel):
 class SuggestedPeersResponse(BaseModel):
     peers: List[SuggestedPeer]
 
+from sentence_transformers import SentenceTransformer
+
+# Initialize embedding model globally
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+
 @router.post("/search", response_model=SearchResponse)
 async def search_embeddings(request: SearchRequest):
     """
-    Search for OaSIS records using semantic similarity with Pinecone's integrated embeddings
+    Search for OaSIS records using semantic similarity with locally generated MiniLM embeddings
     """
     try:
         logger.info(f"Searching with query: {request.query}")
-        
-        # Get Pinecone index with proper error handling
         index = get_pinecone_index()
-        
-        # Format query payload for integrated embeddings
-        query_payload = {
-            "inputs": {
-                "text": request.query
-            },
-            "top_k": request.top_k
-        }
-        
-        # Query Pinecone using integrated embeddings
+
+        # Compute query embedding
+        query_embedding = embedding_model.encode(
+            request.query,
+            normalize_embeddings=True
+        ).tolist()
+
+        # Query Pinecone index with the vector
         try:
-            pinecone_response = index.search(
-                namespace="", 
-                query=query_payload
+            pinecone_response = index.query(
+                vector=query_embedding,
+                top_k=request.top_k,
+                include_metadata=True
             )
             logger.info("Received response from Pinecone")
-            logger.debug(f"Pinecone response: {pinecone_response}")
-            
-            # Extract hits from the response
-            hits = pinecone_response.result.hits if hasattr(pinecone_response, 'result') else []
-            logger.info(f"Found {len(hits)} matches")
-            
-            if not hits:
-                return SearchResponse(query=request.query, results=[])
-            
+
         except Exception as e:
             logger.error(f"Pinecone query error: {e}")
             raise HTTPException(
@@ -195,24 +189,23 @@ async def search_embeddings(request: SearchRequest):
                 detail=f"Error querying vector database: {str(e)}"
             )
 
+        hits = pinecone_response.get("matches", [])
+        logger.info(f"Found {len(hits)} matches")
+
         results = []
         for hit in hits:
-            oasis_code = hit['_id'].split('-')[1] if '-' in hit['_id'] else ""
-            fields = hit.get('fields', {})
-            text = fields.get('text', '')
-
-            parsed_fields = {}
-            for match in re.finditer(r"([^:\n\r]+?):\s*(.*?)(?=  [A-Z][a-z]+:|$)", text):
-                parsed_fields = extract_fields_from_text(text)
+            metadata = hit.get("metadata", {})
+            text = metadata.get("text", "")
+            parsed_fields = extract_fields_from_text(text)
 
             label = parsed_fields.get("oasis_label__final_x") or parsed_fields.get("label") or ""
             lead_statement = parsed_fields.get("lead_statement", "")
             main_duties = parsed_fields.get("main_duties", "")
 
             result = SearchResult(
-                id=hit['_id'],
-                score=float(hit['_score']),
-                oasis_code=oasis_code,
+                id=hit["id"],
+                score=float(hit["score"]),
+                oasis_code=hit["id"].split("-")[1] if "-" in hit["id"] else "",
                 label=label,
                 lead_statement=lead_statement,
                 main_duties=main_duties,
@@ -232,13 +225,12 @@ async def search_embeddings(request: SearchRequest):
                 all_fields=parsed_fields
             )
             results.append(result)
-            print(f'result: {result}')
 
         return SearchResponse(query=request.query, results=results)
+
     except Exception as e:
         logger.error(f"Search error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Vector search failed: {str(e)}")
-
 @router.post("/search/save", status_code=status.HTTP_201_CREATED)
 async def save_search_result(
     recommendation: SavedRecommendationCreate,
@@ -420,7 +412,7 @@ async def debug_index():
             "status": "success",
             "stats": stats,
             # "index_name": "oasis-minilm-index"
-            "index_name": "oasis-1024-custom"
+            "index_name": "oasis-384-custom"
         }
     except Exception as e:
         logger.error(f"Debug check failed: {str(e)}", exc_info=True)

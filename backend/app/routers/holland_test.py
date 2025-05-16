@@ -447,14 +447,23 @@ async def get_test_score(
             if test_result:
                 result_id = str(uuid4())
                 
-                # Créer un UUID déterministe basé sur l'ID utilisateur
-                # Cela garantit que le même utilisateur aura toujours le même UUID
-                user_id_str = str(current_user.id)
-                # Créer un UUID v5 basé sur l'ID utilisateur (namespace UUID + ID utilisateur)
-                namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
-                user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
+                # Get the actual user_id from gca_users_answers
+                user_id_query = text("""
+                    SELECT user_id FROM gca_users_answers
+                    WHERE attempt_id = :attempt_id
+                    LIMIT 1
+                """)
                 
-                logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+                user_id_result = db.execute(user_id_query, {"attempt_id": attempt_id}).fetchone()
+                
+                if not user_id_result:
+                    logger.warning(f"Could not find user_id for attempt_id={attempt_id}")
+                    # Continue with the current user's ID as fallback
+                    actual_user_id = str(current_user.id)
+                else:
+                    actual_user_id = user_id_result.user_id
+                
+                logger.info(f"Using actual user_id: {actual_user_id} for attempt_id={attempt_id}")
                 
                 # Vérifier si un enregistrement avec le même attempt_id existe déjà
                 check_existing_query = text("""
@@ -473,7 +482,8 @@ async def get_test_score(
                             s_score = :s_score,
                             e_score = :e_score,
                             c_score = :c_score,
-                            top_3_code = :top_3_code
+                            top_3_code = :top_3_code,
+                            user_id = :user_id
                         WHERE attempt_id = :attempt_id
                     """)
                     
@@ -485,7 +495,8 @@ async def get_test_score(
                         "s_score": score_result.s_score,
                         "e_score": score_result.e_score,
                         "c_score": score_result.c_score,
-                        "top_3_code": top_3_code
+                        "top_3_code": top_3_code,
+                        "user_id": actual_user_id
                     })
                     
                     logger.info(f"Résultat mis à jour dans gca_results pour attempt_id={attempt_id}")
@@ -503,65 +514,24 @@ async def get_test_score(
                             :top_3_code, CURRENT_TIMESTAMP
                         )
                     """)
+                    
+                    db.execute(insert_query, {
+                        "id": result_id,
+                        "attempt_id": attempt_id,
+                        "user_id": actual_user_id,  # Use the actual user_id from gca_users_answers
+                        "test_id": test_result.id,
+                        "r_score": score_result.r_score,
+                        "i_score": score_result.i_score,
+                        "a_score": score_result.a_score,
+                        "s_score": score_result.s_score,
+                        "e_score": score_result.e_score,
+                        "c_score": score_result.c_score,
+                        "top_3_code": top_3_code
+                    })
+                    
+                    logger.info(f"Nouveau résultat inséré dans gca_results pour attempt_id={attempt_id}")
                 
                 try:
-                    if existing_result:
-                        # Mettre à jour l'enregistrement existant
-                        update_query = text("""
-                            UPDATE gca_results SET
-                                r_score = :r_score,
-                                i_score = :i_score,
-                                a_score = :a_score,
-                                s_score = :s_score,
-                                e_score = :e_score,
-                                c_score = :c_score,
-                                top_3_code = :top_3_code
-                            WHERE attempt_id = :attempt_id
-                        """)
-                        
-                        db.execute(update_query, {
-                            "attempt_id": attempt_id,
-                            "r_score": score_result.r_score,
-                            "i_score": score_result.i_score,
-                            "a_score": score_result.a_score,
-                            "s_score": score_result.s_score,
-                            "e_score": score_result.e_score,
-                            "c_score": score_result.c_score,
-                            "top_3_code": top_3_code
-                        })
-                        
-                        logger.info(f"Résultat mis à jour dans gca_results pour attempt_id={attempt_id}")
-                    else:
-                        # Insérer un nouvel enregistrement
-                        insert_query = text("""
-                            INSERT INTO gca_results (
-                                id, attempt_id, user_id, test_id,
-                                r_score, i_score, a_score, s_score, e_score, c_score,
-                                top_3_code, created_at
-                            )
-                            VALUES (
-                                :id, :attempt_id, :user_id, :test_id,
-                                :r_score, :i_score, :a_score, :s_score, :e_score, :c_score,
-                                :top_3_code, CURRENT_TIMESTAMP
-                            )
-                        """)
-                        
-                        db.execute(insert_query, {
-                            "id": result_id,
-                            "attempt_id": attempt_id,
-                            "user_id": user_uuid,  # Utiliser l'UUID déterministe
-                            "test_id": test_result.id,
-                            "r_score": score_result.r_score,
-                            "i_score": score_result.i_score,
-                            "a_score": score_result.a_score,
-                            "s_score": score_result.s_score,
-                            "e_score": score_result.e_score,
-                            "c_score": score_result.c_score,
-                            "top_3_code": top_3_code
-                        })
-                        
-                        logger.info(f"Nouveau résultat inséré dans gca_results pour attempt_id={attempt_id}")
-                    
                     db.commit()
                     logger.info(f"Résultat enregistré avec succès dans gca_results pour attempt_id={attempt_id}")
                 except Exception as insert_error:
@@ -609,15 +579,6 @@ async def get_user_latest_results(
     logger.info(f"Récupération des résultats RIASEC pour l'utilisateur: {current_user.id}")
     try:
         # Récupérer le résultat le plus récent pour l'utilisateur
-        # Créer un UUID déterministe basé sur l'ID utilisateur
-        # Cela garantit que le même utilisateur aura toujours le même UUID
-        user_id_str = str(current_user.id)
-        # Créer un UUID v5 basé sur l'ID utilisateur (namespace UUID + ID utilisateur)
-        namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
-        user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
-        
-        logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
-        
         query = text("""
             SELECT
                 r.r_score, r.i_score, r.a_score, r.s_score, r.e_score, r.c_score,
@@ -628,7 +589,7 @@ async def get_user_latest_results(
             LIMIT 1
         """)
         
-        result = db.execute(query, {"user_id": user_uuid}).fetchone()
+        result = db.execute(query, {"user_id": str(current_user.id)}).fetchone()
         
         if not result:
             raise HTTPException(
@@ -704,13 +665,6 @@ async def get_user_profile_description(
         Un dictionnaire contenant la description du profil
     """
     try:
-        # Créer un UUID déterministe basé sur l'ID utilisateur
-        user_id_str = str(current_user.id)
-        namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
-        user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
-        
-        logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
-        
         # 1. Récupérer les scores RIASEC les plus récents
         riasec_query = text("""
             SELECT
@@ -722,7 +676,7 @@ async def get_user_profile_description(
             LIMIT 1
         """)
         
-        riasec_result = db.execute(riasec_query, {"user_id": user_uuid}).fetchone()
+        riasec_result = db.execute(riasec_query, {"user_id": str(current_user.id)}).fetchone()
         
         if not riasec_result:
             raise HTTPException(

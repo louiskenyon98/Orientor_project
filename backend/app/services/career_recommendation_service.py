@@ -364,7 +364,7 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
         
         # Get the index
         # index = pc.Index("oasis-minilm-index")
-        index = pc.Index("oasis-1024-custom")
+        index = pc.Index("oasis-384-custom")
         logger.info("Got Pinecone index")
         
         # Ensure embedding is the right format and size
@@ -592,23 +592,19 @@ def get_pinecone_career_recommendations(embedding: List[float], limit: int = 30)
 
 def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db: Session = None) -> List[Dict[str, Any]]:
     """
-    Get personalized career recommendations as a fallback based on user profile
+    Get fallback career recommendations when Pinecone is unavailable.
+    Uses a combination of user profile data and RIASEC code for personalization.
     
     Args:
         limit: Maximum number of recommendations
-        user_id: Optional user ID for personalization
-        db: Optional database session
+        user_id: ID of the user (optional)
+        db: Database session (optional)
         
     Returns:
-        List of career recommendations with personalized scoring
+        List of career recommendations
     """
     try:
-        from collections import Counter
-        
-        logger.info(f"Utilisation du mécanisme de fallback amélioré pour user_id={user_id}")
-        logger.info(f"CAREER_OPTIONS contient {len(CAREER_OPTIONS)} options dans {len(DOMAIN_TO_CAREERS)} domaines différents")
-        
-        # Initialiser les domaines pertinents avec des poids par défaut
+        # Initialize domain weights
         domain_weights = {
             "technology": 1.0,
             "business": 1.0,
@@ -620,83 +616,82 @@ def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db
             "finance": 1.0
         }
         
-        # Personnaliser les recommandations si user_id et db sont fournis
-        user_profile = None
+        # If we have user_id and db, try to personalize based on user profile
         if user_id and db:
             try:
-                # Récupérer plus d'informations du profil pour une meilleure personnalisation
-                query = text("""
-                    SELECT industry, job_title, interests, skills, education_level,
-                           major, hobbies, career_goals
-                    FROM user_profiles
-                    WHERE user_id = :user_id
+                # Get user profile
+                profile_query = text("""
+                    SELECT up.*, gr.top_3_code as riasec_code
+                    FROM user_profiles up
+                    LEFT JOIN gca_results gr ON up.user_id = gr.user_id
+                    WHERE up.user_id = :user_id
+                    ORDER BY gr.created_at DESC
+                    LIMIT 1
                 """)
-                user_profile = db.execute(query, {"user_id": user_id}).fetchone()
+                user_profile = db.execute(profile_query, {"user_id": user_id}).fetchone()
                 
                 if user_profile:
-                    logger.info(f"Personnalisation du fallback avec: industry={user_profile.industry}, job_title={user_profile.job_title}")
+                    logger.info(f"Found user profile for personalization: {user_profile}")
                     
-                    # Ajuster les poids des domaines en fonction du profil
-                    
-                    # 1. Analyser l'industrie actuelle
-                    if user_profile.industry:
-                        industry = user_profile.industry.lower()
-                        # Correspondances approximatives entre industrie et domaines
-                        if any(tech in industry for tech in ["tech", "software", "it", "computer", "digital"]):
-                            domain_weights["technology"] += 2.0
-                        if any(biz in industry for biz in ["business", "consult", "market", "sales"]):
-                            domain_weights["business"] += 2.0
-                        if any(health in industry for health in ["health", "medical", "pharma", "care"]):
-                            domain_weights["healthcare"] += 2.0
-                        if any(edu in industry for edu in ["edu", "teach", "school", "college", "university"]):
-                            domain_weights["education"] += 2.0
-                        if any(creative in industry for creative in ["art", "design", "media", "creative"]):
-                            domain_weights["creative"] += 2.0
-                        if any(sci in industry for sci in ["science", "research", "lab", "r&d"]):
-                            domain_weights["science"] += 2.0
-                        if any(eng in industry for eng in ["engineer", "mechanical", "civil", "electrical"]):
-                            domain_weights["engineering"] += 2.0
-                        if any(fin in industry for fin in ["financ", "bank", "invest", "account"]):
-                            domain_weights["finance"] += 2.0
-                    
-                    # 2. Analyser le titre de poste actuel
+                    # 1. Analyser le titre de poste actuel
                     if user_profile.job_title:
                         job_title = user_profile.job_title.lower()
-                        # Correspondances approximatives entre titre et domaines
-                        if any(tech in job_title for tech in ["developer", "engineer", "programmer", "analyst", "tech"]):
-                            domain_weights["technology"] += 1.5
-                        if any(biz in job_title for biz in ["manager", "director", "consultant", "analyst", "marketing"]):
-                            domain_weights["business"] += 1.5
-                        if any(health in job_title for health in ["doctor", "nurse", "therapist", "medical"]):
-                            domain_weights["healthcare"] += 1.5
-                        if any(edu in job_title for edu in ["teacher", "professor", "instructor", "educator"]):
-                            domain_weights["education"] += 1.5
+                        # Correspondances approximatives entre titres de poste et domaines
+                        if any(tech in job_title for tech in ["software", "developer", "engineer", "data", "analyst", "it"]):
+                            domain_weights["technology"] += 1.0
+                        if any(biz in job_title for biz in ["manager", "director", "consultant", "analyst", "coordinator"]):
+                            domain_weights["business"] += 1.0
+                        if any(health in job_title for health in ["nurse", "doctor", "medical", "health", "therapist"]):
+                            domain_weights["healthcare"] += 1.0
+                        if any(edu in job_title for edu in ["teacher", "professor", "educator", "instructor"]):
+                            domain_weights["education"] += 1.0
                         if any(creative in job_title for creative in ["designer", "artist", "writer", "creator"]):
-                            domain_weights["creative"] += 1.5
-                        if any(sci in job_title for sci in ["scientist", "researcher", "analyst"]):
-                            domain_weights["science"] += 1.5
-                        if any(eng in job_title for eng in ["engineer"]):
-                            domain_weights["engineering"] += 1.5
-                        if any(fin in job_title for fin in ["financial", "accountant", "banker", "investor"]):
-                            domain_weights["finance"] += 1.5
+                            domain_weights["creative"] += 1.0
+                        if any(sci in job_title for sci in ["scientist", "researcher", "analyst", "specialist"]):
+                            domain_weights["science"] += 1.0
+                        if any(eng in job_title for eng in ["engineer", "architect", "technician"]):
+                            domain_weights["engineering"] += 1.0
+                        if any(fin in job_title for fin in ["financial", "accountant", "banker", "advisor"]):
+                            domain_weights["finance"] += 1.0
+                    
+                    # 2. Analyser l'industrie
+                    if user_profile.industry:
+                        industry = user_profile.industry.lower()
+                        # Correspondances approximatives entre industries et domaines
+                        if any(tech in industry for tech in ["technology", "software", "it", "digital"]):
+                            domain_weights["technology"] += 1.0
+                        if any(biz in industry for biz in ["business", "consulting", "retail", "marketing"]):
+                            domain_weights["business"] += 1.0
+                        if any(health in industry for health in ["healthcare", "medical", "pharmaceutical"]):
+                            domain_weights["healthcare"] += 1.0
+                        if any(edu in industry for edu in ["education", "academic", "school"]):
+                            domain_weights["education"] += 1.0
+                        if any(creative in industry for creative in ["media", "entertainment", "design", "arts"]):
+                            domain_weights["creative"] += 1.0
+                        if any(sci in industry for sci in ["research", "science", "laboratory"]):
+                            domain_weights["science"] += 1.0
+                        if any(eng in industry for eng in ["engineering", "manufacturing", "construction"]):
+                            domain_weights["engineering"] += 1.0
+                        if any(fin in industry for fin in ["finance", "banking", "insurance"]):
+                            domain_weights["finance"] += 1.0
                     
                     # 3. Analyser les intérêts
                     if user_profile.interests:
                         interests = user_profile.interests.lower() if isinstance(user_profile.interests, str) else str(user_profile.interests).lower()
                         # Correspondances approximatives entre intérêts et domaines
-                        if any(tech in interests for tech in ["tech", "software", "programming", "computer"]):
+                        if any(tech in interests for tech in ["technology", "computers", "programming", "digital"]):
                             domain_weights["technology"] += 1.0
-                        if any(biz in interests for biz in ["business", "management", "marketing", "entrepreneurship"]):
+                        if any(biz in interests for biz in ["business", "management", "entrepreneurship"]):
                             domain_weights["business"] += 1.0
-                        if any(health in interests for health in ["health", "medical", "wellness", "fitness"]):
+                        if any(health in interests for health in ["health", "medicine", "wellness"]):
                             domain_weights["healthcare"] += 1.0
-                        if any(edu in interests for edu in ["education", "teaching", "learning", "academic"]):
+                        if any(edu in interests for edu in ["teaching", "learning", "education"]):
                             domain_weights["education"] += 1.0
-                        if any(creative in interests for creative in ["art", "design", "music", "writing", "creative"]):
+                        if any(creative in interests for creative in ["art", "design", "music", "writing"]):
                             domain_weights["creative"] += 1.0
-                        if any(sci in interests for sci in ["science", "research", "biology", "chemistry", "physics"]):
+                        if any(sci in interests for sci in ["science", "research", "analysis"]):
                             domain_weights["science"] += 1.0
-                        if any(eng in interests for eng in ["engineering", "building", "mechanics"]):
+                        if any(eng in interests for eng in ["engineering", "building", "construction"]):
                             domain_weights["engineering"] += 1.0
                         if any(fin in interests for fin in ["finance", "investing", "economics", "money"]):
                             domain_weights["finance"] += 1.0
@@ -721,48 +716,31 @@ def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db
                             domain_weights["engineering"] += 1.0
                         if any(fin in skills for fin in ["financial", "accounting", "budgeting", "investment"]):
                             domain_weights["finance"] += 1.0
-                
-                # Récupérer les données RIASEC si disponibles
-                try:
-                    # Convertir l'ID utilisateur en UUID de la même manière que dans holland_test.py
-                    user_id_str = str(user_id)
-                    namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
-                    user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
                     
-                    logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
-                    
-                    riasec_query = text("""
-                        SELECT gr.top_3_code 
-                        FROM gca_results gr
-                        WHERE gr.user_id = :user_uuid
-                        ORDER BY gr.created_at DESC
-                        LIMIT 1
-                    """)
-                    riasec = db.execute(riasec_query, {"user_uuid": user_uuid}).fetchone()
-                    if riasec and riasec.top_3_code:
-                        logger.info(f"Code RIASEC: {riasec.top_3_code}")
-                except Exception as e:
-                    logger.error(f"Erreur lors de la récupération du code RIASEC: {str(e)}")
-                    riasec = None
-                    
-                    # Ajuster les poids des domaines en fonction du code RIASEC
-                    if 'R' in riasec_code:  # Réaliste
-                        domain_weights["engineering"] += 1.0
-                        domain_weights["technology"] += 0.5
-                    if 'I' in riasec_code:  # Investigateur
-                        domain_weights["science"] += 1.0
-                        domain_weights["technology"] += 0.5
-                    if 'A' in riasec_code:  # Artistique
-                        domain_weights["creative"] += 1.0
-                    if 'S' in riasec_code:  # Social
-                        domain_weights["education"] += 1.0
-                        domain_weights["healthcare"] += 0.5
-                    if 'E' in riasec_code:  # Entreprenant
-                        domain_weights["business"] += 1.0
-                        domain_weights["finance"] += 0.5
-                    if 'C' in riasec_code:  # Conventionnel
-                        domain_weights["finance"] += 1.0
-                        domain_weights["business"] += 0.5
+                    # 5. Ajuster les poids en fonction du code RIASEC
+                    if user_profile.riasec_code:
+                        riasec_code = user_profile.riasec_code
+                        logger.info(f"Code RIASEC trouvé: {riasec_code}")
+                        
+                        # Ajuster les poids des domaines en fonction du code RIASEC
+                        if 'R' in riasec_code:  # Réaliste
+                            domain_weights["engineering"] += 1.5
+                            domain_weights["technology"] += 0.8
+                        if 'I' in riasec_code:  # Investigateur
+                            domain_weights["science"] += 1.5
+                            domain_weights["technology"] += 0.8
+                        if 'A' in riasec_code:  # Artistique
+                            domain_weights["creative"] += 1.5
+                            domain_weights["technology"] += 0.5
+                        if 'S' in riasec_code:  # Social
+                            domain_weights["education"] += 1.5
+                            domain_weights["healthcare"] += 1.0
+                        if 'E' in riasec_code:  # Entreprenant
+                            domain_weights["business"] += 1.5
+                            domain_weights["finance"] += 0.8
+                        if 'C' in riasec_code:  # Conventionnel
+                            domain_weights["finance"] += 1.5
+                            domain_weights["business"] += 0.8
                 
             except Exception as e:
                 logger.error(f"Erreur lors de la récupération du profil pour fallback: {str(e)}")

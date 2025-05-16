@@ -84,8 +84,9 @@ else:
                              "data_n_notebook", "models")
     PCA_MODEL_PATH = os.path.join(MODELS_DIR, "pca256.pkl")
 
-# Define the model name
+# Define the model names
 MODEL_NAME = "BAAI/bge-large-en-v1.5"
+OASIS_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 class EmbeddingModel(nn.Module):
     def __init__(self, base_model, output_dim=1024):
@@ -183,6 +184,58 @@ class ModelState:
 
 # Create a single instance of ModelState
 model_state = ModelState()
+
+# Initialize OaSIS model state
+class OasisModelState:
+    def __init__(self):
+        self.embedding_model = None
+        self.tokenizer = None
+        self.models_loaded = False
+        self._lock = threading.Lock()
+    
+    def load_models(self):
+        """Load OaSIS models with proper error handling and retry logic."""
+        with self._lock:
+            if self.models_loaded:
+                return True
+                
+            max_retries = 3
+            retry_count = 0
+            
+            while retry_count < max_retries:
+                try:
+                    # Load the lighter model for OaSIS embeddings
+                    self.tokenizer = AutoTokenizer.from_pretrained(OASIS_MODEL_NAME)
+                    base_model = AutoModel.from_pretrained(OASIS_MODEL_NAME)
+                    self.embedding_model = base_model  # No projection needed for this model
+                    self.embedding_model.eval()  # Set to evaluation mode
+                    logger.info(f"OaSIS embedding model {OASIS_MODEL_NAME} loaded successfully")
+                    
+                    self.models_loaded = True
+                    logger.info("OaSIS models loaded successfully")
+                    return True
+                    
+                except Exception as e:
+                    retry_count += 1
+                    logger.error(f"Error loading OaSIS models (attempt {retry_count}/{max_retries}): {str(e)}")
+                    if retry_count < max_retries:
+                        logger.info("Retrying OaSIS model loading...")
+                        continue
+                    else:
+                        logger.error("Failed to load OaSIS models after maximum retries")
+                        self.embedding_model = None
+                        self.tokenizer = None
+                        self.models_loaded = False
+                        return False
+    
+    def ensure_models_loaded(self):
+        """Ensure OaSIS models are loaded, loading them if necessary."""
+        if not self.models_loaded:
+            return self.load_models()
+        return True
+
+# Create a single instance of OasisModelState
+oasis_model_state = OasisModelState()
 
 # --- Core Functions ---
 
@@ -584,7 +637,8 @@ def format_user_profile_oasis(db: Session, user_id: int) -> Optional[str]:
 
 def generate_oasis_embedding(db: Session, user_id: int) -> Optional[np.ndarray]:
     """
-    Génère un embedding à partir du profil OaSIS formaté.
+    Génère un embedding à partir du profil OaSIS formaté en utilisant un modèle plus léger.
+    Utilise le modèle sentence-transformers/all-MiniLM-L6-v2 au lieu du modèle standard.
     
     Args:
         db: Session de base de données
@@ -593,9 +647,9 @@ def generate_oasis_embedding(db: Session, user_id: int) -> Optional[np.ndarray]:
     Returns:
         Embedding numpy ou None en cas d'échec
     """
-    # Ensure models are loaded
-    if not model_state.ensure_models_loaded():
-        logger.error("Failed to load models, cannot generate OaSIS embedding.")
+    # Ensure OaSIS models are loaded
+    if not oasis_model_state.ensure_models_loaded():
+        logger.error("Failed to load OaSIS models, cannot generate OaSIS embedding.")
         return None
 
     try:
@@ -621,10 +675,12 @@ def generate_oasis_embedding(db: Session, user_id: int) -> Optional[np.ndarray]:
             logger.error(f"Error storing OaSIS profile: {str(e)}")
             db.rollback()
             
-        # Tokenize and generate embeddings
-        inputs = model_state.tokenizer(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        # Tokenize and generate embeddings using the lighter OaSIS model
+        inputs = oasis_model_state.tokenizer(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
         with torch.no_grad():
-            embedding = model_state.embedding_model(**inputs).numpy()
+            # The all-MiniLM-L6-v2 model outputs embeddings directly from the last_hidden_state[:, 0, :]
+            outputs = oasis_model_state.embedding_model(**inputs)
+            embedding = outputs.last_hidden_state[:, 0, :].numpy()
         
         logger.info(f"Generated OaSIS embedding with shape {embedding.shape}")
         
