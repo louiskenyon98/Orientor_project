@@ -825,7 +825,7 @@ def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db
         logger.error(f"Error getting fallback career recommendations: {str(e)}")
         return []
 
-def get_career_recommendations(db: Session, user_id: int, limit: int = 30, use_oasis: bool = False) -> List[Dict[str, Any]]:
+def get_career_recommendations(db: Session, user_id: int, limit: int = 30, use_oasis: bool = True) -> List[Dict[str, Any]]:
     """
     Get personalized career recommendations for a user using their existing embedding.
     If no embedding exists, raises an error.
@@ -834,7 +834,7 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30, use_o
         db: Database session
         user_id: ID of the user
         limit: Maximum number of recommendations
-        use_oasis: Whether to use OaSIS embeddings (default: False)
+        use_oasis: Whether to use OaSIS embeddings (default: True)
         
     Returns:
         List of career recommendations
@@ -863,7 +863,7 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30, use_o
             # Si l'embedding OaSIS n'est pas trouvé mais demandé, essayer l'embedding standard
             if use_oasis:
                 logger.info(f"Falling back to standard embedding for user {user_id}")
-                return get_career_recommendations(db, user_id, limit, use_oasis=False)
+                return get_career_recommendations(db, user_id, limit, use_oasis=True)
             else:
                 raise ValueError(f"No embedding found for user {user_id}. Please complete your profile first.")
             
@@ -875,7 +875,7 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30, use_o
             # Si l'embedding OaSIS n'est pas valide mais demandé, essayer l'embedding standard
             if use_oasis:
                 logger.info(f"Falling back to standard embedding for user {user_id} due to parse error")
-                return get_career_recommendations(db, user_id, limit, use_oasis=False)
+                return get_career_recommendations(db, user_id, limit, use_oasis=True)
             else:
                 raise ValueError(f"Invalid embedding format for user {user_id}")
             

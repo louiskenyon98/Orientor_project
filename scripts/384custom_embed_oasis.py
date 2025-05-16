@@ -29,61 +29,30 @@ tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL)
 
 # === Helper Functions ===
 def combine_row_text(row: Dict[str, str]) -> str:
-    label = row.get("OaSIS Label - Final_x", "Unknown occupation").strip()
-    code = row.get("oasis_code", "N/A")
-    alt_titles = row.get("Job title text", "").replace(" | ", ", ").strip()
-    riasec = row.get("top_3_code", "N/A").strip()
-    requirement = row.get("Employment requirement", "").strip()
-    duties = row.get("Main duties", "").replace(" | ", "; ").strip()
-
-    skills = [
-        "Leadership", "Critical Thinking", "Problem Solving", "Analytical Thinking",
-        "Attention to Detail", "Collaboration", "Evaluation", "Decision Making", "Stress Tolerance"
+    """Combine row data into a single text string, prioritizing important fields."""
+    # Define priority order for fields
+    priority_fields = [
+        'oasis_code',
+        'OaSIS Label - Final_x',  # Ensure this is included
+        'Job title text',
+        'Main duties',
+        'Employment requirement',
+        'top_3_code'  # Add any other fields you want to prioritize
     ]
-    skill_scores = [f"{s}: {row.get(s, 'N/A')}" for s in skills]
-
-    passage = f"""
-oasis_code: {code}
-OaSIS Label - Final_x: {label}
-Job title text: {alt_titles}
-top_3_code: {riasec}
-Employment requirement: {requirement}
-Main duties: {duties}
-{chr(10).join(skill_scores)}
-    """.strip()
-
-    return passage
-
-# ... existing code ...
-
-# def combine_row_text(row: Dict[str, str]) -> str:
-#     """Combine row data into a single text string, prioritizing important fields."""
-#     # Define priority order for fields
-#     priority_fields = [
-#         'oasis_code',
-#         'OaSIS Label - Final_x',  # Ensure this is included
-#         'Job title text',
-#         'Main duties',
-#         'Employment requirement',
-#         'top_3_code', 
-#         "Leadership", "Critical Thinking", "Problem Solving", "Analytical Thinking",
-#         "Attention to Detail", "Collaboration", "Evaluation", "Decision Making", "Stress Tolerance"  # Add any other fields you want to prioritize
-#     ]
     
-#     text_parts = []
+    text_parts = []
     
-#     # First add priority fields
-#     for field in priority_fields:
-#         if field in row and row[field] and str(row[field]).strip() not in {"", "nan"}:
-#             text_parts.append(f"{field}: {row[field]}")
+    # First add priority fields
+    for field in priority_fields:
+        if field in row and row[field] and str(row[field]).strip() not in {"", "nan"}:
+            text_parts.append(f"{field}: {row[field]}")
     
-#     # Then add remaining fields
-#     for key, value in row.items():
-#         if key not in priority_fields and value and str(value).strip() not in {"", "nan"}:
-#             text_parts.append(f"{key}: {value}")
+    # Then add remaining fields
+    for key, value in row.items():
+        if key not in priority_fields and value and str(value).strip() not in {"", "nan"}:
+            text_parts.append(f"{key}: {value}")
 
-#     return ". ".join(text_parts).strip()
-
+    return ". ".join(text_parts).strip()
 
 def process_row(row: Dict[str, str], index_num: int, i: int) -> Dict:
     if not row.get("oasis_code"):
@@ -102,13 +71,18 @@ def process_row(row: Dict[str, str], index_num: int, i: int) -> Dict:
     hash_id = hashlib.md5(raw_code.encode("utf-8")).hexdigest()[:12]
     doc_id = f"oasis-{hash_id}-{index_num}"
 
+    # Ensure riasec is not null
+    riasec = row.get("top_3_code", "N/A").strip()
+    if not riasec:
+        riasec = "N/A"  # Set a default value if riasec is empty or None
+
     return {
         "id": doc_id,
         "values": embedding,
         "metadata": {
             "label": str(row.get("OaSIS Label - Final_x") or "Unknown"),
             "job_title": str(row.get("Job title text") or ""),
-            "riasec": row.get("top_3_code", "N/A"),
+            "riasec": riasec,  # Use the validated riasec value
             "source": "KnowledgeBase",
             "text": full_text
         }

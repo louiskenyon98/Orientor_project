@@ -11,6 +11,7 @@ import torch.nn as nn
 from transformers import AutoTokenizer, AutoModel
 import joblib
 import boto3
+from sentence_transformers import SentenceTransformer
 from pathlib import Path
 from sklearn.decomposition import PCA
 import threading
@@ -189,7 +190,6 @@ model_state = ModelState()
 class OasisModelState:
     def __init__(self):
         self.embedding_model = None
-        self.tokenizer = None
         self.models_loaded = False
         self._lock = threading.Lock()
     
@@ -204,11 +204,9 @@ class OasisModelState:
             
             while retry_count < max_retries:
                 try:
-                    # Load the lighter model for OaSIS embeddings
-                    self.tokenizer = AutoTokenizer.from_pretrained(OASIS_MODEL_NAME)
-                    base_model = AutoModel.from_pretrained(OASIS_MODEL_NAME)
-                    self.embedding_model = base_model  # No projection needed for this model
-                    self.embedding_model.eval()  # Set to evaluation mode
+                    # Load the lighter model for OaSIS embeddings using SentenceTransformer
+                    # This will generate embeddings of dimension 384
+                    self.embedding_model = SentenceTransformer(OASIS_MODEL_NAME)
                     logger.info(f"OaSIS embedding model {OASIS_MODEL_NAME} loaded successfully")
                     
                     self.models_loaded = True
@@ -224,7 +222,6 @@ class OasisModelState:
                     else:
                         logger.error("Failed to load OaSIS models after maximum retries")
                         self.embedding_model = None
-                        self.tokenizer = None
                         self.models_loaded = False
                         return False
     
@@ -675,12 +672,16 @@ def generate_oasis_embedding(db: Session, user_id: int) -> Optional[np.ndarray]:
             logger.error(f"Error storing OaSIS profile: {str(e)}")
             db.rollback()
             
-        # Tokenize and generate embeddings using the lighter OaSIS model
-        inputs = oasis_model_state.tokenizer(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
-        with torch.no_grad():
-            # The all-MiniLM-L6-v2 model outputs embeddings directly from the last_hidden_state[:, 0, :]
-            outputs = oasis_model_state.embedding_model(**inputs)
-            embedding = outputs.last_hidden_state[:, 0, :].numpy()
+        # Generate embeddings using SentenceTransformer's encode method
+        # This will generate embeddings of dimension 384, matching the Pinecone index
+        embedding = oasis_model_state.embedding_model.encode(
+            f"passage: {formatted_text}",
+            convert_to_numpy=True
+        )
+        
+        # Convert to numpy array if it's not already
+        if not isinstance(embedding, np.ndarray):
+            embedding = np.array(embedding)
         
         logger.info(f"Generated OaSIS embedding with shape {embedding.shape}")
         
@@ -695,7 +696,8 @@ def generate_oasis_embedding(db: Session, user_id: int) -> Optional[np.ndarray]:
         }
         logger.info(f"OaSIS embedding statistics: {embedding_stats}")
         
-        return embedding[0]  # Return the first (and only) embedding
+        # SentenceTransformer.encode() returns a 1D array for a single text
+        return embedding  # Return the embedding directly
 
     except Exception as e:
         logger.error(f"Error generating OaSIS embedding: {str(e)}")

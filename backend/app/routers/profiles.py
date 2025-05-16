@@ -6,7 +6,7 @@ import logging
 from app.utils.database import get_db
 from app.models import User, UserProfile, UserSkill
 from app.routers.user import get_current_user
-from app.services.embedding_service import process_user_embedding
+from app.services.embedding_service import process_user_embedding, process_user_oasis_embedding
 from app.services.peer_matching_service import generate_peer_suggestions
 from sqlalchemy.sql import text
 import uuid
@@ -213,9 +213,9 @@ async def update_profile(
             namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
             user_uuid = str(uuid.uuid5(namespace_uuid, user_id_str))
             
-            logger.info(f"ID utilisateur original: {user_id_str}, UUID généré: {user_uuid}")
+            logger.info(f"Original user ID: {user_id_str}, Generated UUID: {user_uuid}")
             
-            # Fetch RIASEC scores using UUID
+            # Fetch RIASEC scores using integer user_id
             riasec_query = text("""
                 SELECT r_score, i_score, a_score, s_score, e_score, c_score, top_3_code
                 FROM gca_results 
@@ -223,7 +223,7 @@ async def update_profile(
                 ORDER BY created_at DESC
                 LIMIT 1
             """)
-            riasec_result = db.execute(riasec_query, {"user_id": user_uuid}).fetchone()
+            riasec_result = db.execute(riasec_query, {"user_id": current_user.id}).fetchone()
             
             # Fetch saved recommendations using integer user_id
             recommendations_query = text("""
@@ -309,7 +309,6 @@ async def update_profile(
             logger.info(f"Profile data: {profile_data}")
             
             # Use the centralized embedding service
-            from app.services.embedding_service import process_user_embedding
             success = process_user_embedding(db, current_user.id, profile_data)
             
             if not success:
@@ -318,13 +317,24 @@ async def update_profile(
                 logger.info(f"Successfully generated new embedding for user ID: {current_user.id}")
                 
                 # Generate peer suggestions with the new embedding
-                from app.services.peer_matching_service import generate_peer_suggestions
                 peer_success = generate_peer_suggestions(db, current_user.id)
                 if peer_success:
                     logger.info(f"Successfully generated peer suggestions for user ID: {current_user.id}")
                 else:
                     logger.warning(f"Failed to generate peer suggestions for user ID: {current_user.id}")
-                    
+                
+                # Generate the OaSIS embedding
+                try:
+                    logger.info(f"Generating OaSIS embedding for user ID: {current_user.id}")
+                    oasis_success = process_user_oasis_embedding(db, current_user.id)
+                    if oasis_success:
+                        logger.info(f"OaSIS embedding generated and stored successfully for user ID: {current_user.id}")
+                    else:
+                        logger.warning(f"Failed to generate or store OaSIS embedding for user ID: {current_user.id}")
+                except Exception as e:
+                    logger.error(f"Error in OaSIS embedding process: {str(e)}")
+                    # Do not block the profile update if OaSIS embedding fails
+                
         except Exception as e:
             logger.error(f"Error in embedding/peer suggestion process: {str(e)}")
             # Don't fail the profile update if embedding generation fails

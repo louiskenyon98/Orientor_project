@@ -142,7 +142,7 @@ def compare_recommendations(db: Session, user_id: int):
         
         try:
             # Obtenir les recommandations basées sur l'embedding standard
-            std_recommendations = get_career_recommendations(db, user_id, limit=5, use_oasis=False)
+            std_recommendations = get_career_recommendations(db, user_id, limit=5, use_oasis=True)
             
             # Obtenir les recommandations basées sur l'embedding OaSIS
             oasis_recommendations = get_career_recommendations(db, user_id, limit=5, use_oasis=True)
