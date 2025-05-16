@@ -1,7 +1,7 @@
 import os
 import pickle
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import pandas as pd
 import numpy as np
 from sqlalchemy.orm import Session
@@ -16,10 +16,58 @@ from sklearn.decomposition import PCA
 import threading
 import ast
 import uuid
+import sys
+import importlib.util
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Import du module de formatage OaSIS
+def import_oasis_formatter():
+    """
+    Importe dynamiquement le module de formatage OaSIS.
+    
+    Returns:
+        Le module importé ou None en cas d'échec
+    """
+    try:
+        # Chemin vers le module de formatage OaSIS
+        # Le module se trouve dans le répertoire 'scripts' au niveau racine du projet
+        script_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                                  "scripts", "format_user_profile_oasis_style.py")
+        
+        # Vérifier si le fichier existe
+        if not os.path.exists(script_path):
+            logger.error(f"Le module de formatage OaSIS n'existe pas au chemin: {script_path}")
+            logger.info(f"Chemin absolu recherché: {os.path.abspath(script_path)}")
+            return None
+            
+        # Importer le module dynamiquement
+        spec = importlib.util.spec_from_file_location("format_user_profile_oasis_style", script_path)
+        oasis_formatter = importlib.util.module_from_spec(spec)
+        
+        try:
+            spec.loader.exec_module(oasis_formatter)
+            
+            # Vérifier si le module a les dépendances requises
+            if hasattr(oasis_formatter, "check_dependencies"):
+                if not oasis_formatter.check_dependencies():
+                    logger.error("Le module de formatage OaSIS a des dépendances manquantes")
+                    return None
+            
+            logger.info("Module de formatage OaSIS importé avec succès")
+            return oasis_formatter
+        except ImportError as e:
+            logger.error(f"Erreur d'importation lors du chargement du module OaSIS: {str(e)}")
+            logger.info("Certaines dépendances requises peuvent être manquantes. Vérifiez que tous les packages nécessaires sont installés.")
+            return None
+    except Exception as e:
+        logger.error(f"Erreur lors de l'importation du module de formatage OaSIS: {str(e)}")
+        return None
+
+# Importer le module de formatage OaSIS
+oasis_formatter = import_oasis_formatter()
 
 # Environment detection
 IS_PRODUCTION = os.getenv('ENVIRONMENT', 'development').lower() == 'production'
@@ -169,7 +217,7 @@ def fetch_user_data(db: Session, user_id: int) -> Dict[str, Any]:
                    problem_solving, analytical_thinking, attention_to_detail,
                    collaboration, adaptability, independence, evaluation,
                    decision_making, stress_tolerance
-            FROM users_skills WHERE user_id = :user_id
+            FROM user_skills WHERE user_id = :user_id
         """)
         skills_result = db.execute(skills_query, {"user_id": user_id}).fetchone()
         skills_data = {}
@@ -423,7 +471,7 @@ def generate_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] =
         logger.error(f"Error generating embedding: {str(e)}")
         return None
 
-def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
+def store_embedding(db: Session, user_id: int, embedding: np.ndarray, column_name: str = "embedding") -> bool:
     """
     Store user embedding in the database.
     
@@ -431,6 +479,7 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
         db: Database session
         user_id: User ID to store embedding for
         embedding: Numpy array containing the embedding vector
+        column_name: Column name to store the embedding in (default: "embedding")
         
     Returns:
         Boolean indicating success or failure
@@ -439,21 +488,24 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray) -> bool:
         # Convert numpy array to list for storage
         embedding_list = embedding.tolist()
         
+        # Construire la requête SQL dynamiquement en fonction du nom de colonne
+        query = text(f"""
+            UPDATE user_profiles
+            SET {column_name} = :embedding
+            WHERE user_id = :user_id
+        """)
+        
         # Update the user's profile with the embedding
         db.execute(
-            text("""
-                UPDATE user_profiles
-                SET embedding = :embedding
-                WHERE user_id = :user_id
-            """),
+            query,
             {"embedding": embedding_list, "user_id": user_id}
         )
         db.commit()
         
-        logger.info(f"Successfully stored embedding for user {user_id}")
+        logger.info(f"Successfully stored embedding for user {user_id} in column {column_name}")
         return True
     except Exception as e:
-        logger.error(f"Error storing embedding: {str(e)}")
+        logger.error(f"Error storing embedding in column {column_name}: {str(e)}")
         db.rollback()
         return False
 
@@ -479,6 +531,188 @@ def process_user_embedding(db: Session, user_id: int, profile_data: Dict[str, An
     except Exception as e:
         logger.error(f"Error processing user embedding: {str(e)}")
         return False
+
+def format_user_profile_oasis(db: Session, user_id: int) -> Optional[str]:
+    """
+    Formate le profil utilisateur selon le style OaSIS.
+    
+    Args:
+        db: Session de base de données
+        user_id: ID de l'utilisateur
+        
+    Returns:
+        Profil formaté selon le style OaSIS ou None en cas d'échec
+    """
+    try:
+        # Vérifier si le module de formatage OaSIS est disponible
+        if oasis_formatter is None:
+            logger.error("Le module de formatage OaSIS n'est pas disponible")
+            logger.info("Assurez-vous que le module format_user_profile_oasis_style.py est présent dans le répertoire 'scripts'")
+            logger.info("Et que toutes les dépendances requises sont installées (langchain, langchain-openai, etc.)")
+            return None
+            
+        # Récupérer les données utilisateur
+        user_data = fetch_user_data(db, user_id)
+        if not user_data:
+            logger.error(f"Aucune donnée utilisateur trouvée pour l'utilisateur {user_id}")
+            return None
+            
+        # Extraire les données nécessaires pour le formatage OaSIS
+        profile = user_data.get("profile", {})
+        skills = user_data.get("skills", {})
+        riasec = user_data.get("riasec", {})
+        saved_recommendations = user_data.get("saved_recommendations", [])
+        
+        # Vérifier que la fonction format_user_profile existe
+        if not hasattr(oasis_formatter, "format_user_profile"):
+            logger.error("La fonction format_user_profile n'existe pas dans le module OaSIS")
+            return None
+        
+        # Formater le profil selon le style OaSIS
+        formatted_profile = oasis_formatter.format_user_profile(profile, skills, riasec, saved_recommendations)
+        
+        if formatted_profile is None:
+            logger.error("Le formatage OaSIS a échoué, vérifiez les logs du module OaSIS pour plus de détails")
+            return None
+            
+        logger.info(f"Profil OaSIS formaté avec succès pour l'utilisateur {user_id}")
+        return formatted_profile
+        
+    except Exception as e:
+        logger.error(f"Erreur lors du formatage du profil OaSIS: {str(e)}")
+        return None
+
+def generate_oasis_embedding(db: Session, user_id: int) -> Optional[np.ndarray]:
+    """
+    Génère un embedding à partir du profil OaSIS formaté.
+    
+    Args:
+        db: Session de base de données
+        user_id: ID de l'utilisateur
+        
+    Returns:
+        Embedding numpy ou None en cas d'échec
+    """
+    # Ensure models are loaded
+    if not model_state.ensure_models_loaded():
+        logger.error("Failed to load models, cannot generate OaSIS embedding.")
+        return None
+
+    try:
+        # Formater le profil selon le style OaSIS
+        formatted_text = format_user_profile_oasis(db, user_id)
+        if formatted_text is None:
+            logger.error(f"Failed to format OaSIS profile for user {user_id}")
+            return None
+            
+        # Stocker le profil OaSIS formaté dans la base de données
+        try:
+            db.execute(
+                text("""
+                    UPDATE user_profiles
+                    SET oasis_profile = :oasis_profile
+                    WHERE user_id = :user_id
+                """),
+                {"oasis_profile": formatted_text, "user_id": user_id}
+            )
+            db.commit()
+            logger.info(f"Successfully stored OaSIS profile for user {user_id}")
+        except Exception as e:
+            logger.error(f"Error storing OaSIS profile: {str(e)}")
+            db.rollback()
+            
+        # Tokenize and generate embeddings
+        inputs = model_state.tokenizer(formatted_text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+        with torch.no_grad():
+            embedding = model_state.embedding_model(**inputs).numpy()
+        
+        logger.info(f"Generated OaSIS embedding with shape {embedding.shape}")
+        
+        # Analyze embedding statistics
+        embedding_stats = {
+            "min": float(np.min(embedding)),
+            "max": float(np.max(embedding)),
+            "mean": float(np.mean(embedding)),
+            "std": float(np.std(embedding)),
+            "zeros": int(np.sum(embedding == 0)),
+            "unique_values": len(np.unique(embedding))
+        }
+        logger.info(f"OaSIS embedding statistics: {embedding_stats}")
+        
+        return embedding[0]  # Return the first (and only) embedding
+
+    except Exception as e:
+        logger.error(f"Error generating OaSIS embedding: {str(e)}")
+        return None
+
+def process_user_oasis_embedding(db: Session, user_id: int) -> bool:
+    """
+    Traite la génération et le stockage de l'embedding OaSIS d'un utilisateur.
+    
+    Args:
+        db: Session de base de données
+        user_id: ID de l'utilisateur
+        
+    Returns:
+        Booléen indiquant le succès ou l'échec
+    """
+    try:
+        # Générer l'embedding OaSIS
+        embedding = generate_oasis_embedding(db, user_id)
+        if embedding is None:
+            return False
+
+        # Stocker l'embedding OaSIS dans la base de données
+        return store_embedding(db, user_id, embedding, column_name="oasis_embedding")
+    except Exception as e:
+        logger.error(f"Error processing user OaSIS embedding: {str(e)}")
+        return False
+
+def get_user_oasis_embedding(db: Session, user_id: int, convert_to_uuid: bool = False) -> Optional[np.ndarray]:
+    """
+    Récupère l'embedding OaSIS existant d'un utilisateur depuis la base de données.
+    
+    Args:
+        db: Session de base de données
+        user_id: ID de l'utilisateur (entier)
+        convert_to_uuid: Indique s'il faut convertir l'ID utilisateur en format UUID pour la requête
+        
+    Returns:
+        Tableau numpy contenant le vecteur d'embedding ou None si non trouvé
+    """
+    try:
+        # Si conversion en UUID demandée, créer l'UUID
+        query_id = user_id
+        if convert_to_uuid:
+            user_id_str = str(user_id)
+            namespace_uuid = uuid.UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')  # UUID namespace DNS
+            query_id = str(uuid.uuid5(namespace_uuid, user_id_str))
+            logger.info(f"ID utilisateur original: {user_id_str}, UUID généré pour requête: {query_id}")
+        
+        # Interroger la table user_profiles pour l'embedding OaSIS
+        query = text("""
+            SELECT oasis_embedding
+            FROM user_profiles
+            WHERE user_id = :user_id
+        """)
+        result = db.execute(query, {"user_id": query_id}).fetchone()
+        
+        if not result or not hasattr(result, 'oasis_embedding') or not result.oasis_embedding:
+            logger.warning(f"No OaSIS embedding found for user {user_id} (query_id: {query_id})")
+            return None
+            
+        # Analyser l'embedding depuis la base de données
+        embedding = parse_embedding(result.oasis_embedding)
+        if embedding is None:
+            logger.error(f"Failed to parse OaSIS embedding for user {user_id} (query_id: {query_id})")
+            return None
+            
+        logger.info(f"Successfully retrieved OaSIS embedding for user {user_id} (query_id: {query_id})")
+        return np.array(embedding)
+        
+    except Exception as e:
+        logger.error(f"Error getting user OaSIS embedding for user {user_id}: {str(e)}")
+        return None
 
 def get_user_embedding(db: Session, user_id: int, convert_to_uuid: bool = False) -> Optional[np.ndarray]:
     """

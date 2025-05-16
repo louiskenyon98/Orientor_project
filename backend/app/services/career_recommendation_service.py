@@ -7,7 +7,7 @@ from sqlalchemy import text
 import pickle
 import random
 import json
-from app.services.embedding_service import parse_embedding
+from app.services.embedding_service import parse_embedding, get_user_oasis_embedding
 import pinecone
 import re
 from app.models.user_profile import UserProfile
@@ -171,7 +171,7 @@ DEFAULT_USER_EMBEDDINGS = {
     "finance": create_domain_embedding(seed=49)  # Finance focused
 }
 
-def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
+def get_user_embedding(db: Session, user_id: int, use_oasis: bool = False) -> Optional[List[float]]:
     """
     Get the embedding for a user by first trying to use the stored embedding,
     then falling back to generating it on-the-fly
@@ -179,11 +179,22 @@ def get_user_embedding(db: Session, user_id: int) -> Optional[List[float]]:
     Args:
         db: Database session
         user_id: ID of the user
+        use_oasis: Whether to use OaSIS embeddings (default: False)
         
     Returns:
         User embedding or None if not found
     """
     try:
+        # Si l'utilisation d'OaSIS est demandée, essayer d'abord d'obtenir l'embedding OaSIS
+        if use_oasis:
+            logger.info(f"Tentative de récupération de l'embedding OaSIS pour l'utilisateur {user_id}")
+            oasis_embedding = get_user_oasis_embedding(db, user_id)
+            if oasis_embedding is not None:
+                logger.info(f"Embedding OaSIS trouvé pour l'utilisateur {user_id}")
+                return oasis_embedding.tolist()
+            else:
+                logger.warning(f"Aucun embedding OaSIS trouvé pour l'utilisateur {user_id}, retour à l'embedding standard")
+        
         # First try to get the stored embedding from the database
         query = text("""
             SELECT embedding, name, job_title, industry, skills, interests
@@ -836,7 +847,7 @@ def get_career_recommendations_fallback(limit: int = 30, user_id: int = None, db
         logger.error(f"Error getting fallback career recommendations: {str(e)}")
         return []
 
-def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> List[Dict[str, Any]]:
+def get_career_recommendations(db: Session, user_id: int, limit: int = 30, use_oasis: bool = False) -> List[Dict[str, Any]]:
     """
     Get personalized career recommendations for a user using their existing embedding.
     If no embedding exists, raises an error.
@@ -845,6 +856,7 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
         db: Database session
         user_id: ID of the user
         limit: Maximum number of recommendations
+        use_oasis: Whether to use OaSIS embeddings (default: False)
         
     Returns:
         List of career recommendations
@@ -854,28 +866,43 @@ def get_career_recommendations(db: Session, user_id: int, limit: int = 30) -> Li
     """
     try:
         # Get user embedding from the database
-        logger.info(f"Getting career recommendations for user {user_id}")
+        logger.info(f"Getting career recommendations for user {user_id}, use_oasis={use_oasis}")
+        
+        # Déterminer quelle colonne d'embedding utiliser
+        embedding_column = "oasis_embedding" if use_oasis else "embedding"
         
         # Query the user_profiles table for the embedding
-        query = text("""
-            SELECT embedding
+        query = text(f"""
+            SELECT {embedding_column}
             FROM user_profiles
             WHERE user_id = :user_id
         """)
         result = db.execute(query, {"user_id": user_id}).fetchone()
         
-        if not result or not result.embedding:
-            logger.error(f"No embedding found for user {user_id}")
-            raise ValueError(f"No embedding found for user {user_id}. Please complete your profile first.")
+        if not result or not getattr(result, embedding_column, None):
+            logger.error(f"No {embedding_column} found for user {user_id}")
+            
+            # Si l'embedding OaSIS n'est pas trouvé mais demandé, essayer l'embedding standard
+            if use_oasis:
+                logger.info(f"Falling back to standard embedding for user {user_id}")
+                return get_career_recommendations(db, user_id, limit, use_oasis=False)
+            else:
+                raise ValueError(f"No embedding found for user {user_id}. Please complete your profile first.")
             
         # Parse the embedding from the database
-        embedding = parse_embedding(result.embedding)
+        embedding = parse_embedding(getattr(result, embedding_column))
         if embedding is None:
-            logger.error(f"Failed to parse embedding for user {user_id}")
-            raise ValueError(f"Invalid embedding format for user {user_id}")
+            logger.error(f"Failed to parse {embedding_column} for user {user_id}")
             
-        logger.info(f"Got embedding for user {user_id}, size: {len(embedding)}")
-        logger.info(f"First 5 values of embedding: {embedding[:5]}")
+            # Si l'embedding OaSIS n'est pas valide mais demandé, essayer l'embedding standard
+            if use_oasis:
+                logger.info(f"Falling back to standard embedding for user {user_id} due to parse error")
+                return get_career_recommendations(db, user_id, limit, use_oasis=False)
+            else:
+                raise ValueError(f"Invalid embedding format for user {user_id}")
+            
+        logger.info(f"Got {embedding_column} for user {user_id}, size: {len(embedding)}")
+        logger.info(f"First 5 values of {embedding_column}: {embedding[:5]}")
         
         # Get recommendations from Pinecone
         recommendations = get_pinecone_career_recommendations(embedding, limit)
