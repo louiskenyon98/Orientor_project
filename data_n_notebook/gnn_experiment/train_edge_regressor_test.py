@@ -16,8 +16,6 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 import pandas as pd
-import glob
-import torch.serialization
 
 # === Device Setup === #
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
@@ -107,6 +105,10 @@ def prepare_edge_data():
     # Combine positive and negative samples
     all_edges = triplets + negatives
     random.shuffle(all_edges)
+    
+    # Sample a smaller dataset
+    sample_size = 100  # Adjust this number for your test size
+    all_edges = all_edges[:sample_size]
     
     # Split into train/val/test
     train_edges, temp_edges = train_test_split(all_edges, test_size=0.3, random_state=42)
@@ -199,47 +201,19 @@ def calculate_metrics(predictions, actuals):
 
 # === Hyperparameter Search Space === #
 search_space = {
-    "hidden_dim": [128, 256],
-    "heads": [4, 8],
-    "lr": [1e-4, 2e-4],
-    "dropout": [0.3, 0.5],
-    "weight_decay": [1e-4, 5e-4],
-    "batch_size": [64, 128]  # Increased batch sizes for M1 Pro
+    'hidden_dim': [128],
+    'heads': [4],
+    'lr': [0.0001],
+    'dropout': [0.3],
+    'weight_decay': [0.0001],
+    'batch_size': [64]
 }
-
 
 combinations = list(product(*search_space.values()))
 print(f"Total combinations to try: {len(combinations)}")
 
 # === MLflow Setup === #
 mlflow.set_experiment("Career_Tree_Edge_Regression")
-
-def find_latest_checkpoint(checkpoint_dir):
-    """Find the latest checkpoint file."""
-    checkpoint_files = glob.glob(str(checkpoint_dir / "pause_checkpoint_*.pt"))
-    if not checkpoint_files:
-        return None
-    return max(checkpoint_files, key=os.path.getctime)
-
-def load_checkpoint(checkpoint_path, model, optimizer):
-    """Load model and optimizer state from checkpoint."""
-    print(f"Loading checkpoint from {checkpoint_path}")
-    
-    # Add safe globals for numpy types
-    torch.serialization.add_safe_globals(['numpy._core.multiarray.scalar'])
-    
-    try:
-        # First try loading with weights_only=True (safer)
-        checkpoint = torch.load(checkpoint_path, weights_only=True)
-    except Exception as e:
-        print("Warning: Safe loading failed, attempting full load...")
-        # If that fails, try loading with weights_only=False
-        checkpoint = torch.load(checkpoint_path, weights_only=False)
-    
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    
-    return checkpoint['epoch'], checkpoint['val_loss'], checkpoint['val_metrics']
 
 for combo_idx, combo in enumerate(combinations, 1):
     config = dict(zip(search_space.keys(), combo))
@@ -252,7 +226,7 @@ for combo_idx, combo in enumerate(combinations, 1):
             mlflow.log_param(k, v)
         
         mlflow.log_param("embedding_dim", x.size(1))
-        mlflow.log_param("epochs", 100)
+        mlflow.log_param("epochs", 2)
         
         # Initialize model
         model = CareerTreeModel(
@@ -276,147 +250,115 @@ for combo_idx, combo in enumerate(combinations, 1):
         best_val_loss = float('inf')
         patience = 10
         patience_counter = 0
-        start_time = time.time()
-        
-        # Check for existing checkpoint
-        latest_checkpoint = find_latest_checkpoint(CHECKPOINT_DIR)
-        start_epoch = 1
-        
-        if latest_checkpoint:
-            print(f"\nFound checkpoint: {latest_checkpoint}")
-            response = input("Do you want to resume training from this checkpoint? (y/n): ")
-            if response.lower() == 'y':
-                start_epoch, best_val_loss, val_metrics = load_checkpoint(latest_checkpoint, model, optimizer)
-                print(f"Resuming training from epoch {start_epoch}")
-                print(f"Previous best validation loss: {best_val_loss:.4f}")
-            else:
-                print("Starting fresh training run")
+        start_time = time.time()  # Start timing
         
         # Create progress bar for epochs
-        epoch_pbar = tqdm(range(start_epoch, 100), desc="Training")
+        epoch_pbar = tqdm(range(1, 2), desc="Training")
         
-        try:
-            for epoch in epoch_pbar:
-                epoch_start = time.time()
-                model.train()
-                total_loss = 0
+        for epoch in epoch_pbar:
+            epoch_start = time.time()
+            model.train()
+            total_loss = 0
+            
+            # Training
+            train_pbar = tqdm(range(0, len(train_edges), config["batch_size"]), 
+                            desc=f"Epoch {epoch} - Training", leave=False)
+            # In the training loop
+            for batch_start in train_pbar:
+                batch_edges = train_edges[batch_start:batch_start + config["batch_size"]]
                 
-                # Training
-                train_pbar = tqdm(range(0, len(train_edges), config["batch_size"]), 
-                                desc=f"Epoch {epoch} - Training", leave=False)
-                # In the training loop
-                for batch_start in train_pbar:
-                    batch_edges = train_edges[batch_start:batch_start + config["batch_size"]]
-                    
-                    # Get positive and negative pairs
-                    pos_edges = [e for e in batch_edges if e[2] > 0]
-                    neg_edges = [e for e in batch_edges if e[2] == 0]
-                    
-                    # Ensure equal numbers
-                    min_size = min(len(pos_edges), len(neg_edges))
-                    if min_size == 0:
-                        continue
-                        
-                    # Sample equal numbers
-                    pos_edges = random.sample(pos_edges, min_size)
-                    neg_edges = random.sample(neg_edges, min_size)
-                    
-                    # Create tensors
-                    pos_pairs = torch.tensor([[e[0], e[1]] for e in pos_edges]).t().to(device)
-                    neg_pairs = torch.tensor([[e[0], e[1]] for e in neg_edges]).t().to(device)
-                    
-                    # Get predictions for positive and negative pairs
-                    pos_pred = model(x, edge_index, pos_pairs).squeeze()
-                    neg_pred = model(x, edge_index, neg_pairs).squeeze()
-                    
-                    # Calculate margin ranking loss
-                    margin_value = 0.2  # Renamed from margin to margin_value
-                    loss = F.margin_ranking_loss(pos_pred, neg_pred, 
-                                               torch.ones_like(pos_pred), 
-                                               margin=margin_value)
-                    
-                    loss.backward()
-                    optimizer.step()
-                    
-                    total_loss += loss.item()
-                    train_pbar.set_postfix({"loss": f"{loss.item():.4f}"})
+                # Get positive and negative pairs
+                pos_edges = [e for e in batch_edges if e[2] > 0]
+                neg_edges = [e for e in batch_edges if e[2] == 0]
                 
-                # Validation
-                model.eval()
-                val_loss = 0
-                val_predictions = []
-                val_actuals = []
+                # Ensure equal numbers
+                min_size = min(len(pos_edges), len(neg_edges))
+                if min_size == 0:
+                    continue
+                    
+                # Sample equal numbers
+                pos_edges = random.sample(pos_edges, min_size)
+                neg_edges = random.sample(neg_edges, min_size)
                 
-                with torch.no_grad():
-                    for batch_start in range(0, len(val_edges), config["batch_size"]):
-                        batch_edges = val_edges[batch_start:batch_start + config["batch_size"]]
-                        edge_pairs = torch.tensor([[e[0], e[1]] for e in batch_edges]).t().to(device)
-                        labels = torch.tensor([e[2] for e in batch_edges]).float().to(device)
-                        
-                        pred = model(x, edge_index, edge_pairs).squeeze()
-                        val_loss += F.mse_loss(pred, labels).item()
-                        
-                        val_predictions.extend(pred.cpu().tolist())
-                        val_actuals.extend(labels.cpu().tolist())
+                # Create tensors
+                pos_pairs = torch.tensor([[e[0], e[1]] for e in pos_edges]).t().to(device)
+                neg_pairs = torch.tensor([[e[0], e[1]] for e in neg_edges]).t().to(device)
                 
-                # Calculate validation metrics
-                val_predictions = np.array(val_predictions)
-                val_actuals = np.array(val_actuals)
-                val_metrics = calculate_metrics(val_predictions, val_actuals)
+                # Get predictions for positive and negative pairs
+                pos_pred = model(x, edge_index, pos_pairs).squeeze()
+                neg_pred = model(x, edge_index, neg_pairs).squeeze()
                 
-                # Log metrics
-                mlflow.log_metric("val_loss", val_loss / len(val_edges), step=epoch)
-                for metric_name, metric_value in val_metrics.items():
-                    mlflow.log_metric(f"val_{metric_name}", metric_value, step=epoch)
+                # Calculate margin ranking loss
+                margin_value = 0.2  # Renamed from margin to margin_value
+                loss = F.margin_ranking_loss(pos_pred, neg_pred, 
+                                           torch.ones_like(pos_pred), 
+                                           margin=margin_value)
                 
-                # Update epoch progress bar
-                epoch_time = time.time() - epoch_start
-                epoch_pbar.set_postfix({
-                    "train_loss": f"{total_loss/len(train_edges):.4f}",
-                    "val_loss": f"{val_loss/len(val_edges):.4f}",
-                    "val_auc": f"{val_metrics['roc_auc']:.4f}",
-                    "time": f"{epoch_time:.1f}s"
-                })
+                loss.backward()
+                optimizer.step()
                 
-                # Early stopping
-                if val_loss < best_val_loss:
-                    best_val_loss = val_loss
-                    patience_counter = 0
-                    # Save best model
-                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    checkpoint_path = CHECKPOINT_DIR / f"best_model_{timestamp}.pt"
-                    torch.save({
-                        'epoch': epoch,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'val_loss': val_loss,
-                        'val_metrics': val_metrics,
-                        'config': config
-                    }, checkpoint_path)
-                    mlflow.log_artifact(str(checkpoint_path))
-                    print(f"\nSaved best model checkpoint to {checkpoint_path}")
-                else:
-                    patience_counter += 1
-                    if patience_counter >= patience:
-                        print(f"\nEarly stopping at epoch {epoch}")
-                        break
-                        
-        except KeyboardInterrupt:
-            print("\n⏸️ Training interrupted. Saving checkpoint...")
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            pause_checkpoint_path = CHECKPOINT_DIR / f"pause_checkpoint_{timestamp}.pt"
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'val_loss': val_loss,
-                'val_metrics': val_metrics,
-                'config': config,
-                'best_val_loss': best_val_loss,
-                'patience_counter': patience_counter
-            }, pause_checkpoint_path)
-            print(f"✅ Checkpoint saved to {pause_checkpoint_path}")
-            exit()
+                total_loss += loss.item()
+                train_pbar.set_postfix({"loss": f"{loss.item():.4f}"})
+            
+            # Validation
+            model.eval()
+            val_loss = 0
+            val_predictions = []
+            val_actuals = []
+            
+            with torch.no_grad():
+                for batch_start in range(0, len(val_edges), config["batch_size"]):
+                    batch_edges = val_edges[batch_start:batch_start + config["batch_size"]]
+                    edge_pairs = torch.tensor([[e[0], e[1]] for e in batch_edges]).t().to(device)
+                    labels = torch.tensor([e[2] for e in batch_edges]).float().to(device)
+                    
+                    pred = model(x, edge_index, edge_pairs).squeeze()
+                    val_loss += F.mse_loss(pred, labels).item()
+                    
+                    val_predictions.extend(pred.cpu().tolist())
+                    val_actuals.extend(labels.cpu().tolist())
+            
+            # Calculate validation metrics
+            val_predictions = np.array(val_predictions)
+            val_actuals = np.array(val_actuals)
+            val_metrics = calculate_metrics(val_predictions, val_actuals)
+            
+            # Log metrics
+            mlflow.log_metric("val_loss", val_loss / len(val_edges), step=epoch)
+            for metric_name, metric_value in val_metrics.items():
+                mlflow.log_metric(f"val_{metric_name}", metric_value, step=epoch)
+            
+            # Update epoch progress bar
+            epoch_time = time.time() - epoch_start
+            epoch_pbar.set_postfix({
+                "train_loss": f"{total_loss/len(train_edges):.4f}",
+                "val_loss": f"{val_loss/len(val_edges):.4f}",
+                "val_auc": f"{val_metrics['roc_auc']:.4f}",
+                "time": f"{epoch_time:.1f}s"
+            })
+            
+            # Early stopping
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                patience_counter = 0
+                # Save best model
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                checkpoint_path = CHECKPOINT_DIR / f"best_model_{timestamp}.pt"
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'val_loss': val_loss,
+                    'val_metrics': val_metrics,
+                    'config': config
+                }, checkpoint_path)
+                mlflow.log_artifact(str(checkpoint_path))
+                print(f"\nSaved best model checkpoint to {checkpoint_path}")
+            else:
+                patience_counter += 1
+                if patience_counter >= patience:
+                    print(f"\nEarly stopping at epoch {epoch}")
+                    break
         
         # Final evaluation on test set
         print("\nEvaluating on test set...")
