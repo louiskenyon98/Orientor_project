@@ -1,10 +1,20 @@
 # visualizer.py
 from pyvis.network import Network
 import json
+
 def visualize_pyvis(G, output_html="esco_graph.html"):
     print(f"[LOG] Generating interactive graph visualization: {output_html}")
-    net = Network(notebook=False, directed=True, cdn_resources='in_line', height='1000px', width='200%', bgcolor='#ffffff', font_color='black')
+    net = Network(
+        notebook=True,  # Changed to True for Jupyter notebook
+        directed=True,
+        cdn_resources='remote',  # Changed to remote to ensure proper template loading
+        height='1000px',
+        width='100%',
+        bgcolor='#ffffff',
+        font_color='black'
+    )
 
+    # Add nodes with their attributes
     for node, data in G.nodes(data=True):
         label = data.get('label', node)
         node_type = data.get('type', 'unknown')
@@ -18,6 +28,7 @@ def visualize_pyvis(G, output_html="esco_graph.html"):
             color = "gray"
         net.add_node(node, label=label, title=node_type, color=color, size=10)
 
+    # Add edges with their attributes
     for src, dst, data in G.edges(data=True):
         edge_type = data.get('type', '')
         if edge_type == 'aggregates':
@@ -25,19 +36,9 @@ def visualize_pyvis(G, output_html="esco_graph.html"):
         else:
             net.add_edge(src, dst, label=edge_type, font={'size': 5})
 
-    net.force_atlas_2based()  # Use force-directed layout to spread nodes apart
+    # Configure physics and layout
     net.set_options("""
     {
-        "layout": {
-            "hierarchical": {
-                "enabled": false,
-                "levelSeparation": 150,
-                "nodeSpacing": 200,
-                "treeSpacing": 200,
-                "direction": "UD",
-                "sortMethod": "directed"
-            }
-        },
         "physics": {
             "enabled": true,
             "barnesHut": {
@@ -56,8 +57,13 @@ def visualize_pyvis(G, output_html="esco_graph.html"):
     }
     """)
 
-    net.write_html(output_html)
-    print("[LOG] Visualization complete.")
+    # Save the visualization
+    try:
+        net.write_html(output_html)
+        print("[LOG] Visualization complete.")
+    except Exception as e:
+        print(f"[ERROR] Failed to generate visualization: {str(e)}")
+        raise
 
 def export_to_json(G, path="graph.json"):
     print(f"[LOG] Exporting graph to JSON file: {path}")
