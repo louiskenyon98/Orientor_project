@@ -43,10 +43,17 @@ def run_pipeline():
         print("[ERROR] Invalid selection.")
         return
 
-    # G = build_graph(esco_data)
+    # Build the graph
     G = build_occupation_subgraph(esco_data, occ_id, depth=10, include_groups=True, include_isco=True)
+    
+    # Export for visualization
     visualize_pyvis(G, "esco_graph.html")
     export_to_json(G, "esco_graph.json")
+    
+    # Export for GNN training
+    gnn_data_dir = "/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/gnn_experiment/data"
+    export_graph_for_gnn(G, gnn_data_dir)
+    
     end_time = time.time()
     print(f"[LOG] Pipeline executed in {end_time - start_time:.2f} seconds.")
 

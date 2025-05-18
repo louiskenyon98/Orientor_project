@@ -74,6 +74,30 @@ def save_labeled_skill_occ_pairs(G, out_path):
             f.write(json.dumps(t) + "\n")
     log_progress(f"Saved {len(triplets)} skill→occupation triplets to {out_path}")
 
+
+def get_skill_label(esco_data, skill_id):
+    skill_row = esco_data['skills'].query("ID == @skill_id")
+    if not skill_row.empty:
+        return clean_label(skill_row.iloc[0]['PREFERREDLABEL'])
+    print(f"[WARN] Skill ID {skill_id} not found in skills.csv")
+    return f"skill::{skill_id}"
+
+def get_skill_group_label(esco_data, group_id):
+    group_row = esco_data['skill_groups'].query("ID == @group_id")
+    if not group_row.empty:
+        return clean_label(group_row.iloc[0]['PREFERREDLABEL'])
+    return f"skillgroup::{group_id}"
+
+def get_isco_group_label(esco_data, group_id):
+    if 'isco_groups' not in esco_data:
+        print("[WARN] 'isco_groups' not found in esco_data.")
+        return f"iscogroup::{group_id}"
+    group_row = esco_data['isco_groups'].query("ID == @group_id")
+    if not group_row.empty:
+        return clean_label(group_row.iloc[0]['PREFERREDLABEL'])
+    print(f"[WARN] ISCO Group ID {group_id} not found in isco_groups.csv")
+    return f"iscogroup::{group_id}"
+
 def build_graph(esco_data):
     start_time = time.time()
     log_progress("Building graph from ESCO data...")
@@ -157,7 +181,7 @@ def build_graph(esco_data):
     return G
 
 
-def export_graph_for_gnn(G, out_dir):
+def export_graph_for_gnn(G, out_dir="/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/gnn_experiment/data"):
     start_time = time.time()
     log_progress("Exporting graph for GNN training...")
     os.makedirs(out_dir, exist_ok=True)
@@ -174,11 +198,17 @@ def export_graph_for_gnn(G, out_dir):
             edge_type.append(data.get("type", "unknown"))
 
     features = []
+    node_metadata = {}  # Store node metadata
     missing_nodes = []
 
     for n in G.nodes():
         if 'embedding' in G.nodes[n]:
             features.append(G.nodes[n]['embedding'])
+            # Save all node attributes except embedding
+            node_metadata[n] = {
+                k: v for k, v in G.nodes[n].items() 
+                if k != 'embedding' and not k.startswith('_')
+            }
         else:
             missing_nodes.append(n)
 
@@ -186,6 +216,7 @@ def export_graph_for_gnn(G, out_dir):
         print(f"[WARN] {len(missing_nodes)} nodes missing embeddings (e.g. {missing_nodes[:3]}).")
         print("They will be excluded from the feature matrix. Ensure this is acceptable for your GNN model.")
 
+    # Save all data files
     torch.save(torch.tensor(edge_index).t().long(), os.path.join(out_dir, "edge_index.pt"))
     torch.save(torch.tensor(features).float(), os.path.join(out_dir, "node_features.pt"))
 
@@ -197,6 +228,10 @@ def export_graph_for_gnn(G, out_dir):
 
     with open(os.path.join(out_dir, "idx2node.json"), "w") as f:
         json.dump(idx2node, f)
+        
+    # Save node metadata
+    with open(os.path.join(out_dir, "node_metadata.json"), "w") as f:
+        json.dump(node_metadata, f, indent=2)
   
     end_time = time.time()
     duration = end_time - start_time

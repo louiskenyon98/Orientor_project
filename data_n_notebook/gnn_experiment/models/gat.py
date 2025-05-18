@@ -50,3 +50,11 @@ class CareerTreeModel(torch.nn.Module):
             return edge_scores
         
         return node_embeddings
+        
+    def get_node_embeddings(self, x, edge_index):
+        """Extract node embeddings from the GAT model."""
+        # Get embeddings from the GAT layers
+        x = self.gat.gat1(x, edge_index)
+        x = F.elu(x)
+        x = self.gat.gat2(x, edge_index)
+        return x

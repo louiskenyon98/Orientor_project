@@ -16,6 +16,16 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 import pandas as pd
+from pinecone import Pinecone
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get Pinecone API key from environment
+PINECONE_API_KEY = os.getenv('PINECONE_API_KEY')
+if not PINECONE_API_KEY:
+    raise ValueError("Please set PINECONE_API_KEY in your .env file")
 
 # === Device Setup === #
 device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
@@ -425,3 +435,89 @@ for combo_idx, combo in enumerate(combinations, 1):
         for metric_name, metric_value in test_metrics.items():
             print(f"{metric_name}: {metric_value:.4f}")
         print(f"\nTraining time: {total_time/60:.2f} minutes") 
+
+def get_node_embeddings(model, x, edge_index, device):
+    """Extract node embeddings from the trained model."""
+    model.eval()
+    with torch.no_grad():
+        embeddings = model.get_node_embeddings(x, edge_index)
+        return embeddings.cpu().numpy()
+
+# Get final node embeddings
+print("\nExtracting node embeddings...")
+node_embeddings = get_node_embeddings(model, x, edge_index, device)
+
+# Save embeddings locally
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+embeddings_path = RESULTS_DIR / f"node_embeddings_{timestamp}.npy"
+np.save(embeddings_path, node_embeddings)
+mlflow.log_artifact(str(embeddings_path))
+
+# Save embedding metadata
+embedding_metadata = {
+    "num_nodes": len(node_embeddings),
+    "embedding_dim": node_embeddings.shape[1],
+    "node_mapping": {str(idx): node for node, idx in node2idx.items()}
+}
+metadata_path = RESULTS_DIR / f"embedding_metadata_{timestamp}.json"
+with open(metadata_path, "w") as f:
+    json.dump(embedding_metadata, f, indent=2)
+mlflow.log_artifact(str(metadata_path))
+
+# Load node information
+print("\nLoading node information...")
+with open(DATA_DIR / "node_metadata.json", "r") as f:
+    node_metadata = json.load(f)
+
+# Upload embeddings to Pinecone
+print("\nUploading embeddings to Pinecone with detailed metadata...")
+try:
+    # Initialize Pinecone client
+    pc = Pinecone(api_key=PINECONE_API_KEY)
+    
+    # Get or create index
+    index_name = "gnn-embeddings"
+    if index_name not in pc.list_indexes().names():
+        print(f"Creating new index: {index_name}")
+        pc.create_index(
+            name=index_name,
+            dimension=node_embeddings.shape[1],
+            metric="cosine"
+        )
+    
+    index = pc.Index(index_name)
+    
+    # Prepare vectors for upload
+    vectors_to_upsert = []
+    for idx, embedding in enumerate(node_embeddings):
+        node_name = idx2node[str(idx)]
+        node_data = node_metadata.get(node_name, {})
+        
+        vectors_to_upsert.append({
+            "id": node_name,
+            "values": embedding.tolist(),
+            "metadata": {
+                "type": node_data.get("type", "unknown"),
+                "original_id": node_name,
+                "preferred_label": node_data.get("label", ""),
+                "description": node_data.get("description", ""),
+                "definition": node_data.get("definition", ""),
+                "alt_labels": node_data.get("alt_labels", []),
+                "broader": node_data.get("broader", []),
+                "narrower": node_data.get("narrower", []),
+                "related": node_data.get("related", [])
+            }
+        })
+    
+    # Upload in batches
+    batch_size = 100
+    for i in range(0, len(vectors_to_upsert), batch_size):
+        batch = vectors_to_upsert[i:i + batch_size]
+        index.upsert(vectors=batch)
+        print(f"Uploaded batch {i//batch_size + 1}/{(len(vectors_to_upsert) + batch_size - 1)//batch_size}")
+    
+    print(f"✅ Successfully uploaded {len(vectors_to_upsert)} embeddings with detailed metadata to Pinecone index: {index_name}")
+    
+except Exception as e:
+    print(f"❌ Error uploading to Pinecone: {str(e)}")
+    print("Embeddings are still saved locally at:", embeddings_path)
