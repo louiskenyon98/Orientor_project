@@ -6,7 +6,7 @@ import mlflow
 import json
 import random
 from itertools import product
-from models.gat import CareerTreeModel
+from models.GraphSage import CareerTreeModel
 import numpy as np
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
@@ -20,6 +20,8 @@ import glob
 import torch.serialization
 from pinecone import Pinecone
 from dotenv import load_dotenv
+import gc
+import psutil
 
 
 # Load environment variables
@@ -40,8 +42,8 @@ print(f"Using device: {device}")
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 EXPERIMENT_DIR = BASE_DIR / "experiment_results"
-CHECKPOINT_DIR = EXPERIMENT_DIR / "checkpoints"
-RESULTS_DIR = EXPERIMENT_DIR / "results"
+CHECKPOINT_DIR = EXPERIMENT_DIR / "checkpoints/GraphSage"
+RESULTS_DIR = EXPERIMENT_DIR / "results/GraphSage"
 
 # Create directories if they don't exist
 EXPERIMENT_DIR.mkdir(exist_ok=True)
@@ -51,10 +53,6 @@ RESULTS_DIR.mkdir(exist_ok=True)
 x = torch.load(DATA_DIR / "node_features.pt").to(device)
 edge_index = torch.load(DATA_DIR / "edge_index.pt").to(device)
 edge_type = torch.tensor(json.load(open(DATA_DIR / "edge_type.json")), dtype=torch.long).to(device)
-
-# from collections import Counter
-# print("Relation type distribution in edge_type.json:")
-# print(Counter(edge_type))
 
 # Load node mappings
 with open(DATA_DIR / "node2idx.json", "r") as f:
@@ -67,7 +65,7 @@ with open(DATA_DIR / "edge_type.json", "r") as f:
 # Load relation type dictionary
 with open(DATA_DIR / "relation_types.json", "r") as f:
     relation_types = json.load(f)
-num_relations = len(relation_types)
+num_relations = 1 # len(relation_types)
 
 import random
 
@@ -119,7 +117,7 @@ def prepare_edge_data():
         raise ValueError("No occupation or skill nodes found in node2idx. Please check the node naming convention.")
     
     print("Generating negative samples...")
-    for _ in range(num_negatives):
+    for _ in tqdm(range(num_negatives)):
         s = random.choice(skill_nodes)
         o = random.choice(occupation_nodes)
         # Use unknown relation type for negative samples
@@ -128,6 +126,10 @@ def prepare_edge_data():
     # Combine positive and negative samples
     all_edges = triplets + negatives
     random.shuffle(all_edges)
+
+    # Sample a smaller dataset
+    # sample_size = 100  # Adjust this number for your test size
+    # all_edges = all_edges[:sample_size]
     
     # Split into train/val/test
     train_edges, temp_edges = train_test_split(all_edges, test_size=0.3, random_state=42)
@@ -219,22 +221,11 @@ def calculate_metrics(predictions, actuals):
     return metrics
 
 # === Hyperparameter Search Space === #
-# search_space = {
-#     "hidden_dim": [128, 256],
-#     "heads": [4, 8],
-#     "lr": [1e-4, 2e-4],
-#     "dropout": [0.3, 0.5],
-#     "weight_decay": [1e-4, 5e-4],
-#     "batch_size": [64, 128]  # Increased batch sizes for M1 Pro
-# }
-
-# === Hyperparameter Search Space === #
 search_space = {
-    'hidden_dim': [128],
-    'heads': [4],
-    'lr': [0.0001],
-    'dropout': [0.3],
-    'weight_decay': [0.0001],
+    'hidden_dim': [128],  # Reduced from 128
+    'lr': [0.0005],
+    'dropout': [0.2],
+    'weight_decay': [0.001],
     'batch_size': [32]
 }
 
@@ -281,6 +272,15 @@ PINECONE_API_KEY = os.getenv('PINECONE_API_KEY')
 if not PINECONE_API_KEY:
     raise ValueError("Please set PINECONE_API_KEY in your .env file")
 
+# Add memory monitoring function
+def print_memory_usage():
+    """Print current memory usage."""
+    process = psutil.Process(os.getpid())
+    print(f"\nMemory Usage:")
+    print(f"RSS: {process.memory_info().rss / 1024 / 1024:.2f} MB")
+    print(f"VMS: {process.memory_info().vms / 1024 / 1024:.2f} MB")
+    print(f"System Memory: {psutil.virtual_memory().percent}% used")
+
 for combo_idx, combo in enumerate(combinations, 1):
     config = dict(zip(search_space.keys(), combo))
     print(f"\n=== Starting combination {combo_idx}/{len(combinations)} ===")
@@ -299,10 +299,9 @@ for combo_idx, combo in enumerate(combinations, 1):
             input_dim=x.size(1),
             hidden_dim=config["hidden_dim"],
             output_dim=config["hidden_dim"],
-            heads=config["heads"],
-            dropout=config["dropout"],
-            num_relations=num_relations  # Add number of relation types
+            dropout=config["dropout"]
         ).to(device)
+
         
         optimizer = torch.optim.AdamW(
             model.parameters(),
@@ -312,6 +311,13 @@ for combo_idx, combo in enumerate(combinations, 1):
         
         # Prepare data
         train_edges, val_edges, test_edges = prepare_edge_data()
+        
+        # Limit dataset size for prototyping
+        print("\nLimiting dataset size for prototyping...")
+        train_edges = train_edges[:50000]
+        val_edges = val_edges[:15000]
+        test_edges = test_edges[:15000]
+        print(f"Using reduced dataset: {len(train_edges)} train, {len(val_edges)} val, {len(test_edges)} test edges")
         
         # Training loop
         best_val_loss = float('inf')
@@ -333,14 +339,20 @@ for combo_idx, combo in enumerate(combinations, 1):
             else:
                 print("Starting fresh training run")
         
+        # Create progress bar for epochs
+        epoch_pbar = tqdm(range(start_epoch, 100), desc="Training")
+        
         try:
-            for epoch in range(start_epoch, 100):
+            for epoch in epoch_pbar:
                 epoch_start = time.time()
                 model.train()
                 total_loss = 0
                 
                 # Training
-                for batch_start in range(0, len(train_edges), config["batch_size"]):
+                train_pbar = tqdm(range(0, len(train_edges), config["batch_size"]), 
+                                desc=f"Epoch {epoch} - Training", leave=False)
+                # In the training loop
+                for batch_start in train_pbar:
                     batch_edges = train_edges[batch_start:batch_start + config["batch_size"]]
                     
                     # Get positive and negative pairs
@@ -352,19 +364,28 @@ for combo_idx, combo in enumerate(combinations, 1):
                     if min_size == 0:
                         continue
                         
-                    # Sample up to batch_size//2 positive and negative pairs
+                    # Cap batch size per class
                     max_per_class = config["batch_size"] // 2
-                    pos_edges = random.sample(pos_edges, min(len(pos_edges), max_per_class))
-                    neg_edges = random.sample(neg_edges, min(len(neg_edges), max_per_class))
-                    
+
+                    pos_edges = [e for e in batch_edges if e[2] > 0]
+                    neg_edges = [e for e in batch_edges if e[2] == 0]
+
+                    min_len = min(len(pos_edges), len(neg_edges), max_per_class)
+                    if min_len < 1:
+                        continue  # Not enough samples for a valid batch
+
+                    # Sample same number of pos/neg
+                    pos_edges = random.sample(pos_edges, min_len)
+                    neg_edges = random.sample(neg_edges, min_len)
+
                     # Create tensors
                     pos_pairs = torch.tensor([[e[0], e[1]] for e in pos_edges]).t().to(device)
                     neg_pairs = torch.tensor([[e[0], e[1]] for e in neg_edges]).t().to(device)
                     
                     # Get predictions for positive and negative pairs
                     pos_pred = model(x, edge_index, edge_type, pos_pairs).view(-1)
-                    neg_pred = model(x, edge_index, edge_type, neg_pairs).view(-1)
-                    
+                    neg_pred = model(x, edge_index, edge_type, neg_pairs).view(-1)  # Fixed to use neg_pairs
+
                     # Drop batch if not enough examples
                     if pos_pred.numel() < 2 or neg_pred.numel() < 2:
                         continue
@@ -377,11 +398,15 @@ for combo_idx, combo in enumerate(combinations, 1):
                     
                     loss.backward()
                     optimizer.step()
+                    optimizer.zero_grad()  # Clear gradients after step
                     
                     total_loss += loss.item()
+                    train_pbar.set_postfix({"loss": f"{loss.item():.4f}"})
                     
-                    if batch_start % 100 == 0:
-                        print(f"Batch {batch_start//config['batch_size']}, Loss: {loss.item():.4f}")
+                    # Clear some memory after each batch
+                    del pos_pred, neg_pred, loss
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
                 
                 # Validation
                 model.eval()
@@ -398,8 +423,14 @@ for combo_idx, combo in enumerate(combinations, 1):
                         pred = model(x, edge_index, edge_type, edge_pairs).squeeze()
                         val_loss += F.mse_loss(pred, labels).item()
                         
-                        val_predictions.extend(pred.cpu().tolist())
+                        # Use detach() to prevent memory leaks
+                        val_predictions.extend(pred.detach().cpu().tolist())
                         val_actuals.extend(labels.cpu().tolist())
+                        
+                        # Clear some memory after each batch
+                        del pred, labels, edge_pairs
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
                 
                 # Calculate validation metrics
                 val_predictions = np.array(val_predictions)
@@ -411,13 +442,22 @@ for combo_idx, combo in enumerate(combinations, 1):
                 for metric_name, metric_value in val_metrics.items():
                     mlflow.log_metric(f"val_{metric_name}", metric_value, step=epoch)
                 
-                # Print epoch summary
+                # Update epoch progress bar
                 epoch_time = time.time() - epoch_start
-                print(f"\nEpoch {epoch} Summary:")
-                print(f"Train Loss: {total_loss/len(train_edges):.4f}")
-                print(f"Val Loss: {val_loss/len(val_edges):.4f}")
-                print(f"Val AUC: {val_metrics['roc_auc']:.4f}")
-                print(f"Time: {epoch_time:.1f}s")
+                epoch_pbar.set_postfix({
+                    "train_loss": f"{total_loss/len(train_edges):.4f}",
+                    "val_loss": f"{val_loss/len(val_edges):.4f}",
+                    "val_auc": f"{val_metrics['roc_auc']:.4f}",
+                    "time": f"{epoch_time:.1f}s"
+                })
+                
+                # Print memory usage after each epoch
+                print_memory_usage()
+                
+                # Clear memory after each epoch
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
                 
                 # Early stopping
                 if val_loss < best_val_loss:
@@ -610,4 +650,3 @@ try:
 except Exception as e:
     print(f"❌ Error uploading to Pinecone: {str(e)}")
     print("Embeddings are still saved locally at:", embeddings_path)
- 

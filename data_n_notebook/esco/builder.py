@@ -9,6 +9,17 @@ from sentence_transformers import SentenceTransformer
 import pickle
 
 
+# Dictionnaire de types de relations normalisés pour RGAT
+relation_types = {
+    "essential": 0,
+    "optional": 1,
+    "requires": 2,
+    "produces": 3,
+    "is_parent_of": 4,
+    "related": 5,
+    "unknown": 6
+}
+
 MODEL_NAME = "BAAI/bge-large-en-v1.5"
 EMBED_MODEL = SentenceTransformer(MODEL_NAME)
 
@@ -73,6 +84,21 @@ def save_labeled_skill_occ_pairs(G, out_path):
         for t in triplets:
             f.write(json.dumps(t) + "\n")
     log_progress(f"Saved {len(triplets)} skill→occupation triplets to {out_path}")
+
+
+def save_all_labeled_triplets(G, out_path):
+    triplets = []
+    for u, v, data in G.edges(data=True):
+        edge_type = data.get("type", "unknown")
+        triplets.append({
+            "source": u,
+            "target": v,
+            "relation_type": edge_type
+        })
+    with open(out_path, "w") as f:
+        for t in triplets:
+            f.write(json.dumps(t) + "\n")
+    log_progress(f"Saved {len(triplets)} total triplets to {out_path}")
 
 
 def get_skill_label(esco_data, skill_id):
@@ -155,7 +181,10 @@ def build_graph(esco_data):
         skill = f"skill::{row['SKILLID']}"
         ensure_node(G, occ, 'occupation')
         ensure_node(G, skill, 'skill')
-        G.add_edge(skill, occ, type=row['RELATIONTYPE'].lower())  # flipped
+        # Ajouter l'arête skill -> occupation (flipped)
+        G.add_edge(skill, occ, type=row['RELATIONTYPE'].lower())
+        # Ajouter l'arête inverse occupation -> skill avec type "produces"
+        G.add_edge(occ, skill, type="produces")
 
     log_progress("Adding skill hierarchy...")
     for _, row in esco_data['skill_hierarchy'].iterrows():
@@ -174,6 +203,7 @@ def build_graph(esco_data):
         G.add_edge(parent, child, type='is_parent_of')
 
     save_labeled_skill_occ_pairs(G, out_path="/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/gnn_experiment/data/esco_labeled_triplets.jsonl")
+    save_all_labeled_triplets(G, "/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/gnn_experiment/data/esco_all_triplets.jsonl")
 
     end_time = time.time()
     duration = end_time - start_time
@@ -195,7 +225,10 @@ def export_graph_for_gnn(G, out_dir="/Users/philippebeliveau/Desktop/Notebook/Or
     for u, v, data in G.edges(data=True):
         if u in node2idx and v in node2idx:
             edge_index.append([node2idx[u], node2idx[v]])
-            edge_type.append(data.get("type", "unknown"))
+            # S'assurer que chaque arête a un type, utiliser "unknown" par défaut
+            edge_type_name = data.get("type", "unknown")
+            edge_type_id = relation_types.get(edge_type_name, relation_types["unknown"])
+            edge_type.append(edge_type_id)
 
     features = []
     node_metadata = {}  # Store node metadata
@@ -220,8 +253,22 @@ def export_graph_for_gnn(G, out_dir="/Users/philippebeliveau/Desktop/Notebook/Or
     torch.save(torch.tensor(edge_index).t().long(), os.path.join(out_dir, "edge_index.pt"))
     torch.save(torch.tensor(features).float(), os.path.join(out_dir, "node_features.pt"))
 
+    # Convertir les types de relations en indices numériques pour RGAT
+    edge_type_indices = [relation_types.get(t, relation_types["unknown"]) for t in edge_type]
+
     with open(os.path.join(out_dir, "edge_type.json"), "w") as f:
         json.dump(edge_type, f)
+    
+    with open(os.path.join(out_dir, "edge_type_indices.json"), "w") as f:
+        json.dump(edge_type_indices, f)
+    
+    # Sauvegarder le mapping des types de relations
+    with open(os.path.join(out_dir, "relation_types.json"), "w") as f:
+        json.dump(relation_types, f)
+        
+    # Sauvegarder le dictionnaire de types de relations dans un fichier séparé
+    with open(os.path.join(out_dir, "edge_type_dict.json"), "w") as f:
+        json.dump(relation_types, f)
 
     with open(os.path.join(out_dir, "node2idx.json"), "w") as f:
         json.dump(node2idx, f)
