@@ -29,3 +29,6 @@ npm start
     
     python -m http.server 8000
 
+# Strealimte esco_gnn_evaluation
+cd /Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/backend/app/services
+streamlit run esco_gnn_evaluation.py
