@@ -558,6 +558,57 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray, column_nam
         logger.error(f"Error storing embedding in column {column_name}: {str(e)}")
         db.rollback()
         return False
+    
+def generate_embedding_from_text(
+    text: str,
+    model_label: str = "BAAI/bge-large-en-v1.5"
+) -> Optional[np.ndarray]:
+    """
+    Generate a 1024-dimensional embedding from raw profile text using the specified model.
+    
+    Args:
+        text: Formatted ESCO-style text (full profile, occupation, etc.)
+        model_label: Optional model ID to document which model was used (for debugging)
+
+    Returns:
+        Numpy array of shape (1024,) if successful, otherwise None
+    """
+    # Ensure models are loaded
+    if not model_state.ensure_models_loaded():
+        logger.error(f"[{model_label}] Failed to load models, cannot generate embedding.")
+        return None
+
+    try:
+        if not isinstance(text, str) or not text.strip():
+            logger.error(f"[{model_label}] Empty or invalid text input for embedding.")
+            return None
+
+        # Tokenize and generate embedding
+        inputs = model_state.tokenizer(
+            text, return_tensors="pt", padding=True, truncation=True, max_length=512
+        )
+        with torch.no_grad():
+            embedding = model_state.embedding_model(**inputs).numpy()
+
+        logger.info(f"[{model_label}] Generated embedding with shape {embedding.shape}")
+
+        # Log embedding stats
+        stats = {
+            "min": float(np.min(embedding)),
+            "max": float(np.max(embedding)),
+            "mean": float(np.mean(embedding)),
+            "std": float(np.std(embedding)),
+            "zeros": int(np.sum(embedding == 0)),
+            "unique_values": int(len(np.unique(embedding)))
+        }
+        logger.info(f"[{model_label}] Embedding stats: {stats}")
+
+        return embedding[0]  # single input → return first vector
+
+    except Exception as e:
+        logger.error(f"[{model_label}] Error generating embedding: {str(e)}")
+        return None
+
 
 def process_user_embedding(db: Session, user_id: int, profile_data: Dict[str, Any] = None) -> bool:
     """

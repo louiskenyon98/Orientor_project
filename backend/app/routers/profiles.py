@@ -7,6 +7,7 @@ from app.utils.database import get_db
 from app.models import User, UserProfile, UserSkill
 from app.routers.user import get_current_user
 from app.services.embedding_service import process_user_embedding, process_user_oasis_embedding
+from app.services.esco_embedding_service import process_user_esco_embeddings
 from app.services.peer_matching_service import generate_peer_suggestions
 from sqlalchemy.sql import text
 import uuid
@@ -334,6 +335,18 @@ async def update_profile(
                 except Exception as e:
                     logger.error(f"Error in OaSIS embedding process: {str(e)}")
                     # Do not block the profile update if OaSIS embedding fails
+                
+                # Generate the ESCO embeddings
+                try:
+                    logger.info(f"Generating ESCO embeddings for user ID: {current_user.id}")
+                    esco_success = process_user_esco_embeddings(db, current_user.id)
+                    if esco_success:
+                        logger.info(f"ESCO embeddings generated and stored successfully for user ID: {current_user.id}")
+                    else:
+                        logger.warning(f"Failed to generate or store ESCO embeddings for user ID: {current_user.id}")
+                except Exception as e:
+                    logger.error(f"Error in ESCO embedding process: {str(e)}")
+                    # Do not block the profile update if ESCO embedding fails
                 
         except Exception as e:
             logger.error(f"Error in embedding/peer suggestion process: {str(e)}")
