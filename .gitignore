@@ -81,3 +81,7 @@ data_n_notebook/gnn_experiment/checkpoints/
 data_n_notebook/gnn_experiment/experiment_results/
 data_n_notebook/gnn_experiment/mlruns/
 # End of Selection
+
+# Data
+backend/app/services/gnn_experiment/data/
+backend/app/services/gnn_experiment/data_1024/

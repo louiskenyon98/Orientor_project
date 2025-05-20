@@ -8,7 +8,6 @@ from datetime import datetime
 from sentence_transformers import SentenceTransformer
 import pickle
 
-
 # Dictionnaire de types de relations normalisés pour RGAT
 relation_types = {
     "essential": 0,
@@ -20,7 +19,8 @@ relation_types = {
     "unknown": 6
 }
 
-MODEL_NAME = "BAAI/bge-large-en-v1.5"
+# MODEL_NAME = "BAAI/bge-large-en-v1.5"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 EMBED_MODEL = SentenceTransformer(MODEL_NAME)
 
 def log_progress(message):
@@ -382,3 +382,7 @@ def build_occupation_subgraph(esco_data, occupation_id, depth=1, include_groups=
 
     print(f"[LOG] Subgraph built with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
     return G
+
+if __name__ == "__main__":
+    esco_data = {}  # Ensure you have the necessary data initialized here
+    build_graph(esco_data)

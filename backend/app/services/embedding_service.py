@@ -234,6 +234,54 @@ class OasisModelState:
 # Create a single instance of OasisModelState
 oasis_model_state = OasisModelState()
 
+# Initialize ESCO model state
+class ESCOModelState:
+    def __init__(self):
+        self.embedding_model = None
+        self.models_loaded = False
+        self._lock = threading.Lock()
+    
+    def load_models(self):
+        """Load ESCO models with proper error handling and retry logic."""
+        with self._lock:
+            if self.models_loaded:
+                return True
+                
+            max_retries = 3
+            retry_count = 0
+            
+            while retry_count < max_retries:
+                try:
+                    # Load the model for ESCO embeddings using SentenceTransformer
+                    # This will generate embeddings of dimension 384
+                    self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+                    logger.info("ESCO embedding model loaded successfully")
+                    
+                    self.models_loaded = True
+                    logger.info("ESCO models loaded successfully")
+                    return True
+                    
+                except Exception as e:
+                    retry_count += 1
+                    logger.error(f"Error loading ESCO models (attempt {retry_count}/{max_retries}): {str(e)}")
+                    if retry_count < max_retries:
+                        logger.info("Retrying ESCO model loading...")
+                        continue
+                    else:
+                        logger.error("Failed to load ESCO models after maximum retries")
+                        self.embedding_model = None
+                        self.models_loaded = False
+                        return False
+    
+    def ensure_models_loaded(self):
+        """Ensure ESCO models are loaded, loading them if necessary."""
+        if not self.models_loaded:
+            return self.load_models()
+        return True
+
+# Create a single instance of ESCOModelState
+esco_model_state = ESCOModelState()
+
 # --- Core Functions ---
 
 def fetch_user_data(db: Session, user_id: int) -> Dict[str, Any]:
@@ -528,15 +576,15 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray, column_nam
     Args:
         db: Database session
         user_id: User ID to store embedding for
-        embedding: Numpy array containing the embedding vector
+        embedding: Numpy array or list containing the embedding vector
         column_name: Column name to store the embedding in (default: "embedding")
         
     Returns:
         Boolean indicating success or failure
     """
     try:
-        # Convert numpy array to list for storage
-        embedding_list = embedding.tolist()
+        # Convert to list if it's a numpy array, otherwise use as is
+        embedding_list = embedding.tolist() if isinstance(embedding, np.ndarray) else embedding
         
         # Construire la requête SQL dynamiquement en fonction du nom de colonne
         query = text(f"""
@@ -559,19 +607,19 @@ def store_embedding(db: Session, user_id: int, embedding: np.ndarray, column_nam
         db.rollback()
         return False
     
-def generate_embedding_from_text(
+def generate_embedding_from_text_1024(
     text: str,
     model_label: str = "BAAI/bge-large-en-v1.5"
 ) -> Optional[np.ndarray]:
     """
-    Generate a 1024-dimensional embedding from raw profile text using the specified model.
+    Generate a 384-dimensional embedding from raw profile text using the specified model.
     
     Args:
         text: Formatted ESCO-style text (full profile, occupation, etc.)
         model_label: Optional model ID to document which model was used (for debugging)
 
     Returns:
-        Numpy array of shape (1024,) if successful, otherwise None
+        Numpy array of shape (384,) if successful, otherwise None
     """
     # Ensure models are loaded
     if not model_state.ensure_models_loaded():
@@ -604,6 +652,57 @@ def generate_embedding_from_text(
         logger.info(f"[{model_label}] Embedding stats: {stats}")
 
         return embedding[0]  # single input → return first vector
+
+    except Exception as e:
+        logger.error(f"[{model_label}] Error generating embedding: {str(e)}")
+        return None
+    
+
+def generate_embedding_from_text_384(
+    text: str,
+    model_label: str = "sentence-transformers/all-MiniLM-L6-v2" 
+) -> Optional[np.ndarray]:
+    """
+    Generate a 384-dimensional embedding from raw profile text using the specified model.
+    
+    Args:
+        text: Formatted ESCO-style text (full profile, occupation, etc.)
+        model_label: Optional model ID to document which model was used (for debugging)
+
+    Returns:
+        Numpy array of shape (384,) if successful, otherwise None
+    """
+    # Ensure models are loaded
+    if not esco_model_state.ensure_models_loaded():
+        logger.error(f"[{model_label}] Failed to load models, cannot generate embedding.")
+        return None
+
+    try:
+        if not isinstance(text, str) or not text.strip():
+            logger.error(f"[{model_label}] Empty or invalid text input for embedding.")
+            return None
+
+        # Generate embedding using SentenceTransformer
+        embedding = esco_model_state.embedding_model.encode(
+            text,
+            convert_to_numpy=True,
+            normalize_embeddings=True
+        )
+
+        logger.info(f"[{model_label}] Generated embedding with shape {embedding.shape}")
+
+        # Log embedding stats
+        stats = {
+            "min": float(np.min(embedding)),
+            "max": float(np.max(embedding)),
+            "mean": float(np.mean(embedding)),
+            "std": float(np.std(embedding)),
+            "zeros": int(np.sum(embedding == 0)),
+            "unique_values": int(len(np.unique(embedding)))
+        }
+        logger.info(f"[{model_label}] Embedding stats: {stats}")
+
+        return embedding  # SentenceTransformer.encode() returns a 1D array for a single text
 
     except Exception as e:
         logger.error(f"[{model_label}] Error generating embedding: {str(e)}")

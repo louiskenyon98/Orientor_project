@@ -14,7 +14,7 @@ from pinecone import Pinecone
 import ast
 
 # --- Config ---
-PINECONE_INDEX = "gnn-embeddings"
+PINECONE_INDEX = "esco-368" # "gnn-embeddings"
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 url = urlparse(DATABASE_URL)
