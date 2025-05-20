@@ -314,9 +314,9 @@ for combo_idx, combo in enumerate(combinations, 1):
         
         # Limit dataset size for prototyping
         print("\nLimiting dataset size for prototyping...")
-        train_edges = train_edges[:50000]
-        val_edges = val_edges[:15000]
-        test_edges = test_edges[:15000]
+        train_edges = train_edges[:30000]
+        val_edges = val_edges[:5000]
+        test_edges = test_edges[:5000]
         print(f"Using reduced dataset: {len(train_edges)} train, {len(val_edges)} val, {len(test_edges)} test edges")
         
         # Training loop

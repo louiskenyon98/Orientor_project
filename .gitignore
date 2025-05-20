@@ -85,3 +85,4 @@ data_n_notebook/gnn_experiment/mlruns/
 # Data
 backend/app/services/gnn_experiment/data/
 backend/app/services/gnn_experiment/data_1024/
+backend/SkillsTree_eval/data

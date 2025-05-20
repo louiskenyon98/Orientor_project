@@ -1,0 +1,71 @@
+"""
+Script pour exécuter l'exploration de l'arbre de compétences avec l'embedding formaté.
+"""
+
+import os
+import sys
+import logging
+from explore_skills_tree import explore_skills_tree
+
+# Configuration du logger
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+def main():
+    """
+    Fonction principale pour exécuter l'exploration de l'arbre de compétences.
+    """
+    import argparse
+    
+    # Définir les arguments de ligne de commande
+    parser = argparse.ArgumentParser(description="Exécuter l'exploration de l'arbre de compétences")
+    parser.add_argument("--anchor-type", default="all",
+                      choices=["all", "occupation", "occupationgroup", "skill", "skillgroup"],
+                      help="Type d'ancrage à utiliser (all, occupation, occupationgroup, skill, skillgroup)")
+    
+    args = parser.parse_args()
+    # Chemin vers le fichier d'embedding formaté
+    embedding_file = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "embeddingsformatted_user22.json"
+    )
+    
+    # Vérifier si le fichier d'embedding existe
+    if not os.path.exists(embedding_file):
+        logger.error(f"Le fichier d'embedding n'existe pas: {embedding_file}")
+        return
+    
+    # Vérifier si le graphe prétraité existe
+    networkx_graph_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "data",
+        "networkx_graph.pkl"
+    )
+    
+    if not os.path.exists(networkx_graph_path):
+        logger.info(f"Le graphe prétraité n'existe pas: {networkx_graph_path}")
+        logger.info("Création du graphe prétraité...")
+        
+        # Importer le script de sauvegarde du graphe
+        from save_networkx_graph import save_networkx_graph
+        
+        # Exécuter le script
+        success = save_networkx_graph()
+        if not success:
+            logger.error("Erreur lors de la création et de la sauvegarde du graphe NetworkX.")
+            return
+    
+    # Exécuter l'exploration de l'arbre de compétences
+    logger.info(f"Exploration de l'arbre de compétences avec type d'ancrage: {args.anchor_type}...")
+    explore_skills_tree(
+        embedding_file=embedding_file,
+        api_key=os.getenv("PINECONE_API_KEY"),
+        embedding_type="esco_embedding",
+        top_k=5,
+        max_depth=5,
+        anchor_type=args.anchor_type
+    )
+
+if __name__ == "__main__":
+    main()

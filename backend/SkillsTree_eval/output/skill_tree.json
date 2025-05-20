@@ -1,0 +1,110 @@
+{
+  "nodes": {
+    "skill::key_4824": {
+      "id": "skill::key_4824",
+      "type": "skill",
+      "label": "demonstrate disciplinary expertise",
+      "metadata": {
+        "label": "demonstrate disciplinary expertise",
+        "type": "skill",
+        "originuri": "http://data.europa.eu/esco/skill/4134622c-c3fb-4a41-beb6-6d58ba5107db",
+        "uuidhistory": "a4403324-08b3-4a47-8874-f9afdec8b0cd\n60553862-9d47-432f-8c99-0a2f6aeaf6c2",
+        "skilltype": "skill/competence",
+        "reuselevel": "cross-sector",
+        "preferredlabel": "demonstrate disciplinary expertise",
+        "altlabels": "demonstrate disciplinary expertise",
+        "description": "Demonstrate deep knowledge and complex understanding of a specific research area, including responsible research, research ethics and scientific integrity principles, privacy and GDPR requirements, related to research activities within a specific discipline.",
+        "definition": "",
+        "scopenote": "",
+        "islocalized": "false"
+      },
+      "is_anchor": true,
+      "depth": 0
+    },
+    "skill::key_12485": {
+      "id": "skill::key_12485",
+      "type": "skill",
+      "label": "ethics",
+      "metadata": {
+        "label": "ethics",
+        "type": "skill",
+        "originuri": "http://data.europa.eu/esco/skill/cef5c0f8-1e40-4c09-b6a7-aa7811849e5d",
+        "uuidhistory": "e5bbe122-0b12-43ac-aa67-4e3688b50b3c\ne84dfdbb-85c5-45c9-85d3-eb95389c52d9",
+        "skilltype": "knowledge",
+        "reuselevel": "cross-sector",
+        "preferredlabel": "ethics",
+        "altlabels": "moral studies\nthe study of moral principles\nethics",
+        "description": "The philosophical study that deals with solving questions of human morality; it defines and systemises concepts such as right, wrong, and crime.",
+        "definition": "",
+        "scopenote": "",
+        "islocalized": "false"
+      },
+      "is_anchor": true,
+      "depth": 0
+    },
+    "skill::key_4884": {
+      "id": "skill::key_4884",
+      "type": "skill",
+      "label": "ICT safety",
+      "metadata": {
+        "label": "ICT safety",
+        "type": "skill",
+        "originuri": "http://data.europa.eu/esco/skill/426ceaba-6867-481c-bb6b-aee3933da7d2",
+        "uuidhistory": "4eea18d8-b848-485b-9c0c-73c8cb5baffb\n39231b3b-9353-47e2-a43d-460d30551898",
+        "skilltype": "",
+        "reuselevel": "",
+        "preferredlabel": "ICT safety",
+        "altlabels": "ICT protection\ninformation and communication technology safety\ninformation and communication technologies safety\nICT welfare maintenance\nICT safety\nICT security\nICT well-being  maintenance",
+        "description": "Personal protection, data protection, digital identity protection, security measures, safe and sustainable use.",
+        "definition": "",
+        "scopenote": "",
+        "islocalized": "false"
+      },
+      "is_anchor": true,
+      "depth": 0
+    },
+    "skill::key_14629": {
+      "id": "skill::key_14629",
+      "type": "skill",
+      "label": "perform high risk work",
+      "metadata": {
+        "label": "perform high risk work",
+        "type": "skill",
+        "originuri": "http://data.europa.eu/esco/skill/f6b1bb4f-170b-4c38-8c9e-abc90d30fb6c",
+        "uuidhistory": "2bef5241-99cc-4f50-8560-0e2128186fad\n694e34b2-5940-4d84-8dc4-68c94525c17a",
+        "skilltype": "skill/competence",
+        "reuselevel": "cross-sector",
+        "preferredlabel": "perform high risk work",
+        "altlabels": "undertake dangerous work\nperform dangerous work\ndo dangerous work\nundertake hazardous work\nperform high risk work\nundertake high risk work\nexecute high risk work\nperform hazardous work\ncarry out high risk work\nexecute dangerous work tasks\ndo high risk work\ncarry out dangerous work",
+        "description": "Perform high risk tasks and work that requires close adherence to specific rules and procedures to ensure safe operations.",
+        "definition": "",
+        "scopenote": "",
+        "islocalized": "false"
+      },
+      "is_anchor": true,
+      "depth": 0
+    },
+    "skill::key_13604": {
+      "id": "skill::key_13604",
+      "type": "skill",
+      "label": "principles of artificial intelligence",
+      "metadata": {
+        "label": "principles of artificial intelligence",
+        "type": "skill",
+        "originuri": "http://data.europa.eu/esco/skill/e465a154-93f7-4973-9ce1-31659fe16dd2",
+        "uuidhistory": "15c01384-bf63-4428-bc0a-14cd804a57fe\n51d56c8d-713f-41ab-91ba-b53eda75a2de",
+        "skilltype": "knowledge",
+        "reuselevel": "sector-specific",
+        "preferredlabel": "principles of artificial intelligence",
+        "altlabels": "principles of artificial intelligence\nprinciples of AI",
+        "description": "The artificial intelligence theories, applied principles, architectures and systems, such as intelligent agents, multi-agent systems, expert systems, rule-based systems, neural networks, ontologies and cognition theories.",
+        "definition": "",
+        "scopenote": "",
+        "islocalized": "false"
+      },
+      "is_anchor": true,
+      "depth": 0
+    }
+  },
+  "edges": []
+}
