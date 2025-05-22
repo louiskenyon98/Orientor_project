@@ -261,11 +261,11 @@ export default function MainLayout({
             {isLoggedIn && (
                 <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/90 backdrop-blur-md border-b border-stitch-border shadow-sm hidden md:block font-departure header">
                     <div className="layout-container mx-auto">
-                        <div className="flex justify-between py-3">
+                        <div className="flex justify-between items-center py-2">
                             {/* Left Side - Logo and Primary Navigation */}
-                            <div className="flex items-center space-x-8">
+                            <div className="flex items-center space-x-6">
                                 {/* Logo */}
-                                <Link href="/" className="flex-shrink-0 flex items-center">
+                                <Link href="/landing" className="flex-shrink-0 flex items-center">
                                     <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
                                         Navigo
                                     </span>
@@ -274,170 +274,56 @@ export default function MainLayout({
                                 {/* Primary Navigation */}
                                 <div className="flex items-center space-x-1">
                                     <Link 
+                                        href="/" 
+                                        className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
+                                            ${pathname === '/'
+                                                ? 'text-stitch-accent bg-stitch-primary/50'
+                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
+                                            }`}
+                                    >
+                                        <span className="material-icons-outlined">dashboard</span>
+                                    </Link>
+                                    
+                                    <Link 
                                         href="/chat" 
-                                        className={`px-4 py-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
+                                        className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
                                             ${pathname === '/chat'
                                                 ? 'text-stitch-accent bg-stitch-primary/50'
                                                 : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                             }`}
                                     >
-                                        Mentor
+                                        <span className="material-icons-outlined">chat</span>
                                     </Link>
-                                    
-                                    <Link 
-                                        href="/peers" 
-                                        className={`px-4 py-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
-                                            ${pathname === '/peers'
-                                                ? 'text-stitch-accent bg-stitch-primary/50'
-                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                            }`}
-                                    >
-                                        Network
-                                    </Link>
-
-
-                                    {/* Career Path Dropdown */}
-                                    <div className="relative" ref={careerMenuRef}>
-                                        <button 
-                                            onClick={toggleCareerDropdown}
-                                            className={`group px-4 py-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out flex items-center font-departure
-                                                ${isCareerPath
-                                                    ? 'text-stitch-accent bg-stitch-primary/50'
-                                                    : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                                }`}
-                                        >
-                                            Career Growth
-                                            <svg className={`ml-1 h-4 w-4 transition-transform duration-200 ${careerMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </button>
-                                        
-                                        {careerMenuOpen && (
-                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-stitch-primary border border-stitch-border ring-1 ring-black ring-opacity-5 z-40">
-                                                <div className="py-1" role="menu" aria-orientation="vertical">
-                                                    <Link
-                                                        href="/vector-search"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/vector-search' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Career Insights
-                                                    </Link>
-                                                    <Link
-                                                        href="/find-your-way"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/find-your-way' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Pathway Explorer
-                                                    </Link>
-                                                    <Link
-                                                        href="/career"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/career' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Career Explorer
-                                                    </Link>
-                                                    <Link
-                                                        href="/enhanced-skills"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/enhanced-skills' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Enhanced Skills Path
-                                                    </Link>
-                                                    <Link
-                                                        href="/holland-test"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/holland-test' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Test Holland (RIASEC)
-                                                    </Link>
-                                                    <Link
-                                                        href="/case-study-journey"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/case-study-journey' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
-                                                    >
-                                                        Étude de Cas Navigo
-                                                    </Link>
-                                                    {/* Resume Studio Link - Commented out for AWS deployment
-                                                    <Link
-                                                        href="/cv"
-                                                        className={`block px-4 py-2 text-sm ${pathname === '/cv' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
-                                                        role="menuitem"
-                                                    >
-                                                        Resume Studio
-                                                    </Link>
-                                                    */}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Workspace Dropdown */}
-                                    <div className="relative inline-block text-left" ref={workspaceMenuRef}>
-                                        <button
-                                            type="button"
-                                            onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-                                            className="inline-flex justify-center w-full px-4 py-2 text-sm font-bold text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30 rounded-md transition-colors duration-150 ease-in-out font-departure"
-                                        >
-                                            Workspace
-                                            <svg
-                                            className={`ml-2 h-4 w-4 transition-transform duration-200 ${workspaceMenuOpen ? 'rotate-180' : ''}`}
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            aria-hidden="true"
-                                            >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                                clipRule="evenodd"
-                                            />
-                                            </svg>
-                                        </button>
-
-                                        <div className={`absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-stitch-primary border border-stitch-border shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${workspaceMenuOpen ? 'block' : 'hidden'}`}>
-                                            <div className="py-1">
-                                            <Link
-                                                href="/space"
-                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out font-departure
-                                                ${pathname === '/space'
-                                                    ? 'text-stitch-accent bg-stitch-primary/50'
-                                                    : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                                }`}
-                                            >
-                                                Space
-                                            </Link>
-                                            <Link
-                                                href="/tree-path"
-                                                className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out font-departure
-                                                ${pathname === '/tree-path'
-                                                    ? 'text-stitch-accent bg-stitch-primary/50'
-                                                    : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                                }`}
-                                            >
-                                                Tree Path
-                                            </Link>
-                                            </div>
-                                        </div>
-                                        </div>
                                 </div>
                             </div>
 
-                            
-                            
-                            {/* Right Side - XP Progress, Dark Mode Toggle, User Profile & Logout */}
+                            {/* Right Side - User Profile & Settings */}
                             <div className="flex items-center space-x-4">
                                 {/* XP Progress Bar */}
                                 <XPProgress className="mr-2" />
                                 
-                                {/* Dark Mode Toggle - Added to the left of Profile */}
+                                {/* Dark Mode Toggle */}
                                 <DarkModeToggle />
                                 
-                                <ProfileDropdown pathname={pathname} />
-                                
-                                <button 
+                                {/* User Profile */}
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-stitch-accent">
+                                        <img src="/Avatar.PNG" alt="Profile" className="w-full h-full object-cover" />
+                                    </div>
+                                    <Link 
+                                        href="/profile"
+                                        className="p-2 text-sm font-bold rounded-md text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30 transition-colors duration-150 ease-in-out"
+                                    >
+                                        <span className="material-icons-outlined">settings</span>
+                                    </Link>
+                                </div>
+
+                                {/* Logout Button */}
+                                <button
                                     onClick={handleLogout}
-                                    className="px-4 py-2 text-sm font-bold rounded-md text-stitch-sage hover:text-red-500 hover:bg-stitch-primary/30 transition-colors duration-150 ease-in-out font-departure"
+                                    className="p-2 text-sm font-bold rounded-md text-stitch-sage hover:text-red-500 hover:bg-stitch-primary/30 transition-colors duration-150 ease-in-out"
                                 >
-                                    Sign Out
+                                    <span className="material-icons-outlined">logout</span>
                                 </button>
                             </div>
                         </div>

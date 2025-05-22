@@ -9,9 +9,9 @@ module.exports = {
       colors: {
         // Stitch Design Theme Colors
         stitch: {
-          primary: '#122112', // mint forest green (primary background)
+          primary: '#e6f5e6', // mint forest green (primary background)
           accent: '#19b219', // deep green for progress, highlights
-          sage: '#95c695', // sage green for secondary info
+          sage: '#6b9a6b', // sage green for secondary info
           border: '#254625', // subtle separator
           track: '#366336', // progress track
         },
