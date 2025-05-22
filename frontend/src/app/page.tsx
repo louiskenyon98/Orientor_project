@@ -185,7 +185,6 @@ export default function Home() {
                       className="p-6 bg-stitch-primary rounded-lg border border-stitch-border w-full shadow-md"
                     />
                   </div>
-
               {/* RIASEC Section */}
               <div className="w-full">
                 <div className="bg-stitch-primary rounded-lg border border-stitch-border px-6 py-4 md:px-8 md:py-6">
