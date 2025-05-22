@@ -209,7 +209,7 @@ def get_user_embedding(db: Session, user_id: int, use_oasis: bool = False) -> Op
             logger.info(f"Job Title: {result.job_title}")
             logger.info(f"Industry: {result.industry}")
             logger.info(f"Skills: {result.skills}")
-            logger.info(f"Interests: {result.interests}")
+            logger.info(f"interests: {result.interests}")
             
             if result.embedding:
                 logger.info(f"Found stored embedding for user {user_id}")
@@ -285,7 +285,7 @@ def get_user_embedding(db: Session, user_id: int, use_oasis: bool = False) -> Op
         logger.info(f"Job Title: {profile_data['job_title']}")
         logger.info(f"Industry: {profile_data['industry']}")
         logger.info(f"Skills: {profile_data['skills']}")
-        logger.info(f"Interests: {profile_data['interests']}")
+        logger.info(f"interests: {profile_data['interests']}")
         
         embedding = parse_embedding(profile_data)
         if embedding is not None:

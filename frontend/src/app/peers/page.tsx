@@ -109,7 +109,7 @@ export default function SuggestedPeersPage() {
                   <div className="mt-4 flex-grow">
                     {peer.interests && (
                       <div className="mb-2">
-                        <span className="text-sm font-medium text-neutral-gray">Interests: </span>
+                        <span className="text-sm font-medium text-neutral-gray">interests: </span>
                         <span className="text-sm text-neutral-lightgray">{peer.interests}</span>
                       </div>
                     )}

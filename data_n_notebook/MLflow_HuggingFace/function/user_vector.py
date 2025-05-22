@@ -5,7 +5,7 @@ from pinecone import Pinecone
 
 def build_user_vector(user_df_row, pca, encoder, scaler, ohe, embedder_model):
     # 1. Embed text
-    text_fields = ['Story', 'Interests', 'Hobbies', 'Unique Quality', 'Learning Style',
+    text_fields = ['Story', 'interests', 'Hobbies', 'Unique Quality', 'Learning Style',
                    'Favourite movie', 'Favourite Book', 'Role Model']
     text_input = " ".join(str(user_df_row[col]) for col in text_fields if pd.notnull(user_df_row[col]))
     text_vec = embedder_model.encode([text_input])[0]

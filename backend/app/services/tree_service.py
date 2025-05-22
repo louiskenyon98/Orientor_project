@@ -245,7 +245,7 @@ Example format (partial):
         
     async def _generate_tree_with_prompt(self, prompt: str, cache_key: str = None) -> TreeNode:
         """
-        Internal method to generate a tree using a given prompt.
+        internal method to generate a tree using a given prompt.
         Abstracts the API call and validation logic for reuse.
         """
         start_time = time.time()

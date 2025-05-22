@@ -124,7 +124,7 @@ async def get_test_metadata(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des métadonnées du test: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Erreur lors de la récupération des métadonnées du test: {str(e)}"
         )
 
@@ -240,7 +240,7 @@ async def get_test_questions(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des questions du test: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Erreur lors de la récupération des questions du test: {str(e)}"
         )
 
@@ -628,7 +628,7 @@ async def get_user_latest_results(
     except Exception as e:
         logger.error(f"Erreur lors de la récupération des résultats de l'utilisateur: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Erreur lors de la récupération des résultats: {str(e)}"
         )
 
@@ -840,6 +840,6 @@ async def get_user_profile_description(
     except Exception as e:
         logger.error(f"Erreur lors de la génération de la description du profil: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Erreur lors de la génération de la description du profil: {str(e)}"
         )

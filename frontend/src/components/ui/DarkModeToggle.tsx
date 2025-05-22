@@ -13,8 +13,8 @@ export default function DarkModeToggle({ className = '' }: DarkModeToggleProps) 
       onClick={toggleDarkMode}
       className={`p-2 rounded-md transition-colors ${
         isDarkMode
-          ? 'text-gray-200 hover:text-white hover:bg-gray-700'
-          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-200'
+          ? 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/50'
+          : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
       } ${className}`}
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >

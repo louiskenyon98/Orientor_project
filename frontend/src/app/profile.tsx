@@ -352,7 +352,7 @@ const ProfilePage = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium">Interests:</label>
+                            <label className="block text-sm font-medium">interests:</label>
                             <textarea
                                 name="interests"
                                 value={formData.interests}

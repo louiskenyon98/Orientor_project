@@ -114,7 +114,7 @@ async def send_message(
                 if profile.learning_style:
                     system_message += f"- Learning Style: {profile.learning_style}\n"
                 if profile.interests:
-                    system_message += f"- Interests: {profile.interests}\n"
+                    system_message += f"- interests: {profile.interests}\n"
             
             conversation_history[user_id] = [
                 {"role": "system", "content": system_message}
@@ -141,7 +141,7 @@ async def send_message(
         except Exception as openai_error:
             logger.error(f"OpenAI API error: {str(openai_error)}")
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=status.HTTP_500_interNAL_SERVER_ERROR,
                 detail=f"OpenAI API error: {str(openai_error)}"
             )
         
@@ -159,7 +159,7 @@ async def send_message(
     except Exception as e:
         logger.error(f"Error in send_message: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Failed to get response from AI service: {str(e)}"
         )
 
@@ -181,6 +181,6 @@ async def clear_history(current_user: User = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error in clear_history: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Failed to clear conversation history: {str(e)}"
         ) 

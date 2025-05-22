@@ -122,17 +122,17 @@ const FindYourWay: React.FC = () => {
         </Box>
       ) : error ? (
         <Box sx={{ textAlign: 'center', my: 4 }}>
-          <Typography color="error" sx={{ fontFamily: '"Inter", sans-serif' }}>{error}</Typography>
+          <Typography color="error" sx={{ fontFamily: '"inter", sans-serif' }}>{error}</Typography>
           <IconButton onClick={fetchCareerRecommendations} color="primary">
             <RefreshIcon />
           </IconButton>
         </Box>
       ) : !hasMoreCareers ? (
         <Box sx={{ textAlign: 'center', my: 4 }}>
-          <Typography variant="h6" gutterBottom sx={{ fontFamily: '"Inter", sans-serif' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontFamily: '"inter", sans-serif' }}>
             No more career suggestions
           </Typography>
-          <Typography paragraph color="textSecondary" sx={{ fontFamily: '"Inter", sans-serif' }}>
+          <Typography paragraph color="textSecondary" sx={{ fontFamily: '"inter", sans-serif' }}>
             Check back later or refresh to see if we have new recommendations for you.
           </Typography>
           <IconButton onClick={fetchCareerRecommendations} color="primary">
@@ -182,20 +182,20 @@ const FindYourWay: React.FC = () => {
                 overflow: 'hidden',
               }}>
                 <CardContent sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 2, fontFamily: '"Inter", sans-serif' }}>
+                  <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 2, fontFamily: '"inter", sans-serif' }}>
                     {currentCareer.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ flex: 1, overflow: 'auto', mb: 2, color: 'text.secondary', lineHeight: 1.6, fontFamily: '"Inter", sans-serif' }}>
+                  <Typography variant="body2" sx={{ flex: 1, overflow: 'auto', mb: 2, color: 'text.secondary', lineHeight: 1.6, fontFamily: '"inter", sans-serif' }}>
                     {currentCareer.description}
                   </Typography>
                   
                   {/* Display main duties if available */}
                   {currentCareer.main_duties && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, fontFamily: '"Inter", sans-serif' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, fontFamily: '"inter", sans-serif' }}>
                         Main Duties:
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: '"Inter", sans-serif' }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: '"inter", sans-serif' }}>
                         {currentCareer.main_duties}
                       </Typography>
                     </Box>
@@ -212,7 +212,7 @@ const FindYourWay: React.FC = () => {
                           sx={{ 
                             bgcolor: 'rgba(25,118,210,0.08)', 
                             color: 'primary.main',
-                            fontFamily: '"Inter", sans-serif'
+                            fontFamily: '"inter", sans-serif'
                           }} 
                         />
                       ))}
@@ -237,7 +237,7 @@ const FindYourWay: React.FC = () => {
                         letterSpacing: 1.2, 
                         fontSize: '0.85rem',
                         textTransform: 'uppercase',
-                        fontFamily: '"Inter", sans-serif'
+                        fontFamily: '"inter", sans-serif'
                       }}
                     >
                       Swipe to Explore
@@ -248,7 +248,7 @@ const FindYourWay: React.FC = () => {
             </motion.div>
           </Box>
 
-          <Typography variant="body2" sx={{ mt: 4, textAlign: 'center', color: 'text.secondary', fontFamily: '"Inter", sans-serif' }}>
+          <Typography variant="body2" sx={{ mt: 4, textAlign: 'center', color: 'text.secondary', fontFamily: '"inter", sans-serif' }}>
             {currentIndex + 1} of {careers.length} recommendations
           </Typography>
         </>
@@ -259,7 +259,7 @@ const FindYourWay: React.FC = () => {
         autoHideDuration={4000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })} sx={{ fontFamily: '"Inter", sans-serif' }}>
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })} sx={{ fontFamily: '"inter", sans-serif' }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

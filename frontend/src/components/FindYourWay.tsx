@@ -148,7 +148,7 @@ const FindYourWay: React.FC = () => {
       display: 'flex', 
       flexDirection: 'column', 
       alignItems: 'center',
-      fontFamily: 'DepartureMono, monospace'
+      fontFamily: 'inter, monospace'
     }}>
       <Typography 
         variant="h4" 
@@ -158,7 +158,7 @@ const FindYourWay: React.FC = () => {
           mb: 6, 
           fontWeight: 'bold', 
           letterSpacing: 2,
-          fontFamily: 'DepartureMono, monospace',
+          fontFamily: 'inter, monospace',
           background: 'black',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
@@ -174,17 +174,17 @@ const FindYourWay: React.FC = () => {
         </Box>
       ) : error ? (
         <Box sx={{ textAlign: 'center', my: 4 }}>
-          <Typography color="error" sx={{ fontFamily: 'DepartureMono, monospace' }}>{error}</Typography>
+          <Typography color="error" sx={{ fontFamily: 'inter, monospace' }}>{error}</Typography>
           <IconButton onClick={fetchCareerRecommendations} color="primary">
             <RefreshIcon />
           </IconButton>
         </Box>
       ) : !hasMoreCareers ? (
         <Box sx={{ textAlign: 'center', my: 4 }}>
-          <Typography variant="h6" gutterBottom sx={{ fontFamily: 'DepartureMono, monospace' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontFamily: 'inter, monospace' }}>
             No more career suggestions
           </Typography>
-          <Typography paragraph color="textSecondary" sx={{ fontFamily: 'DepartureMono, monospace' }}>
+          <Typography paragraph color="textSecondary" sx={{ fontFamily: 'inter, monospace' }}>
             Check back later or refresh to see if we have new recommendations for you.
           </Typography>
           <IconButton onClick={fetchCareerRecommendations} color="primary">
@@ -245,7 +245,7 @@ const FindYourWay: React.FC = () => {
                       component="h2" 
                       sx={{ 
                         fontWeight: 600, 
-                        fontFamily: 'DepartureMono, monospace',
+                        fontFamily: 'inter, monospace',
                         color: '#2A9D8F'
                       }}
                     >
@@ -261,7 +261,7 @@ const FindYourWay: React.FC = () => {
                       mb: 2, 
                       color: 'text.secondary', 
                       lineHeight: 1.6,
-                      fontFamily: 'DepartureMono, monospace',
+                      fontFamily: 'inter, monospace',
                       fontSize: '0.95rem'
                     }}
                   >
@@ -276,7 +276,7 @@ const FindYourWay: React.FC = () => {
                           variant="subtitle2" 
                           sx={{ 
                             fontWeight: 600,
-                            fontFamily: 'DepartureMono, monospace',
+                            fontFamily: 'inter, monospace',
                             color: '#2A9D8F'
                           }}
                         >
@@ -287,7 +287,7 @@ const FindYourWay: React.FC = () => {
                         variant="body2" 
                         sx={{ 
                           color: 'text.secondary',
-                          fontFamily: 'DepartureMono, monospace',
+                          fontFamily: 'inter, monospace',
                           pl: 3
                         }}
                       >
@@ -307,7 +307,7 @@ const FindYourWay: React.FC = () => {
                           sx={{ 
                             bgcolor: 'rgba(89,194,201,0.08)', 
                             color: '#2A9D8F',
-                            fontFamily: 'DepartureMono, monospace',
+                            fontFamily: 'inter, monospace',
                             '& .MuiChip-icon': {
                               color: '#59C2C9'
                             }
@@ -335,7 +335,7 @@ const FindYourWay: React.FC = () => {
                         letterSpacing: 1.2, 
                         fontSize: '0.85rem',
                         textTransform: 'uppercase',
-                        fontFamily: 'DepartureMono, monospace',
+                        fontFamily: 'inter, monospace',
                         opacity: 0.8
                       }}
                     >
@@ -353,7 +353,7 @@ const FindYourWay: React.FC = () => {
               mt: 4, 
               textAlign: 'center', 
               color: 'text.secondary',
-              fontFamily: 'DepartureMono, monospace',
+              fontFamily: 'inter, monospace',
               letterSpacing: 1
             }}
           >
@@ -371,7 +371,7 @@ const FindYourWay: React.FC = () => {
           severity={snackbar.severity} 
           onClose={() => setSnackbar({ ...snackbar, open: false })} 
           sx={{ 
-            fontFamily: 'DepartureMono, monospace',
+            fontFamily: 'inter, monospace',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}
         >

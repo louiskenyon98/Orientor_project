@@ -19,7 +19,7 @@ index = pc.Index("oasis-768-index")
 # User input
 st.title("🧠 Job Matching Evaluation")
 story = st.text_area("User Story", "I enjoy solving problems with design and technology.")
-interests = st.text_input("Interests", "UX design, storytelling, software engineering")
+interests = st.text_input("interests", "UX design, storytelling, software engineering")
 submit = st.button("Evaluate Matches")
 
 def build_vector(model, text):

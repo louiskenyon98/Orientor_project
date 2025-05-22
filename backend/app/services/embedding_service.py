@@ -897,7 +897,7 @@ def get_user_oasis_embedding(db: Session, user_id: int, convert_to_uuid: bool = 
             query_id = str(uuid.uuid5(namespace_uuid, user_id_str))
             logger.info(f"ID utilisateur original: {user_id_str}, UUID généré pour requête: {query_id}")
         
-        # Interroger la table user_profiles pour l'embedding OaSIS
+        # interroger la table user_profiles pour l'embedding OaSIS
         query = text("""
             SELECT oasis_embedding
             FROM user_profiles

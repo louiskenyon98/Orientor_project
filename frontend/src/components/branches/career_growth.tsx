@@ -234,7 +234,7 @@ const root: SkillNode = {
         {
           id: 's3-1',
           skillDescription: 'You adapt your message for different people',
-          taskSuggestion: 'Interview people and present what you learned in a visual way',
+          taskSuggestion: 'interview people and present what you learned in a visual way',
           reachableJobs: [
             { jobTitle: 'Clear Speaker', jobDomain: 'Ideas & Expression', requiredSkills: [] },
             { jobTitle: 'Learning Spark', jobDomain: 'Group Learning', requiredSkills: [] },
@@ -324,7 +324,7 @@ export default function SkillTreeFlow() {
         >
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
           <Background color="#f3f4f6" gap={24} />
-          <Controls showInteractive={false} position="bottom-right" />
+          <Controls showinteractive={false} position="bottom-right" />
         </ReactFlow>
       </ReactFlowProvider>
     </div>

@@ -396,7 +396,7 @@ async def get_suggested_peers(
     except Exception as e:
         logger.error(f"Error getting suggested peers: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail="Failed to get suggested peers"
         )
 

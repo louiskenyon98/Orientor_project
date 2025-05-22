@@ -55,7 +55,7 @@ def upload_data():
             'Favourite Book': 'favorite_book',
             'Role Model': 'favorite_celebrities',
             'Learning Style': 'learning_style',
-            'Interests': 'interests',
+            'interests': 'interests',
             'ID': 'id',
             'user_id': 'user_id'
         })

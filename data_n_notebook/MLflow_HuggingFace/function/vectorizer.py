@@ -3,7 +3,7 @@ def vectorize_user_profiles(df, model_name="all-MiniLM-L6-v2"):
     from sklearn.preprocessing import OneHotEncoder, StandardScaler
     import numpy as np
     # Text embedding
-    text_fields = ['Story', 'Interests', 'Hobbies', 'Unique Quality', 'Learning Style',
+    text_fields = ['Story', 'interests', 'Hobbies', 'Unique Quality', 'Learning Style',
                    'Favourite movie', 'Favourite Book', 'Role Model']
     df['text_input'] = df.apply(lambda row: " ".join(str(row[col]) for col in text_fields if pd.notnull(row[col])), axis=1)
     model = SentenceTransformer(model_name)

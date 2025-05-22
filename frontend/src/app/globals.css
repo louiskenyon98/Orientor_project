@@ -3,20 +3,34 @@
 @tailwind utilities;
 
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
 
-/* Configuration des polices departure */
+/* Configuration des polices inter */
 @font-face {
-  font-family: "departure";
-  src: url("/fonts/DepartureMono-1.422/DepartureMono-Regular.woff2") format("woff2");
+  font-family: "inter";
+  src: url("/fonts/inter-1.422/inter-Regular.woff2") format("woff2"),
+       url("/fonts/inter-1.422/inter-Regular.woff") format("woff"),
+       url("/fonts/inter-1.422/inter-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "inter";
+  src: url("/fonts/inter-1.422/inter-Regular.woff2") format("woff2"),
+       url("/fonts/inter-1.422/inter-Regular.woff") format("woff"),
+       url("/fonts/inter-1.422/inter-Regular.otf") format("opentype");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "departure";
-  src: url("/fonts/DepartureMono-1.422/DepartureMono-Regular.woff2") format("woff2");
+  font-family: "inter";
+  src: url("/fonts/inter-1.422/inter-Regular.woff2") format("woff2"),
+       url("/fonts/inter-1.422/inter-Regular.woff") format("woff"),
+       url("/fonts/inter-1.422/inter-Regular.otf") format("opentype");
   font-style: normal;
   font-weight: 600;
   font-display: swap;
@@ -28,54 +42,54 @@
   }
   
   body {
-    @apply bg-light-background dark:bg-dark-background text-neutral-800 dark:text-dark-text min-h-screen font-sans antialiased;
+    @apply bg-stitch-primary text-stitch-sage min-h-screen font-sans antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif text-neutral-800 dark:text-gray-100 tracking-wide;
+    @apply font-departure text-stitch-sage tracking-wide;
   }
 
   h1 {
-    @apply text-4xl md:text-5xl font-light mb-8;
+    @apply text-4xl md:text-5xl font-bold mb-8;
   }
 
   h2 {
-    @apply text-3xl md:text-4xl font-light mb-6;
+    @apply text-3xl md:text-4xl font-bold mb-6;
   }
 
   h3 {
-    @apply text-2xl md:text-3xl font-light mb-4;
+    @apply text-2xl md:text-3xl font-bold mb-4;
   }
 
   p {
-    @apply leading-relaxed text-base md:text-lg text-neutral-600 dark:text-gray-300;
+    @apply leading-relaxed text-base md:text-lg text-stitch-sage;
   }
 
   a {
-    @apply text-primary-green dark:text-dark-cta hover:text-primary-indigo dark:hover:text-blue-300 transition-colors duration-300;
+    @apply text-stitch-accent hover:text-white transition-colors duration-300;
   }
 }
 
 @layer components {
   /* Buttons */
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 font-light tracking-wide rounded-lg
+    @apply inline-flex items-center justify-center px-6 py-3 font-bold tracking-wide rounded-lg
     transition-all duration-300
-    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 focus:ring-opacity-50
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-stitch-primary focus:ring-stitch-accent focus:ring-opacity-50
     disabled:opacity-60 disabled:cursor-not-allowed
     text-base;
   }
   
   .btn-primary {
-    @apply bg-light-cta text-white shadow-soft hover:bg-primary-indigo dark:bg-dark-cta dark:hover:bg-blue-700;
+    @apply bg-stitch-accent text-white shadow-soft hover:bg-opacity-90;
   }
   
   .btn-secondary {
-    @apply bg-white dark:bg-gray-800 text-primary-blue dark:text-blue-400 border border-primary-blue/20 dark:border-blue-500/20 hover:bg-primary-blue/5 dark:hover:bg-blue-900/30;
+    @apply bg-stitch-primary text-stitch-sage border border-stitch-border hover:border-stitch-accent;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-neutral-600 dark:text-gray-300 hover:text-primary-blue dark:hover:text-blue-400;
+    @apply bg-transparent text-stitch-sage hover:text-stitch-accent;
   }
 
   .btn-sm {
@@ -86,26 +100,44 @@
     @apply px-8 py-4 text-lg rounded-lg;
   }
 
+  /* Domain-specific buttons */
+  .btn-builder {
+    @apply bg-domain-builder text-white shadow-soft hover:bg-opacity-90;
+  }
+
+  .btn-communicator {
+    @apply bg-domain-communicator text-white shadow-soft hover:bg-opacity-90;
+  }
+
   /* Cards & Containers */
   .card {
-    @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-xl p-6 md:p-8 
-    shadow-soft border border-white/20 dark:border-gray-800/50
+    @apply bg-stitch-primary/80 backdrop-blur-md rounded-xl p-6 md:p-8
+    shadow-soft border border-stitch-border
     transition-all duration-300;
   }
   
   .panel {
-    @apply bg-white/10 dark:bg-gray-900/20 backdrop-blur-md rounded-xl p-6 shadow-soft;
+    @apply bg-stitch-primary/60 backdrop-blur-md rounded-xl p-6 shadow-soft border border-stitch-border;
   }
 
   .glass {
-    @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/20 dark:border-gray-700/30;
+    @apply bg-stitch-primary/40 backdrop-blur-md border border-stitch-border;
+  }
+
+  /* User card styles */
+  .user-card {
+    @apply card flex items-center gap-4;
+  }
+
+  .avatar {
+    @apply rounded-full border-2 border-stitch-accent overflow-hidden;
   }
 
   /* Form Elements */
   .input {
-    @apply w-full px-4 py-3 bg-white/30 dark:bg-gray-900/30 border-b border-neutral-300 dark:border-gray-600 rounded-none
-    focus:outline-none focus:border-primary-blue dark:focus:border-blue-500
-    text-neutral-700 dark:text-gray-200 placeholder-neutral-400 dark:placeholder-gray-500;
+    @apply w-full px-4 py-3 bg-stitch-primary/60 border-b border-stitch-border rounded-none
+    focus:outline-none focus:border-stitch-accent
+    text-stitch-sage placeholder-stitch-sage/50;
   }
 
   .input-group {
@@ -113,18 +145,18 @@
   }
 
   .label {
-    @apply block text-sm font-light text-neutral-600 dark:text-gray-300 mb-1;
+    @apply block text-sm font-bold text-stitch-sage mb-1;
   }
 
   /* Navigation */
   .nav-link {
-    @apply px-4 py-2 rounded-lg transition-all duration-300 text-neutral-600 dark:text-gray-300
-    hover:text-primary-blue dark:hover:text-blue-400 relative;
+    @apply px-4 py-2 rounded-lg transition-all duration-300 text-stitch-sage
+    hover:text-stitch-accent relative;
   }
 
   .nav-link::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary-blue dark:bg-blue-500 transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-stitch-accent transition-all duration-300;
   }
 
   .nav-link:hover::after {
@@ -132,11 +164,16 @@
   }
 
   .nav-link-active {
-    @apply text-primary-blue dark:text-blue-400;
+    @apply text-stitch-accent;
   }
 
   .nav-link-active::after {
     @apply w-full;
+  }
+
+  /* Header styles */
+  .header {
+    @apply py-3 px-10 border-b border-stitch-border flex items-center justify-between;
   }
 
   /* Chat Elements */
@@ -145,11 +182,20 @@
   }
   
   .message-user {
-    @apply message-bubble bg-primary-blue dark:bg-blue-700 text-white ml-auto;
+    @apply message-bubble bg-stitch-accent text-white ml-auto;
   }
   
   .message-system {
-    @apply message-bubble bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border border-white/20 dark:border-gray-700/30;
+    @apply message-bubble bg-stitch-primary/50 backdrop-blur-md border border-stitch-border;
+  }
+
+  /* Progress bar styles */
+  .progress-container {
+    @apply w-full h-4 bg-stitch-track rounded-full overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-stitch-accent origin-left transition-all duration-300;
   }
 
   /* Section layouts */
@@ -158,16 +204,25 @@
   }
 
   .container-narrow {
-    @apply max-w-4xl mx-auto px-4;
+    @apply max-w-4xl mx-auto px-10;
+  }
+
+  /* Layout container as per specs */
+  .layout-container {
+    @apply max-w-[960px] mx-auto px-10;
   }
 
   /* Background patterns */
   .bg-branch {
-    @apply bg-branch-pattern bg-repeat opacity-90 dark:opacity-300;
+    @apply bg-branch-pattern bg-repeat opacity-10;
   }
 
   .bg-grid {
-    @apply bg-grid-pattern bg-repeat opacity-90 dark:opacity-300;
+    @apply bg-grid-pattern bg-repeat opacity-10;
+  }
+
+  .bg-stitch {
+    @apply bg-stitch-pattern bg-repeat;
   }
 
   /* Animations & Effects */
@@ -186,11 +241,37 @@
   /* Gradient Text */
   .gradient-text {
     @apply font-bold;
-    background: linear-gradient(to right, #7D5BA6, #59C2C9);
+    background: linear-gradient(to right, #19b219, #95c695);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-fill-color: transparent;
+  }
+
+  /* ReactFlow customization */
+  .react-flow__node {
+    @apply border border-stitch-border bg-stitch-primary/80 text-stitch-sage rounded-lg;
+  }
+
+  .react-flow__edge-path {
+    @apply stroke-stitch-border stroke-2;
+  }
+
+  .react-flow__edge-path:hover {
+    @apply stroke-stitch-accent;
+  }
+
+  /* Tree/Graph rendering */
+  .tree-node {
+    @apply bg-stitch-primary border border-stitch-border rounded-lg p-4 shadow-soft;
+  }
+
+  .tree-node-active {
+    @apply border-stitch-accent;
+  }
+
+  .tree-edge {
+    @apply stroke-stitch-border stroke-1;
   }
 }
 

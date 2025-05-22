@@ -6,14 +6,14 @@ import { Question, AnswerRequest } from '@/services/hollandTestService';
 import hollandTestService from '@/services/hollandTestService';
 import { useSwipeable } from 'react-swipeable';
 
-interface TestInterfaceProps {
+interface TestinterfaceProps {
   questions: Question[];
   attemptId: string;
   onTestComplete: (attemptId: string) => void;
   onError: (error: Error) => void;
 }
 
-const TestInterface: React.FC<TestInterfaceProps> = ({
+const Testinterface: React.FC<TestinterfaceProps> = ({
   questions,
   attemptId,
   onTestComplete,
@@ -175,4 +175,4 @@ const TestInterface: React.FC<TestInterfaceProps> = ({
   );
 };
 
-export default TestInterface;
+export default Testinterface;

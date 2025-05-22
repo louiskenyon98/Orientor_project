@@ -58,7 +58,7 @@
 #                 elif skill_value >= 3.0:
 #                     level = "Advanced"
 #                 elif skill_value >= 2.0:
-#                     level = "Intermediate"
+#                     level = "intermediate"
 #                 else:
 #                     level = "Beginner"
                 

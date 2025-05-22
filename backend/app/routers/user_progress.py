@@ -107,6 +107,6 @@ async def update_user_progress(
         db.rollback()
         logger.error(f"Error updating progress: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Failed to update progress: {str(e)}"
         ) 

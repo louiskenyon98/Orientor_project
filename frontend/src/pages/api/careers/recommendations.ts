@@ -54,7 +54,7 @@ export default async function handler(
     });
     
     res.status(error.response?.status || 500).json({
-      message: error.response?.data?.message || 'Internal server error',
+      message: error.response?.data?.message || 'internal server error',
       error: error.message,
       details: error.response?.data
     });

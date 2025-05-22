@@ -84,7 +84,7 @@ The Suggested Peers tab is available in the main navigation after login. It disp
 
 - Name and academic information
 - Similarity score
-- Interests and hobbies
+- interests and hobbies
 - Option to start a conversation
 
 ## Architecture

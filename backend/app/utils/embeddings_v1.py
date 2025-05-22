@@ -144,7 +144,7 @@
 #     if profile.hobbies:
 #         parts.append(f"Hobbies: {profile.hobbies}")
 #     if profile.interests:
-#         parts.append(f"Interests: {profile.interests}")
+#         parts.append(f"interests: {profile.interests}")
 #     if profile.unique_quality:
 #         parts.append(f"Unique Quality: {profile.unique_quality}")
 #     if profile.story:

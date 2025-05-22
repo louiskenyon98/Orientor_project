@@ -5,7 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Providers } from './providers';
 import './globals.css';
 
-const inter = Inter({
+ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',

@@ -19,7 +19,7 @@ The Skill Tree Generation System:
   - In-memory caching to reduce API costs
 
 - **Frontend (Next.js + ReactFlow)**:
-  - Interactive tree visualization
+  - interactive tree visualization
   - Color-coded node types (skills, outcomes, careers)
   - Popovers displaying recommended actions for skill nodes
   - Responsive force-directed layout

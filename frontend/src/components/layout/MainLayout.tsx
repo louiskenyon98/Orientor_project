@@ -254,17 +254,17 @@ export default function MainLayout({
     console.log('Rendering layout with isLoggedIn:', isLoggedIn);
 
     return (
-        <div className="min-h-screen flex flex-col bg-light-background dark:bg-gray-950 dark:text-gray-100">
+        <div className="min-h-screen flex flex-col bg-stitch-primary text-stitch-sage">
             {/* Desktop Navigation Bar - Only visible on larger screens */}
             {isLoggedIn && (
-                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-light-background/90 dark:bg-dark-background/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-sm hidden md:block font-departure">
-                    <div className="max-w-7xl mx-auto px-8">
-                        <div className="flex justify-between h-16">
+                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/90 backdrop-blur-md border-b border-stitch-border shadow-sm hidden md:block font-departure header">
+                    <div className="layout-container mx-auto">
+                        <div className="flex justify-between py-3">
                             {/* Left Side - Logo and Primary Navigation */}
                             <div className="flex items-center space-x-8">
                                 {/* Logo */}
                                 <Link href="/" className="flex-shrink-0 flex items-center">
-                                    <span className="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 font-departure">
+                                    <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
                                         Navigo
                                     </span>
                                 </Link>
@@ -273,10 +273,10 @@ export default function MainLayout({
                                 <div className="flex items-center space-x-1">
                                     <Link 
                                         href="/chat" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out font-departure
-                                            ${pathname === '/chat' 
-                                                ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
+                                        className={`px-4 py-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
+                                            ${pathname === '/chat'
+                                                ? 'text-stitch-accent bg-stitch-primary/50'
+                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                             }`}
                                     >
                                         Mentor
@@ -284,10 +284,10 @@ export default function MainLayout({
                                     
                                     <Link 
                                         href="/peers" 
-                                        className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out font-departure
-                                            ${pathname === '/peers' 
-                                                ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
+                                        className={`px-4 py-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
+                                            ${pathname === '/peers'
+                                                ? 'text-stitch-accent bg-stitch-primary/50'
+                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                             }`}
                                     >
                                         Network
@@ -298,10 +298,10 @@ export default function MainLayout({
                                     <div className="relative" ref={careerMenuRef}>
                                         <button 
                                             onClick={toggleCareerDropdown}
-                                            className={`group px-4 py-2 text-sm font-medium rounded-md transition-colors duration-150 ease-in-out flex items-center font-departure
+                                            className={`group px-4 py-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out flex items-center font-departure
                                                 ${isCareerPath
-                                                    ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800' 
-                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800'
+                                                    ? 'text-stitch-accent bg-stitch-primary/50'
+                                                    : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                                 }`}
                                         >
                                             Career Growth
@@ -311,46 +311,46 @@ export default function MainLayout({
                                         </button>
                                         
                                         {careerMenuOpen && (
-                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-light-background dark:bg-dark-background ring-1 ring-black ring-opacity-5 z-40">
+                                            <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-stitch-primary border border-stitch-border ring-1 ring-black ring-opacity-5 z-40">
                                                 <div className="py-1" role="menu" aria-orientation="vertical">
                                                     <Link
                                                         href="/vector-search"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/vector-search' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/vector-search' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                                         role="menuitem"
                                                     >
                                                         Career Insights
                                                     </Link>
                                                     <Link
                                                         href="/find-your-way"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/find-your-way' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/find-your-way' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                                         role="menuitem"
                                                     >
                                                         Pathway Explorer
                                                     </Link>
                                                     <Link
                                                         href="/career"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/career' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/career' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                                         role="menuitem"
                                                     >
                                                         Career Explorer
                                                     </Link>
                                                     <Link
                                                         href="/enhanced-skills"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/enhanced-skills' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/enhanced-skills' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                                         role="menuitem"
                                                     >
                                                         Enhanced Skills Path
                                                     </Link>
                                                     <Link
                                                         href="/holland-test"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/holland-test' ? 'bg-blue-50 text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/holland-test' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                                         role="menuitem"
                                                     >
                                                         Test Holland (RIASEC)
                                                     </Link>
                                                     <Link
                                                         href="/case-study-journey"
-                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/case-study-journey' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
+                                                        className={`block px-4 py-2 text-sm font-departure ${pathname === '/case-study-journey' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                                     >
                                                         Étude de Cas Navigo
                                                     </Link>
@@ -373,7 +373,7 @@ export default function MainLayout({
                                         <button
                                             type="button"
                                             onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
-                                            className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors duration-150 ease-in-out font-departure"
+                                            className="inline-flex justify-center w-full px-4 py-2 text-sm font-bold text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30 rounded-md transition-colors duration-150 ease-in-out font-departure"
                                         >
                                             Workspace
                                             <svg
@@ -391,14 +391,14 @@ export default function MainLayout({
                                             </svg>
                                         </button>
 
-                                        <div className={`absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-light-background dark:bg-dark-background shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${workspaceMenuOpen ? 'block' : 'hidden'}`}>
+                                        <div className={`absolute z-10 mt-2 w-44 origin-top-right rounded-md bg-stitch-primary border border-stitch-border shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${workspaceMenuOpen ? 'block' : 'hidden'}`}>
                                             <div className="py-1">
                                             <Link
                                                 href="/space"
                                                 className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out font-departure
                                                 ${pathname === '/space'
-                                                    ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
-                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                                                    ? 'text-stitch-accent bg-stitch-primary/50'
+                                                    : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                                 }`}
                                             >
                                                 Space
@@ -407,8 +407,8 @@ export default function MainLayout({
                                                 href="/tree-path"
                                                 className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out font-departure
                                                 ${pathname === '/tree-path'
-                                                    ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
-                                                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                                                    ? 'text-stitch-accent bg-stitch-primary/50'
+                                                    : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                                 }`}
                                             >
                                                 Tree Path
@@ -433,7 +433,7 @@ export default function MainLayout({
                                 
                                 <button 
                                     onClick={handleLogout}
-                                    className="px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:text-red-600 hover:bg-red-50 dark:text-gray-300 dark:hover:text-red-400 dark:hover:bg-gray-800 transition-colors duration-150 ease-in-out font-departure"
+                                    className="px-4 py-2 text-sm font-bold rounded-md text-stitch-sage hover:text-red-500 hover:bg-stitch-primary/30 transition-colors duration-150 ease-in-out font-departure"
                                 >
                                     Sign Out
                                 </button>
@@ -444,24 +444,24 @@ export default function MainLayout({
             )}
 
             {/* Main content area */}
-            <main className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 ${isLoggedIn ? 'pt-0 md:pt-20 pb-16 md:pb-8' : 'py-8'}`}>
+            <main className={`flex-1 layout-container mx-auto ${isLoggedIn ? 'pt-0 md:pt-20 pb-16 md:pb-8' : 'py-8'}`}>
                 {children}
             </main>
 
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
             {isLoggedIn && (
-                <div className="fixed bottom-0 left-0 right-0 w-full bg-light-background dark:bg-dark-background border-t border-gray-200 dark:border-gray-800 md:hidden z-50 font-departure">
+                <div className="fixed bottom-0 left-0 right-0 w-full bg-stitch-primary border-t border-stitch-border md:hidden z-50 font-departure">
                     <div className="grid grid-cols-5 py-2">
                         <Link 
                             href="/chat" 
-                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/chat' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/chat' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
                         >
                             <span className="material-icons-outlined">chat</span>
                             <span>Chat</span>
                         </Link>
                         <Link 
                             href="/peers" 
-                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/peers' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/peers' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
                         >
                             <span className="material-icons-outlined">people</span>
                             <span>Peers</span>
@@ -470,7 +470,7 @@ export default function MainLayout({
                         {/* More menu button */}
                         <div className="relative">
                             <button 
-                                className="flex flex-col items-center w-full text-xs text-gray-600 dark:text-gray-400 font-departure"
+                                className="flex flex-col items-center w-full text-xs text-stitch-sage font-departure"
                                 onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                                 aria-label="More options"
                             >
@@ -482,59 +482,59 @@ export default function MainLayout({
                             {moreMenuOpen && (
                                 <div 
                                     ref={moreMenuRef}
-                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-light-background dark:bg-dark-background rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-stitch-primary rounded-lg shadow-lg border border-stitch-border overflow-hidden"
                                 >
                                     <div className="py-1">
                                         {/* Dropdown menu items with dark mode styles */}
                                         <Link 
                                             href="/vector-search" 
-                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/vector-search' ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/vector-search' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                         >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">trending_up</span>
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">trending_up</span>
                                             Career Recommendation
                                         </Link>
                                         <Link 
                                             href="/find-your-way" 
-                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/find-your-way' ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/find-your-way' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                         >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">explore</span>
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">explore</span>
                                             Pathway Explorer
                                         </Link>
                                         <Link 
                                             href="/career" 
-                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/career' ? 'bg-blue-50 text-blue-600 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/career' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
                                         >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">business</span>
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">business</span>
                                             Career Explorer
                                         </Link>
                                         <Link 
                                             href="/enhanced-skills" 
                                             className={`flex items-center px-4 py-3 text-sm ${
-                                                pathname === '/enhanced-skills' 
-                                                    ? 'text-gray-900 font-medium dark:text-gray-100' 
-                                                    : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'
+                                                pathname === '/enhanced-skills'
+                                                    ? 'bg-stitch-primary/50 text-stitch-accent font-bold'
+                                                    : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'
                                             }`}
                                         >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">school</span>
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">school</span>
                                             Enhanced Skills Path
                                         </Link>
                                         <Link
                                             href="/holland-test"
                                             className={`flex items-center px-4 py-3 text-sm ${
                                                 pathname === '/holland-test'
-                                                    ? 'text-gray-900 font-medium dark:text-gray-100'
-                                                    : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'
+                                                    ? 'bg-stitch-primary/50 text-stitch-accent font-bold'
+                                                    : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'
                                             }`}
                                         >
-                                            <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">psychology</span>
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">psychology</span>
                                             Test Holland (RIASEC)
                                         </Link>
-                                        <div className="border-t border-gray-200 dark:border-gray-700 mt-1"></div>
+                                        <div className="border-t border-stitch-border mt-1"></div>
                                         
                                         {/* Dark mode toggle in mobile menu */}
-                                        <div className="flex items-center justify-between w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                        <div className="flex items-center justify-between w-full px-4 py-3 text-sm text-stitch-sage">
                                             <div className="flex items-center">
-                                                <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">
+                                                <span className="material-icons-outlined mr-2 text-stitch-sage">
                                                     {/* Icon will be determined by the dark mode state */}
                                                     dark_mode
                                                 </span>
@@ -545,7 +545,7 @@ export default function MainLayout({
                                         
                                         <button 
                                             onClick={handleLogout}
-                                            className="flex items-center w-full px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800"
+                                            className="flex items-center w-full px-4 py-3 text-sm text-red-500 hover:bg-stitch-primary/30"
                                         >
                                             <span className="material-icons-outlined mr-2">logout</span>
                                             Logout
@@ -559,9 +559,9 @@ export default function MainLayout({
                             <Link
                                 href="/space"
                                 className={`flex flex-col items-center w-full text-xs ${
-                                    pathname === '/space' || pathname === '/tree-path' 
-                                        ? 'text-blue-600 dark:text-blue-400' 
-                                        : 'text-gray-600 dark:text-gray-400'
+                                    pathname === '/space' || pathname === '/tree-path'
+                                        ? 'text-stitch-accent'
+                                        : 'text-stitch-sage'
                                 }`}
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -574,18 +574,18 @@ export default function MainLayout({
                             
                         {/* Mobile Workspace Dropdown Menu */}
                         {workspaceMenuOpen && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-stitch-primary rounded-lg shadow-lg border border-stitch-border overflow-hidden">
                                 <div className="py-1">
                                     <Link 
                                         href="/space"
                                         onClick={() => setWorkspaceMenuOpen(false)}
                                         className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
                                             ${pathname === '/space'
-                                                ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                                                ? 'text-stitch-accent bg-stitch-primary/50'
+                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                             }`}
                                     >
-                                        <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">space_dashboard</span>
+                                        <span className="material-icons-outlined mr-2 text-stitch-sage">space_dashboard</span>
                                         Space
                                     </Link>
                                     <Link 
@@ -593,11 +593,11 @@ export default function MainLayout({
                                         onClick={() => setWorkspaceMenuOpen(false)}
                                         className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
                                             ${pathname === '/tree-path'
-                                                ? 'text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-gray-800'
-                                                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                                                ? 'text-stitch-accent bg-stitch-primary/50'
+                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
                                             }`}
                                     >
-                                        <span className="material-icons-outlined mr-2 text-gray-500 dark:text-gray-400">account_tree</span>
+                                        <span className="material-icons-outlined mr-2 text-stitch-sage">account_tree</span>
                                         Tree Path
                                     </Link>
                                 </div>

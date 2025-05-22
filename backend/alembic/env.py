@@ -19,7 +19,7 @@ load_dotenv()
 # this is the Alembic Config object
 config = context.config
 
-# Interpret the config file for Python logging
+# interpret the config file for Python logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 

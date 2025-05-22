@@ -173,7 +173,7 @@ def get_career_recommendations(
         embedding = generate_embedding(profile_data)
         if not embedding:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=status.HTTP_500_interNAL_SERVER_ERROR,
                 detail="Failed to generate embedding"
             )
         
@@ -215,7 +215,7 @@ def get_career_recommendations(
     except Exception as e:
         logger.error(f"Error getting career recommendations: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Failed to get career recommendations: {str(e)}"
         )
 
@@ -312,6 +312,6 @@ def swipe_recommendation(
         db.rollback()
         logger.error(f"Error processing swipe action: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=f"Failed to process swipe action: {str(e)}"
         ) 

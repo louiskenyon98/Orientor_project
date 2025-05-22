@@ -70,7 +70,7 @@ Years of Experience: {years_experience}
 Job Title: {job_title}
 Top Rated Skills: {top_skills}
 Top 3 RIASEC Code: {top_riasec}
-Interests: {interests}
+interests: {interests}
 
 ### OUTPUT FORMAT
 
@@ -162,7 +162,7 @@ Experience: {years_experience} years in {job_title}
 Story: {story}  
 Career Goal: {career_goals}  
 RIASEC: {top_riasec}  
-Interests: {interests}
+interests: {interests}
 
 ### OUTPUT
 

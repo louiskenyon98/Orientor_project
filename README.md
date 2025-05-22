@@ -21,7 +21,7 @@ A **proof-of-concept** project integrating a Large Language Model (LLM) with a R
 - **Hybrid Recommendation Engine**:
   - **Content-Based Filtering**: Matches user interests with relevant content (videos, articles, interactive exercises).
   - **Collaborative Filtering**: Leverages community data (ratings, completion rates) to suggest widely successful resources.
-- **Interactive UI**: A chat-like interface prompts students to refine their queries, view recommended items, and track learning progress.
+- **interactive UI**: A chat-like interface prompts students to refine their queries, view recommended items, and track learning progress.
 - **Game Semantics**: The LLM uses guided, step-by-step questioning to nudge deeper thinking, turning each dialogue into a problem-solving "game."  
 
 ---

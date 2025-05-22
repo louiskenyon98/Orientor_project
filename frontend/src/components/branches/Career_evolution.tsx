@@ -175,7 +175,7 @@ const root: TechNode = {
       nextSkills: [
         {
           id: 'dashboards-sql',
-          skillDescription: 'Interactive dashboards + advanced SQL queries',
+          skillDescription: 'interactive dashboards + advanced SQL queries',
           taskSuggestion: 'Design real-time dashboards for business metrics',
           reachableJobs: [
             { jobTitle: 'Business Intelligence Analyst', jobDomain: 'Analytics & Reporting' },
@@ -263,7 +263,7 @@ export default function CareerTechTree() {
         >
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
           <Background color="#f3f4f6" gap={24} />
-          <Controls showInteractive={false} position="bottom-right" />
+          <Controls showinteractive={false} position="bottom-right" />
         </ReactFlow>
       </ReactFlowProvider>
     </div>

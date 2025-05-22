@@ -133,13 +133,13 @@ export default function ProfilePage() {
                     ? response.data.skills.join(', ')
                     : '';
                     
-                const formattedInterests = Array.isArray(response.data.interests)
+                const formattedinterests = Array.isArray(response.data.interests)
                     ? response.data.interests.join(', ')
                     : '';
                 
                 setRawInputs({
                     skills: formattedSkills,
-                    interests: formattedInterests
+                    interests: formattedinterests
                 });
                 setProfile(prev => ({
                     ...prev,
@@ -600,7 +600,7 @@ export default function ProfilePage() {
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                                Interests
+                                                interests
                                             </label>
                                             <input
                                                 type="text"
@@ -931,7 +931,7 @@ export default function ProfilePage() {
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-neutral-lightgray mb-1">
-                                                Interests
+                                                interests
                                             </label>
                                             <input
                                                 type="text"

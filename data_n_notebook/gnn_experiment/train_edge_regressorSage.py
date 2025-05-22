@@ -482,7 +482,7 @@ for combo_idx, combo in enumerate(combinations, 1):
                         print(f"\nEarly stopping at epoch {epoch}")
                         break
                         
-        except KeyboardInterrupt:
+        except Keyboardinterrupt:
             print("\n⏸️ Training interrupted. Saving checkpoint...")
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             pause_checkpoint_path = CHECKPOINT_DIR / f"pause_checkpoint_{timestamp}.pt"

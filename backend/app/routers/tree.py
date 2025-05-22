@@ -83,7 +83,7 @@ async def generate_tree(
         }
         
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=json.dumps({
                 "message": "An unexpected error occurred while generating the tree.",
                 "error_context": error_context
@@ -150,7 +150,7 @@ async def generate_skills_tree(
         }
         
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
             detail=json.dumps({
                 "message": "An unexpected error occurred while generating the skills tree.",
                 "error_context": error_context

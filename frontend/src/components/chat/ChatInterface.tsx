@@ -1,5 +1,5 @@
-'use client';// frontend/src/components/chat/ChatInterface.tsx
-// frontend/src/components/chat/ChatInterface.tsx
+'use client';// frontend/src/components/chat/Chatinterface.tsx
+// frontend/src/components/chat/Chatinterface.tsx
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ interface ChatResponse {
   text: string;
 }
 
-export default function ChatInterface() {
+export default function Chatinterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);

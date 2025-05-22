@@ -52,15 +52,15 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
   if (loading) {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
-        <div className="h-2 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
-        <span className="text-xs text-gray-400 dark:text-gray-500 font-departure">Loading...</span>
+        <div className="h-2 w-24 bg-stitch-track rounded-full animate-pulse"></div>
+        <span className="text-xs text-stitch-sage font-departure">Loading...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={`text-xs text-red-500 dark:text-red-400 font-departure ${className}`}>
+      <div className={`text-xs text-red-500 font-departure ${className}`}>
         Error loading XP
       </div>
     );
@@ -69,15 +69,15 @@ export default function XPProgress({ className = '' }: XPProgressProps) {
   return (
     <div className={`flex items-center ${className}`}>
       {/* Capsule-style level indicator */}
-      <div className="flex items-center bg-light-background/80 dark:bg-dark-background/80 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 shadow-sm">
-        <span className="text-sm font-departure font-medium text-gray-800 dark:text-gray-200">🧭 Level {level} – {xpInCurrentLevel}/{xpRequiredForNextLevel} XP</span>
+      <div className="flex items-center bg-stitch-primary/80 border border-stitch-border rounded-full px-3 py-1 shadow-sm">
+        <span className="text-sm font-departure font-bold text-stitch-sage">🧭 Level {level} – {xpInCurrentLevel}/{xpRequiredForNextLevel} XP</span>
       </div>
       
-      {/* XP Progress Bar */}
+      {/* XP Progress Bar - Using the progress-container and progress-fill classes from globals.css */}
       <div className="ml-3 w-24">
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+        <div className="progress-container">
           <div
-            className="bg-blue-600 dark:bg-blue-500 rounded-full h-2 transition-all duration-500 ease-out animate-pulse-subtle"
+            className="progress-fill"
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>

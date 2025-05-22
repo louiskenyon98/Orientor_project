@@ -222,7 +222,7 @@ const root: SkillNode = {
         {
           id: 's3-1',
           skillDescription: 'You understand your audience deeply',
-          taskSuggestion: 'Interview 5 people from different backgrounds about their needs',
+          taskSuggestion: 'interview 5 people from different backgrounds about their needs',
           reachableJobs: [
             { jobTitle: 'UX Designer', jobDomain: 'Tech & Accessibility', requiredSkills: [] },
             { jobTitle: 'Workshop Facilitator', jobDomain: 'Adult Learning & Training', requiredSkills: [] },
@@ -284,7 +284,7 @@ export default function SkillTreeFlow() {
         <ReactFlow nodes={nodes} edges={edges} fitView panOnScroll zoomOnScroll fitViewOptions={{ padding: 0.4 }}>
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
           <Background color="#f3f4f6" gap={24} />
-          <Controls showInteractive={false} />
+          <Controls showinteractive={false} />
         </ReactFlow>
       </ReactFlowProvider>
     </div>

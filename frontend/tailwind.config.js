@@ -7,6 +7,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Stitch Design Theme Colors
+        stitch: {
+          primary: '#122112', // mint forest green (primary background)
+          accent: '#19b219', // deep green for progress, highlights
+          sage: '#95c695', // sage green for secondary info
+          border: '#254625', // subtle separator
+          track: '#366336', // progress track
+        },
         // Primary colors
         primary: {
           blue: '#3B82F6',
@@ -14,7 +22,7 @@ module.exports = {
           teal: '#59C2C9',
           purple: '#7D5BA6',
           lilac: '#A78BDA',
-          green: '#2d7b46', // Nouvelle couleur CTA
+          green: '#19b219', // Updated to match accent green
         },
         // Accent colors
         accent: {
@@ -36,25 +44,31 @@ module.exports = {
         },
         // Thème clair et sombre
         light: {
-          background: '#e6f0e5', // Fond vert menthe
-          text: '#1a1a1a',
-          cta: '#2d7b46',
+          background: '#122112', // Updated to mint forest green
+          text: '#95c695', // Updated to sage text
+          cta: '#19b219', // Updated to accent green
         },
         dark: {
-          background: '#1a2e19', // Version sombre du vert menthe
-          text: '#e6e6e6',
-          cta: '#3d9d5a', // Version plus claire du CTA pour le mode sombre
+          background: '#0a140a', // Darker version of mint forest green
+          text: '#95c695', // Sage text
+          cta: '#19b219', // Accent green
+        },
+        // Domain-based theming
+        domain: {
+          builder: '#F97316', // Orange for Builder domain
+          communicator: '#3B82F6', // Blue for Communicator domain
         },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(#f7f9fc, #ffffff)',
         'branch-pattern': "url('/patterns/branch.svg')",
         'grid-pattern': "url('/patterns/grid.svg')",
+        'stitch-pattern': "linear-gradient(rgba(25, 178, 25, 0.05), rgba(25, 178, 25, 0.05)), url('/patterns/branch.svg')",
       },
       fontFamily: {
-        sans: ['departure', 'system-ui', 'sans-serif'],
-        mono: ['departure', 'monospace'],
-        serif: ['Playfair Display', 'serif'],
+        sans: ['Noto Sans', 'system-ui', 'sans-serif'],
+        mono: ['inter', 'monospace'],
+        departure: ['inter', 'monospace'],
       },
       boxShadow: {
         'soft': '0 2px 12px rgba(0,0,0,0.05)',
@@ -136,8 +150,16 @@ module.exports = {
         },
       },
     },
+    container: {
+      center: true,
+      padding: '2.5rem', // px-40 as specified
+      screens: {
+        DEFAULT: '960px', // max-w-960px as specified
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('@tailwindcss/container-queries'),
   ],
 };

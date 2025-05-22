@@ -161,9 +161,9 @@ export default function PeerChatPage() {
     useEffect(() => {
         if (!peerId) return;
 
-        const pollInterval = setInterval(fetchMessages, 5000); // Poll every 5 seconds
+        const pollinterval = setinterval(fetchMessages, 5000); // Poll every 5 seconds
 
-        return () => clearInterval(pollInterval);
+        return () => clearinterval(pollinterval);
     }, [peerId]);
 
     if (!peerId) {

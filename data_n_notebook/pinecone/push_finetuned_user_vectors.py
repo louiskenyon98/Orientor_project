@@ -26,7 +26,7 @@ ohe = joblib.load("/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Ori
 scaler = joblib.load("/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/data_n_notebook/siamese_pipeline/mlruns/models/scaler_Siamese.pkl")
 
 # Text fields for embedding
-TEXT_FIELDS = ['Story', 'Interests', 'Hobbies', 'Unique Quality',
+TEXT_FIELDS = ['Story', 'interests', 'Hobbies', 'Unique Quality',
                'Learning Style', 'Favourite movie', 'Favourite Book', 'Role Model']
 CATEGORICAL_FIELDS = ['Sex', 'Major', 'Country', 'Learning Style', 'Year']
 NUMERIC_FIELDS = ['Age', 'GPA']
