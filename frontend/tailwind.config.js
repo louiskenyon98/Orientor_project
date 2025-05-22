@@ -44,9 +44,9 @@ module.exports = {
         },
         // Thème clair et sombre
         light: {
-          background: '#122112', // Updated to mint forest green
-          text: '#95c695', // Updated to sage text
-          cta: '#19b219', // Updated to accent green
+          background: '#e6f5e6', // Mint color for light mode
+          text: '#2c4c2c', // Darker text for better contrast on light background
+          cta: '#19b219', // Keeping the accent green
         },
         dark: {
           background: '#0a140a', // Darker version of mint forest green
