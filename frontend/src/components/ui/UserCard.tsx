@@ -31,40 +31,43 @@ export default function UserCard({
 
   return (
     <motion.div 
-      className={`user-card ${className}`}
+      className={`flex flex-col items-center gap-4 ${className}`}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
     >
-      {/* Avatar */}
-      <div className={`avatar h-16 w-16 ${domainColor}`}>
-        <Image 
-          src={avatarUrl} 
-          alt={`${name}'s avatar`} 
-          width={64} 
-          height={64}
-          className="w-full h-full object-cover"
-        />
+      {/* Avatar Container */}
+      <div className="flex-shrink-0">
+        <div className={`relative w-32 h-32 ${domainColor} rounded-full overflow-hidden border-2`}>
+          <Image 
+            src={avatarUrl} 
+            alt={`${name}'s avatar`} 
+            fill
+            sizes="128px"
+            className="object-cover"
+            priority
+          />
+        </div>
       </div>
 
       {/* User Info */}
-      <div className="flex flex-col">
-        <h3 className="text-lg font-bold font-departure text-stitch-accent mb-0">{name}</h3>
-        {role && <p className="text-sm text-stitch-sage mb-2">{role}</p>}
+      <div className="flex flex-col items-center text-center">
+        <h3 className="text-xl font-bold font-departure text-stitch-accent mb-1">{name}</h3>
+        {role && <p className="text-base text-stitch-sage mb-3">{role}</p>}
         
         {/* Skills Tags */}
         {skills.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1">
+          <div className="flex flex-wrap justify-center gap-2">
             {skills.slice(0, 3).map((skill, index) => (
               <span 
                 key={index} 
-                className="text-xs px-2 py-0.5 bg-stitch-primary border border-stitch-border rounded-full"
+                className="text-sm px-3 py-1 bg-stitch-primary border border-stitch-border rounded-full"
               >
                 {skill}
               </span>
             ))}
             {skills.length > 3 && (
-              <span className="text-xs px-2 py-0.5 bg-stitch-primary border border-stitch-border rounded-full">
+              <span className="text-sm px-3 py-1 bg-stitch-primary border border-stitch-border rounded-full">
                 +{skills.length - 3}
               </span>
             )}
