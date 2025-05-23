@@ -344,6 +344,28 @@ export default function Home() {
                 </div>
               </div>
 
+                              {/* Section des recommandations d'emploi - occupe toute la largeur */}
+                              <div className="md:col-span-12 mt-8">
+                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5 font-departure">Recommandations d'emploi</h2>
+                  <div className="w-full">
+                    <JobRecommendationList
+                      recommendations={jobRecommendations}
+                      isLoading={jobsLoading}
+                      error={jobsError}
+                      onSelectJob={handleSelectJob}
+                      className="mb-8"
+                    />
+                    
+                    {/* Arbre de compétences pour l'emploi sélectionné */}
+                    {selectedJob && (
+                      <JobSkillsTree
+                        jobId={selectedJob.id}
+                        className="mt-8"
+                      />
+                    )}
+                  </div>
+                </div>
+
               {/* Dashboard Grid - responsive avec largeur complète et optimisé pour grands écrans */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
                 {/* Student Summary - occupe toute la largeur sur mobile, 8 colonnes sur desktop */}
@@ -378,25 +400,6 @@ export default function Home() {
                       <div className="flex items-center gap-2"><p className="text-stitch-sage text-base font-normal leading-normal">Notes sauvegardées</p></div>
                     </div>
                   </div>
-                  
-                  {/* Section des recommandations d'emploi */}
-                  <div className="md:col-span-12 mt-8">
-                    <JobRecommendationList
-                      recommendations={jobRecommendations}
-                      isLoading={jobsLoading}
-                      error={jobsError}
-                      onSelectJob={handleSelectJob}
-                      className="mb-8"
-                    />
-                    
-                    {/* Arbre de compétences pour l'emploi sélectionné */}
-                    {selectedJob && (
-                      <JobSkillsTree
-                        jobId={selectedJob.id}
-                        className="mt-8"
-                      />
-                    )}
-                  </div>
                 </div>
 
                 {/* How to get there? Section */}
@@ -428,6 +431,28 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
+
+                {/* Section des recommandations d'emploi - occupe toute la largeur */}
+                {/* <div className="md:col-span-12 mt-8">
+                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5 font-departure">Recommandations d'emploi</h2>
+                  <div className="w-full">
+                    <JobRecommendationList
+                      recommendations={jobRecommendations}
+                      isLoading={jobsLoading}
+                      error={jobsError}
+                      onSelectJob={handleSelectJob}
+                      className="mb-8"
+                    /> */}
+                    
+                    {/* Arbre de compétences pour l'emploi sélectionné */}
+                    {/* {selectedJob && (
+                      <JobSkillsTree
+                        jobId={selectedJob.id}
+                        className="mt-8"
+                      />
+                    )}
+                  </div>
+                </div> */}
 
                 {/* Personality Section */}
                 <div className="md:col-span-12 mt-4">

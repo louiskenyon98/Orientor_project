@@ -73,6 +73,7 @@ backend/app/models/finetuned_model_quantized/
 # Fonts
 # Start of Selection
 frontend/public/fonts/
+frontend/public/avatar/
 
 # GNN_experiment
 data_n_notebook/gnn_experiment/data/

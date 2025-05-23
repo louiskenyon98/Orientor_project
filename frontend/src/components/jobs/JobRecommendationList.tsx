@@ -67,10 +67,14 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
   return (
     <div className={`w-full ${className}`}>
       <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4 font-departure">
-        Recommandations d'emploi
+        Explorez vos meilleures correspondances d'emploi
       </h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <p className="text-stitch-sage text-sm mb-6">
+        Ces recommandations sont basées sur votre profil et vos compétences. Cliquez sur une carte pour voir les compétences associées.
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         {recommendations.map((job) => (
           <JobCard
             key={job.id}
@@ -80,6 +84,17 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
           />
         ))}
       </div>
+      
+      {recommendations.length > 0 && (
+        <div className="mt-4 text-right">
+          <button
+            className="text-stitch-accent text-sm hover:underline focus:outline-none"
+            onClick={() => {/* Fonction pour voir plus de recommandations */}}
+          >
+            Voir plus de recommandations →
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -217,13 +217,17 @@ class JobRecommendationService:
             job_id: ID de l'emploi (format: 'occupation::key_XXXXX')
             
         Returns:
-            Dict[str, Any]: Arbre de compétences généré
+            Dict[str, Any]: Arbre de compétences généré avec visualisation
         """
         try:
             from SkillsTree_eval.graph_traversal_service import GraphTraversalService
+            from SkillsTree_eval.skill_tree_visualization import SkillTreeVisualization
             
             # Initialiser le service de traversée du graphe
             graph_service = GraphTraversalService()
+            
+            # Initialiser le service de visualisation
+            viz_service = SkillTreeVisualization()
             
             # Vérifier si le nœud d'emploi existe dans le graphe
             if job_id not in graph_service.graph.nodes:
@@ -237,16 +241,60 @@ class JobRecommendationService:
                 return {}
             
             # Traverser le graphe à partir de l'ID de l'emploi
+            # Limiter à une profondeur de 1 et 5 nœuds maximum à cette profondeur
             graph_data = graph_service.traverse_graph(
                 anchor_node_ids=[job_id],
-                max_depth=5,
+                max_depth=1,  # Profondeur de 1 (emploi + compétences directement liées)
                 min_similarity=0.7,
-                max_nodes_per_level=5
+                max_nodes_per_level=5  # Maximum 5 nœuds par niveau
             )
+            
+            logger.info(f"Arbre de compétences généré avec profondeur=1 et max_nodes=5")
             
             if not graph_data.get("nodes"):
                 logger.error(f"Aucun nœud trouvé lors de la traversée du graphe pour l'emploi {job_id}")
                 return {}
+            
+            # Générer une visualisation de l'arbre de compétences
+            try:
+                # Créer une visualisation Plotly interactive
+                plotly_viz = viz_service.visualize_plotly(graph_data)
+                
+                # Créer une visualisation Matplotlib statique
+                matplotlib_viz = viz_service.visualize_matplotlib(graph_data)
+                
+                # Créer une visualisation pour Streamlit
+                streamlit_viz = viz_service.create_streamlit_visualization(graph_data)
+                
+                # Ajouter les visualisations au graphe
+                graph_data["visualizations"] = {
+                    "plotly": plotly_viz,
+                    "matplotlib": matplotlib_viz,
+                    "streamlit": streamlit_viz
+                }
+                
+                # Logs détaillés pour déboguer les visualisations
+                logger.info("=== DÉTAILS DES VISUALISATIONS ===")
+                logger.info(f"Visualisation Plotly disponible: {plotly_viz is not None}")
+                if plotly_viz:
+                    logger.info(f"Type de visualisation Plotly: {type(plotly_viz)}")
+                    logger.info(f"Clés de visualisation Plotly: {plotly_viz.keys() if isinstance(plotly_viz, dict) else 'N/A'}")
+                
+                logger.info(f"Visualisation Matplotlib disponible: {matplotlib_viz is not None}")
+                if matplotlib_viz:
+                    logger.info(f"Type de visualisation Matplotlib: {type(matplotlib_viz)}")
+                    logger.info(f"Longueur de la chaîne base64: {len(matplotlib_viz) if isinstance(matplotlib_viz, str) else 'N/A'}")
+                
+                logger.info(f"Visualisation Streamlit disponible: {streamlit_viz is not None}")
+                if streamlit_viz:
+                    logger.info(f"Type de visualisation Streamlit: {type(streamlit_viz)}")
+                    logger.info(f"Clés de visualisation Streamlit: {streamlit_viz.keys() if isinstance(streamlit_viz, dict) else 'N/A'}")
+                logger.info("=== FIN DES DÉTAILS DES VISUALISATIONS ===")
+                
+                logger.info("Visualisations de l'arbre de compétences générées avec succès")
+            except Exception as viz_error:
+                logger.error(f"Erreur lors de la génération des visualisations: {str(viz_error)}")
+                # Continuer même si la visualisation échoue
             
             logger.info(f"Arbre de compétences généré avec succès pour l'emploi {job_id}")
             return graph_data
