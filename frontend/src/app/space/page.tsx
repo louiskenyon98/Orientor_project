@@ -182,7 +182,7 @@ export default function SpacePage() {
             <>
               {/* Sidebar avec liste des emplois */}
               <div className="flex flex-col w-80">
-                <h2 className="text-xl font-semibold mb-4 text-stitch-accent">Saved Recommendations</h2>
+                {/* <h2 className="text-xl font-semibold mb-4 text-stitch-accent">Saved Recommendations</h2> */}
                 <div className="space-y-3">
                   {recommendations.map((rec) => (
                     <div
@@ -209,7 +209,7 @@ export default function SpacePage() {
               </div>
               
               {/* Contenu principal */}
-              <div className="flex flex-col max-w-[960px] flex-1 ml-6">
+              <div className="flex flex-col w-full flex-1 ml-6">
                 {selectedRecommendation ? (
                   <div className="bg-stitch-primary/30 p-6 rounded-lg border border-stitch-border">
                     <h2 className="text-2xl font-bold mb-4 text-stitch-accent">{selectedRecommendation.label}</h2>

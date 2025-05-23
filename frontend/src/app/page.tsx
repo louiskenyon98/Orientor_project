@@ -84,12 +84,12 @@ export default function Home() {
   // Navigation items pour la sidebar
   const navItems = [
     { name: 'Chat', icon: 'Chat', path: '/chat' },
-    { name: 'Peers', icon: 'List', path: '/peers' },
-    { name: 'Swipe', icon: 'List', path: '/find-your-way' },
+    { name: 'Peers', icon: 'Peers', path: '/peers' },
+    { name: 'Swipe', icon: 'Personality', path: '/find-your-way' },
     { name: 'Saved', icon: 'Bookmark', path: '/space' },
     { name: 'Challenges', icon: 'Trophy', path: '/challenges' },
     { name: 'Notes', icon: 'Note', path: '/notes' },
-    { name: 'Case Study', icon: 'List', path: '/case-study-journey' },
+    { name: 'Case Study', icon: 'Case Study', path: '/case-study-journey' },
   ];
 
   // Career navigation items
@@ -102,8 +102,8 @@ export default function Home() {
 
   // Personality navigation items
   const personalityItems = [
-    { name: 'Holland Test', icon: 'List', path: '/holland-test' },
-    { name: 'Personality', icon: 'List', path: '/profile/holland-results' },
+    { name: 'Holland Test', icon: 'Personality', path: '/holland-test' },
+    { name: 'Personality', icon: 'Personality', path: '/profile/holland-results' },
   ];
 
   const navigateTo = (path: string) => {
@@ -146,6 +146,33 @@ export default function Home() {
                     {item.icon === 'Note' && (
                       <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256" className="shrink-0">
                         <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216v96H176a16,16,0,0,0-16,16v48H40Zm152,144V168h24v32Z"></path>
+                      </svg>
+                    )}
+                    {item.icon === 'Peers' && (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256" className="shrink-0">
+                        <path d="M128,120a48,48,0,1,0-48-48A48,48,0,0,0,128,120Zm0,16c-33.08,0-96,16.54-96,49.38V200a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8v-14.62C224,152.54,161.08,136,128,136Z"></path>
+                      </svg>
+                    )}
+                    {item.icon === 'Case Study' && (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256" className="shrink-0">
+                        <path d="M128,16A112,112,0,1,0,240,128,112.13,112.13,0,0,0,128,16Zm0,208a96,96,0,1,1,96-96A96.11,96.11,0,0,1,128,224Z"></path>
+                      </svg>
+                    )}
+                    {item.icon === 'Search' && (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" viewBox="0 0 256 256" className="shrink-0">
+                        <path d="M112,16A96,96,0,1,0,208,112a95.83,95.83,0,0,0-16.5-54.5l-36.5,36.5A48,48,0,1,1,112,16Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,112,192Z"></path>
+                      </svg>
+                    )}
+                    {item.icon === 'Personality' && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18px"
+                        height="18px"
+                        fill="currentColor"
+                        viewBox="0 0 256 256"
+                        className="shrink-0"
+                      >
+                        <path d="M232,128a104,104,0,1,0-193.55,58.25C41.62,187.2,40,191.43,40,196v20a12,12,0,0,0,12,12H88a12,12,0,0,0,12-12V204h8a8,8,0,0,0,8-8V168a40.05,40.05,0,0,0,40-40v-8a8,8,0,0,0-8-8H139.75a40,40,0,0,0-75.5,0H56a8,8,0,0,0,0,16h80a24,24,0,0,1,24,24v8a8,8,0,0,0,8,8h8a12,12,0,0,0,12-12V196c0-4.57-1.62-8.8-4.45-12.25ZM128,24A88,88,0,1,1,40,112,88.1,88.1,0,0,1,128,24Z"></path>
                       </svg>
                     )}
                     
@@ -307,7 +334,7 @@ export default function Home() {
 
                 {/* How to get there? Section */}
                 <div className="md:col-span-12 mt-4">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5 font-departure">How to get there?</h2>
+                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5 font-departure">Tree</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
                     {careerItems.map((item, index) => (
                       <Link
