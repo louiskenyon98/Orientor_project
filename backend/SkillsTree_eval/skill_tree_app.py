@@ -328,10 +328,11 @@ def main():
     st.sidebar.subheader("Embedding")
     embedding_source = st.sidebar.radio(
         "Source de l'embedding",
-        ["Fichier", "Aléatoire"]
+        ["Fichier", "Aléatoire", "ID personnalisé"]
     )
     
     embedding = None
+    custom_anchor_ids = []
     
     if embedding_source == "Fichier":
         uploaded_file = st.sidebar.file_uploader("Charger un embedding", type=["json", "txt"])
@@ -339,10 +340,21 @@ def main():
             embedding = load_embedding_from_file(uploaded_file)
             if embedding is not None:
                 st.sidebar.success(f"Embedding chargé avec succès: {embedding.shape}")
-    else:  # Aléatoire
+    elif embedding_source == "Aléatoire":
         if st.sidebar.button("Générer un embedding aléatoire"):
             embedding = generate_random_embedding()
             st.sidebar.success(f"Embedding aléatoire généré: {embedding.shape}")
+    else:  # ID personnalisé
+        st.sidebar.markdown("""
+        Entrez un ou plusieurs IDs de nœuds d'ancrage (un par ligne).
+        
+        Format: `occupation::key_15817` ou `skill::key_12345`
+        """)
+        custom_ids_input = st.sidebar.text_area("IDs des nœuds d'ancrage", height=100)
+        if custom_ids_input:
+            custom_anchor_ids = [id.strip() for id in custom_ids_input.split('\n') if id.strip()]
+            if custom_anchor_ids:
+                st.sidebar.success(f"{len(custom_anchor_ids)} ID(s) d'ancrage saisi(s)")
     
     # Type d'embedding à utiliser
     embedding_type = st.sidebar.selectbox(
@@ -393,23 +405,56 @@ def main():
     st.sidebar.info(f"Types d'ancrage sélectionnés: {', '.join(filter_types)}")
     
     # Bouton pour lancer la traversée
-    if embedding is not None and st.sidebar.button("Lancer la traversée"):
-        # Afficher un spinner pendant le traitement
-        with st.spinner("Recherche des nœuds d'ancrage..."):
-            # Trouver les nœuds d'ancrage
-            anchors = anchor_service.find_anchors(
-                embedding=embedding,
-                top_k=top_k,
-                threshold=threshold,
-                filter_types=filter_types
-            )
+    if (embedding is not None or custom_anchor_ids) and st.sidebar.button("Lancer la traversée"):
+        # Initialiser la liste des IDs d'ancrage
+        anchor_ids = []
+        
+        # Si nous utilisons des IDs personnalisés
+        if embedding_source == "ID personnalisé":
+            anchor_ids = custom_anchor_ids
             
-            if not anchors:
-                st.error("Aucun nœud d'ancrage trouvé. Essayez de réduire le seuil de similarité.")
+            # Vérifier si les IDs existent dans le graphe
+            valid_ids = [node_id for node_id in anchor_ids if node_id in graph_service.graph.nodes]
+            invalid_ids = [node_id for node_id in anchor_ids if node_id not in graph_service.graph.nodes]
+            
+            if invalid_ids:
+                st.warning(f"Les IDs suivants n'existent pas dans le graphe et seront ignorés: {', '.join(invalid_ids)}")
+            
+            if not valid_ids:
+                st.error("Aucun ID d'ancrage valide. Veuillez vérifier les IDs saisis.")
                 return
             
-            # Extraire les IDs des nœuds d'ancrage
-            anchor_ids = [anchor["id"] for anchor in anchors]
+            anchor_ids = valid_ids
+            
+            # Créer une liste d'ancres pour l'affichage
+            anchors = []
+            for node_id in anchor_ids:
+                node_info = graph_service.get_node_info(node_id)
+                anchors.append({
+                    "id": node_id,
+                    "metadata": {
+                        "label": node_info.get("label", ""),
+                        "type": node_info.get("type", "unknown")
+                    },
+                    "score": 1.0  # Score par défaut pour les IDs personnalisés
+                })
+        else:
+            # Afficher un spinner pendant le traitement
+            with st.spinner("Recherche des nœuds d'ancrage..."):
+                # Trouver les nœuds d'ancrage
+                anchors = anchor_service.find_anchors(
+                    embedding=embedding,
+                    top_k=top_k,
+                    threshold=threshold,
+                    filter_types=filter_types
+                )
+                
+                if not anchors:
+                    st.error("Aucun nœud d'ancrage trouvé. Essayez de réduire le seuil de similarité.")
+                    return
+                
+                # Extraire les IDs des nœuds d'ancrage
+                anchor_ids = [anchor["id"] for anchor in anchors]
             
             # Afficher les nœuds d'ancrage
             st.subheader("Nœuds d'ancrage")

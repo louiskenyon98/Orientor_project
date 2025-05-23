@@ -66,4 +66,56 @@ export const getSavedCareers = async () => {
   }
 };
 
-export default api; 
+// Function to get job recommendations for the homepage
+export const getJobRecommendations = async (userId?: number, top_k: number = 3) => {
+  try {
+    // Si userId n'est pas fourni, utilise l'utilisateur courant
+    const endpoint = userId
+      ? `/api/v1/jobs/recommendations/${userId}?top_k=${top_k}`
+      : `/api/v1/jobs/recommendations/me?top_k=${top_k}`;
+    
+    console.log('Calling job recommendations API:', `${API_URL}${endpoint}`);
+    const response = await api.get(endpoint);
+    console.log('Job recommendations API response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching job recommendations:', error);
+    console.error('API Error Details:', {
+      status: (error as any)?.response?.status,
+      statusText: (error as any)?.response?.statusText,
+      data: (error as any)?.response?.data,
+      config: {
+        baseURL: (error as any)?.config?.baseURL,
+        url: (error as any)?.config?.url,
+        headers: (error as any)?.config?.headers
+      }
+    });
+    throw error;
+  }
+};
+
+// Function to get the skills tree for a specific job
+export const getJobSkillsTree = async (jobId: string) => {
+  try {
+    const endpoint = `/api/v1/jobs/skill-tree/${jobId}`;
+    console.log('Calling job skills tree API:', `${API_URL}${endpoint}`);
+    const response = await api.get(endpoint);
+    console.log('Job skills tree API response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching job skills tree:', error);
+    console.error('API Error Details:', {
+      status: (error as any)?.response?.status,
+      statusText: (error as any)?.response?.statusText,
+      data: (error as any)?.response?.data,
+      config: {
+        baseURL: (error as any)?.config?.baseURL,
+        url: (error as any)?.config?.url,
+        headers: (error as any)?.config?.headers
+      }
+    });
+    throw error;
+  }
+};
+
+export default api;

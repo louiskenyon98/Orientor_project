@@ -6,6 +6,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import UserCard from '@/components/ui/UserCard';
 import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
+import { getJobRecommendations } from '@/services/api';
+import JobRecommendationList from '@/components/jobs/JobRecommendationList';
+import JobSkillsTree from '@/components/jobs/JobSkillsTree';
+import { Job } from '@/components/jobs/JobCard';
+
+// Interface pour la réponse de l'API de recommandations d'emploi
+interface JobRecommendationsResponse {
+  recommendations: Job[];
+  user_id: number;
+}
 
 export default function Home() {
   const router = useRouter();
@@ -43,6 +53,12 @@ export default function Home() {
   const [hollandResults, setHollandResults] = useState<ScoreResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // États pour les recommandations d'emploi
+  const [jobRecommendations, setJobRecommendations] = useState<Job[]>([]);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const [jobsError, setJobsError] = useState<string | null>(null);
 
   // Récupérer les résultats du test Holland au chargement de la page
   useEffect(() => {
@@ -59,7 +75,39 @@ export default function Home() {
     };
 
     fetchHollandResults();
+    
+    // Récupérer les recommandations d'emploi
+    const fetchJobRecommendations = async () => {
+      try {
+        setJobsLoading(true);
+        setJobsError(null);
+        
+        // Utiliser l'ID de l'utilisateur actuel (à adapter selon votre système d'authentification)
+        const response = await getJobRecommendations() as JobRecommendationsResponse;
+        
+        if (response && response.recommendations) {
+          setJobRecommendations(response.recommendations);
+          
+          // Sélectionner automatiquement le premier emploi
+          if (response.recommendations.length > 0) {
+            setSelectedJob(response.recommendations[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Erreur lors de la récupération des recommandations d\'emploi:', err);
+        setJobsError('Impossible de récupérer les recommandations d\'emploi');
+      } finally {
+        setJobsLoading(false);
+      }
+    };
+    
+    fetchJobRecommendations();
   }, []);
+  
+  // Fonction pour gérer la sélection d'un emploi
+  const handleSelectJob = (job: Job) => {
+    setSelectedJob(job);
+  };
 
   // Définir les couleurs pour chaque dimension RIASEC
   const riasecColors = {
@@ -329,6 +377,25 @@ export default function Home() {
                       <p className="text-stitch-accent tracking-light text-3xl font-bold leading-tight font-departure">{userData.notesSaved}</p>
                       <div className="flex items-center gap-2"><p className="text-stitch-sage text-base font-normal leading-normal">Notes sauvegardées</p></div>
                     </div>
+                  </div>
+                  
+                  {/* Section des recommandations d'emploi */}
+                  <div className="md:col-span-12 mt-8">
+                    <JobRecommendationList
+                      recommendations={jobRecommendations}
+                      isLoading={jobsLoading}
+                      error={jobsError}
+                      onSelectJob={handleSelectJob}
+                      className="mb-8"
+                    />
+                    
+                    {/* Arbre de compétences pour l'emploi sélectionné */}
+                    {selectedJob && (
+                      <JobSkillsTree
+                        jobId={selectedJob.id}
+                        className="mt-8"
+                      />
+                    )}
                   </div>
                 </div>
 

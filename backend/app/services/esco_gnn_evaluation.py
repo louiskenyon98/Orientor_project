@@ -70,7 +70,7 @@ def query_diverse_matches(vector):
     def run_query(filter_type):
         return index.query(
             vector=vector,
-            top_k=3,
+            top_k=10,
             filter={"type": {"$eq": filter_type}},
             include_metadata=True,
             include_values=True
@@ -83,7 +83,7 @@ def evaluate_match(user_id, expected_anchors, embedding_column):
     user_vec = get_user_embedding(user_id, column=embedding_column)
     st.write(f"Embedding type: {embedding_column}")
     st.write("Embedding shape:", user_vec.shape)
-    st.write("Sample values:", user_vec[:5])
+    st.write("Sample values:", user_vec[:10])
 
     profiles_text = get_user_profiles_text(user_id)
     for k, v in profiles_text.items():
