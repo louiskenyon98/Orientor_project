@@ -616,6 +616,91 @@ export default function ProfilePage() {
                                                     />
                                                 </label>
                                             </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Hobbies</p>
+                                                    <textarea
+                                                        placeholder="What are your hobbies?"
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none min-h-36 placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        value={profile.hobbies || ''}
+                                                        onChange={handleProfileChange('hobbies')}
+                                                    ></textarea>
+                                                </label>
+                                            </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Learning Style</p>
+                                                    <select
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none h-14 bg-[image:--select-button-svg] placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        value={profile.learning_style || ''}
+                                                        onChange={handleProfileChange('learning_style')}
+                                                    >
+                                                        <option value="">Select your learning style</option>
+                                                        <option value="Visual">Visual</option>
+                                                        <option value="Auditory">Auditory</option>
+                                                        <option value="Reading/Writing">Reading/Writing</option>
+                                                        <option value="Kinesthetic">Kinesthetic</option>
+                                                    </select>
+                                                </label>
+                                            </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Unique Quality</p>
+                                                    <textarea
+                                                        placeholder="What makes you unique?"
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none min-h-36 placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        value={profile.unique_quality || ''}
+                                                        onChange={handleProfileChange('unique_quality')}
+                                                    ></textarea>
+                                                </label>
+                                            </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Your Story</p>
+                                                    <textarea
+                                                        placeholder="Tell us your story"
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none min-h-36 placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        value={profile.story || ''}
+                                                        onChange={handleProfileChange('story')}
+                                                    ></textarea>
+                                                </label>
+                                            </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Favorite Movie</p>
+                                                    <input
+                                                        placeholder="What's your favorite movie?"
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none h-14 placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        type="text"
+                                                        value={profile.favorite_movie || ''}
+                                                        onChange={handleProfileChange('favorite_movie')}
+                                                    />
+                                                </label>
+                                            </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Favorite Book</p>
+                                                    <input
+                                                        placeholder="What's your favorite book?"
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none h-14 placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        type="text"
+                                                        value={profile.favorite_book || ''}
+                                                        onChange={handleProfileChange('favorite_book')}
+                                                    />
+                                                </label>
+                                            </div>
+                                            <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                                <label className="flex flex-col min-w-40 flex-1">
+                                                    <p className="text-[#0d1b13] text-base font-medium leading-normal pb-2">Favorite Celebrities</p>
+                                                    <input
+                                                        placeholder="Your role model or favorite celebrity"
+                                                        className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d1b13] focus:outline-0 focus:ring-0 border-none bg-[#e7f3ec] focus:border-none h-14 placeholder:text-[#4c9a6a] p-4 text-base font-normal leading-normal"
+                                                        type="text"
+                                                        value={profile.favorite_celebrities || ''}
+                                                        onChange={handleProfileChange('favorite_celebrities')}
+                                                    />
+                                                </label>
+                                            </div>
                                             <div className="md:col-span-2">
                                                 <h3 className="text-lg font-medium text-neutral-lightgray mb-4">Skill Scores</h3>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
