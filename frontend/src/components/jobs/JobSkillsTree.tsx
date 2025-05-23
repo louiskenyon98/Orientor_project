@@ -53,6 +53,12 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
   const [error, setError] = useState<string | null>(null);
   const [topSkills, setTopSkills] = useState<Node[]>([]);
   
+  // États pour les paramètres de l'arbre
+  const [treeDepth, setTreeDepth] = useState<number>(1);
+  const [nodesPerLevel, setNodesPerLevel] = useState<number>(5);
+  const [isApplying, setIsApplying] = useState<boolean>(false);
+  const [paramVersion, setParamVersion] = useState<number>(0); // Pour forcer le rechargement
+  
   // États pour ReactFlow
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -65,25 +71,17 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
     const occupationNode = Object.values(data.nodes).find(node => node.type === 'occupation');
     if (!occupationNode) return;
     
-    // Identifier les nœuds de compétences (skills) directement liés à l'emploi
-    const skillNodes = Object.values(data.nodes).filter(node =>
-      node.type === 'skill' &&
-      data.edges.some(edge =>
-        (edge.source === occupationNode.id && edge.target === node.id) ||
-        (edge.target === occupationNode.id && edge.source === node.id)
-      )
-    );
+    console.log("Nœud d'emploi trouvé:", occupationNode);
+    console.log("Tous les nœuds:", Object.values(data.nodes));
+    console.log("Toutes les arêtes:", data.edges);
     
-    // Limiter à 5 compétences maximum
-    const topSkillNodes = skillNodes.slice(0, 5);
-    
-    // Créer un layout en étoile avec l'emploi au centre
+    // Créer un layout en étoile
     const centerX = 400;
     const centerY = 250;
-    const radius = 200;
     
     // Convertir les nœuds
     const flowNodes: FlowNode[] = [];
+    const nodeIds = new Set<string>();
     
     // Ajouter le nœud d'emploi au centre
     flowNodes.push({
@@ -93,38 +91,212 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
       style: { background: '#4285F4', color: 'white', padding: '10px', borderRadius: '8px', width: '200px', textAlign: 'center' },
       type: 'default'
     });
+    nodeIds.add(occupationNode.id);
     
-    // Ajouter les nœuds de compétences autour
-    topSkillNodes.forEach((node, index) => {
-      const angle = (index / topSkillNodes.length) * 2 * Math.PI;
-      const x = centerX + radius * Math.cos(angle);
-      const y = centerY + radius * Math.sin(angle);
+    // Trouver les nœuds directement connectés au nœud d'emploi
+    const level1Nodes = Object.values(data.nodes).filter(node =>
+      node.id !== occupationNode.id &&
+      data.edges.some(edge =>
+        (edge.source === occupationNode.id && edge.target === node.id) ||
+        (edge.target === occupationNode.id && edge.source === node.id)
+      )
+    );
+    
+    console.log("Nœuds de niveau 1:", level1Nodes);
+    
+    // Limiter au nombre de nœuds spécifié pour le niveau 1
+    const topLevel1Nodes = level1Nodes.slice(0, nodesPerLevel);
+    
+    // Ajouter les nœuds de niveau 1 autour du nœud d'emploi
+    const radius1 = 200;
+    topLevel1Nodes.forEach((node, index) => {
+      const angle = (index / topLevel1Nodes.length) * 2 * Math.PI;
+      const x = centerX + radius1 * Math.cos(angle);
+      const y = centerY + radius1 * Math.sin(angle);
+      
+      // Déterminer la couleur en fonction du type de nœud
+      let bgColor = '#34A853'; // Vert par défaut pour les compétences
+      if (node.type === 'skillsgroup') {
+        bgColor = '#FBBC05'; // Jaune pour les groupes de compétences
+      } else if (node.type === 'occupation') {
+        bgColor = '#4285F4'; // Bleu pour les emplois
+      }
       
       flowNodes.push({
         id: node.id,
         position: { x, y },
         data: { label: node.label },
-        style: { background: '#34A853', color: 'white', padding: '8px', borderRadius: '8px', width: '180px', textAlign: 'center' },
+        style: {
+          background: bgColor,
+          color: 'white',
+          padding: '8px',
+          borderRadius: '8px',
+          width: '180px',
+          textAlign: 'center'
+        },
         type: 'default'
       });
+      nodeIds.add(node.id);
     });
-      
-    // Convertir uniquement les arêtes entre l'emploi et les compétences
-    const flowEdges: FlowEdge[] = [];
     
-    // Ajouter les arêtes entre l'emploi et les compétences
-    topSkillNodes.forEach((node, index) => {
-      // Trouver l'arête correspondante
-      const edge = data.edges.find(e =>
-        (e.source === occupationNode.id && e.target === node.id) ||
-        (e.target === occupationNode.id && e.source === node.id)
+    // Si la profondeur est supérieure à 1, ajouter les nœuds de niveau 2
+    if (treeDepth > 1) {
+      console.log("Recherche des nœuds de niveau 2 (profondeur > 1)");
+      
+      // Pour chaque nœud de niveau 1, trouver les nœuds connectés (niveau 2)
+      topLevel1Nodes.forEach((level1Node, level1Index) => {
+        console.log(`Recherche des nœuds connectés à ${level1Node.label} (ID: ${level1Node.id})`);
+        
+        // Afficher toutes les arêtes liées à ce nœud pour le débogage
+        const relatedEdges = data.edges.filter(edge =>
+          edge.source === level1Node.id || edge.target === level1Node.id
+        );
+        console.log(`Arêtes liées à ${level1Node.label}:`, relatedEdges);
+        
+        // Approche alternative pour trouver les nœuds de niveau 2
+        const level2Nodes: Node[] = [];
+        
+        // Parcourir toutes les arêtes pour trouver les connexions
+        data.edges.forEach(edge => {
+          let connectedNodeId = null;
+          
+          // Si l'arête part du nœud de niveau 1
+          if (edge.source === level1Node.id) {
+            connectedNodeId = edge.target;
+          }
+          // Si l'arête arrive au nœud de niveau 1
+          else if (edge.target === level1Node.id) {
+            connectedNodeId = edge.source;
+          }
+          
+          // Si on a trouvé un nœud connecté et qu'il n'est pas déjà dans notre graphe
+          if (connectedNodeId && !nodeIds.has(connectedNodeId) && connectedNodeId !== occupationNode.id) {
+            const connectedNode = data.nodes[connectedNodeId];
+            if (connectedNode && !level2Nodes.some(n => n.id === connectedNodeId)) {
+              level2Nodes.push(connectedNode);
+            }
+          }
+        });
+        
+        console.log(`Nœuds de niveau 2 connectés à ${level1Node.label}:`, level2Nodes);
+        
+        // Limiter au nombre de nœuds spécifié pour le niveau 2
+        const topLevel2Nodes = level2Nodes.slice(0, Math.max(2, Math.floor(nodesPerLevel / 2)));
+        
+        // Calculer la position de base pour les nœuds de niveau 2
+        const baseAngle = (level1Index / topLevel1Nodes.length) * 2 * Math.PI;
+        const baseX = centerX + radius1 * Math.cos(baseAngle);
+        const baseY = centerY + radius1 * Math.sin(baseAngle);
+        
+        // Ajouter les nœuds de niveau 2 autour du nœud de niveau 1
+        const radius2 = 150;
+        topLevel2Nodes.forEach((node, index) => {
+          // Calculer un angle relatif au nœud de niveau 1
+          const angleOffset = ((index / topLevel2Nodes.length) - 0.5) * Math.PI / 2;
+          const angle = baseAngle + angleOffset;
+          const x = baseX + radius2 * Math.cos(angle);
+          const y = baseY + radius2 * Math.sin(angle);
+          
+          // Déterminer la couleur en fonction du type de nœud
+          let bgColor = '#34A853'; // Vert par défaut pour les compétences
+          if (node.type === 'skillsgroup') {
+            bgColor = '#FBBC05'; // Jaune pour les groupes de compétences
+          } else if (node.type === 'occupation') {
+            bgColor = '#4285F4'; // Bleu pour les emplois
+          }
+          
+          flowNodes.push({
+            id: node.id,
+            position: { x, y },
+            data: { label: node.label },
+            style: {
+              background: bgColor,
+              color: 'white',
+              padding: '8px',
+              borderRadius: '8px',
+              width: '150px',
+              textAlign: 'center'
+            },
+            type: 'default'
+          });
+          nodeIds.add(node.id);
+        });
+      });
+    }
+    
+    // Si la profondeur est supérieure à 2, ajouter les nœuds de niveau 3
+    if (treeDepth > 2) {
+      // Trouver tous les nœuds de niveau 2 (ceux qui ont été ajoutés après les nœuds de niveau 1)
+      const level2NodeIds = Array.from(nodeIds).filter(id =>
+        id !== occupationNode.id &&
+        !topLevel1Nodes.some(node => node.id === id)
       );
       
-      if (edge) {
+      // Pour chaque nœud de niveau 2, trouver les nœuds connectés (niveau 3)
+      level2NodeIds.forEach(level2Id => {
+        const level2Node = flowNodes.find(node => node.id === level2Id);
+        if (!level2Node) return;
+        
+        const level3Nodes = Object.values(data.nodes).filter(node =>
+          !nodeIds.has(node.id) &&
+          data.edges.some(edge =>
+            (edge.source === level2Id && edge.target === node.id) ||
+            (edge.target === level2Id && edge.source === node.id)
+          )
+        );
+        
+        // Limiter au nombre de nœuds spécifié pour le niveau 3
+        const topLevel3Nodes = level3Nodes.slice(0, Math.max(1, Math.floor(nodesPerLevel / 3)));
+        
+        // Ajouter les nœuds de niveau 3 autour du nœud de niveau 2
+        const radius3 = 100;
+        const baseX = level2Node.position.x;
+        const baseY = level2Node.position.y;
+        
+        topLevel3Nodes.forEach((node, index) => {
+          // Calculer un angle pour positionner les nœuds de niveau 3
+          const angle = (index / topLevel3Nodes.length) * 2 * Math.PI;
+          const x = baseX + radius3 * Math.cos(angle);
+          const y = baseY + radius3 * Math.sin(angle);
+          
+          // Déterminer la couleur en fonction du type de nœud
+          let bgColor = '#34A853'; // Vert par défaut pour les compétences
+          if (node.type === 'skillsgroup') {
+            bgColor = '#FBBC05'; // Jaune pour les groupes de compétences
+          } else if (node.type === 'occupation') {
+            bgColor = '#4285F4'; // Bleu pour les emplois
+          }
+          
+          flowNodes.push({
+            id: node.id,
+            position: { x, y },
+            data: { label: node.label },
+            style: {
+              background: bgColor,
+              color: 'white',
+              padding: '6px',
+              borderRadius: '8px',
+              width: '120px',
+              textAlign: 'center',
+              fontSize: '0.8rem'
+            },
+            type: 'default'
+          });
+          nodeIds.add(node.id);
+        });
+      });
+    }
+    
+    // Convertir les arêtes entre les nœuds ajoutés
+    const flowEdges: FlowEdge[] = [];
+    
+    data.edges.forEach((edge, index) => {
+      // Vérifier que les nœuds source et cible existent dans notre ensemble de nœuds
+      if (nodeIds.has(edge.source) && nodeIds.has(edge.target)) {
         flowEdges.push({
           id: `e${index}`,
-          source: occupationNode.id,
-          target: node.id,
+          source: edge.source,
+          target: edge.target,
           animated: false,
           style: {
             stroke: '#888',
@@ -143,56 +315,82 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
     
     setNodes(flowNodes);
     setEdges(flowEdges);
-  }, [setNodes, setEdges]);
+  }, [setNodes, setEdges, treeDepth, nodesPerLevel]);
 
-  // Charger l'arbre de compétences lorsque jobId change
+  // Forcer un rechargement complet du composant lorsque les paramètres changent
   useEffect(() => {
-    const fetchSkillsTree = async () => {
-      if (!jobId) {
-        setSkillTreeData(null);
-        setTopSkills([]);
-        setNodes([]);
-        setEdges([]);
-        return;
-      }
+    if (skillTreeData) {
+      console.log(`Paramètres changés: treeDepth=${treeDepth}, nodesPerLevel=${nodesPerLevel}`);
+      // Réinitialiser les nœuds et les arêtes
+      setNodes([]);
+      setEdges([]);
+      // Reconvertir les données
+      convertToReactFlowFormat(skillTreeData);
+    }
+  }, [treeDepth, nodesPerLevel, skillTreeData, convertToReactFlowFormat]);
 
-      setIsLoading(true);
-      setError(null);
+  // Fonction pour charger l'arbre de compétences avec les paramètres spécifiés
+  const fetchSkillsTree = useCallback(async () => {
+    if (!jobId) {
+      setSkillTreeData(null);
+      setTopSkills([]);
+      setNodes([]);
+      setEdges([]);
+      return;
+    }
 
-      try {
-        const data = await getJobSkillsTree(jobId);
-        const typedData = data as SkillTreeData;
-        setSkillTreeData(typedData);
-        
-        console.log("Données de l'arbre de compétences reçues:", typedData);
-        
-        // Extraire les 5 principales compétences à développer
-        const skillNodes = Object.values(typedData.nodes).filter(
-          (node) => node.type === 'skill'
-        ) as Node[];
-        
-        // Trier par score si disponible, sinon par ordre alphabétique
-        const sortedSkills = skillNodes.sort((a, b) => {
-          if (a.score !== undefined && b.score !== undefined) {
-            return b.score - a.score; // Du plus haut au plus bas score
-          }
-          return a.label.localeCompare(b.label);
-        });
-        
-        setTopSkills(sortedSkills.slice(0, 5));
-        
-        // Convertir les données pour ReactFlow
-        convertToReactFlowFormat(typedData);
-      } catch (err) {
-        console.error("Erreur lors du chargement de l'arbre de compétences:", err);
-        setError("Impossible de charger l'arbre de compétences");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    setIsLoading(true);
+    setError(null);
 
+    try {
+      console.log(`Demande d'arbre avec profondeur=${treeDepth}, nodesPerLevel=${nodesPerLevel}`);
+      const data = await getJobSkillsTree(jobId, treeDepth, nodesPerLevel);
+      const typedData = data as SkillTreeData;
+      setSkillTreeData(typedData);
+      
+      console.log("Données de l'arbre de compétences reçues:", typedData);
+      console.log(`Nombre de nœuds reçus: ${Object.keys(typedData.nodes).length}`);
+      console.log(`Nombre d'arêtes reçues: ${typedData.edges.length}`);
+      
+      // Analyser la profondeur des nœuds reçus
+      const nodesByLevel: { [level: number]: number } = {};
+      Object.values(typedData.nodes).forEach(node => {
+        const level = node.level || 0;
+        nodesByLevel[level] = (nodesByLevel[level] || 0) + 1;
+      });
+      console.log("Répartition des nœuds par niveau:", nodesByLevel);
+      
+      // Extraire les principales compétences à développer
+      const skillNodes = Object.values(typedData.nodes).filter(
+        (node) => node.type === 'skill'
+      ) as Node[];
+      
+      // Trier par score si disponible, sinon par ordre alphabétique
+      const sortedSkills = skillNodes.sort((a, b) => {
+        if (a.score !== undefined && b.score !== undefined) {
+          return b.score - a.score; // Du plus haut au plus bas score
+        }
+        return a.label.localeCompare(b.label);
+      });
+      
+      setTopSkills(sortedSkills.slice(0, nodesPerLevel));
+      
+      // Convertir les données pour ReactFlow
+      convertToReactFlowFormat(typedData);
+    } catch (err) {
+      console.error("Erreur lors du chargement de l'arbre de compétences:", err);
+      setError("Impossible de charger l'arbre de compétences");
+    } finally {
+      setIsLoading(false);
+      setIsApplying(false);
+    }
+  }, [jobId, treeDepth, nodesPerLevel, convertToReactFlowFormat]);
+
+  // Charger l'arbre de compétences lorsque jobId change ou lorsque paramVersion change
+  useEffect(() => {
+    console.log(`Effet déclenché: jobId=${jobId}, paramVersion=${paramVersion}`);
     fetchSkillsTree();
-  }, [jobId, convertToReactFlowFormat]);
+  }, [jobId, paramVersion, fetchSkillsTree]);
 
   // Afficher un état de chargement
   if (isLoading) {
@@ -237,12 +435,119 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
     );
   }
 
+  // Fonction pour appliquer les nouveaux paramètres
+  const applyParameters = () => {
+    setIsApplying(true);
+    // Incrémenter la version des paramètres pour forcer un rechargement
+    setParamVersion(prev => prev + 1);
+    // Le rechargement sera déclenché par l'effet qui dépend de paramVersion
+  };
+
   return (
     <div className={`w-full ${className}`}>
-      {/* Top 5 des compétences */}
+      {/* Contrôles pour les paramètres de l'arbre */}
       <div className="bg-stitch-primary border border-stitch-border rounded-lg p-6 mb-6">
         <h3 className="text-stitch-accent text-lg font-medium mb-4">
-          Top 5 des compétences à acquérir
+          Paramètres de l'arbre de compétences
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <div>
+            <label htmlFor="treeDepth" className="block text-stitch-sage mb-2">
+              Profondeur de l'arbre (1-3)
+            </label>
+            <div className="flex items-center">
+              <button
+                onClick={() => setTreeDepth(Math.max(1, treeDepth - 1))}
+                className="bg-stitch-accent text-white px-3 py-1 rounded-l-md"
+                disabled={treeDepth <= 1}
+              >
+                -
+              </button>
+              <input
+                id="treeDepth"
+                type="number"
+                min={1}
+                max={3}
+                value={treeDepth}
+                onChange={(e) => setTreeDepth(Math.min(3, Math.max(1, parseInt(e.target.value) || 1)))}
+                className="w-16 text-center border border-stitch-border py-1"
+              />
+              <button
+                onClick={() => setTreeDepth(Math.min(3, treeDepth + 1))}
+                className="bg-stitch-accent text-white px-3 py-1 rounded-r-md"
+                disabled={treeDepth >= 3}
+              >
+                +
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <label htmlFor="nodesPerLevel" className="block text-stitch-sage mb-2">
+              Nœuds par niveau (3-10)
+            </label>
+            <div className="flex items-center">
+              <button
+                onClick={() => setNodesPerLevel(Math.max(3, nodesPerLevel - 1))}
+                className="bg-stitch-accent text-white px-3 py-1 rounded-l-md"
+                disabled={nodesPerLevel <= 3}
+              >
+                -
+              </button>
+              <input
+                id="nodesPerLevel"
+                type="number"
+                min={3}
+                max={10}
+                value={nodesPerLevel}
+                onChange={(e) => setNodesPerLevel(Math.min(10, Math.max(3, parseInt(e.target.value) || 3)))}
+                className="w-16 text-center border border-stitch-border py-1"
+              />
+              <button
+                onClick={() => setNodesPerLevel(Math.min(10, nodesPerLevel + 1))}
+                className="bg-stitch-accent text-white px-3 py-1 rounded-r-md"
+                disabled={nodesPerLevel >= 10}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex space-x-4">
+          <button
+            onClick={applyParameters}
+            disabled={isLoading || isApplying}
+            className="bg-stitch-accent text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+          >
+            {isApplying ? 'Application en cours...' : 'Appliquer les paramètres'}
+          </button>
+          
+          <button
+            onClick={() => {
+              setIsApplying(true);
+              // Réinitialiser les paramètres
+              setTreeDepth(1);
+              setNodesPerLevel(5);
+              // Forcer un rechargement
+              setParamVersion(prev => prev + 1);
+            }}
+            disabled={isLoading || isApplying}
+            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+          >
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+      
+      {/* Top des compétences */}
+      <div className="bg-stitch-primary border border-stitch-border rounded-lg p-6 mb-6">
+        <h3 className="text-stitch-accent text-lg font-medium mb-4">
+          Top {nodesPerLevel} des compétences à acquérir
+          <span className="text-sm text-stitch-sage ml-2">
+            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
+          </span>
         </h3>
         
         <div className="space-y-3">
@@ -284,6 +589,9 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
       <div className="bg-stitch-primary border border-stitch-border rounded-lg p-6">
         <h3 className="text-stitch-accent text-lg font-medium mb-4">
           Arbre de compétences ESCO
+          <span className="text-sm text-stitch-sage ml-2">
+            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
+          </span>
         </h3>
         
         <p className="text-stitch-sage text-sm mb-4">

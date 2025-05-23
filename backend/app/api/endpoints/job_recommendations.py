@@ -383,14 +383,20 @@ async def get_current_user_job_recommendations(
 @router.get("/skill-tree/{job_id}", response_model=SkillTreeResponse, response_model_exclude_unset=True)
 async def get_skill_tree_for_job(
     job_id: str = Path(..., description="ID de l'emploi (format: 'occupation::key_XXXXX')"),
+    depth: int = Query(1, description="Profondeur de l'arbre (1-3)", ge=1, le=3),
+    max_nodes: int = Query(5, description="Nombre maximum de nœuds par niveau (3-10)", ge=3, le=10),
     current_user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """
     Récupère l'arbre de compétences pour un emploi spécifique.
+    
+    - depth: Profondeur de l'arbre (1-3)
+    - max_nodes: Nombre maximum de nœuds par niveau (3-10)
     """
     try:
         logger.info(f"Récupération de l'arbre de compétences pour l'emploi: {job_id}")
+        logger.info(f"Paramètres: depth={depth}, max_nodes={max_nodes}")
         
         # Vérifier que l'ID de l'emploi est valide
         if not job_id.startswith("occupation::key_"):
@@ -403,8 +409,8 @@ async def get_skill_tree_for_job(
             else:
                 raise HTTPException(status_code=400, detail="Format d'ID d'emploi invalide. Format attendu: 'occupation::key_XXXXX'")
         
-        # Générer l'arbre de compétences
-        skill_tree = job_recommendation_service.generate_skill_tree_for_job(job_id)
+        # Générer l'arbre de compétences avec les paramètres spécifiés
+        skill_tree = job_recommendation_service.generate_skill_tree_for_job(job_id, depth, max_nodes)
         logger.info(f"Arbre de compétences généré: {skill_tree}")
         
         # Vérifier si l'arbre de compétences est valide

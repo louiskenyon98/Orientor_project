@@ -95,9 +95,9 @@ export const getJobRecommendations = async (userId?: number, top_k: number = 3) 
 };
 
 // Function to get the skills tree for a specific job
-export const getJobSkillsTree = async (jobId: string) => {
+export const getJobSkillsTree = async (jobId: string, depth: number = 1, maxNodes: number = 5) => {
   try {
-    const endpoint = `/api/v1/jobs/skill-tree/${jobId}`;
+    const endpoint = `/api/v1/jobs/skill-tree/${jobId}?depth=${depth}&max_nodes=${maxNodes}`;
     console.log('Calling job skills tree API:', `${API_URL}${endpoint}`);
     const response = await api.get(endpoint);
     console.log('Job skills tree API response:', response.data);

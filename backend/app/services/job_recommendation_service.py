@@ -209,12 +209,14 @@ class JobRecommendationService:
             logger.error(f"Erreur lors de la récupération des recommandations: {str(e)}")
             return []
     
-    def generate_skill_tree_for_job(self, job_id: str) -> Dict[str, Any]:
+    def generate_skill_tree_for_job(self, job_id: str, depth: int = 1, max_nodes: int = 5) -> Dict[str, Any]:
         """
         Génère un arbre de compétences pour un emploi spécifique.
         
         Args:
             job_id: ID de l'emploi (format: 'occupation::key_XXXXX')
+            depth: Profondeur de l'arbre (1-3)
+            max_nodes: Nombre maximum de nœuds par niveau (3-10)
             
         Returns:
             Dict[str, Any]: Arbre de compétences généré avec visualisation
@@ -222,6 +224,10 @@ class JobRecommendationService:
         try:
             from SkillsTree_eval.graph_traversal_service import GraphTraversalService
             from SkillsTree_eval.skill_tree_visualization import SkillTreeVisualization
+            
+            # Valider les paramètres
+            depth = max(1, min(3, depth))  # Limiter entre 1 et 3
+            max_nodes = max(3, min(10, max_nodes))  # Limiter entre 3 et 10
             
             # Initialiser le service de traversée du graphe
             graph_service = GraphTraversalService()
@@ -240,16 +246,15 @@ class JobRecommendationService:
                 logger.error(f"Impossible de récupérer les informations pour l'emploi {job_id}")
                 return {}
             
-            # Traverser le graphe à partir de l'ID de l'emploi
-            # Limiter à une profondeur de 1 et 5 nœuds maximum à cette profondeur
+            # Traverser le graphe à partir de l'ID de l'emploi avec les paramètres spécifiés
             graph_data = graph_service.traverse_graph(
                 anchor_node_ids=[job_id],
-                max_depth=1,  # Profondeur de 1 (emploi + compétences directement liées)
+                max_depth=depth,  # Profondeur spécifiée par l'utilisateur
                 min_similarity=0.7,
-                max_nodes_per_level=5  # Maximum 5 nœuds par niveau
+                max_nodes_per_level=max_nodes  # Nombre de nœuds spécifié par l'utilisateur
             )
             
-            logger.info(f"Arbre de compétences généré avec profondeur=1 et max_nodes=5")
+            logger.info(f"Arbre de compétences généré avec profondeur={depth} et max_nodes={max_nodes}")
             
             if not graph_data.get("nodes"):
                 logger.error(f"Aucun nœud trouvé lors de la traversée du graphe pour l'emploi {job_id}")
