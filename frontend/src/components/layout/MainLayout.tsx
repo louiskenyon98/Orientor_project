@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import XPProgress from '../ui/XPProgress';
 import DarkModeToggle from '../ui/DarkModeToggle';
+import styles from '@/styles/patterns.module.css';
 
 // Composants pour les menus déroulants
 const ProfileDropdown = ({ pathname }: { pathname: string | null }) => {
@@ -259,6 +260,8 @@ export default function MainLayout({
         <div className="min-h-screen flex flex-col bg-stitch-primary text-stitch-sage">
             {/* Desktop Navigation Bar - Only visible on larger screens */}
             {isLoggedIn && (
+            //             <div className="min-h-screen bg-light-background dark:bg-dark-background">
+            // {showNav && (
                 <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/90 backdrop-blur-md border-b border-stitch-border shadow-sm hidden md:block font-departure header">
                     <div className="layout-container mx-auto">
                         <div className="flex justify-between items-center py-2">
@@ -334,6 +337,10 @@ export default function MainLayout({
             {/* Main content area */}
             <main className={`flex-1 layout-container mx-auto ${isLoggedIn ? 'pt-0 md:pt-20 pb-16 md:pb-8' : 'py-8'}`}>
                 {children}
+            {/* <main className={`relative min-h-screen ${styles.pattern}`}>
+                <div className="relative z-10">
+                    {children}
+                </div> */}
             </main>
 
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
