@@ -1,4 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+const greenColors = require('./public/color_fonts/gradient_green.js');
+const blueColors = require('./public/color_fonts/gradiient_blue.js');
+const grayColors = require('./public/color_fonts/gradiient_gray.js');
+
 module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,6 +11,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Palettes de couleurs importées
+        ...greenColors,
+        ...blueColors,
+        ...grayColors,
         // Stitch Design Theme Colors
         stitch: {
           primary: '#e6f5e6', // mint forest green (primary background)
@@ -66,9 +74,13 @@ module.exports = {
         'stitch-pattern': "linear-gradient(rgba(25, 178, 25, 0.05), rgba(25, 178, 25, 0.05)), url('/patterns/branch.svg')",
       },
       fontFamily: {
-        sans: ['Noto Sans', 'system-ui', 'sans-serif'],
-        mono: ['inter', 'monospace'],
-        departure: ['inter', 'monospace'],
+        sans: ['var(--body-font)'],
+        mono: ['var(--mono-font)'],
+        departure: ['var(--font-departure)'],
+        khand: ['var(--font-khand)'],
+        kola: ['var(--font-kola)'],
+        nippo: ['var(--font-nippo)'],
+        technor: ['var(--font-technor)'],
       },
       boxShadow: {
         'soft': '0 2px 12px rgba(0,0,0,0.05)',
@@ -109,18 +121,18 @@ module.exports = {
               },
             },
             h1: {
-              fontFamily: 'Playfair Display',
-              fontWeight: '300',
+              fontFamily: 'var(--heading-font)',
+              fontWeight: '700',
               letterSpacing: '0.05em',
             },
             h2: {
-              fontFamily: 'Playfair Display',
-              fontWeight: '300',
+              fontFamily: 'var(--heading-font)',
+              fontWeight: '600',
               letterSpacing: '0.05em',
             },
             h3: {
-              fontFamily: 'Playfair Display',
-              fontWeight: '300',
+              fontFamily: 'var(--heading-font)',
+              fontWeight: '500',
               letterSpacing: '0.05em',
             },
           },

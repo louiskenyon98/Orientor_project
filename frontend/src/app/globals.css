@@ -2,38 +2,259 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import fonts */
+/* Import Google fonts */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
 
-/* Configuration des polices inter */
+/* Configuration des polices locales */
+
+/* DepartureMono */
 @font-face {
-  font-family: "inter";
-  src: url("/fonts/inter-1.422/inter-Regular.woff2") format("woff2"),
-       url("/fonts/inter-1.422/inter-Regular.woff") format("woff"),
-       url("/fonts/inter-1.422/inter-Regular.otf") format("opentype");
+  font-family: "DepartureMono";
+  src: url("/fonts/DepartureMono-1.422/DepartureMono-Regular.woff2") format("woff2"),
+       url("/fonts/DepartureMono-1.422/DepartureMono-Regular.woff") format("woff"),
+       url("/fonts/DepartureMono-1.422/DepartureMono-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Khand */
+@font-face {
+  font-family: "Khand";
+  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Regular.woff2") format("woff2"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Regular.woff") format("woff"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Regular.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "inter";
-  src: url("/fonts/inter-1.422/inter-Regular.woff2") format("woff2"),
-       url("/fonts/inter-1.422/inter-Regular.woff") format("woff"),
-       url("/fonts/inter-1.422/inter-Regular.otf") format("opentype");
+  font-family: "Khand";
+  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Light.woff2") format("woff2"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Light.woff") format("woff"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Light.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Khand";
+  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Medium.woff2") format("woff2"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Medium.woff") format("woff"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Medium.ttf") format("truetype");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "inter";
-  src: url("/fonts/inter-1.422/inter-Regular.woff2") format("woff2"),
-       url("/fonts/inter-1.422/inter-Regular.woff") format("woff"),
-       url("/fonts/inter-1.422/inter-Regular.otf") format("opentype");
+  font-family: "Khand";
+  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-SemiBold.woff2") format("woff2"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-SemiBold.woff") format("woff"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-SemiBold.ttf") format("truetype");
   font-style: normal;
   font-weight: 600;
   font-display: swap;
+}
+
+@font-face {
+  font-family: "Khand";
+  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Bold.woff2") format("woff2"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Bold.woff") format("woff"),
+       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* Kola */
+@font-face {
+  font-family: "Kola";
+  src: url("/fonts/Kola_Complete/Fonts/WEB/fonts/Kola-Regular.woff2") format("woff2"),
+       url("/fonts/Kola_Complete/Fonts/WEB/fonts/Kola-Regular.woff") format("woff"),
+       url("/fonts/Kola_Complete/Fonts/WEB/fonts/Kola-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Nippo */
+@font-face {
+  font-family: "Nippo";
+  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Regular.woff2") format("woff2"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Regular.woff") format("woff"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nippo";
+  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Light.woff2") format("woff2"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Light.woff") format("woff"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Light.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nippo";
+  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Extralight.woff2") format("woff2"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Extralight.woff") format("woff"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Extralight.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nippo";
+  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Medium.woff2") format("woff2"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Medium.woff") format("woff"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nippo";
+  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Bold.woff2") format("woff2"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Bold.woff") format("woff"),
+       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* Technor */
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Regular.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Regular.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Light.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Light.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Light.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Extralight.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Extralight.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Extralight.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Medium.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Medium.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Semibold.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Semibold.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Semibold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Bold.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Bold.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Technor";
+  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Black.woff2") format("woff2"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Black.woff") format("woff"),
+       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Black.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
+/* Variables CSS pour les polices et les couleurs */
+:root {
+  /* Variables pour les polices */
+  --font-departure: DepartureMono, monospace;
+  --font-khand: Khand, sans-serif;
+  --font-kola: Kola, sans-serif;
+  --font-nippo: Nippo, sans-serif;
+  --font-technor: Technor, sans-serif;
+  --font-noto: 'Noto Sans', sans-serif;
+  
+  /* Variables pour le thème de typographie actif */
+  --heading-font: var(--font-departure);
+  --body-font: var(--font-noto);
+  --mono-font: var(--font-departure);
+  
+  /* Variables pour les couleurs vertes */
+  --color-ash_gray: #cad2c5;
+  --color-cambridge_blue: #84a98c;
+  --color-hookers_green: #52796f;
+  --color-dark_slate_gray: #354f52;
+  --color-charcoal: #2f3e46;
+  
+  /* Variables pour les couleurs bleues */
+  --color-true_blue: #0466c8;
+  --color-sapphire: #0353a4;
+  --color-yale_blue: #023e7d;
+  --color-oxford_blue_1: #002855;
+  --color-oxford_blue_2: #001845;
+  --color-oxford_blue_3: #001233;
+  --color-delft_blue: #33415c;
+  --color-paynes_gray: #5c677d;
+  --color-slate_gray: #7d8597;
+  --color-cool_gray: #979dac;
+  
+  /* Variables pour les couleurs grises */
+  --color-seasalt: #f8f9fa;
+  --color-anti-flash_white: #e9ecef;
+  --color-platinum: #dee2e6;
+  --color-french_gray_1: #ced4da;
+  --color-french_gray_2: #adb5bd;
+  --color-slate_gray: #6c757d;
+  --color-outer_space: #495057;
+  --color-onyx: #343a40;
+  --color-eerie_black: #212529;
+  
+  /* Variables pour le thème de couleurs actif */
+  --primary-color: var(--color-cambridge_blue);
+  --accent-color: var(--color-hookers_green);
+  --border-color: var(--color-dark_slate_gray);
+  --text-color: var(--color-dark_slate_gray);
+  --text-color-light: var(--color-cambridge_blue);
+  --link-color: var(--color-hookers_green);
+  --link-hover-color: var(--color-charcoal);
 }
 
 @layer base {
@@ -42,31 +263,47 @@
   }
   
   body {
-    @apply bg-stitch-primary text-stitch-sage min-h-screen font-sans antialiased;
+    @apply min-h-screen antialiased;
+    font-family: var(--body-font);
+    background-color: var(--primary-color);
+    color: var(--text-color);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-departure text-stitch-sage tracking-wide;
+    @apply tracking-wide;
+    font-family: var(--heading-font);
+    color: var(--text-color);
   }
 
   h1 {
     @apply text-4xl md:text-5xl font-bold mb-8;
+    font-family: var(--heading-font);
   }
 
   h2 {
     @apply text-3xl md:text-4xl font-bold mb-6;
+    font-family: var(--heading-font);
   }
 
   h3 {
     @apply text-2xl md:text-3xl font-bold mb-4;
+    font-family: var(--heading-font);
   }
 
   p {
-    @apply leading-relaxed text-base md:text-lg text-stitch-sage;
+    @apply leading-relaxed text-base md:text-lg;
+    font-family: var(--body-font);
+    color: var(--text-color);
   }
 
   a {
-    @apply text-stitch-accent hover:text-white transition-colors duration-300;
+    @apply transition-colors duration-300;
+    font-family: var(--body-font);
+    color: var(--link-color);
+  }
+
+  a:hover {
+    color: var(--link-hover-color);
   }
 }
 
@@ -75,53 +312,92 @@
   .btn {
     @apply inline-flex items-center justify-center px-6 py-3 font-bold tracking-wide rounded-lg
     transition-all duration-300
-    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-stitch-primary focus:ring-stitch-accent focus:ring-opacity-50
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50
     disabled:opacity-60 disabled:cursor-not-allowed
     text-base;
+    font-family: var(--heading-font);
+    focus-ring-offset-color: var(--primary-color);
+    focus-ring-color: var(--accent-color);
   }
   
   .btn-primary {
-    @apply bg-stitch-accent text-white shadow-soft hover:bg-opacity-90;
+    @apply shadow-soft hover:bg-opacity-90;
+    background-color: var(--accent-color);
+    color: white;
+    font-family: var(--heading-font);
   }
   
   .btn-secondary {
-    @apply bg-stitch-primary text-stitch-sage border border-stitch-border hover:border-stitch-accent;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    font-family: var(--heading-font);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent-color);
   }
 
   .btn-ghost {
-    @apply bg-transparent text-stitch-sage hover:text-stitch-accent;
+    @apply bg-transparent;
+    color: var(--text-color);
+    font-family: var(--heading-font);
+  }
+
+  .btn-ghost:hover {
+    color: var(--link-color);
   }
 
   .btn-sm {
     @apply px-4 py-2 text-sm rounded-md;
+    font-family: var(--heading-font);
   }
 
   .btn-lg {
     @apply px-8 py-4 text-lg rounded-lg;
+    font-family: var(--heading-font);
   }
 
   /* Domain-specific buttons */
   .btn-builder {
-    @apply bg-domain-builder text-white shadow-soft hover:bg-opacity-90;
+    @apply shadow-soft hover:bg-opacity-90;
+    background-color: var(--accent-color);
+    color: white;
+    font-family: var(--heading-font);
   }
 
   .btn-communicator {
-    @apply bg-domain-communicator text-white shadow-soft hover:bg-opacity-90;
+    @apply shadow-soft hover:bg-opacity-90;
+    background-color: var(--link-color);
+    color: white;
+    font-family: var(--heading-font);
   }
 
   /* Cards & Containers */
   .card {
-    @apply bg-stitch-primary/80 backdrop-blur-md rounded-xl p-6 md:p-8
-    shadow-soft border border-stitch-border
+    @apply backdrop-blur-md rounded-xl p-6 md:p-8
+    shadow-soft
     transition-all duration-300;
+    background-color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
   }
   
   .panel {
-    @apply bg-stitch-primary/60 backdrop-blur-md rounded-xl p-6 shadow-soft border border-stitch-border;
+    @apply backdrop-blur-md rounded-xl p-6 shadow-soft;
+    background-color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
   }
 
   .glass {
-    @apply bg-stitch-primary/40 backdrop-blur-md border border-stitch-border;
+    @apply backdrop-blur-md;
+    background-color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
   }
 
   /* User card styles */
@@ -130,14 +406,27 @@
   }
 
   .avatar {
-    @apply rounded-full border-2 border-stitch-accent overflow-hidden;
+    @apply rounded-full overflow-hidden;
+    border: 2px solid var(--accent-color);
   }
 
   /* Form Elements */
   .input {
-    @apply w-full px-4 py-3 bg-stitch-primary/60 border-b border-stitch-border rounded-none
-    focus:outline-none focus:border-stitch-accent
-    text-stitch-sage placeholder-stitch-sage/50;
+    @apply w-full px-4 py-3 rounded-none
+    focus:outline-none;
+    background-color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
+  }
+
+  .input:focus {
+    border-color: var(--accent-color);
+  }
+
+  .input::placeholder {
+    color: var(--text-color-light);
+    opacity: 0.5;
   }
 
   .input-group {
@@ -145,18 +434,26 @@
   }
 
   .label {
-    @apply block text-sm font-bold text-stitch-sage mb-1;
+    @apply block text-sm font-bold mb-1;
+    color: var(--text-color);
+    font-family: var(--heading-font);
   }
 
   /* Navigation */
   .nav-link {
-    @apply px-4 py-2 rounded-lg transition-all duration-300 text-stitch-sage
-    hover:text-stitch-accent relative;
+    @apply px-4 py-2 rounded-lg transition-all duration-300 relative;
+    color: var(--text-color);
+    font-family: var(--heading-font);
+  }
+
+  .nav-link:hover {
+    color: var(--link-color);
   }
 
   .nav-link::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-stitch-accent transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
+    background-color: var(--accent-color);
   }
 
   .nav-link:hover::after {
@@ -164,7 +461,8 @@
   }
 
   .nav-link-active {
-    @apply text-stitch-accent;
+    color: var(--accent-color);
+    font-family: var(--heading-font);
   }
 
   .nav-link-active::after {
@@ -173,29 +471,39 @@
 
   /* Header styles */
   .header {
-    @apply py-3 px-10 border-b border-stitch-border flex items-center justify-between;
+    @apply py-3 px-10 flex items-center justify-between;
+    border-bottom: 1px solid var(--border-color);
+    font-family: var(--heading-font);
   }
 
   /* Chat Elements */
   .message-bubble {
     @apply rounded-xl p-4 my-2 max-w-[85%] shadow-soft;
+    font-family: var(--body-font);
   }
   
   .message-user {
-    @apply message-bubble bg-stitch-accent text-white ml-auto;
+    @apply message-bubble ml-auto;
+    background-color: var(--accent-color);
+    color: white;
   }
   
   .message-system {
-    @apply message-bubble bg-stitch-primary/50 backdrop-blur-md border border-stitch-border;
+    @apply message-bubble backdrop-blur-md;
+    background-color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
   }
 
   /* Progress bar styles */
   .progress-container {
-    @apply w-full h-4 bg-stitch-track rounded-full overflow-hidden;
+    @apply w-full h-4 rounded-full overflow-hidden;
+    background-color: var(--border-color);
   }
   
   .progress-fill {
-    @apply h-full bg-stitch-accent origin-left transition-all duration-300;
+    @apply h-full origin-left transition-all duration-300;
+    background-color: var(--accent-color);
   }
 
   /* Section layouts */
@@ -241,37 +549,48 @@
   /* Gradient Text */
   .gradient-text {
     @apply font-bold;
-    background: linear-gradient(to right, #19b219, #95c695);
+    background: linear-gradient(to right, var(--accent-color), var(--primary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-fill-color: transparent;
+    font-family: var(--heading-font);
   }
 
   /* ReactFlow customization */
   .react-flow__node {
-    @apply border border-stitch-border bg-stitch-primary/80 text-stitch-sage rounded-lg;
+    @apply rounded-lg;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
   }
 
   .react-flow__edge-path {
-    @apply stroke-stitch-border stroke-2;
+    stroke: var(--border-color);
+    stroke-width: 2px;
   }
 
   .react-flow__edge-path:hover {
-    @apply stroke-stitch-accent;
+    stroke: var(--accent-color);
   }
 
   /* Tree/Graph rendering */
   .tree-node {
-    @apply bg-stitch-primary border border-stitch-border rounded-lg p-4 shadow-soft;
+    @apply rounded-lg p-4 shadow-soft;
+    background-color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
   }
 
   .tree-node-active {
-    @apply border-stitch-accent;
+    border-color: var(--accent-color);
   }
 
   .tree-edge {
-    @apply stroke-stitch-border stroke-1;
+    stroke: var(--border-color);
+    stroke-width: 1px;
   }
 }
 

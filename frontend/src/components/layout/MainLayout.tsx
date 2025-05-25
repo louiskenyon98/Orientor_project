@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import XPProgress from '../ui/XPProgress';
 import DarkModeToggle from '../ui/DarkModeToggle';
+import TypographyToggle from '../ui/TypographyToggle';
 import styles from '@/styles/patterns.module.css';
 
 // Composants pour les menus déroulants
@@ -305,8 +306,17 @@ export default function MainLayout({
                                 {/* XP Progress Bar */}
                                 <XPProgress className="mr-2" />
                                 
-                                {/* Dark Mode Toggle */}
-                                <DarkModeToggle />
+                                {/* Settings Link */}
+                                <Link
+                                    href="/settings"
+                                    className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out
+                                        ${pathname === '/settings'
+                                            ? 'text-stitch-accent bg-stitch-primary/50'
+                                            : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
+                                        }`}
+                                >
+                                    <span className="material-icons-outlined">settings</span>
+                                </Link>
                                 
                                 {/* User Profile */}
                                 <div className="flex items-center space-x-2">
@@ -335,7 +345,7 @@ export default function MainLayout({
             )}
 
             {/* Main content area */}
-            <main className={`flex-1 layout-container mx-auto ${isLoggedIn ? 'pt-0 md:pt-20 pb-16 md:pb-8' : 'py-8'}`}>
+            <main className={`flex-1 layout-container mx-auto w-full ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`}>
                 {children}
             {/* <main className={`relative min-h-screen ${styles.pattern}`}>
                 <div className="relative z-10">
@@ -426,17 +436,19 @@ export default function MainLayout({
                                         </Link>
                                         <div className="border-t border-stitch-border mt-1"></div>
                                         
-                                        {/* Dark mode toggle in mobile menu */}
-                                        <div className="flex items-center justify-between w-full px-4 py-3 text-sm text-stitch-sage">
-                                            <div className="flex items-center">
-                                                <span className="material-icons-outlined mr-2 text-stitch-sage">
-                                                    {/* Icon will be determined by the dark mode state */}
-                                                    dark_mode
-                                                </span>
-                                                Dark Mode
-                                            </div>
-                                            <DarkModeToggle className="p-1" />
-                                        </div>
+                                        {/* Settings Link in mobile menu */}
+                                        <Link
+                                            href="/settings"
+                                            onClick={() => setMoreMenuOpen(false)}
+                                            className={`flex items-center px-4 py-3 text-sm ${
+                                                pathname === '/settings'
+                                                    ? 'bg-stitch-primary/50 text-stitch-accent font-bold'
+                                                    : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'
+                                            }`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">settings</span>
+                                            Paramètres
+                                        </Link>
                                         
                                         <button 
                                             onClick={handleLogout}

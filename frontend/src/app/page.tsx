@@ -10,6 +10,7 @@ import { getJobRecommendations } from '@/services/api';
 import JobRecommendationList from '@/components/jobs/JobRecommendationList';
 import JobSkillsTree from '@/components/jobs/JobSkillsTree';
 import { Job } from '@/components/jobs/JobCard';
+import styles from '@/styles/patterns.module.css';
 
 // Interface pour la réponse de l'API de recommandations d'emploi
 interface JobRecommendationsResponse {
@@ -160,8 +161,8 @@ export default function Home() {
 
   return (
     <MainLayout showNav={false}>
-      <div className="relative flex w-full min-h-screen flex-col bg-stitch-primary pb-12 overflow-x-hidden">
-        <div className="flex h-full w-full grow relative">
+      <div className={`relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden ${styles.container}`}>
+        <div className="relative z-10 w-full flex h-full grow">
           {/* Sidebar - étroite sur mobile, plus large sur desktop, mais optimisée pour grands écrans */}
           <div className="w-10 md:w-36 lg:w-32 xl:w-40 border-r border-stitch-border transition-all duration-300 flex-shrink-0 -ml-1 md:-ml-2">
             <div className="flex flex-col gap-5 items-center md:items-start pt-8 px-1 md:px-2 sticky top-0">
@@ -241,7 +242,10 @@ export default function Home() {
           <div className="flex flex-col flex-1 w-full">
             {/* Header */}
             <div className="flex flex-wrap justify-between gap-3 p-4 md:p-6 lg:p-8 mb-2">
-              <p className="text-stitch-accent tracking-light text-[32px] md:text-4xl font-bold leading-tight min-w-72 font-departure">Accueil</p>
+              <p className="tracking-light text-[32px] md:text-4xl font-bold leading-tight min-w-72" style={{
+                color: 'var(--accent-color)',
+                fontFamily: 'var(--heading-font)'
+              }}>Accueil</p>
             </div>
 
             {/* Main Content Container */}
@@ -257,13 +261,16 @@ export default function Home() {
                       role={userData.role}
                       avatarUrl={userData.avatarUrl}
                       skills={userData.skills}
-                      className="p-6 bg-stitch-primary rounded-lg border border-stitch-border w-full shadow-md"
+                      className="p-6 bg-black/30 rounded-lg border border-stitch-border w-full shadow-md"
                     />
                   </div>
               {/* RIASEC Section */}
               <div className="w-full">
-                <div className="bg-stitch-primary rounded-lg border border-stitch-border px-6 py-4 md:px-8 md:py-6">
-                  <h2 className="text-stitch-accent text-[22px] md:text-[28px] font-bold leading-tight tracking-[-0.02em] mb-6 font-departure">
+                <div className="bg-black/30 rounded-lg border border-stitch-border px-6 py-4 md:px-8 md:py-6">
+                  <h2 className="text-[22px] md:text-[28px] font-bold leading-tight tracking-[-0.02em] mb-6" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>
                     Profil RIASEC
                   </h2>
 
@@ -346,7 +353,10 @@ export default function Home() {
 
                               {/* Section des recommandations d'emploi - occupe toute la largeur */}
                               <div className="md:col-span-12 mt-8">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5 font-departure">Recommandations d'emploi</h2>
+                  <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>Recommandations d'emploi</h2>
                   <div className="w-full">
                     <JobRecommendationList
                       recommendations={jobRecommendations}
@@ -370,47 +380,86 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
                 {/* Student Summary - occupe toute la largeur sur mobile, 8 colonnes sur desktop */}
                 <div className="md:col-span-8">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5 font-departure">Résumé de l'étudiant</h2>
+                  <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>Résumé de l'étudiant</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md">
-                      <p className="text-stitch-accent tracking-light text-2xl md:text-3xl font-bold leading-tight font-departure">{userData.careerTreesExplored}</p>
-                      <div className="flex items-center gap-2"><p className="text-stitch-sage text-sm md:text-base font-normal leading-normal">Career Trees Explorés</p></div>
+                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md bg-black/30">
+                      <p className="tracking-light text-2xl md:text-3xl font-bold leading-tight" style={{
+                        color: 'var(--accent-color)',
+                        fontFamily: 'var(--heading-font)'
+                      }}>{userData.careerTreesExplored}</p>
+                      <div className="flex items-center gap-2"><p className="text-sm md:text-base font-normal leading-normal" style={{
+                        color: 'var(--text-color)',
+                        fontFamily: 'var(--body-font)'
+                      }}>Career Trees Explorés</p></div>
                     </div>
-                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md">
-                      <p className="text-stitch-accent tracking-light text-2xl md:text-3xl font-bold leading-tight font-departure">{userData.skillsInProgress}</p>
-                      <div className="flex items-center gap-2"><p className="text-stitch-sage text-sm md:text-base font-normal leading-normal">Compétences en cours</p></div>
+                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md bg-black/30">
+                      <p className="tracking-light text-2xl md:text-3xl font-bold leading-tight" style={{
+                        color: 'var(--accent-color)',
+                        fontFamily: 'var(--heading-font)'
+                      }}>{userData.skillsInProgress}</p>
+                      <div className="flex items-center gap-2"><p className="text-sm md:text-base font-normal leading-normal" style={{
+                        color: 'var(--text-color)',
+                        fontFamily: 'var(--body-font)'
+                      }}>Compétences en cours</p></div>
                     </div>
-                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md">
-                      <p className="text-stitch-accent tracking-light text-2xl md:text-3xl font-bold leading-tight font-departure">{userData.totalXP}</p>
-                      <div className="flex items-center gap-2"><p className="text-stitch-sage text-sm md:text-base font-normal leading-normal">XP Total</p></div>
+                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md bg-black/30">
+                      <p className="tracking-light text-2xl md:text-3xl font-bold leading-tight" style={{
+                        color: 'var(--accent-color)',
+                        fontFamily: 'var(--heading-font)'
+                      }}>{userData.totalXP}</p>
+                      <div className="flex items-center gap-2"><p className="text-sm md:text-base font-normal leading-normal" style={{
+                        color: 'var(--text-color)',
+                        fontFamily: 'var(--body-font)'
+                      }}>XP Total</p></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Stats supplémentaires - visible uniquement sur desktop, 4 colonnes */}
                 <div className="hidden md:block md:col-span-4">
-                  <h2 className="text-stitch-accent text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5 font-departure">Statistiques</h2>
+                  <h2 className="text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>Statistiques</h2>
                   <div className="grid grid-cols-2 gap-6">
-                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md">
-                      <p className="text-stitch-accent tracking-light text-3xl font-bold leading-tight font-departure">{userData.challengesCompleted}</p>
-                      <div className="flex items-center gap-2"><p className="text-stitch-sage text-base font-normal leading-normal">Défis complétés</p></div>
+                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md bg-black/30">
+                      <p className="tracking-light text-3xl font-bold leading-tight" style={{
+                        color: 'var(--accent-color)',
+                        fontFamily: 'var(--heading-font)'
+                      }}>{userData.challengesCompleted}</p>
+                      <div className="flex items-center gap-2"><p className="text-base font-normal leading-normal" style={{
+                        color: 'var(--text-color)',
+                        fontFamily: 'var(--body-font)'
+                      }}>Défis complétés</p></div>
                     </div>
-                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md">
-                      <p className="text-stitch-accent tracking-light text-3xl font-bold leading-tight font-departure">{userData.notesSaved}</p>
-                      <div className="flex items-center gap-2"><p className="text-stitch-sage text-base font-normal leading-normal">Notes sauvegardées</p></div>
+                    <div className="flex flex-col gap-2 rounded-lg border border-stitch-border p-4 md:p-5 items-start min-h-[100px] shadow-md bg-black/30">
+                      <p className="tracking-light text-3xl font-bold leading-tight" style={{
+                        color: 'var(--accent-color)',
+                        fontFamily: 'var(--heading-font)'
+                      }}>{userData.notesSaved}</p>
+                      <div className="flex items-center gap-2"><p className="text-base font-normal leading-normal" style={{
+                        color: 'var(--text-color)',
+                        fontFamily: 'var(--body-font)'
+                      }}>Notes sauvegardées</p></div>
                     </div>
                   </div>
                 </div>
 
                 {/* How to get there? Section */}
                 <div className="md:col-span-12 mt-4">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5 font-departure">Tree</h2>
+                  <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>Tree</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
                     {careerItems.map((item, index) => (
                       <Link
                         key={index}
                         href={item.path}
-                        className="flex items-center gap-4 bg-stitch-primary p-5 rounded-lg border border-stitch-border hover:bg-[#eaf0ec] transition-colors shadow-md min-h-[90px]"
+                        className="flex items-center gap-4 bg-black/30 p-5 rounded-lg border border-stitch-border hover:bg-[#eaf0ec] transition-colors shadow-md min-h-[90px]"
                       >
                         <div className="text-stitch-sage flex items-center justify-center rounded-lg bg-[#eaf0ec] shrink-0 size-12">
                           {item.icon === 'Tree' && (
@@ -425,7 +474,10 @@ export default function Home() {
                           )}
                         </div>
                         <div className="flex flex-col">
-                          <p className="text-stitch-accent text-lg font-medium">{item.name}</p>
+                          <p className="text-lg font-medium" style={{
+                            color: 'var(--accent-color)',
+                            fontFamily: 'var(--heading-font)'
+                          }}>{item.name}</p>
                         </div>
                       </Link>
                     ))}
@@ -456,13 +508,16 @@ export default function Home() {
 
                 {/* Personality Section */}
                 <div className="md:col-span-12 mt-4">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5 font-departure">Personality</h2>
+                  <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>Personality</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                     {personalityItems.map((item, index) => (
                       <Link
                         key={index}
                         href={item.path}
-                        className="flex items-center gap-4 bg-stitch-primary p-5 rounded-lg border border-stitch-border hover:bg-[#eaf0ec] transition-colors shadow-md min-h-[90px]"
+                        className="flex items-center gap-4 bg-black/30 p-5 rounded-lg border border-stitch-border hover:bg-[#eaf0ec] transition-colors shadow-md min-h-[90px]"
                       >
                         <div className="text-stitch-sage flex items-center justify-center rounded-lg bg-[#eaf0ec] shrink-0 size-12">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -479,10 +534,13 @@ export default function Home() {
 
                 {/* Recent Activity - occupe toute la largeur */}
                 <div className="md:col-span-12 mt-4">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5 font-departure">Activité récente</h2>
+                  <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-4 pt-5" style={{
+                    color: 'var(--accent-color)',
+                    fontFamily: 'var(--heading-font)'
+                  }}>Activité récente</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
                     {userData.recentActivities.map((activity, index) => (
-                      <div key={index} className="flex items-center gap-4 bg-stitch-primary p-5 md:p-6 rounded-lg border border-stitch-border shadow-md min-h-[100px]">
+                      <div key={index} className="flex items-center gap-4 bg-black/30 p-5 md:p-6 rounded-lg border border-stitch-border shadow-md min-h-[100px]">
                         <div className="text-stitch-sage flex items-center justify-center rounded-lg bg-[#eaf0ec] shrink-0 size-12 md:size-14">
                           {activity.icon === 'CheckCircle' ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
