@@ -2,6 +2,8 @@
 const greenColors = require('./public/color_fonts/gradient_green.js');
 const blueColors = require('./public/color_fonts/gradiient_blue.js');
 const grayColors = require('./public/color_fonts/gradiient_gray.js');
+const orangeBlueColors = require('./public/color_fonts/gradient_orangBlue.js');
+const grayBlackColors = require('./public/color_fonts/gradient_grayBlack.js');
 
 module.exports = {
   content: [
@@ -15,6 +17,8 @@ module.exports = {
         ...greenColors,
         ...blueColors,
         ...grayColors,
+        ...orangeBlueColors,
+        ...grayBlackColors,
         // Stitch Design Theme Colors
         stitch: {
           primary: 'var(--primary-color)', // Utilise la variable CSS dynamique
