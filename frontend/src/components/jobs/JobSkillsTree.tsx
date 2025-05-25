@@ -397,7 +397,7 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
     return (
       <div className={`flex justify-center items-center p-8 ${className}`}>
         <LoadingSpinner size="lg" />
-        <p className="ml-3 text-stitch-sage">Chargement de l'arbre de compétences...</p>
+        <p className="ml-3" style={{ color: 'var(--text-color)' }}>Chargement de l'arbre de compétences...</p>
       </div>
     );
   }
@@ -416,8 +416,13 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
   // Afficher un message si aucun emploi n'est sélectionné
   if (!jobId) {
     return (
-      <div className={`bg-stitch-primary border border-stitch-border rounded-lg p-6 text-center ${className}`}>
-        <p className="text-stitch-sage">
+      <div className={`rounded-lg p-6 text-center ${className}`} style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <p style={{ color: 'var(--text-color)' }}>
           Sélectionnez un emploi pour voir l'arbre de compétences associé.
         </p>
       </div>
@@ -427,8 +432,13 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
   // Afficher un message si aucune donnée n'est disponible
   if (!skillTreeData || Object.keys(skillTreeData.nodes).length === 0) {
     return (
-      <div className={`bg-stitch-primary border border-stitch-border rounded-lg p-6 text-center ${className}`}>
-        <p className="text-stitch-sage">
+      <div className={`rounded-lg p-6 text-center ${className}`} style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <p style={{ color: 'var(--text-color)' }}>
           Aucune donnée d'arbre de compétences disponible pour cet emploi.
         </p>
       </div>
@@ -446,20 +456,26 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
   return (
     <div className={`w-full ${className}`}>
       {/* Contrôles pour les paramètres de l'arbre */}
-      <div className="bg-stitch-primary border border-stitch-border rounded-lg p-6 mb-6">
-        <h3 className="text-stitch-accent text-lg font-medium mb-4">
+      <div className="rounded-lg p-6 mb-6" style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
           Paramètres de l'arbre de compétences
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
           <div>
-            <label htmlFor="treeDepth" className="block text-stitch-sage mb-2">
+            <label htmlFor="treeDepth" className="block mb-2" style={{ color: 'var(--text-color)' }}>
               Profondeur de l'arbre (1-3)
             </label>
             <div className="flex items-center">
               <button
                 onClick={() => setTreeDepth(Math.max(1, treeDepth - 1))}
-                className="bg-stitch-accent text-white px-3 py-1 rounded-l-md"
+                className="text-white px-3 py-1 rounded-l-md"
+                style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={treeDepth <= 1}
               >
                 -
@@ -471,11 +487,13 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
                 max={3}
                 value={treeDepth}
                 onChange={(e) => setTreeDepth(Math.min(3, Math.max(1, parseInt(e.target.value) || 1)))}
-                className="w-16 text-center border border-stitch-border py-1"
+                className="w-16 text-center border py-1"
+                style={{ borderColor: 'var(--border-color)' }}
               />
               <button
                 onClick={() => setTreeDepth(Math.min(3, treeDepth + 1))}
-                className="bg-stitch-accent text-white px-3 py-1 rounded-r-md"
+                className="text-white px-3 py-1 rounded-r-md"
+                style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={treeDepth >= 3}
               >
                 +
@@ -484,13 +502,14 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           </div>
           
           <div>
-            <label htmlFor="nodesPerLevel" className="block text-stitch-sage mb-2">
+            <label htmlFor="nodesPerLevel" className="block mb-2" style={{ color: 'var(--text-color)' }}>
               Nœuds par niveau (3-10)
             </label>
             <div className="flex items-center">
               <button
                 onClick={() => setNodesPerLevel(Math.max(3, nodesPerLevel - 1))}
-                className="bg-stitch-accent text-white px-3 py-1 rounded-l-md"
+                className="text-white px-3 py-1 rounded-l-md"
+                style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={nodesPerLevel <= 3}
               >
                 -
@@ -502,11 +521,13 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
                 max={10}
                 value={nodesPerLevel}
                 onChange={(e) => setNodesPerLevel(Math.min(10, Math.max(3, parseInt(e.target.value) || 3)))}
-                className="w-16 text-center border border-stitch-border py-1"
+                className="w-16 text-center border py-1"
+                style={{ borderColor: 'var(--border-color)' }}
               />
               <button
                 onClick={() => setNodesPerLevel(Math.min(10, nodesPerLevel + 1))}
-                className="bg-stitch-accent text-white px-3 py-1 rounded-r-md"
+                className="text-white px-3 py-1 rounded-r-md"
+                style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={nodesPerLevel >= 10}
               >
                 +
@@ -519,7 +540,8 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           <button
             onClick={applyParameters}
             disabled={isLoading || isApplying}
-            className="bg-stitch-accent text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+            className="text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+            style={{ backgroundColor: 'var(--accent-color)' }}
           >
             {isApplying ? 'Application en cours...' : 'Appliquer les paramètres'}
           </button>
@@ -542,10 +564,15 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
       </div>
       
       {/* Top des compétences */}
-      <div className="bg-stitch-primary border border-stitch-border rounded-lg p-6 mb-6">
-        <h3 className="text-stitch-accent text-lg font-medium mb-4">
+      <div className="rounded-lg p-6 mb-6" style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
           Top {nodesPerLevel} des compétences à acquérir
-          <span className="text-sm text-stitch-sage ml-2">
+          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
             (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
           </span>
         </h3>
@@ -554,22 +581,25 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           {topSkills.map((skill, index) => (
             <div 
               key={skill.id} 
-              className="flex items-center p-3 bg-[#eaf0ec] rounded-lg"
+              className="flex items-center p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--primary-color)' }}
             >
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-stitch-accent text-white rounded-full mr-3">
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white rounded-full mr-3"
+                   style={{ backgroundColor: 'var(--accent-color)' }}>
                 {index + 1}
               </div>
               <div>
-                <p className="text-stitch-accent font-medium">{skill.label}</p>
+                <p className="font-medium" style={{ color: 'var(--accent-color)' }}>{skill.label}</p>
                 {skill.description && (
-                  <p className="text-stitch-sage text-sm mt-1 line-clamp-2">
+                  <p className="text-sm mt-1 line-clamp-2" style={{ color: 'var(--text-color)' }}>
                     {skill.description}
                   </p>
                 )}
               </div>
               {skill.score !== undefined && (
                 <div className="ml-auto">
-                  <span className="bg-stitch-accent text-white text-xs font-bold px-2 py-1 rounded-full">
+                  <span className="text-white text-xs font-bold px-2 py-1 rounded-full"
+                        style={{ backgroundColor: 'var(--accent-color)' }}>
                     {Math.round(skill.score * 100)}%
                   </span>
                 </div>
@@ -578,7 +608,7 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           ))}
           
           {topSkills.length === 0 && (
-            <p className="text-stitch-sage text-center py-4">
+            <p className="text-center py-4" style={{ color: 'var(--text-color)' }}>
               Aucune compétence à développer identifiée.
             </p>
           )}
@@ -586,15 +616,20 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
       </div>
 
       {/* Visualisation de l'arbre de compétences ESCO */}
-      <div className="bg-stitch-primary border border-stitch-border rounded-lg p-6">
-        <h3 className="text-stitch-accent text-lg font-medium mb-4">
+      <div className="rounded-lg p-6" style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
           Arbre de compétences ESCO
-          <span className="text-sm text-stitch-sage ml-2">
+          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
             (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
           </span>
         </h3>
         
-        <p className="text-stitch-sage text-sm mb-4">
+        <p className="text-sm mb-4" style={{ color: 'var(--text-color)' }}>
           Cette visualisation montre les relations entre les différentes compétences requises pour ce poste, générées à partir du graphe ESCO.
         </p>
         
@@ -602,20 +637,24 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
         <div className="flex flex-wrap gap-3 mb-4">
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-            <span className="text-xs text-stitch-sage">Emploi</span>
+            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Emploi</span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-            <span className="text-xs text-stitch-sage">Compétence</span>
+            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Compétence</span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-            <span className="text-xs text-stitch-sage">Groupe de compétences</span>
+            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Groupe de compétences</span>
           </div>
         </div>
         
         {/* Visualisation ReactFlow */}
-        <div className="border border-stitch-border rounded-lg overflow-hidden bg-[#f5f8f6]" style={{ height: '500px' }}>
+        <div className="border rounded-lg overflow-hidden" style={{
+          height: '500px',
+          borderColor: 'var(--border-color)',
+          backgroundColor: 'var(--primary-color)'
+        }}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -631,7 +670,7 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
         </div>
         
         <div className="mt-4 text-center">
-          <p className="text-xs text-stitch-sage italic">
+          <p className="text-xs italic" style={{ color: 'var(--text-color)' }}>
             Nombre total de nœuds: {Object.keys(skillTreeData.nodes).length} | 
             Nombre total de relations: {skillTreeData.edges.length}
           </p>

@@ -34,7 +34,7 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
     return (
       <div className={`flex justify-center items-center p-8 ${className}`}>
         <LoadingSpinner size="lg" />
-        <p className="ml-3 text-stitch-sage">Chargement des recommandations...</p>
+        <p className="ml-3" style={{ color: 'var(--text-color)' }}>Chargement des recommandations...</p>
       </div>
     );
   }
@@ -54,10 +54,10 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
   if (recommendations.length === 0) {
     return (
       <div className={`bg-stitch-primary border border-stitch-border rounded-lg p-6 text-center ${className}`}>
-        <p className="text-stitch-sage">
+        <p style={{ color: 'var(--text-color)' }}>
           Aucune recommandation d'emploi disponible pour le moment.
         </p>
-        <p className="text-stitch-sage text-sm mt-2">
+        <p className="text-sm mt-2" style={{ color: 'var(--text-color)' }}>
           Complétez votre profil pour obtenir des recommandations personnalisées.
         </p>
       </div>
@@ -66,11 +66,11 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4 font-departure">
+      <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4 font-departure" style={{ color: 'var(--accent-color)' }}>
         Explorez vos meilleures correspondances d'emploi
       </h2>
       
-      <p className="text-stitch-sage text-sm mb-6">
+      <p className="text-sm mb-6" style={{ color: 'var(--text-color)' }}>
         Ces recommandations sont basées sur votre profil et vos compétences. Cliquez sur une carte pour voir les compétences associées.
       </p>
       
@@ -88,7 +88,8 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
       {recommendations.length > 0 && (
         <div className="mt-4 text-right">
           <button
-            className="text-stitch-accent text-sm hover:underline focus:outline-none"
+            className="text-sm hover:underline focus:outline-none"
+            style={{ color: 'var(--accent-color)' }}
             onClick={() => {/* Fonction pour voir plus de recommandations */}}
           >
             Voir plus de recommandations →

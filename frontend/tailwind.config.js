@@ -17,11 +17,11 @@ module.exports = {
         ...grayColors,
         // Stitch Design Theme Colors
         stitch: {
-          primary: '#e6f5e6', // mint forest green (primary background)
-          accent: '#19b219', // deep green for progress, highlights
-          sage: '#6b9a6b', // sage green for secondary info
-          border: '#254625', // subtle separator
-          track: '#366336', // progress track
+          primary: 'var(--primary-color)', // Utilise la variable CSS dynamique
+          accent: 'var(--accent-color)', // Utilise la variable CSS dynamique
+          sage: 'var(--text-color)', // Utilise la variable CSS dynamique
+          border: 'var(--border-color)', // Utilise la variable CSS dynamique
+          track: 'var(--text-color-light)', // Utilise la variable CSS dynamique
         },
         // Primary colors
         primary: {

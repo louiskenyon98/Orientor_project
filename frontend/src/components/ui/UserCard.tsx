@@ -27,7 +27,7 @@ export default function UserCard({
     ? 'border-domain-builder' 
     : domain === 'communicator' 
       ? 'border-domain-communicator' 
-      : 'border-stitch-accent';
+      : 'border-accent';
 
   return (
     <motion.div 
@@ -38,7 +38,12 @@ export default function UserCard({
     >
       {/* Avatar Container */}
       <div className="flex-shrink-0">
-        <div className={`relative w-32 h-32 ${domainColor} rounded-full overflow-hidden border-2`}>
+        <div className={`relative w-32 h-32 rounded-full overflow-hidden border-2`}
+             style={{ borderColor: domain === 'builder'
+                      ? 'var(--domain-builder-color)'
+                      : domain === 'communicator'
+                        ? 'var(--domain-communicator-color)'
+                        : 'var(--accent-color)' }}>
           <Image 
             src={avatarUrl} 
             alt={`${name}'s avatar`} 
@@ -52,8 +57,8 @@ export default function UserCard({
 
       {/* User Info */}
       <div className="flex flex-col items-center text-center">
-        <h3 className="text-xl font-bold font-departure text-stitch-accent mb-1">{name}</h3>
-        {role && <p className="text-base text-stitch-sage mb-3">{role}</p>}
+        <h3 className="text-xl font-bold font-departure mb-1" style={{ color: 'var(--accent-color)' }}>{name}</h3>
+        {role && <p className="text-base mb-3" style={{ color: 'var(--text-color)' }}>{role}</p>}
         
         {/* Skills Tags */}
         {skills.length > 0 && (
@@ -61,13 +66,23 @@ export default function UserCard({
             {skills.slice(0, 3).map((skill, index) => (
               <span 
                 key={index} 
-                className="text-sm px-3 py-1 bg-stitch-primary border border-stitch-border rounded-full"
+                className="text-sm px-3 py-1 border rounded-full"
+                style={{
+                  backgroundColor: 'var(--primary-color)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-color)'
+                }}
               >
                 {skill}
               </span>
             ))}
             {skills.length > 3 && (
-              <span className="text-sm px-3 py-1 bg-stitch-primary border border-stitch-border rounded-full">
+              <span className="text-sm px-3 py-1 border rounded-full"
+                    style={{
+                      backgroundColor: 'var(--primary-color)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-color)'
+                    }}>
                 +{skills.length - 3}
               </span>
             )}
