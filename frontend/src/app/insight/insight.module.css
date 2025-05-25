@@ -1,0 +1,222 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: var(--font-family);
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+}
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.insightContainer {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.previewSection {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 2rem;
+}
+
+.previewSection h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.previewText {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.mainSection {
+  padding: 2rem;
+}
+
+.toggleButton {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.fullTextSection {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+}
+
+.fullText {
+  line-height: 1.8;
+  font-size: 1.1rem;
+}
+
+.acceptSection h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.acceptText {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.actionsSection {
+  padding: 2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.actionButton {
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 1rem;
+}
+
+.actionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.saveButton {
+  background-color: var(--primary-color);
+  color: white;
+  margin-bottom: 2rem;
+  display: block;
+  width: 100%;
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rewriteSection {
+  margin-top: 2rem;
+}
+
+.rewriteSection h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.feedbackInput {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.feedbackInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+.rewriteButton {
+  background-color: var(--secondary-color);
+  color: white;
+  display: block;
+  width: 100%;
+}
+
+.rewriteButton:hover:not(:disabled) {
+  background-color: var(--secondary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.backButton {
+  background-color: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.backButton:hover {
+  background-color: var(--text-secondary);
+  color: white;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .previewSection,
+  .mainSection,
+  .actionsSection {
+    padding: 1.5rem;
+  }
+}

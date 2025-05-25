@@ -1,0 +1,91 @@
+.container {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.container > * {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  min-height: 120px;
+  border: solid 1px #bebebe;
+  background-color: #1f1f1f;
+  border-radius: 10px;
+  padding: 20px;
+  color: #ffffff;
+  box-shadow: 0px 8px 20px -10px #bbbbbb;
+  text-shadow: 0px 0px 5px #fff;
+  letter-spacing: 1px;
+  background-image: radial-gradient(circle 160px at 50% 120%, #353535, #1f1f1f);
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.card1 {
+  width: 100%;
+  margin: 0;
+}
+
+.card2 {
+  width: 100%;
+  margin: 0;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.preview {
+  font-size: 16px;
+  opacity: 0.9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+  color: #ffffff;
+}
+
+/* Styles pour l'état de chargement */
+.loading {
+  opacity: 0.8;
+}
+
+.loadingIndicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  margin: 0 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}

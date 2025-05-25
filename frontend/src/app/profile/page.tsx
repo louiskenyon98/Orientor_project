@@ -466,6 +466,45 @@ export default function ProfilePage() {
                                                         <option value="Business">Business</option>
                                                         <option value="Arts">Arts</option>
                                                         <option value="Sciences">Sciences</option>
+                                                        <option value="Health">Health</option>
+                                                        <option value="Law">Law</option>
+                                                        <option value="Medicine">Medicine</option>
+                                                        <option value="Education">Education</option>
+                                                        <option value="Social Sciences">Social Sciences</option>
+                                                        <option value="Humanities">Humanities</option>
+                                                        <option value="Mathematics">Mathematics</option>
+                                                        <option value="Music">Music</option>
+                                                        <option value="Psychology">Psychology</option>
+                                                        <option value="Economics">Economics</option>
+                                                        <option value="Architecture">Architecture</option>
+                                                        <option value="Design">Design</option>
+                                                        <option value="Fashion">Fashion</option>
+                                                        <option value="Film">Film</option>
+                                                        <option value="Journalism">Journalism</option>
+                                                        <option value="Marketing">Marketing</option>
+                                                        <option value="Public Relations">Public Relations</option>
+                                                        <option value="Social Work">Social Work</option>
+                                                        <option value="Automotive Technology">Automotive Technology</option>
+                                                        <option value="Construction and Building Technology">Construction and Building Technology</option>
+                                                        <option value="Electrical Technology">Electrical Technology</option>
+                                                        <option value="HVAC & Refrigeration">HVAC & Refrigeration</option>
+                                                        <option value="Welding Technology">Welding Technology</option>
+                                                        <option value="Plumbing and Heating">Plumbing and Heating</option>
+                                                        <option value="Heavy Equipment Operation">Heavy Equipment Operation</option>
+                                                        <option value="Industrial Mechanics">Industrial Mechanics</option>
+                                                        <option value="Forestry Operations">Forestry Operations</option>
+                                                        <option value="Landscape and Horticulture">Landscape and Horticulture</option>
+                                                        <option value="Carpentry">Carpentry</option>
+                                                        <option value="Appliance Repair and Maintenance">Appliance Repair and Maintenance</option>
+                                                        <option value="Fire Protection Technology">Fire Protection Technology</option>
+                                                        <option value="Renewable Energy Systems">Renewable Energy Systems</option>
+                                                        <option value="High School">High School</option>
+                                                        <option value="High School Diploma">High School Diploma</option>
+                                                        <option value="High School Diploma with Honors">High School Diploma with Honors</option>
+                                                        <option value="High School Diploma with Distinction">High School Diploma with Distinction</option>
+                                                        <option value="High School Diploma with Honors and Distinction">High School Diploma with Honors and Distinction</option>
+                                                        <option value="High School Diploma with Honors and Distinction">High School Diploma with Honors and Distinction</option>
+                                                        <option value="Other">Other</option>
                                                     </select>
                                                 </label>
                                             </div>

@@ -21,6 +21,7 @@ from app.routers.tree_paths import router as tree_paths_router  # Import tree pa
 from app.routers.node_notes import router as node_notes_router  # Import node notes router
 from app.routers.user_progress import router as user_progress_router  # Import user progress router
 from app.routers.holland_test import router as holland_test_router  # Import Holland test router
+from app.routers.insight_router import router as insight_router  # Import insight router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
 from scripts.model_loader import load_models
@@ -86,6 +87,7 @@ try:
     logger.info(f"Registering node_notes_router routes: {[f'{route.path} [{route.methods}]' for route in node_notes_router.routes]}")  # Log node notes router
     logger.info(f"Registering user_progress_router routes: {[f'{route.path} [{route.methods}]' for route in user_progress_router.routes]}")  # Log user progress router
     logger.info(f"Registering holland_test_router routes: {[f'{route.path} [{route.methods}]' for route in holland_test_router.routes]}")  # Log Holland test router
+    logger.info(f"Registering insight_router routes: {[f'{route.path} [{route.methods}]' for route in insight_router.routes]}")  # Log insight router
     # logger.info(f"Registering resume_router routes: {[f'{route.path} [{route.methods}]' for route in resume_router.routes]}")  # Commented out resume router logging
     logger.info("============================================")
 except Exception as e:
@@ -114,6 +116,7 @@ app.include_router(tree_paths_router)  # Include the tree paths router
 app.include_router(node_notes_router)  # Include the node notes router
 app.include_router(user_progress_router)  # Include the user progress router
 app.include_router(holland_test_router)  # Include the Holland test router
+app.include_router(insight_router)  # Include the insight router
 # app.include_router(resume_router)  # Commented out resume router inclusion
 logger.info("All routers included successfully")
 

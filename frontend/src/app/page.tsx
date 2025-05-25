@@ -5,6 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import UserCard from '@/components/ui/UserCard';
+import PhilosophicalCard from '@/components/ui/PhilosophicalCard';
 import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
 import { getJobRecommendations } from '@/services/api';
 import JobRecommendationList from '@/components/jobs/JobRecommendationList';
@@ -198,6 +199,11 @@ export default function Home() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Philosophical Card Section */}
+              <div className="w-full mb-10">
+                <PhilosophicalCard />
               </div>
 
               {/* Section des recommandations d'emploi - occupe toute la largeur */}
