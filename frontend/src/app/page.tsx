@@ -256,7 +256,7 @@ export default function Home() {
             </div>
 
             {/* Main Content Container */}
-            <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16">
+            <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16 max-w-[2000px] mx-auto">
               {/* User Profile Section - Avatar et RIASEC */}
               <div className="mb-10">
                 {/* Unified flex container for the entire profile section */}
@@ -368,14 +368,16 @@ export default function Home() {
                     color: 'var(--accent-color)',
                     fontFamily: 'var(--heading-font)'
                   }}>Recommandations d'emploi</h2>
-                  <div className="w-full">
-                    <JobRecommendationList
-                      recommendations={jobRecommendations}
-                      isLoading={jobsLoading}
-                      error={jobsError}
-                      onSelectJob={handleSelectJob}
-                      className="mb-8"
-                    />
+                  <div className="w-full overflow-hidden">
+                    <div className="max-w-[1400px] mx-auto">
+                      <JobRecommendationList
+                        recommendations={jobRecommendations}
+                        isLoading={jobsLoading}
+                        error={jobsError}
+                        onSelectJob={handleSelectJob}
+                        className="mb-8"
+                      />
+                    </div>
                     
                     {/* Arbre de compétences pour l'emploi sélectionné */}
                     {selectedJob && (
@@ -506,28 +508,6 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-
-                {/* Section des recommandations d'emploi - occupe toute la largeur */}
-                {/* <div className="md:col-span-12 mt-8">
-                  <h2 className="text-stitch-accent text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5 font-departure">Recommandations d'emploi</h2>
-                  <div className="w-full">
-                    <JobRecommendationList
-                      recommendations={jobRecommendations}
-                      isLoading={jobsLoading}
-                      error={jobsError}
-                      onSelectJob={handleSelectJob}
-                      className="mb-8"
-                    /> */}
-                    
-                    {/* Arbre de compétences pour l'emploi sélectionné */}
-                    {/* {selectedJob && (
-                      <JobSkillsTree
-                        jobId={selectedJob.id}
-                        className="mt-8"
-                      />
-                    )}
-                  </div>
-                </div> */}
 
                 {/* Personality Section */}
                 <div className="md:col-span-12 mt-4">

@@ -70,11 +70,93 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
         Explorez vos meilleures correspondances d'emploi
       </h2>
       
-      {/* <p className="text-sm mb-6" style={{ color: 'var(--text-color)' }}>
-        Ces recommandations sont basées sur votre profil et vos compétences. Cliquez sur une carte pour voir les compétences associées.
-      </p> */}
+      <style jsx global>{`
+        .container {
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-width: 180px;
+          height: 200px;
+        }
+
+        .container .glass {
+          position: relative;
+          width: 180px;
+          height: 200px;
+          background: linear-gradient(#fff2, transparent);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 25px 25px rgba(0, 0, 0, 0.25);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: 0.5s;
+          border-radius: 10px;
+          margin: 0 -45px;
+          backdrop-filter: blur(10px);
+          transform: rotate(calc(var(--r) * 1deg));
+        }
+
+        .container:hover .glass {
+          transform: rotate(0deg);
+          margin: 0 10px;
+        }
+
+        .container .glass::before {
+          content: attr(data-text);
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.05);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #fff;
+          font-size: 0.9rem;
+          padding: 0 10px;
+          text-align: center;
+        }
+
+        .cards-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0;
+          padding: 2rem 0;
+          perspective: 1000px;
+        }
+
+        .cards-container > *:nth-child(1) {
+          --r: -15;
+        }
+
+        .cards-container > *:nth-child(2) {
+          --r: 0;
+          z-index: 1;
+        }
+
+        .cards-container > *:nth-child(3) {
+          --r: 15;
+        }
+
+        .cards-container:hover > *:nth-child(1) {
+          --r: -15;
+          margin: 0 -45px;
+        }
+
+        .cards-container:hover > *:nth-child(2) {
+          --r: 0;
+          margin: 0 10px;
+        }
+
+        .cards-container:hover > *:nth-child(3) {
+          --r: 15;
+          margin: 0 -45px;
+        }
+      `}</style>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+      <div className="cards-container">
         {recommendations.map((job) => (
           <JobCard
             key={job.id}

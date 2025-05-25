@@ -113,71 +113,68 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
   
   // Limiter le nombre de compétences affichées
   const displayedSkills = skills.slice(0, 3);
-  
+
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={`
-        relative flex flex-col rounded-lg border p-5 cursor-pointer transition-all duration-200
-        ${isSelected
-          ? 'border-stitch-accent bg-[#eaf0ec] shadow-md'
-          : 'border-stitch-border bg-stitch-primary hover:bg-[#f5f8f6]'}
+        container relative flex justify-center items-center
         ${className}
       `}
+      style={{
+        '--r': isSelected ? '0' : '-15',
+      } as React.CSSProperties}
     >
-      {/* Badge de correspondance */}
-      <div className="absolute top-4 right-4 bg-stitch-accent text-white text-xs font-bold px-2 py-1 rounded-full">
-        {matchPercentage}% match
-      </div>
-      
-      {/* Avatar et titre de l'emploi */}
-      <div className="flex items-start mb-3">
-        <div className="flex-shrink-0 mr-3">
-          {/* Avatar local basé sur l'ID de l'emploi */}
-          <div className="w-12 h-12 rounded-full overflow-hidden bg-stitch-accent flex items-center justify-center">
+      <div 
+        className="glass"
+        data-text={title}
+      >
+        <div className="flex flex-col items-center justify-center p-4 h-full">
+          {/* Avatar */}
+          <div className="w-16 h-16 rounded-full overflow-hidden mb-4">
             <Image
               src={`/avatar/${getAvatarForJob(job.id, title)}`}
               alt={title}
-              width={48}
-              height={48}
+              width={64}
+              height={64}
               className="w-full h-full object-cover"
             />
           </div>
-        </div>
-        <h3 className="text-stitch-accent text-xl font-bold pr-16">{title}</h3>
-      </div>
-      
-      {/* Description courte */}
-      <p className="text-stitch-sage text-sm mb-4 line-clamp-2">{description}</p>
-      
-      {/* Compétences principales */}
-      {displayedSkills.length > 0 && (
-        <div className="mt-auto">
-          <p className="text-xs text-stitch-sage mb-2 font-medium">Compétences clés:</p>
-          <div className="flex flex-wrap gap-2">
-            {displayedSkills.map((skill, index) => (
-              <span 
-                key={index}
-                className="bg-[#eaf0ec] text-stitch-sage text-xs px-2 py-1 rounded-md"
-              >
-                {skill}
-              </span>
-            ))}
-            {skills.length > 3 && (
-              <span className="text-stitch-sage text-xs px-2 py-1">
-                +{skills.length - 3} autres
-              </span>
-            )}
+
+          {/* Match percentage */}
+          <div className="absolute top-4 right-4 bg-stitch-accent text-white text-xs font-bold px-2 py-1 rounded-full">
+            {matchPercentage}% match
           </div>
+
+          {/* Description */}
+          <p className="text-white text-sm text-center mb-4 line-clamp-2">
+            {description}
+          </p>
+
+          {/* Skills */}
+          {displayedSkills.length > 0 && (
+            <div className="mt-auto">
+              <div className="flex flex-wrap gap-2 justify-center">
+                {displayedSkills.map((skill, index) => (
+                  <span 
+                    key={index}
+                    className="bg-white/10 text-white text-xs px-2 py-1 rounded-md"
+                  >
+                    {skill}
+                  </span>
+                ))}
+                {skills.length > 3 && (
+                  <span className="text-white text-xs px-2 py-1">
+                    +{skills.length - 3}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-      
-      {/* Indicateur de sélection */}
-      {isSelected && (
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-stitch-accent rounded-b-lg"></div>
-      )}
+      </div>
     </motion.div>
   );
 };
