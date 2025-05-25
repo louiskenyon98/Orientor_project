@@ -70,9 +70,9 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
         Explorez vos meilleures correspondances d'emploi
       </h2>
       
-      <p className="text-sm mb-6" style={{ color: 'var(--text-color)' }}>
+      {/* <p className="text-sm mb-6" style={{ color: 'var(--text-color)' }}>
         Ces recommandations sont basées sur votre profil et vos compétences. Cliquez sur une carte pour voir les compétences associées.
-      </p>
+      </p> */}
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
         {recommendations.map((job) => (
