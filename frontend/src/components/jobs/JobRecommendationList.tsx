@@ -67,7 +67,7 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
   return (
     <div className={`w-full ${className}`}>
       <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] mb-4 font-departure" style={{ color: 'var(--accent-color)' }}>
-        Explorez vos meilleures correspondances d'emploi
+        {/* Explorez vos meilleures correspondances d'emploi */}
       </h2>
       
       <style jsx global>{`
@@ -112,7 +112,7 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
           display: flex;
           justify-content: center;
           align-items: center;
-          color: #fff;
+          color: var(--text-color);
           font-size: 0.9rem;
           padding: 0 10px;
           text-align: center;

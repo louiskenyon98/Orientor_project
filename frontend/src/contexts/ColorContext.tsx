@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 // Définition des thèmes de couleurs disponibles
-export type ColorPalette = 'green' | 'blue' | 'gray' | 'orangeBlue' | 'grayBlack';
+export type ColorPalette = 'green' | 'blue' | 'gray' | 'yellowColors' | 'grayBlack';
 
 export interface ColorTheme {
   id: ColorPalette;
@@ -55,17 +55,17 @@ export const colorThemes: Record<ColorPalette, ColorTheme> = {
     linkHoverColor: 'var(--color-outer_space)',
     variable: '--color-gray',
   },
-  orangeBlue: {
-    id: 'orangeBlue',
-    name: 'Orange-Bleu',
-    primaryColor: 'var(--color-yale_blue)',
-    accentColor: 'var(--color-mikado_yellow)',
-    borderColor: 'var(--color-rich_black)',
-    textColor: 'var(--color-rich_black)',
-    textColorLight: 'var(--color-oxford_blue)',
-    linkColor: 'var(--color-mikado_yellow)',
-    linkHoverColor: 'var(--color-gold)',
-    variable: '--color-orange-blue',
+  yellowColors: {
+    id: 'yellowColors',
+    name: 'yellow',
+    primaryColor: 'var(--color-naples_yellow)',
+    accentColor: 'var(--color-mustard)',
+    borderColor: 'var(--color-golden_brown)',
+    textColor: '#000',
+    textColorLight: 'var(--color-field_drab_2)',
+    linkColor: 'var(--color-saffron)',
+    linkHoverColor: 'var(--color-dark_goldenrod_1)',
+    variable: '--color-yellow',
   },
   grayBlack: {
     id: 'grayBlack',
@@ -73,7 +73,7 @@ export const colorThemes: Record<ColorPalette, ColorTheme> = {
     primaryColor: 'var(--color-gray)',
     accentColor: 'var(--color-black)',
     borderColor: 'var(--color-gray)',
-    textColor: 'var(--color-gray)',
+    textColor: '#000',
     textColorLight: 'var(--color-gray)',
     linkColor: 'var(--color-gray)',
     linkHoverColor: 'var(--color-gray)',

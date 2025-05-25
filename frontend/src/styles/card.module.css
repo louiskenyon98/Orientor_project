@@ -1,0 +1,182 @@
+.card {
+  --main-color: #000;
+  --submain-color: #78858f;
+  --bg-color: #fff;
+  --background-color: #1680bd; /* Added background color */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  position: relative;
+  width: 400px; /* Increased width */
+  height: 500px; /* Increased height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 20px;
+  background: var(--bg-color);
+  overflow: hidden;
+  /* background: var(--background-color); Updated to use new background color */
+}
+
+.card__img {
+  height: 250px; /* Increased height */
+  width: 100%;
+  background: linear-gradient(
+      30deg,
+      #111111 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #111111 87.5%,
+      #111111
+    ),
+    linear-gradient(
+      150deg,
+      #111111 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #111111 87.5%,
+      #111111
+    ),
+    linear-gradient(
+      30deg,
+      #111111 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #111111 87.5%,
+      #111111
+    ),
+    linear-gradient(
+      150deg,
+      #111111 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #111111 87.5%,
+      #111111
+    ),
+    linear-gradient(
+      60deg,
+      #77777777 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #77777777 75%,
+      #77777777
+    ),
+    linear-gradient(
+      60deg,
+      #77777777 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #77777777 75%,
+      #77777777
+    );
+  background-position:
+    0 0,
+    0 0,
+    40px 70px,
+    40px 70px,
+    0 0,
+    40px 70px;
+  background-color: #000000;
+  background-size: 80px 140px;
+  box-shadow: inset 0 0 100px rgba(255, 215, 0, 0.1);
+  border-radius: 20px 20px 0 0;
+}
+
+.card__img svg {
+  display: none;
+}
+
+.card__avatar {
+  position: absolute;
+  width: 140px; /* Increased width */
+  height: 140px; /* Increased height */
+  background: var(--bg-color);
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 100px; /* Adjusted position to be higher */
+  border: 4px solid var(--bg-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card__avatar svg {
+  width: 120px; /* Increased width */
+  height: 120px; /* Increased height */
+}
+
+.card__title {
+  margin-top: 100px; /* Adjusted margin to account for new avatar position */
+  font-weight: 500;
+  font-size: 20px; /* Increased font size */
+  color: var(--main-color);
+}
+
+.card__subtitle {
+  margin-top: 15px; /* Adjusted for new card size */
+  font-weight: 400;
+  font-size: 17px; /* Increased font size */
+  color: var(--submain-color);
+}
+
+.card__riasec {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.card__riasec_codes {
+  display: flex;
+  gap: 8px;
+}
+
+.card__riasec_code {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card__riasec_label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--main-color);
+  text-align: center;
+}
+
+.card__btn {
+  margin-top: 20px; /* Adjusted for new card size */
+  width: 90px; /* Increased width */
+  height: 36px; /* Increased height */
+  border: 2px solid var(--main-color);
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 13px; /* Increased font size */
+  color: var(--main-color);
+  background: var(--bg-color);
+  text-transform: uppercase;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.card__btn-solid {
+  background: var(--main-color);
+  color: var(--bg-color);
+}
+
+.card__btn:hover {
+  background: var(--main-color);
+  color: var(--bg-color);
+}
+
+.card__btn-solid:hover {
+  background: var(--bg-color);
+  color: var(--main-color);
+} 

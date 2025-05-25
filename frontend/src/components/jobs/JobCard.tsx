@@ -149,7 +149,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
           </div>
 
           {/* Description */}
-          <p className="text-white text-sm text-center mb-4 line-clamp-2">
+          <p className="text-sm text-center mb-4 line-clamp-2" style={{ color: 'var(--text-color)' }}>
             {description}
           </p>
 
@@ -160,13 +160,14 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
                 {displayedSkills.map((skill, index) => (
                   <span 
                     key={index}
-                    className="bg-white/10 text-white text-xs px-2 py-1 rounded-md"
+                    className="bg-white/10 text-xs px-2 py-1 rounded-md"
+                    style={{ color: 'var(--text-color)' }}
                   >
                     {skill}
                   </span>
                 ))}
                 {skills.length > 3 && (
-                  <span className="text-white text-xs px-2 py-1">
+                  <span className="text-xs px-2 py-1" style={{ color: 'var(--text-color)' }}>
                     +{skills.length - 3}
                   </span>
                 )}

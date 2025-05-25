@@ -246,6 +246,15 @@
   --color-outer_space: #495057;
   --color-onyx: #343a40;
   --color-eerie_black: #212529;
+
+    /* Variables pour les couleurs jaunes */
+    --color-naples_yellow: #ffe169;
+    --color-mustard: #fad643;
+    --color-saffron: #edc531;
+    --color-golden_brown: #926c15;
+    --color-field_drab_1: #805b10;
+    --color-field_drab_2: #76520e;
+    --color-dark_goldenrod_1: #b69121;
   
   /* Variables pour le thème de couleurs actif */
   --primary-color: var(--color-cambridge_blue);
@@ -255,6 +264,7 @@
   --text-color-light: var(--color-cambridge_blue);
   --link-color: var(--color-hookers_green);
   --link-hover-color: var(--color-charcoal);
+  --color-black: #000;
 }
 
 @layer base {

@@ -12,6 +12,7 @@ import JobSkillsTree from '@/components/jobs/JobSkillsTree';
 import { Job } from '@/components/jobs/JobCard';
 import styles from '@/styles/patterns.module.css';
 import sidebarStyles from '@/styles/sidebar.module.css';
+import NewSidebar from '@/components/layout/NewSidebar';
 
 // Interface pour la réponse de l'API de recommandations d'emploi
 interface JobRecommendationsResponse {
@@ -164,79 +165,11 @@ export default function Home() {
     <MainLayout showNav={false}>
       <div className={`relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden ${styles.container}`}>
         <div className="relative z-10 w-full flex h-full grow">
-          {/* Sidebar - étroite sur mobile, plus large sur desktop, mais optimisée pour grands écrans */}
-          <div className={`w-20 md:w-48 lg:w-44 xl:w-52 border-r border-stitch-border transition-all duration-300 flex-shrink-0 -ml-1 md:-ml-2 ${sidebarStyles.card}`}>
-            <div className="flex flex-col gap-8 items-center pt-8 px-1 md:px-2 sticky top-0">
-              {/* Navigation Items */}
-              {navItems.map((item, index) => (
-                <Link href={item.path} key={index} className={`relative group w-full ${sidebarStyles.isoPro}`}>
-                  <div className="flex items-center justify-center w-full">
-                    {/* Icon */}
-                    <div className={sidebarStyles.svg}>
-                      {item.icon === 'Chat' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M216,48H40A16,16,0,0,0,24,64V224a15.84,15.84,0,0,0,9.25,14.5A16.05,16.05,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78.69.69,0,0,0,.13-.11L82.5,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM40,224V64H216V192H82.5a16,16,0,0,0-10.25,3.78L40,224Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'List' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Bookmark' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Trophy' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M232,64H208V56a16,16,0,0,0-16-16H64A16,16,0,0,0,48,56v8H24A16,16,0,0,0,8,80V96a40,40,0,0,0,40,40h3.65A80.13,80.13,0,0,0,120,191.61V216H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V191.58c31.94-3.23,58.44-25.64,68.08-55.58H208a40,40,0,0,0,40-40V80A16,16,0,0,0,232,64ZM48,120A24,24,0,0,1,24,96V80H48v32q0,4,.39,8Zm144-8.9c0,35.52-28.49,64.64-63.51,64.9H128a64,64,0,0,1-64-64V56H192ZM232,96a24,24,0,0,1-24,24h-.5a81.81,81.81,0,0,0,.5-8.9V80h24Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Note' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216v96H176a16,16,0,0,0-16,16v48H40Zm152,144V168h24v32Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Peers' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M128,120a48,48,0,1,0-48-48A48,48,0,0,0,128,120Zm0,16c-33.08,0-96,16.54-96,49.38V200a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8v-14.62C224,152.54,161.08,136,128,136Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Case Study' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M128,16A112,112,0,1,0,240,128,112.13,112.13,0,0,0,128,16Zm0,208a96,96,0,1,1,96-96A96.11,96.11,0,0,1,128,224Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Search' && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                          <path d="M112,16A96,96,0,1,0,208,112a95.83,95.83,0,0,0-16.5-54.5l-36.5,36.5A48,48,0,1,1,112,16Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,112,192Z"></path>
-                        </svg>
-                      )}
-                      {item.icon === 'Personality' && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24px"
-                          height="24px"
-                          fill="currentColor"
-                          viewBox="0 0 256 256"
-                        >
-                          <path d="M232,128a104,104,0,1,0-193.55,58.25C41.62,187.2,40,191.43,40,196v20a12,12,0,0,0,12,12H88a12,12,0,0,0,12-12V204h8a8,8,0,0,0,8-8V168a40.05,40.05,0,0,0,40-40v-8a8,8,0,0,0-8-8H139.75a40,40,0,0,0-75.5,0H56a8,8,0,0,0,0,16h80a24,24,0,0,1,24,24v8a8,8,0,0,0,8,8h8a12,12,0,0,0,12-12V196c0-4.57-1.62-8.8-4.45-12.25ZM128,24A88,88,0,1,1,40,112,88.1,88.1,0,0,1,128,24Z"></path>
-                        </svg>
-                      )}
-                    </div>
-                    <span className={sidebarStyles.text}>{item.name}</span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+          {/* New Sidebar */}
+          <NewSidebar navItems={navItems} />
 
-          {/* Main Content - adapté pour desktop avec largeur complète et optimisé pour grands écrans */}
-          <div className="flex flex-col flex-1 w-full">
+          {/* Main Content */}
+          <div className="flex flex-col flex-1 w-full ml-20">
             {/* Header */}
             <div className="flex flex-wrap justify-between gap-3 p-4 md:p-6 lg:p-8 mb-2">
               <p className="tracking-light text-[32px] md:text-4xl font-bold leading-tight min-w-72" style={{
@@ -258,126 +191,41 @@ export default function Home() {
                       role={userData.role}
                       avatarUrl={userData.avatarUrl}
                       skills={userData.skills}
+                      hollandResults={hollandResults}
+                      loading={loading}
+                      error={error}
                       className="p-6 bg-black/30 rounded-lg border w-full shadow-md"
                     />
                   </div>
-              {/* RIASEC Section */}
-              <div className="w-full">
-                <div className="bg-black/30 rounded-lg border px-6 py-4 md:px-8 md:py-6"
-                     style={{ borderColor: 'var(--border-color)' }}>
-                  <h2 className="text-[22px] md:text-[28px] font-bold leading-tight tracking-[-0.02em] mb-6" style={{
-                    color: 'var(--accent-color)',
-                    fontFamily: 'var(--heading-font)'
-                  }}>
-                    Profil RIASEC
-                  </h2>
+                </div>
+              </div>
 
-                  {loading ? (
-                    <p style={{ color: 'var(--text-color)' }}>Chargement du profil RIASEC...</p>
-                  ) : error ? (
-                    <p className="text-red-500">{error}</p>
-                  ) : !hollandResults ? (
-                    <div className="p-4 rounded-lg border" style={{
-                      backgroundColor: 'var(--primary-color)',
-                      borderColor: 'var(--border-color)'
-                    }}>
-                      <p className="mb-2" style={{ color: 'var(--text-color)' }}>
-                        Vous n'avez pas encore passé le test Holland Code (RIASEC).
-                      </p>
-                      <Link href="/holland-test" className="text-blue-600 hover:underline">
-                        Passer le test maintenant
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                      {/* Left: Code + Trait */}
-                      <div className="col-span-1">
-                        <p className="font-medium text-sm mb-2" style={{ color: 'var(--accent-color)' }}>
-                          Votre code Holland:
-                        </p>
-                        <div className="flex gap-3 mb-4">
-                          {hollandResults.top_3_code.split('').map((letter, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-center w-10 h-10 rounded-full text-white text-base font-bold"
-                              style={{
-                                backgroundColor:
-                                  riasecColors[letter as keyof typeof riasecColors],
-                              }}
-                            >
-                              {letter}
-                            </div>
-                          ))}
-                        </div>
-
-                        <p className="text-xs italic mb-1" style={{ color: 'var(--text-color)' }}>Votre trait dominant</p>
-                        <h3
-                          className="text-[24px] md:text-[28px] font-bold leading-tight tracking-tight mb-3"
-                          style={{
-                            color:
-                              riasecColors[
-                                hollandResults.top_3_code[0] as keyof typeof riasecColors
-                              ],
-                          }}
-                        >
-                          {riasecLabels[
-                            hollandResults.top_3_code[0] as keyof typeof riasecLabels
-                          ]}
-                        </h3>
-
-                        <Link
-                          href="/profile/holland-results"
-                          className="text-blue-600 hover:underline text-sm"
-                        >
-                          Voir le profil complet
-                        </Link>
-                      </div>
-
-                      {/* Right: Personality Description */}
-                      {hollandResults.personality_description && (
-                        <div className="lg:col-span-2 lg:border-l border-stitch-border lg:pl-8">
-                          <p className="font-medium text-sm mb-2" style={{ color: 'var(--accent-color)' }}>
-                            Description du profil:
-                          </p>
-                          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-color)' }}>
-                            {hollandResults.personality_description}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+              {/* Section des recommandations d'emploi - occupe toute la largeur */}
+              <div className="md:col-span-12 mt-8">
+                <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5" style={{
+                  color: 'var(--accent-color)',
+                  fontFamily: 'var(--heading-font)'
+                }}>Recommandations d'emploi</h2>
+                <div className="w-full overflow-hidden">
+                  <div className="max-w-[1400px] mx-auto">
+                    <JobRecommendationList
+                      recommendations={jobRecommendations}
+                      isLoading={jobsLoading}
+                      error={jobsError}
+                      onSelectJob={handleSelectJob}
+                      className="mb-8"
+                    />
+                  </div>
+                  
+                  {/* Arbre de compétences pour l'emploi sélectionné */}
+                  {selectedJob && (
+                    <JobSkillsTree
+                      jobId={selectedJob.id}
+                      className="mt-8"
+                    />
                   )}
                 </div>
               </div>
-
-                </div>
-              </div>
-
-                              {/* Section des recommandations d'emploi - occupe toute la largeur */}
-                              <div className="md:col-span-12 mt-8">
-                  <h2 className="text-[22px] md:text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5" style={{
-                    color: 'var(--accent-color)',
-                    fontFamily: 'var(--heading-font)'
-                  }}>Recommandations d'emploi</h2>
-                  <div className="w-full overflow-hidden">
-                    <div className="max-w-[1400px] mx-auto">
-                      <JobRecommendationList
-                        recommendations={jobRecommendations}
-                        isLoading={jobsLoading}
-                        error={jobsError}
-                        onSelectJob={handleSelectJob}
-                        className="mb-8"
-                      />
-                    </div>
-                    
-                    {/* Arbre de compétences pour l'emploi sélectionné */}
-                    {selectedJob && (
-                      <JobSkillsTree
-                        jobId={selectedJob.id}
-                        className="mt-8"
-                      />
-                    )}
-                  </div>
-                </div>
 
               {/* Dashboard Grid - responsive avec largeur complète et optimisé pour grands écrans */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
@@ -425,7 +273,7 @@ export default function Home() {
                 </div>
 
                 {/* Stats supplémentaires - visible uniquement sur desktop, 4 colonnes */}
-                <div className="hidden md:block md:col-span-4">
+                {/* <div className="hidden md:block md:col-span-4">
                   <h2 className="text-2xl font-bold leading-tight tracking-[-0.015em] pb-3 pt-5" style={{
                     color: 'var(--accent-color)',
                     fontFamily: 'var(--heading-font)'
@@ -454,7 +302,7 @@ export default function Home() {
                       }}>Notes sauvegardées</p></div>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* How to get there? Section */}
                 <div className="md:col-span-12 mt-4">

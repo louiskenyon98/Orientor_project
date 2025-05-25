@@ -2,7 +2,7 @@
 const greenColors = require('./public/color_fonts/gradient_green.js');
 const blueColors = require('./public/color_fonts/gradiient_blue.js');
 const grayColors = require('./public/color_fonts/gradiient_gray.js');
-const orangeBlueColors = require('./public/color_fonts/gradient_orangBlue.js');
+const yellowColors = require('./public/color_fonts/gradient_yellow.js');
 const grayBlackColors = require('./public/color_fonts/gradient_grayBlack.js');
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
         ...greenColors,
         ...blueColors,
         ...grayColors,
-        ...orangeBlueColors,
+        ...yellowColors,
         ...grayBlackColors,
         // Stitch Design Theme Colors
         stitch: {

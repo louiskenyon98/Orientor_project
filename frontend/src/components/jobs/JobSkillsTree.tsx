@@ -456,25 +456,25 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
   return (
     <div className={`w-full ${className}`}>
       {/* Contrôles pour les paramètres de l'arbre */}
-      <div className="rounded-lg p-6 mb-6" style={{
+      <div className="rounded-lg p-4 mb-4" style={{
         backgroundColor: 'var(--primary-color)',
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: 'var(--border-color)'
       }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
-          Paramètres de l'arbre de compétences
+        <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--accent-color)' }}>
+          Paramètres de l'arbre
         </h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
           <div>
-            <label htmlFor="treeDepth" className="block mb-2" style={{ color: 'var(--text-color)' }}>
-              Profondeur de l'arbre (1-3)
+            <label htmlFor="treeDepth" className="block mb-1" style={{ color: 'var(--text-color)' }}>
+              Profondeur (1-3)
             </label>
             <div className="flex items-center">
               <button
                 onClick={() => setTreeDepth(Math.max(1, treeDepth - 1))}
-                className="text-white px-3 py-1 rounded-l-md"
+                className="text-white px-2 py-1 rounded-l-md"
                 style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={treeDepth <= 1}
               >
@@ -487,12 +487,12 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
                 max={3}
                 value={treeDepth}
                 onChange={(e) => setTreeDepth(Math.min(3, Math.max(1, parseInt(e.target.value) || 1)))}
-                className="w-16 text-center border py-1"
+                className="w-12 text-center border py-1"
                 style={{ borderColor: 'var(--border-color)' }}
               />
               <button
                 onClick={() => setTreeDepth(Math.min(3, treeDepth + 1))}
-                className="text-white px-3 py-1 rounded-r-md"
+                className="text-white px-2 py-1 rounded-r-md"
                 style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={treeDepth >= 3}
               >
@@ -502,13 +502,13 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           </div>
           
           <div>
-            <label htmlFor="nodesPerLevel" className="block mb-2" style={{ color: 'var(--text-color)' }}>
-              Nœuds par niveau (3-10)
+            <label htmlFor="nodesPerLevel" className="block mb-1" style={{ color: 'var(--text-color)' }}>
+              Nœuds (3-10)
             </label>
             <div className="flex items-center">
               <button
                 onClick={() => setNodesPerLevel(Math.max(3, nodesPerLevel - 1))}
-                className="text-white px-3 py-1 rounded-l-md"
+                className="text-white px-2 py-1 rounded-l-md"
                 style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={nodesPerLevel <= 3}
               >
@@ -521,12 +521,12 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
                 max={10}
                 value={nodesPerLevel}
                 onChange={(e) => setNodesPerLevel(Math.min(10, Math.max(3, parseInt(e.target.value) || 3)))}
-                className="w-16 text-center border py-1"
+                className="w-12 text-center border py-1"
                 style={{ borderColor: 'var(--border-color)' }}
               />
               <button
                 onClick={() => setNodesPerLevel(Math.min(10, nodesPerLevel + 1))}
-                className="text-white px-3 py-1 rounded-r-md"
+                className="text-white px-2 py-1 rounded-r-md"
                 style={{ backgroundColor: 'var(--accent-color)' }}
                 disabled={nodesPerLevel >= 10}
               >
@@ -536,14 +536,14 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           </div>
         </div>
         
-        <div className="flex space-x-4">
+        <div className="flex space-x-2">
           <button
             onClick={applyParameters}
             disabled={isLoading || isApplying}
-            className="text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+            className="text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors"
             style={{ backgroundColor: 'var(--accent-color)' }}
           >
-            {isApplying ? 'Application en cours...' : 'Appliquer les paramètres'}
+            {isApplying ? 'En cours...' : 'Appliquer'}
           </button>
           
           <button
@@ -556,13 +556,12 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
               setParamVersion(prev => prev + 1);
             }}
             disabled={isLoading || isApplying}
-            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+            className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors"
           >
             Réinitialiser
           </button>
         </div>
       </div>
-      
       {/* Top des compétences */}
       <div className="rounded-lg p-6 mb-6" style={{
         backgroundColor: 'var(--primary-color)',
