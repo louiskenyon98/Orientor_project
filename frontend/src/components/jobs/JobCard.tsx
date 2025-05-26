@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import styles from './JobCard.module.css';
 
 // Interface pour les données d'un emploi
 export interface Job {
@@ -100,18 +101,11 @@ const getAvatarForJob = (jobId: string, title: string): string => {
 };
 
 const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className = '' }) => {
-  // Extraire les informations pertinentes de l'emploi
   const rawTitle = job.metadata.preferred_label || job.metadata.title || job.id.replace('occupation::key_', '') || 'Emploi sans titre';
-  
-  // Assurer que le titre n'est pas trop long et ajouter une ellipse si nécessaire
   const title = rawTitle.length > 40 ? `${rawTitle.substring(0, 40)}...` : rawTitle;
-  
-  // Extraire les autres informations
   const description = job.metadata.description || 'Aucune description disponible';
   const matchPercentage = job.metadata.match_percentage || Math.round(job.score * 100);
   const skills = job.metadata.skills || [];
-  
-  // Limiter le nombre de compétences affichées
   const displayedSkills = skills.slice(0, 3);
 
   return (
@@ -119,16 +113,13 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`
-        container relative flex justify-center items-center
-        ${className}
-      `}
+      className={`${styles.container} ${isSelected ? styles.selected : ''} ${className}`}
       style={{
         '--r': isSelected ? '0' : '-15',
       } as React.CSSProperties}
     >
       <div 
-        className="glass"
+        className={styles.glass}
         data-text={title}
       >
         <div className="flex flex-col items-center justify-center p-4 h-full">
@@ -149,7 +140,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
           </div>
 
           {/* Description */}
-          <p className="text-sm text-center mb-4 line-clamp-2" style={{ color: 'var(--text-color)' }}>
+          <p className="text-sm text-center mb-4 line-clamp-2 text-black">
             {description}
           </p>
 
@@ -160,14 +151,13 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
                 {displayedSkills.map((skill, index) => (
                   <span 
                     key={index}
-                    className="bg-white/10 text-xs px-2 py-1 rounded-md"
-                    style={{ color: 'var(--text-color)' }}
+                    className="bg-white/10 text-xs px-2 py-1 rounded-md text-black"
                   >
                     {skill}
                   </span>
                 ))}
                 {skills.length > 3 && (
-                  <span className="text-xs px-2 py-1" style={{ color: 'var(--text-color)' }}>
+                  <span className="text-xs px-2 py-1 text-black">
                     +{skills.length - 3}
                   </span>
                 )}
