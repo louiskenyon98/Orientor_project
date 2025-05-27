@@ -25,7 +25,7 @@ export default function Home() {
     name: 'Philippe B.',
     role: 'Étudiant Msc. in Data Science',
     level: 3,
-    avatarUrl: '/Avatar.PNG',
+    avatarUrl: '/greg.png',
     skills: ['UI Design', 'JavaScript', 'React', 'Node.js'],
     careerTreesExplored: 3,
     skillsInProgress: 12,

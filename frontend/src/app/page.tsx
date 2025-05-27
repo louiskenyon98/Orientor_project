@@ -142,6 +142,7 @@ export default function Home() {
     { name: 'Challenges', icon: 'Trophy', path: '/challenges' },
     { name: 'Notes', icon: 'Note', path: '/notes' },
     { name: 'Case Study', icon: 'Case Study', path: '/case-study-journey' },
+    { name: 'Competence Tree', icon: 'Tree', path: '/competence-tree' },
   ];
 
   // Career navigation items
@@ -149,6 +150,7 @@ export default function Home() {
     { name: 'Career Search', icon: 'List', path: '/vector-search' },
     { name: 'Skills Tree', icon: 'Tree', path: '/enhanced-skills' },
     { name: 'Career Tree', icon: 'Tree', path: '/career' },
+    { name: 'Competence Tree', icon: 'Tree', path: '/competence-tree' },
     { name: 'Saved Tree', icon: 'Tree', path: '/tree-path' },
   ];
 
