@@ -113,9 +113,70 @@ class CompetenceTreeService:
         try:
             # Récupérer les compétences de l'utilisateur depuis la base de données
             query = text("""
-                SELECT skill_id, proficiency_level
+                SELECT 
+                    'creativity' as skill_id, creativity as proficiency_level
                 FROM user_skills
-                WHERE user_id = :user_id
+                WHERE user_id = :user_id AND creativity IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'leadership' as skill_id, leadership as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND leadership IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'digital_literacy' as skill_id, digital_literacy as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND digital_literacy IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'critical_thinking' as skill_id, critical_thinking as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND critical_thinking IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'problem_solving' as skill_id, problem_solving as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND problem_solving IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'analytical_thinking' as skill_id, analytical_thinking as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND analytical_thinking IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'attention_to_detail' as skill_id, attention_to_detail as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND attention_to_detail IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'collaboration' as skill_id, collaboration as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND collaboration IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'adaptability' as skill_id, adaptability as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND adaptability IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'independence' as skill_id, independence as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND independence IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'evaluation' as skill_id, evaluation as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND evaluation IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'decision_making' as skill_id, decision_making as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND decision_making IS NOT NULL
+                UNION ALL
+                SELECT 
+                    'stress_tolerance' as skill_id, stress_tolerance as proficiency_level
+                FROM user_skills
+                WHERE user_id = :user_id AND stress_tolerance IS NOT NULL
                 ORDER BY proficiency_level DESC
                 LIMIT :top_k
             """)
@@ -123,36 +184,13 @@ class CompetenceTreeService:
             
             if not results:
                 logger.warning(f"Aucune compétence trouvée pour l'utilisateur {user_id}")
-                
-                # Utiliser l'embedding de l'utilisateur pour trouver des compétences similaires
-                embedding = self.get_user_embedding(db, user_id, "esco_embedding_skill")
-                if embedding is None:
-                    logger.error(f"Impossible de récupérer l'embedding pour l'utilisateur {user_id}")
-                    return []
-                
-                # Interroger Pinecone pour les compétences similaires
-                if self.index is None:
-                    if not self._initialize_pinecone():
-                        logger.error("Impossible d'initialiser Pinecone")
-                        return []
-                
-                vector = embedding.tolist()
-                results = self.index.query(
-                    vector=vector,
-                    top_k=top_k,
-                    filter={"type": {"$eq": "skill"}},
-                    include_metadata=True
-                )
-                
-                # Extraire les IDs de compétences
-                skill_ids = [match.id for match in results.matches]
-                logger.info(f"Compétences extraites via embedding pour l'utilisateur {user_id}: {skill_ids}")
-                return skill_ids
+                return []
             
-            # Extraire les IDs de compétences
-            skill_ids = [result[0] for result in results]
-            logger.info(f"Compétences dominantes extraites pour l'utilisateur {user_id}: {skill_ids}")
+            # Convertir les résultats en liste d'IDs de compétences
+            skill_ids = [row[0] for row in results]
+            logger.info(f"Compétences dominantes trouvées pour l'utilisateur {user_id}: {skill_ids}")
             return skill_ids
+            
         except Exception as e:
             logger.error(f"Erreur lors de l'extraction des compétences dominantes: {str(e)}")
             return []

@@ -36,7 +36,7 @@ export default function LoginPage() {
         try {
             console.log('Attempting to login with:', { email });
             
-            const loginUrl = endpoint('/users/login');
+            const loginUrl = endpoint('/auth/login');
             console.log('Full login URL:', loginUrl);
             
             const response = await axios.post<LoginResponse>(

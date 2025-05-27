@@ -5,6 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import CompetenceTreeView from '../../components/tree/CompetenceTreeView';
 import MainLayout from '../../components/layout/MainLayout';
 import { generateCompetenceTree } from '../../services/competenceTreeService';
+import axios from 'axios';
+
+const API_URL = '/api/v1';
+
+interface UserResponse {
+  id: number;
+  email: string;
+}
 
 const CompetenceTreePage: React.FC = () => {
   console.log("CompetenceTreePage: Composant chargé");
@@ -28,8 +36,35 @@ const CompetenceTreePage: React.FC = () => {
       setLoading(true);
       console.log("handleGenerateTree: Loading state set to true");
       
-      // Utilisez l'ID utilisateur actuel (à adapter selon votre système d'authentification)
-      const userId = 1; // Exemple, à remplacer par l'ID réel de l'utilisateur
+      // Get the current user's ID from the JWT token
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        console.error("No authentication token found");
+        setError("Vous devez être connecté pour générer un arbre de compétences");
+        setLoading(false);
+        return;
+      }
+
+      // Decode the JWT token to get the user's email
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        console.error("Invalid token format");
+        setError("Token d'authentification invalide");
+        setLoading(false);
+        return;
+      }
+
+      const payload = JSON.parse(atob(tokenParts[1]));
+      const userEmail = payload.sub;
+      
+      // Get the user's ID from the email
+      const response = await axios.get<UserResponse>(`${API_URL}/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const userId = response.data.id;
       console.log("handleGenerateTree: Appel à generateCompetenceTree avec userId:", userId);
       
       const result = await generateCompetenceTree(userId);

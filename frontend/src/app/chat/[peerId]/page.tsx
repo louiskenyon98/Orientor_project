@@ -46,7 +46,7 @@ export default function PeerChatPage() {
             }
 
             const response = await axios.get<Message[]>(
-                `${cleanApiUrl}/messages/conversation/${peerId}`,
+                `${cleanApiUrl}/api/v1/messages/conversation/${peerId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -69,7 +69,7 @@ export default function PeerChatPage() {
             }
 
             const response = await axios.get<PeerProfile>(
-                `${cleanApiUrl}/profiles/${peerId}`,
+                `${cleanApiUrl}/api/v1/profiles/${peerId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -92,7 +92,7 @@ export default function PeerChatPage() {
             }
 
             const response = await axios.get<{id: number}>(
-                `${cleanApiUrl}/users/me`,
+                `${cleanApiUrl}/api/v1/users/me`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -115,7 +115,7 @@ export default function PeerChatPage() {
             }
 
             await axios.post(
-                `${cleanApiUrl}/messages`,
+                `${cleanApiUrl}/api/v1/messages`,
                 {
                     recipient_id: parseInt(peerId),
                     body: messageText
@@ -161,9 +161,13 @@ export default function PeerChatPage() {
     useEffect(() => {
         if (!peerId) return;
 
-        const pollinterval = setinterval(fetchMessages, 5000); // Poll every 5 seconds
+        const interval = setInterval(() => {
+            fetchMessages();
+        }, 5000);
 
-        return () => clearinterval(pollinterval);
+        return () => {
+            clearInterval(interval);
+        };
     }, [peerId]);
 
     if (!peerId) {

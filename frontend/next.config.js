@@ -36,6 +36,15 @@ const nextConfig = {
     maxInactiveAge: 60 * 60 * 1000,
     pagesBufferLength: 5,
   },
+  // Add rewrite rules for API proxying
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:8000/api/:path*', // Preserve the /api prefix
+      },
+    ];
+  },
   // Custom error handling
   async headers() {
     return [

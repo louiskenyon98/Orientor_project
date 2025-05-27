@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List
+import logging
 
 from ..services.competence_tree_service import CompetenceTreeService
 from ..utils.database import get_db
+
+# Configurer le logger
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/competence-tree",
@@ -19,8 +23,10 @@ def generate_competence_tree(user_id: int, db: Session = Depends(get_db)):
     """
     Génère un nouvel arbre de compétences pour un utilisateur.
     """
+    logger.info(f"Requête reçue pour générer un arbre de compétences pour l'utilisateur {user_id}")
     try:
         # Créer l'arbre de compétences
+        logger.info(f"Création de l'arbre de compétences pour l'utilisateur {user_id}")
         tree_data = competence_tree_service.create_skill_tree(db, user_id)
         
         if not tree_data:
@@ -52,8 +58,10 @@ def get_competence_tree(graph_id: str, db: Session = Depends(get_db)):
     """
     Récupère un arbre de compétences existant.
     """
+    logger.info(f"Requête reçue pour récupérer l'arbre de compétences avec ID {graph_id}")
     try:
         # Récupérer l'arbre de compétences depuis la base de données
+        logger.info(f"Récupération de l'arbre de compétences {graph_id} depuis la base de données")
         query = db.execute(
             "SELECT tree_data FROM user_skill_trees WHERE graph_id = :graph_id",
             {"graph_id": graph_id}
@@ -83,8 +91,10 @@ def complete_challenge(node_id: int, user_id: int, db: Session = Depends(get_db)
     """
     Marque un défi comme complété et accorde des XP.
     """
+    logger.info(f"Requête reçue pour compléter le défi {node_id} pour l'utilisateur {user_id}")
     try:
         # Marquer le défi comme complété
+        logger.info(f"Marquage du défi {node_id} comme complété pour l'utilisateur {user_id}")
         success = competence_tree_service.complete_challenge(db, node_id, user_id)
         
         if not success:

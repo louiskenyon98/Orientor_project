@@ -46,7 +46,7 @@ export default function RegisterPage() {
         try {
             console.log('Attempting to register with:', { email, password });
             
-            const registerUrl = endpoint('/users/register');
+            const registerUrl = endpoint('/auth/register');
             console.log('Full request URL:', registerUrl);
             
             const response = await axios.post<RegisterResponse>(
