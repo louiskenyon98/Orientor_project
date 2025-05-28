@@ -45,7 +45,7 @@ class AnchorDiscoveryService:
     def find_anchors(self, 
                     embedding: np.ndarray, 
                     top_k: int = 5, 
-                    threshold: float = 0.3,
+                    threshold: float = 0.1,
                     filter_types: Optional[List[str]] = None) -> List[Dict[str, Any]]:
         """
         Trouve les nœuds d'ancrage les plus pertinents pour un embedding donné.

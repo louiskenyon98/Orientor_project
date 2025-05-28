@@ -21,4 +21,5 @@ class User(Base):
     # New relationships
     tree_paths = relationship("TreePath", back_populates="user", cascade="all, delete-orphan")
     node_notes = relationship("NodeNote", back_populates="user", cascade="all, delete-orphan")
-    progress = relationship("UserProgress", back_populates="user", uselist=False, cascade="all, delete-orphan") 
+    progress = relationship("UserProgress", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    skill_trees = relationship("UserSkillTree", back_populates="user", cascade="all, delete-orphan") 

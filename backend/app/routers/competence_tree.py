@@ -1,116 +1,156 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List
 import logging
+import json
 
 from ..services.competence_tree_service import CompetenceTreeService
 from ..utils.database import get_db
+from ..routers.user import get_current_user
+from ..models import User, UserSkillTree
 
-# Configurer le logger
+# Configure logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/competence-tree",
     tags=["competence-tree"],
-    responses={404: {"description": "Not found"}},
+    dependencies=[Depends(get_current_user)],
 )
 
-# Initialiser le service
+# Initialize service
 competence_tree_service = CompetenceTreeService()
 
 @router.post("/generate", response_model=Dict[str, Any])
-def generate_competence_tree(user_id: int, db: Session = Depends(get_db)):
+def generate_competence_tree(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
-    Génère un nouvel arbre de compétences pour un utilisateur.
+    Generate a new competence tree for a user.
     """
-    logger.info(f"Requête reçue pour générer un arbre de compétences pour l'utilisateur {user_id}")
+    logger.info(f"Request received to generate competence tree for user {current_user.id}")
     try:
-        # Créer l'arbre de compétences
-        logger.info(f"Création de l'arbre de compétences pour l'utilisateur {user_id}")
-        tree_data = competence_tree_service.create_skill_tree(db, user_id)
+        # Create the competence tree
+        logger.info(f"Creating competence tree for user {current_user.id}")
+        tree_data = competence_tree_service.create_skill_tree(db, current_user.id)
         
         if not tree_data:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Échec de la création de l'arbre de compétences"
+                detail="Failed to create competence tree"
             )
         
-        # Sauvegarder l'arbre dans la base de données
-        graph_id = competence_tree_service.save_skill_tree(db, user_id, tree_data)
+        # Save the tree in the database
+        graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
         
         if not graph_id:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Échec de la sauvegarde de l'arbre de compétences"
+                detail="Failed to save competence tree"
             )
         
-        return {"graph_id": graph_id, "message": "Arbre de compétences généré avec succès"}
+        return {"graph_id": graph_id, "message": "Competence tree generated successfully"}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la génération de l'arbre de compétences: {str(e)}"
+            detail=f"Error generating competence tree: {str(e)}"
         )
 
-@router.get("/{graph_id}", response_model=Dict[str, Any])
-def get_competence_tree(graph_id: str, db: Session = Depends(get_db)):
+@router.get("/{graph_id}")
+def get_competence_tree(
+    graph_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
-    Récupère un arbre de compétences existant.
+    Get an existing competence tree.
     """
-    logger.info(f"Requête reçue pour récupérer l'arbre de compétences avec ID {graph_id}")
+    logger.info(f"Request received to get competence tree with ID {graph_id}")
     try:
-        # Récupérer l'arbre de compétences depuis la base de données
-        logger.info(f"Récupération de l'arbre de compétences {graph_id} depuis la base de données")
-        query = db.execute(
-            "SELECT tree_data FROM user_skill_trees WHERE graph_id = :graph_id",
-            {"graph_id": graph_id}
-        )
-        result = query.fetchone()
+        # Get the competence tree from the database
+        logger.info(f"Retrieving competence tree {graph_id} from database")
+        skill_tree = db.query(UserSkillTree).filter(
+            UserSkillTree.graph_id == graph_id,
+            UserSkillTree.user_id == current_user.id
+        ).first()
         
-        if not result or not result[0]:
+        if not skill_tree:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Arbre de compétences avec ID {graph_id} non trouvé"
+                detail=f"Competence tree with ID {graph_id} not found"
             )
         
-        import json
-        tree_data = json.loads(result[0])
+        # Log the type and content of tree_data for debugging
+        logger.debug(f"Type of tree_data: {type(skill_tree.tree_data)}")
+        logger.debug(f"Content of tree_data: {skill_tree.tree_data}")
         
-        return tree_data
+        try:
+            # Handle different types of tree_data
+            if isinstance(skill_tree.tree_data, str):
+                # If it's a string, parse it as JSON
+                tree_data = json.loads(skill_tree.tree_data)
+            else:
+                # If it's already a dict (JSONB), use it directly
+                tree_data = skill_tree.tree_data
+            
+            # Return as JSONResponse to ensure proper serialization
+            return JSONResponse(content=tree_data)
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Error decoding JSON from tree_data: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error decoding competence tree data: {str(e)}"
+            )
+        except Exception as e:
+            logger.error(f"Error processing tree data: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error processing competence tree data: {str(e)}"
+            )
+            
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error retrieving competence tree: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la récupération de l'arbre de compétences: {str(e)}"
+            detail=f"Error retrieving competence tree: {str(e)}"
         )
 
 @router.patch("/node/{node_id}/complete", response_model=Dict[str, Any])
-def complete_challenge(node_id: int, user_id: int, db: Session = Depends(get_db)):
+def complete_challenge(
+    node_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
-    Marque un défi comme complété et accorde des XP.
+    Mark a challenge as completed and award XP.
     """
-    logger.info(f"Requête reçue pour compléter le défi {node_id} pour l'utilisateur {user_id}")
+    logger.info(f"Request received to complete challenge {node_id} for user {current_user.id}")
     try:
-        # Marquer le défi comme complété
-        logger.info(f"Marquage du défi {node_id} comme complété pour l'utilisateur {user_id}")
-        success = competence_tree_service.complete_challenge(db, node_id, user_id)
+        # Mark the challenge as completed
+        logger.info(f"Marking challenge {node_id} as completed for user {current_user.id}")
+        success = competence_tree_service.complete_challenge(db, node_id, current_user.id)
         
         if not success:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Impossible de compléter le défi pour le nœud {node_id}"
+                detail=f"Could not complete challenge for node {node_id}"
             )
         
-        # Émettre un événement public
-        competence_tree_service.emit_public_event(db, user_id, "challenge_completed")
+        # Emit a public event
+        competence_tree_service.emit_public_event(db, current_user.id, "challenge_completed")
         
-        return {"success": True, "message": "Défi complété avec succès"}
+        return {"success": True, "message": "Challenge completed successfully"}
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la complétion du défi: {str(e)}"
+            detail=f"Error completing challenge: {str(e)}"
         )

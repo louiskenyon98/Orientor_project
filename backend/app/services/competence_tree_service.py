@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 import pinecone
 from pinecone import Pinecone
+from ..models import UserSkillTree
+from uuid import uuid4
 
 # Configuration du logger
 logging.basicConfig(level=logging.INFO)
@@ -21,13 +23,36 @@ class CompetenceTreeService:
     Service pour générer des arbres de compétences personnalisés avec des défis dynamiques.
     """
     
-    def __init__(self):
+    def __init__(self, index_name: str = "esco-368"):
         """
         Initialise le service d'arbre de compétences.
         """
-        self.pinecone_client = None
-        self.index = None
+        self.api_key = os.getenv("PINECONE_API_KEY")
+        if not self.api_key:
+            raise ValueError("La clé API Pinecone n'est pas définie. Utilisez le paramètre api_key ou définissez la variable d'environnement PINECONE_API_KEY.")
+        
+        self.index_name = index_name
+        self.pc = Pinecone(api_key=self.api_key)
+        self.index = self.pc.Index(self.index_name)
+        self.embedding_model = None
         self._initialize_pinecone()
+        self._initialize_embedding_model()
+        
+    def _initialize_embedding_model(self):
+        """
+        Initialise le modèle d'embedding pour la recherche vectorielle.
+        
+        Returns:
+            bool: True si l'initialisation a réussi, False sinon
+        """
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+            logger.info("Modèle d'embedding initialisé avec succès")
+            return True
+        except Exception as e:
+            logger.error(f"Erreur lors de l'initialisation du modèle d'embedding: {str(e)}")
+            return False
     
     def _initialize_pinecone(self) -> bool:
         """
@@ -50,18 +75,7 @@ class CompetenceTreeService:
             logger.error(f"Erreur lors de l'initialisation de Pinecone: {str(e)}")
             return False
     
-    def _convert_score_to_similarity(self, score: float) -> float:
-        """
-        Convertit un score de distance Pinecone en score de similarité.
-        
-        Args:
-            score: Score de distance Pinecone
-            
-        Returns:
-            float: Score de similarité entre 0 et 1
-        """
-        # Pinecone retourne une distance, nous la convertissons en similarité (1 - distance)
-        return 1.0 - score
+    # Fonction supprimée car non nécessaire pour extraire les top 5
     
     def get_user_embedding(self, db: Session, user_id: int, embedding_type: str = "esco_embedding_skill") -> Optional[np.ndarray]:
         """
@@ -98,236 +112,127 @@ class CompetenceTreeService:
         except Exception as e:
             logger.error(f"Erreur lors de la récupération de l'embedding: {str(e)}")
             return None
-    def extract_anchor_skills(self, db: Session, user_id: int, top_k: int = 5) -> List[str]:
+    
+    def extract_anchor_skills(self, db: Session, user_id: int, top_k: int = 5) -> List[Dict[str, Any]]:
         """
-        Extrait les compétences dominantes d'un utilisateur.
-        
-        Args:
-            db: Session de base de données
-            user_id: ID de l'utilisateur
-            top_k: Nombre de compétences à extraire
-            
-        Returns:
-            List[str]: Liste des IDs de compétences dominantes
+        Extrait les compétences dominantes d'un utilisateur en utilisant son embedding vectoriel.
+        Retourne une liste de dicts contenant l'ID, score, metadata et vecteur de chaque compétence.
         """
         try:
-            # Récupérer les compétences de l'utilisateur depuis la base de données
-            query = text("""
-                SELECT 
-                    'creativity' as skill_id, creativity as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND creativity IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'leadership' as skill_id, leadership as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND leadership IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'digital_literacy' as skill_id, digital_literacy as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND digital_literacy IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'critical_thinking' as skill_id, critical_thinking as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND critical_thinking IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'problem_solving' as skill_id, problem_solving as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND problem_solving IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'analytical_thinking' as skill_id, analytical_thinking as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND analytical_thinking IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'attention_to_detail' as skill_id, attention_to_detail as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND attention_to_detail IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'collaboration' as skill_id, collaboration as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND collaboration IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'adaptability' as skill_id, adaptability as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND adaptability IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'independence' as skill_id, independence as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND independence IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'evaluation' as skill_id, evaluation as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND evaluation IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'decision_making' as skill_id, decision_making as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND decision_making IS NOT NULL
-                UNION ALL
-                SELECT 
-                    'stress_tolerance' as skill_id, stress_tolerance as proficiency_level
-                FROM user_skills
-                WHERE user_id = :user_id AND stress_tolerance IS NOT NULL
-                ORDER BY proficiency_level DESC
-                LIMIT :top_k
-            """)
-            results = db.execute(query, {"user_id": user_id, "top_k": top_k}).fetchall()
-            
-            if not results:
-                logger.warning(f"Aucune compétence trouvée pour l'utilisateur {user_id}")
+            user_embedding = self.get_user_embedding(db, user_id, "esco_embedding_skill")
+            if user_embedding is None:
+                logger.error(f"Aucun embedding trouvé pour l'utilisateur {user_id}")
                 return []
-            
-            # Convertir les résultats en liste d'IDs de compétences
-            skill_ids = [row[0] for row in results]
-            logger.info(f"Compétences dominantes trouvées pour l'utilisateur {user_id}: {skill_ids}")
-            return skill_ids
-            
+
+            if self.index is None and not self._initialize_pinecone():
+                logger.error("Impossible d'initialiser Pinecone")
+                return []
+
+            vector = user_embedding.astype(np.float32).tolist()
+
+            logger.info(f"Recherche des compétences similaires dans Pinecone pour l'utilisateur {user_id}")
+            results = self.index.query(
+                vector=vector,
+                top_k=top_k,
+                filter=None, # {"type": {"$eq": "skill"}},
+                include_metadata=True,
+                include_values=True
+            )
+
+            matches = []
+            for match in results.matches:
+                similarity = 1 - match.score
+                if similarity >= 0.1:
+                    matches.append({
+                        "id": match.id,
+                        "score": similarity,
+                        "metadata": match.metadata,
+                        "vector": match.values
+                    })
+
+            logger.info(f"Trouvé {len(matches)} nœuds d'ancrage avec un seuil de similarité ≥ 0.1")
+            return matches
+
         except Exception as e:
             logger.error(f"Erreur lors de l'extraction des compétences dominantes: {str(e)}")
             return []
-    def traverse_skill_graph(self, anchor_skill_ids: List[str], max_depth: int = 3, max_nodes_per_level: int = 5) -> Dict[str, Any]:
+
+    def traverse_skill_graph(self, anchor_skills: List[Dict[str, Any]], max_depth: int = 3, max_nodes_per_level: int = 5) -> Dict[str, Any]:
         """
-        Traverse le graphe de compétences à partir des compétences d'ancrage.
-        
-        Args:
-            anchor_skill_ids: Liste des IDs de compétences d'ancrage
-            max_depth: Profondeur maximale de traversée
-            max_nodes_per_level: Nombre maximum de nœuds par niveau
-            
-        Returns:
-            Dict[str, Any]: Données du graphe traversé
+        Traverse le graphe de compétences à partir de compétences d'ancrage riches.
         """
         try:
-            # Initialiser le graphe dirigé
             graph = nx.DiGraph()
-            
-            # Ajouter les nœuds d'ancrage
-            for skill_id in anchor_skill_ids:
-                # Récupérer les métadonnées de la compétence depuis Pinecone
-                if self.index is None:
-                    if not self._initialize_pinecone():
-                        logger.error("Impossible d'initialiser Pinecone")
-                        return {}
-                
-                # Récupérer les métadonnées de la compétence
-                try:
-                    skill_info = self.index.fetch(ids=[skill_id])
-                    if skill_id in skill_info.vectors:
-                        metadata = skill_info.vectors[skill_id].metadata
-                        graph.add_node(skill_id,
-                                      label=metadata.get("preferredLabel", "Compétence inconnue"),
-                                      type="skill",
-                                      level=0,
-                                      metadata=metadata)
-                    else:
-                        logger.warning(f"Compétence {skill_id} non trouvée dans Pinecone")
-                        graph.add_node(skill_id,
-                                      label=f"Compétence {skill_id}",
-                                      type="skill",
-                                      level=0)
-                except Exception as e:
-                    logger.error(f"Erreur lors de la récupération des métadonnées pour {skill_id}: {str(e)}")
-                    graph.add_node(skill_id,
-                                  label=f"Compétence {skill_id}",
-                                  type="skill",
-                                  level=0)
-            
-            # Traverser le graphe niveau par niveau
-            current_level_nodes = anchor_skill_ids
-            
+            metadata_lookup = {}
+
+            current_level_nodes = []
+
+            # Initialisation des nœuds d'ancrage
+            for skill in anchor_skills:
+                skill_id = skill["id"]
+                metadata = skill["metadata"]
+                vector = skill["vector"]
+                label = metadata.get("preferredLabel", skill_id)
+
+                graph.add_node(skill_id, label=label, type="skill", level=0, metadata=metadata)
+                metadata_lookup[skill_id] = metadata
+                current_level_nodes.append((skill_id, vector))  # start with anchor + its vector
+
+            # Traversée niveau par niveau
             for level in range(1, max_depth + 1):
                 next_level_nodes = []
-                
-                for node_id in current_level_nodes:
-                    # Récupérer l'embedding du nœud
+
+                for node_id, node_vector in current_level_nodes:
                     try:
-                        node_info = self.index.fetch(ids=[node_id])
-                        if node_id not in node_info.vectors:
-                            logger.warning(f"Nœud {node_id} non trouvé dans Pinecone")
-                            continue
-                        
-                        node_vector = node_info.vectors[node_id].values
-                        
-                        # Rechercher des compétences similaires
+                        logger.info(f"Recherche de compétences similaires à {node_id} dans Pinecone")
                         results = self.index.query(
                             vector=node_vector,
                             top_k=max_nodes_per_level,
-                            filter={"type": {"$eq": "skill"}},
-                            include_metadata=True
+                            include_metadata=True,
+                            namespace="esco-368",
+                            filter={"type": {"$eq": "skill"}}
                         )
-                        
-                        # Ajouter les nœuds et les arêtes au graphe
+
                         for match in results.matches:
-                            # Éviter d'ajouter des nœuds déjà présents dans le graphe
                             if match.id not in graph:
-                                similarity = self._convert_score_to_similarity(match.score)
-                                
-                                # Ajouter le nœud
-                                graph.add_node(match.id,
-                                              label=match.metadata.get("preferredLabel", f"Compétence {match.id}"),
-                                              type="skill",
-                                              level=level,
-                                              metadata=match.metadata)
-                                
-                                # Ajouter l'arête
-                                graph.add_edge(node_id, match.id, weight=similarity)
-                                
-                                # Ajouter à la liste des nœuds du niveau suivant
-                                next_level_nodes.append(match.id)
+                                match_label = match.metadata.get("preferredLabel", match.id)
+                                graph.add_node(match.id, label=match_label, type="skill", level=level, metadata=match.metadata)
+                                graph.add_edge(node_id, match.id, weight=1.0)
+                                next_level_nodes.append((match.id, match.values))
+
                     except Exception as e:
-                        logger.error(f"Erreur lors de la traversée pour le nœud {node_id}: {str(e)}")
-                
-                # Limiter le nombre de nœuds pour le niveau suivant
-                if len(next_level_nodes) > max_nodes_per_level:
-                    next_level_nodes = next_level_nodes[:max_nodes_per_level]
-                
-                # Mettre à jour les nœuds du niveau courant
-                current_level_nodes = next_level_nodes
-                
-                # Si aucun nœud n'est trouvé pour le niveau suivant, arrêter la traversée
+                        logger.error(f"Erreur lors de la recherche de voisins pour {node_id}: {str(e)}")
+
+                # Limiter et passer au niveau suivant
+                current_level_nodes = next_level_nodes[:max_nodes_per_level]
                 if not current_level_nodes:
                     break
-            
-            # Préparer les données du graphe pour la réponse
-            nodes = []
-            for node_id in graph.nodes():
-                node_data = graph.nodes[node_id]
-                nodes.append({
-                    "id": node_id,
-                    "label": node_data.get("label", f"Compétence {node_id}"),
-                    "type": node_data.get("type", "skill"),
-                    "level": node_data.get("level", 0),
-                    "metadata": node_data.get("metadata", {})
-                })
-            
-            edges = []
-            for source, target, data in graph.edges(data=True):
-                edges.append({
-                    "source": source,
-                    "target": target,
-                    "weight": data.get("weight", 0.5)
-                })
-            
-            graph_data = {
+
+            # Construction du résultat final
+            nodes = [{
+                "id": n,
+                "label": d.get("label", n),
+                "type": d.get("type", "skill"),
+                "level": d.get("level", 0),
+                "metadata": d.get("metadata", {})
+            } for n, d in graph.nodes(data=True)]
+
+            edges = [{
+                "source": u,
+                "target": v,
+                "weight": d.get("weight", 1.0)
+            } for u, v, d in graph.edges(data=True)]
+
+            return {
                 "nodes": nodes,
                 "edges": edges,
-                "anchor_nodes": anchor_skill_ids
+                "anchor_nodes": [s["id"] for s in anchor_skills]
             }
-            
-            logger.info(f"Graphe de compétences traversé avec succès: {len(nodes)} nœuds, {len(edges)} arêtes")
-            return graph_data
+
         except Exception as e:
             logger.error(f"Erreur lors de la traversée du graphe de compétences: {str(e)}")
             return {}
+
     def mark_visibility(self, graph: nx.DiGraph, reveal_ratio: float = 0.60) -> Dict[str, bool]:
         """
         Marque la visibilité des nœuds dans le graphe.
@@ -549,18 +454,31 @@ class CompetenceTreeService:
                     skill_label = node_data.get("label", f"Compétence {node_id}")
                     challenges[node_id] = self.generate_challenge(skill_label, user_age)
             
+            # Convertir les données au format attendu par le frontend
+            competence_nodes = []
+            for node in graph_data.get("nodes", []):
+                node_id = node["id"]
+                node_data = graph.nodes[node_id]
+                challenge_data = challenges.get(node_id, {})
+                
+                competence_node = {
+                    "id": node_id,
+                    "skill_id": node_id,
+                    "skill_label": node_data.get("label", f"Compétence {node_id}"),
+                    "challenge": challenge_data.get("description", ""),
+                    "xp_reward": challenge_data.get("xp_reward", 25),
+                    "visible": visibility.get(node_id, False),
+                    "revealed": visibility.get(node_id, False),
+                    "state": "locked",  # Par défaut, tous les nœuds sont verrouillés
+                    "notes": ""
+                }
+                competence_nodes.append(competence_node)
+            
             # Construire la réponse finale
             skill_tree = {
-                "user_id": user_id,
-                "graph_data": graph_data,
-                "visibility": visibility,
-                "challenges": challenges,
-                "metadata": {
-                    "created_at": "2025-05-27T14:00:00Z",  # À remplacer par la date actuelle
-                    "max_depth": max_depth,
-                    "max_nodes_per_level": max_nodes_per_level,
-                    "anchor_skills": anchor_skill_ids
-                }
+                "nodes": competence_nodes,
+                "edges": graph_data.get("edges", []),
+                "graph_id": str(uuid4())  # Générer un nouvel ID de graphe
             }
             
             logger.info(f"Arbre de compétences créé avec succès pour l'utilisateur {user_id}")
@@ -582,34 +500,48 @@ class CompetenceTreeService:
         """
         try:
             import json
-            import uuid
+            import numpy as np
             
-            # Générer un ID unique pour le graphe
-            graph_id = str(uuid.uuid4())
+            # Classe personnalisée pour encoder les objets numpy en JSON
+            class NumpyEncoder(json.JSONEncoder):
+                def default(self, obj):
+                    if isinstance(obj, np.ndarray):
+                        return obj.tolist()
+                    if isinstance(obj, np.integer):
+                        return int(obj)
+                    if isinstance(obj, np.floating):
+                        return float(obj)
+                    return super(NumpyEncoder, self).default(obj)
             
-            # Convertir les données en JSON
-            tree_json = json.dumps(tree_data)
+            # Nettoyer les données pour s'assurer qu'elles sont sérialisables
+            def clean_for_json(data):
+                if isinstance(data, dict):
+                    return {k: clean_for_json(v) for k, v in data.items()}
+                elif isinstance(data, list):
+                    return [clean_for_json(item) for item in data]
+                elif isinstance(data, np.ndarray):
+                    return data.tolist()
+                elif isinstance(data, (np.integer, np.floating)):
+                    return float(data) if isinstance(data, np.floating) else int(data)
+                else:
+                    return data
             
-            # Insérer dans la base de données
-            query = text("""
-                INSERT INTO user_skill_trees (user_id, graph_id, tree_data, created_at)
-                VALUES (:user_id, :graph_id, :tree_data, NOW())
-                RETURNING graph_id
-            """)
+            # Nettoyer les données avant la sérialisation
+            clean_tree_data = clean_for_json(tree_data)
             
-            result = db.execute(query, {
-                "user_id": user_id,
-                "graph_id": graph_id,
-                "tree_data": tree_json
-            })
+            # Créer une nouvelle instance de UserSkillTree
+            skill_tree = UserSkillTree(
+                user_id=user_id,
+                tree_data=clean_tree_data  # JSONB will handle the serialization
+            )
             
+            # Ajouter et sauvegarder dans la base de données
+            db.add(skill_tree)
             db.commit()
+            db.refresh(skill_tree)
             
-            # Récupérer l'ID du graphe inséré
-            inserted_id = result.fetchone()[0]
-            
-            logger.info(f"Arbre de compétences sauvegardé avec succès pour l'utilisateur {user_id}, ID: {inserted_id}")
-            return inserted_id
+            logger.info(f"Arbre de compétences sauvegardé avec succès pour l'utilisateur {user_id}, ID: {skill_tree.graph_id}")
+            return skill_tree.graph_id
         except Exception as e:
             logger.error(f"Erreur lors de la sauvegarde de l'arbre de compétences: {str(e)}")
             db.rollback()
@@ -643,6 +575,32 @@ class CompetenceTreeService:
                 return False
             
             import json
+            import numpy as np
+            
+            # Classe personnalisée pour encoder les objets numpy en JSON
+            class NumpyEncoder(json.JSONEncoder):
+                def default(self, obj):
+                    if isinstance(obj, np.ndarray):
+                        return obj.tolist()
+                    if isinstance(obj, np.integer):
+                        return int(obj)
+                    if isinstance(obj, np.floating):
+                        return float(obj)
+                    return super(NumpyEncoder, self).default(obj)
+            
+            # Nettoyer les données pour s'assurer qu'elles sont sérialisables
+            def clean_for_json(data):
+                if isinstance(data, dict):
+                    return {k: clean_for_json(v) for k, v in data.items()}
+                elif isinstance(data, list):
+                    return [clean_for_json(item) for item in data]
+                elif isinstance(data, np.ndarray):
+                    return data.tolist()
+                elif isinstance(data, (np.integer, np.floating)):
+                    return float(data) if isinstance(data, np.floating) else int(data)
+                else:
+                    return data
+            
             tree_data = json.loads(result[0])
             
             # Vérifier si le défi existe
@@ -751,5 +709,4 @@ class CompetenceTreeService:
         except Exception as e:
             logger.error(f"Erreur lors de l'émission de l'événement public: {str(e)}")
             db.rollback()
-            return False
             return False

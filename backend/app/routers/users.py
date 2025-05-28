@@ -6,7 +6,11 @@ from ..utils.database import get_db
 from ..models import User, UserProfile
 from ..routers.user import get_current_user
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],
+    responses={404: {"description": "Not found"}},
+)
 
 class UserResponse(BaseModel):
     id: int

@@ -29,6 +29,14 @@ const CompetenceTreePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Check authentication on mount
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
+
   // Fonction pour générer un nouvel arbre
   const handleGenerateTree = async () => {
     console.log("handleGenerateTree: Début de la génération de l'arbre");
@@ -42,21 +50,10 @@ const CompetenceTreePage: React.FC = () => {
         console.error("No authentication token found");
         setError("Vous devez être connecté pour générer un arbre de compétences");
         setLoading(false);
+        router.push('/login');
         return;
       }
 
-      // Decode the JWT token to get the user's email
-      const tokenParts = token.split('.');
-      if (tokenParts.length !== 3) {
-        console.error("Invalid token format");
-        setError("Token d'authentification invalide");
-        setLoading(false);
-        return;
-      }
-
-      const payload = JSON.parse(atob(tokenParts[1]));
-      const userEmail = payload.sub;
-      
       // Get the user's ID from the email
       const response = await axios.get<UserResponse>(`${API_URL}/users/me`, {
         headers: {
@@ -76,7 +73,12 @@ const CompetenceTreePage: React.FC = () => {
       router.push(newUrl);
     } catch (err: any) {
       console.error("handleGenerateTree: Erreur lors de la génération:", err);
-      setError(err.message || 'Une erreur est survenue lors de la génération de l\'arbre');
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setError("Votre session a expiré. Veuillez vous reconnecter.");
+        router.push('/login');
+      } else {
+        setError(err.message || 'Une erreur est survenue lors de la génération de l\'arbre');
+      }
       setLoading(false);
     }
   };

@@ -6,7 +6,6 @@ import logging
 
 # Import routers directly
 from app.routers.user import router as auth_router, get_current_user
-from app.routers.users import router as users_router
 from app.routers.chat import router as chat_router
 from app.routers.peers import router as peers_router
 from app.routers.messages import router as messages_router
@@ -22,11 +21,12 @@ from app.routers.node_notes import router as node_notes_router
 from app.routers.user_progress import router as user_progress_router
 from app.routers.holland_test import router as holland_test_router
 from app.routers.insight_router import router as insight_router
+from app.routers.competence_tree import router as competence_tree_router
+from app.routers.users import router as users_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
 from scripts.model_loader import load_models
 from logging.handlers import RotatingFileHandler
-from app.api.api import api_router
 from .utils.logging_config import setup_logging
 
 # from app.routers.resume import router as resume_router  # Commented out resume router
@@ -72,7 +72,6 @@ try:
     
     logger.info(f"Registering auth_router routes: {[f'{route.path} [{route.methods}]' for route in auth_router.routes]}")
     logger.info(f"Registering profiles_router routes: {[f'{route.path} [{route.methods}]' for route in profiles_router.routes]}")
-    logger.info(f"Registering users_router routes: {[f'{route.path} [{route.methods}]' for route in users_router.routes]}")
     logger.info(f"Registering chat_router routes: {[f'{route.path} [{route.methods}]' for route in chat_router.routes]}")
     logger.info(f"Registering peers_router routes: {[f'{route.path} [{route.methods}]' for route in peers_router.routes]}")
     logger.info(f"Registering messages_router routes: {[f'{route.path} [{route.methods}]' for route in messages_router.routes]}")
@@ -114,6 +113,8 @@ app.include_router(node_notes_router)
 app.include_router(user_progress_router)
 app.include_router(holland_test_router)
 app.include_router(insight_router)
+app.include_router(competence_tree_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 logger.info("All routers included successfully")
 
 # Explicitly capture route after including it
@@ -121,8 +122,6 @@ logger.info("=== Available Routes ===")
 for route in app.routes:
     logger.info(f"Route: {route.path}, Methods: {route.methods}")
 logger.info("======================")
-
-app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
