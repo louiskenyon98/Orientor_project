@@ -61,7 +61,7 @@ success = process_user_oasis_embedding(db, user_id)
 ### Obtenir des recommandations basées sur l'embedding OaSIS
 
 ```python
-from app.services.career_recommendation_service import get_career_recommendations
+from app.services.career_swipe.career_recommendation_service import get_career_recommendations
 
 # Obtenir des recommandations basées sur l'embedding OaSIS
 recommendations = get_career_recommendations(db, user_id, use_oasis=True)

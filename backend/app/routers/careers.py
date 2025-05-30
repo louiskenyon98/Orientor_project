@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from ..utils.database import get_db
 from ..routers.user import get_current_user
 from ..models import User
-from ..services.career_recommendation_service import (
+from ..services.career_swipe.career_recommendation_service import (
     get_career_recommendations,
     save_career_recommendation,
     get_saved_careers

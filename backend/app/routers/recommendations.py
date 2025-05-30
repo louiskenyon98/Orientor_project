@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict
 from datetime import datetime
 from ..utils.database import get_db
-from ..services.embedding_service import generate_embedding
-from ..services.career_recommendation_service import get_pinecone_career_recommendations
+from ..services.embeddings.embedding_service import generate_embedding
+from ..services.career_swipe.career_recommendation_service import get_pinecone_career_recommendations
 from ..models import User, UserRecommendation, SavedRecommendation
 from ..routers.user import get_current_user
 from ..schemas.space import SavedRecommendationCreate

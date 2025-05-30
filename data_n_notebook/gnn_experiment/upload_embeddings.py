@@ -1,4 +1,3 @@
-# pause_checkpoint_20250519_113135.pt
 
 import torch
 import numpy as np

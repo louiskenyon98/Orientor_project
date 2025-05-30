@@ -26,7 +26,6 @@ from app.routers.users import router as users_router
 from app.api.endpoints.job_recommendations import router as job_recommendations_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
-from scripts.model_loader import load_models
 from logging.handlers import RotatingFileHandler
 from .utils.logging_config import setup_logging
 
