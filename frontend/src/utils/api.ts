@@ -10,11 +10,11 @@ export const apiUrl = API_URL.trim();
 
 // Helper to build full endpoint URLs
 export const endpoint = (path: string): string => {
-  // Remove /api prefix if present since our backend doesn't use it
-  const cleanPath = path.replace('/api/', '/');
+  // Ensure path starts with /api
+  const apiPath = path.startsWith('/api') ? path : `/api${path}`;
   
   // Make sure path starts with a slash
-  const formattedPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+  const formattedPath = apiPath.startsWith('/') ? apiPath : `/${apiPath}`;
   
   return `${apiUrl}${formattedPath}`;
 };
@@ -35,5 +35,5 @@ export const logApiDetails = () => {
   console.log('Environment:', process.env.NODE_ENV);
   console.log('Is production:', process.env.NODE_ENV === 'production');
   console.log('API URL from env:', process.env.NEXT_PUBLIC_API_URL);
-  console.log('Example login endpoint:', endpoint('/users/login'));
+  console.log('Example login endpoint:', endpoint('/auth/login'));
 }; 

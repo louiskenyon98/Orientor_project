@@ -109,14 +109,11 @@ export const ColorProvider = ({ children }: { children: ReactNode }) => {
       setCurrentTheme(colorThemes[storedTheme as ColorPalette]);
     }
 
-    // Appliquer les classes CSS pour le thème de couleurs
-    document.documentElement.style.setProperty('--primary-color', currentTheme.primaryColor);
-    document.documentElement.style.setProperty('--accent-color', currentTheme.accentColor);
-    document.documentElement.style.setProperty('--border-color', currentTheme.borderColor);
-    document.documentElement.style.setProperty('--text-color', currentTheme.textColor);
-    document.documentElement.style.setProperty('--text-color-light', currentTheme.textColorLight);
-    document.documentElement.style.setProperty('--link-color', currentTheme.linkColor);
-    document.documentElement.style.setProperty('--link-hover-color', currentTheme.linkHoverColor);
+    // Remove all theme classes first
+    document.documentElement.classList.remove('theme-green', 'theme-blue', 'theme-gray', 'theme-yellow', 'theme-gray-black');
+    
+    // Add the current theme class
+    document.documentElement.classList.add(`theme-${currentTheme.id}`);
   }, [currentTheme]);
 
   // Fonction pour changer le thème de couleurs
@@ -138,4 +135,4 @@ export const ColorProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </ColorContext.Provider>
   );
-};
+}; 

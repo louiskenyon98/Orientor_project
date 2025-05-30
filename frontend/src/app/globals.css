@@ -242,7 +242,6 @@
   --color-platinum: #dee2e6;
   --color-french_gray_1: #ced4da;
   --color-french_gray_2: #adb5bd;
-  --color-slate_gray: #6c757d;
   --color-outer_space: #495057;
   --color-onyx: #343a40;
   --color-eerie_black: #212529;
@@ -265,6 +264,88 @@
   --link-color: var(--color-hookers_green);
   --link-hover-color: var(--color-charcoal);
   --color-black: #000;
+}
+
+/* Theme-specific variables */
+:root.theme-green {
+  --primary-color: var(--color-cambridge_blue);
+  --accent-color: var(--color-hookers_green);
+  --border-color: var(--color-dark_slate_gray);
+  --text-color: var(--color-dark_slate_gray);
+  --text-color-light: var(--color-cambridge_blue);
+  --link-color: var(--color-hookers_green);
+  --link-hover-color: var(--color-charcoal);
+}
+
+:root.theme-blue {
+  --primary-color: var(--color-true_blue);
+  --accent-color: var(--color-yale_blue);
+  --border-color: var(--color-oxford_blue_3);
+  --text-color: var(--color-oxford_blue_1);
+  --text-color-light: var(--color-true_blue);
+  --link-color: var(--color-yale_blue);
+  --link-hover-color: var(--color-oxford_blue_2);
+}
+
+:root.theme-gray {
+  --primary-color: var(--color-french_gray_1);
+  --accent-color: var(--color-slate_gray);
+  --border-color: var(--color-onyx);
+  --text-color: var(--color-eerie_black);
+  --text-color-light: var(--color-french_gray_2);
+  --link-color: var(--color-slate_gray);
+  --link-hover-color: var(--color-outer_space);
+}
+
+:root.theme-yellow {
+  --primary-color: var(--color-naples_yellow);
+  --accent-color: var(--color-mustard);
+  --border-color: var(--color-golden_brown);
+  --text-color: #000;
+  --text-color-light: var(--color-field_drab_2);
+  --link-color: var(--color-saffron);
+  --link-hover-color: var(--color-dark_goldenrod_1);
+}
+
+:root.theme-gray-black {
+  --primary-color: var(--color-gray);
+  --accent-color: var(--color-black);
+  --border-color: var(--color-gray);
+  --text-color: #000;
+  --text-color-light: var(--color-gray);
+  --link-color: var(--color-gray);
+  --link-hover-color: var(--color-gray);
+}
+
+/* Typography theme variables */
+:root.font-departure {
+  --heading-font: var(--font-departure);
+  --body-font: var(--font-noto);
+  --mono-font: var(--font-departure);
+}
+
+:root.font-khand {
+  --heading-font: var(--font-khand);
+  --body-font: var(--font-noto);
+  --mono-font: var(--font-departure);
+}
+
+:root.font-kola {
+  --heading-font: var(--font-kola);
+  --body-font: var(--font-kola);
+  --mono-font: var(--font-departure);
+}
+
+:root.font-nippo {
+  --heading-font: var(--font-nippo);
+  --body-font: var(--font-nippo);
+  --mono-font: var(--font-departure);
+}
+
+:root.font-technor {
+  --heading-font: var(--font-technor);
+  --body-font: var(--font-technor);
+  --mono-font: var(--font-departure);
 }
 
 @layer base {

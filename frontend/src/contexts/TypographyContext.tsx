@@ -85,10 +85,11 @@ export const TypographyProvider = ({ children }: { children: ReactNode }) => {
       setCurrentTheme(typographyThemes[storedTheme as FontFamily]);
     }
 
-    // Appliquer les classes CSS pour le thème de typographie
-    document.documentElement.style.setProperty('--heading-font', currentTheme.headingFont);
-    document.documentElement.style.setProperty('--body-font', currentTheme.bodyFont);
-    document.documentElement.style.setProperty('--mono-font', currentTheme.monoFont);
+    // Remove all typography classes first
+    document.documentElement.classList.remove('font-departure', 'font-khand', 'font-kola', 'font-nippo', 'font-technor');
+    
+    // Add the current typography class
+    document.documentElement.classList.add(`font-${currentTheme.id}`);
   }, [currentTheme]);
 
   // Fonction pour changer le thème de typographie
@@ -110,4 +111,4 @@ export const TypographyProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </TypographyContext.Provider>
   );
-};
+}; 
