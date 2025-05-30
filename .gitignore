@@ -105,3 +105,6 @@ next-env.d.ts
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Nodes graph
+backend/app/services/occupation_tree/gnn_experiment

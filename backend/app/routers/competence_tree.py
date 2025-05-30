@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any, List
 import logging
 import json
+import traceback
 
 from ..services.competence_tree.competence_tree_service import CompetenceTreeService
 from ..utils.database import get_db
@@ -11,6 +12,7 @@ from ..routers.user import get_current_user
 from ..models import User, UserSkillTree
 
 # Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
@@ -19,7 +21,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)],
 )
 
-# Initialize service
+# Initialize service as singleton
 competence_tree_service = CompetenceTreeService()
 
 @router.post("/generate", response_model=Dict[str, Any])
@@ -50,24 +52,39 @@ def generate_competence_tree(
         )
         
         if not tree_data:
+            logger.error(f"Failed to create competence tree for user {current_user.id}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to create competence tree"
             )
         
-        # Save the tree in the database
-        graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
-        
+        # Get the graph_id from the tree data
+        graph_id = tree_data.get("graph_id")
         if not graph_id:
+            logger.error(f"No graph_id found in tree data for user {current_user.id}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate graph_id"
+            )
+        
+        # Save the tree in the database
+        logger.info(f"Saving competence tree for user {current_user.id} with graph_id {graph_id}")
+        saved_graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
+        
+        if not saved_graph_id:
+            logger.error(f"Failed to save competence tree for user {current_user.id}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to save competence tree"
             )
         
-        return {"graph_id": graph_id, "message": "Competence tree generated successfully"}
+        logger.info(f"Competence tree generated and saved successfully for user {current_user.id} with graph_id {saved_graph_id}")
+        return {"graph_id": saved_graph_id, "message": "Competence tree generated successfully"}
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Error generating competence tree for user {current_user.id}: {str(e)}")
+        logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error generating competence tree: {str(e)}"
@@ -82,16 +99,17 @@ def get_competence_tree(
     """
     Get an existing competence tree.
     """
-    logger.info(f"Request received to get competence tree with ID {graph_id}")
+    logger.info(f"Request received to get competence tree with ID {graph_id} for user {current_user.id}")
     try:
         # Get the competence tree from the database
-        logger.info(f"Retrieving competence tree {graph_id} from database")
+        logger.info(f"Retrieving competence tree {graph_id} from database for user {current_user.id}")
         skill_tree = db.query(UserSkillTree).filter(
             UserSkillTree.graph_id == graph_id,
             UserSkillTree.user_id == current_user.id
         ).first()
         
         if not skill_tree:
+            logger.error(f"Competence tree with ID {graph_id} not found for user {current_user.id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Competence tree with ID {graph_id} not found"
@@ -110,17 +128,18 @@ def get_competence_tree(
                 # If it's already a dict (JSONB), use it directly
                 tree_data = skill_tree.tree_data
             
+            logger.info(f"Successfully retrieved competence tree {graph_id} for user {current_user.id}")
             # Return as JSONResponse to ensure proper serialization
             return JSONResponse(content=tree_data)
             
         except json.JSONDecodeError as e:
-            logger.error(f"Error decoding JSON from tree_data: {str(e)}")
+            logger.error(f"Error decoding JSON from tree_data for user {current_user.id}: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error decoding competence tree data: {str(e)}"
             )
         except Exception as e:
-            logger.error(f"Error processing tree data: {str(e)}")
+            logger.error(f"Error processing tree data for user {current_user.id}: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error processing competence tree data: {str(e)}"
@@ -129,7 +148,7 @@ def get_competence_tree(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error retrieving competence tree: {str(e)}")
+        logger.error(f"Error retrieving competence tree for user {current_user.id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving competence tree: {str(e)}"

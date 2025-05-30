@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Dict, Any, Optional, List
 import logging
 from sqlalchemy.orm import Session
-from app.services.competence_tree.job_recommendation_service import JobRecommendationService
+from app.services.occupation_tree.job_recommendation_service import JobRecommendationService
 from app.routers.user import get_current_user
 from app.models.user import User
 from app.utils.database import get_db
