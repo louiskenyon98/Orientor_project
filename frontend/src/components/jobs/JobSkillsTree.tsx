@@ -158,7 +158,7 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
         
         // Parcourir toutes les arêtes pour trouver les connexions
         data.edges.forEach(edge => {
-          let connectedNodeId = null;
+          let connectedNodeId: string | null = null;
           
           // Si l'arête part du nœud de niveau 1
           if (edge.source === level1Node.id) {

@@ -29,7 +29,7 @@ export default function StitchDemoPage() {
       role: 'Data Scientist',
       avatarUrl: 'https://randomuser.me/api/portraits/women/68.jpg',
       skills: ['Python', 'Machine Learning', 'Data Visualization'],
-      domain: undefined
+      // Removed domain property to fix TypeScript error
     }
   ];
 
@@ -272,7 +272,7 @@ export default function StitchDemoPage() {
                       role={user.role}
                       avatarUrl={user.avatarUrl}
                       skills={user.skills}
-                      domain={user.domain}
+                      // Removed domain prop to fix TypeScript error
                     />
                   ))}
                 </div>
@@ -285,6 +285,9 @@ export default function StitchDemoPage() {
                   {challenges.map((challenge, index) => (
                     <ChallengeCard
                       key={index}
+                      challenge={challenge.title}
+                      completed={challenge.isCompleted}
+                      onComplete={() => {}}
                       title={challenge.title}
                       description={challenge.description}
                       xpReward={challenge.xpReward}

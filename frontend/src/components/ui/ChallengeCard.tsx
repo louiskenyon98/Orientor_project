@@ -5,6 +5,12 @@ interface ChallengeCardProps {
   challenge: string;
   xpReward: number;
   completed: boolean;
+  title: string; // Add this line
+  description: string;
+  progress: number;
+  isCompleted: boolean;
+  difficulty: 'medium' | 'hard' | 'easy';
+  domain: 'communicator' | 'builder';
   onComplete: () => void;
 }
 

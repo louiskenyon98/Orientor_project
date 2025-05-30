@@ -65,6 +65,12 @@ const CustomNode = ({ data }: { data: any }) => {
           xpReward={xp_reward} 
           completed={state === 'completed'} 
           onComplete={onComplete}
+          title={challenge}
+          description={challenge}
+          progress={0}
+          isCompleted={state === 'completed'}
+          difficulty="medium"
+          domain="builder"
         />
       </div>
     </div>
