@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List
@@ -24,17 +24,30 @@ competence_tree_service = CompetenceTreeService()
 
 @router.post("/generate", response_model=Dict[str, Any])
 def generate_competence_tree(
+    max_depth: int = Query(10, gt=0, le=20),
+    max_nodes_per_level: int = Query(5, gt=0, le=10),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Generate a new competence tree for a user.
+    
+    Args:
+        max_depth: Maximum depth of the tree (1-20)
+        max_nodes_per_level: Maximum number of nodes per level (1-10)
+        current_user: Current authenticated user
+        db: Database session
     """
     logger.info(f"Request received to generate competence tree for user {current_user.id}")
     try:
         # Create the competence tree
         logger.info(f"Creating competence tree for user {current_user.id}")
-        tree_data = competence_tree_service.create_skill_tree(db, current_user.id)
+        tree_data = competence_tree_service.create_skill_tree(
+            db, 
+            current_user.id,
+            max_depth=max_depth,
+            max_nodes_per_level=max_nodes_per_level
+        )
         
         if not tree_data:
             raise HTTPException(

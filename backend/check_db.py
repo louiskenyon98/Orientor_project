@@ -11,7 +11,7 @@ def check_database():
     load_dotenv()
     
     # Get database URL
-    DATABASE_URL = os.getenv("DATABASE_URL")
+    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Mac.phil.007@localhost:5432/navigo_local")
     if not DATABASE_URL:
         logger.error("DATABASE_URL is not set!")
         return False

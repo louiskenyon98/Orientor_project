@@ -10,10 +10,14 @@ def check_environment():
     load_dotenv()
     
     required_vars = {
-        'DATABASE_URL': 'Database connection string',
+        'DATABASE_URL': 'Database connection string (defaults to local navigo_local)',
         'JWT_SECRET_KEY': 'Secret key for JWT tokens',
         'OPENAI_API_KEY': 'OpenAI API key for chat functionality'
     }
+    
+    # Set default DATABASE_URL if not present
+    if not os.getenv('DATABASE_URL'):
+        os.environ['DATABASE_URL'] = "postgresql://postgres:Mac.phil.007@localhost:5432/navigo_local"
     
     missing_vars = []
     for var, description in required_vars.items():

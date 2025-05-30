@@ -10,6 +10,12 @@ import pinecone
 from pinecone import Pinecone
 from ..models import UserSkillTree
 from uuid import uuid4
+import torch
+import sys
+
+# Add the path to import the GNN model
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "services"))
+from GNN.GraphSage import GraphSAGE, CareerTreeModel
 
 # Configuration du logger
 logging.basicConfig(level=logging.INFO)
@@ -37,6 +43,7 @@ class CompetenceTreeService:
         self.embedding_model = None
         self._initialize_pinecone()
         self._initialize_embedding_model()
+        self._initialize_gnn_model()
         
     def _initialize_embedding_model(self):
         """
@@ -74,6 +81,43 @@ class CompetenceTreeService:
         except Exception as e:
             logger.error(f"Erreur lors de l'initialisation de Pinecone: {str(e)}")
             return False
+    
+    def _initialize_gnn_model(self):
+        """Initialize the GNN model for graph traversal."""
+        try:
+            model_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "services", "GNN", "best_model_20250520_022237.pt"
+            )
+            
+            if not os.path.exists(model_path):
+                logger.error(f"Le fichier du modèle n'existe pas: {model_path}")
+                return
+            
+            # Load the checkpoint
+            checkpoint = torch.load(model_path, map_location="cpu", weights_only=False)
+            
+            # Initialize the model
+            self.gnn_model = CareerTreeModel(
+                input_dim=384,  # Embedding dimension
+                hidden_dim=128,
+                output_dim=128,
+                dropout=0.2
+            )
+            
+            # Load model weights
+            if "model_state_dict" not in checkpoint:
+                logger.error("Le checkpoint ne contient pas 'model_state_dict'")
+                return
+            
+            self.gnn_model.load_state_dict(checkpoint["model_state_dict"])
+            self.gnn_model.eval()  # Set to evaluation mode
+            
+            logger.info("Modèle GraphSAGE chargé avec succès")
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de l'initialisation du modèle GNN: {str(e)}")
+            self.gnn_model = None
     
     # Fonction supprimée car non nécessaire pour extraire les top 5
     
@@ -159,12 +203,11 @@ class CompetenceTreeService:
 
     def traverse_skill_graph(self, anchor_skills: List[Dict[str, Any]], max_depth: int = 3, max_nodes_per_level: int = 5) -> Dict[str, Any]:
         """
-        Traverse le graphe de compétences à partir de compétences d'ancrage riches.
+        Traverse le graphe de compétences à partir de compétences d'ancrage en utilisant le modèle GNN.
         """
         try:
             graph = nx.DiGraph()
             metadata_lookup = {}
-
             current_level_nodes = []
 
             # Initialisation des nœuds d'ancrage
@@ -176,7 +219,7 @@ class CompetenceTreeService:
 
                 graph.add_node(skill_id, label=label, type="skill", level=0, metadata=metadata)
                 metadata_lookup[skill_id] = metadata
-                current_level_nodes.append((skill_id, vector))  # start with anchor + its vector
+                current_level_nodes.append((skill_id, vector))
 
             # Traversée niveau par niveau
             for level in range(1, max_depth + 1):
@@ -184,26 +227,55 @@ class CompetenceTreeService:
 
                 for node_id, node_vector in current_level_nodes:
                     try:
-                        logger.info(f"Recherche de compétences similaires à {node_id} dans Pinecone")
+                        # Rechercher des nœuds similaires dans Pinecone
                         results = self.index.query(
                             vector=node_vector,
-                            top_k=max_nodes_per_level,
+                            top_k=max_nodes_per_level * 2,  # Get more candidates for filtering
                             include_metadata=True,
-                            namespace="esco-368",
                             filter={"type": {"$eq": "skill"}}
                         )
 
+                        # Filtrer et trier les résultats en utilisant GraphSAGE
+                        filtered_matches = []
                         for match in results.matches:
                             if match.id not in graph:
-                                match_label = match.metadata.get("preferredLabel", match.id)
-                                graph.add_node(match.id, label=match_label, type="skill", level=level, metadata=match.metadata)
-                                graph.add_edge(node_id, match.id, weight=1.0)
-                                next_level_nodes.append((match.id, match.values))
+                                # Convertir les vecteurs en tensors
+                                node_tensor = torch.tensor(node_vector, dtype=torch.float32).unsqueeze(0)
+                                match_tensor = torch.tensor(match.values, dtype=torch.float32).unsqueeze(0)
+                                
+                                # Créer un mini-graphe pour les deux nœuds
+                                x = torch.cat([node_tensor, match_tensor], dim=0)
+                                edge_index = torch.tensor([[0, 1], [1, 0]], dtype=torch.long)
+                                
+                                # Calculer la similarité avec GraphSAGE
+                                with torch.no_grad():
+                                    node_embeddings = self.gnn_model.encoder(x, edge_index)
+                                    similarity = torch.cosine_similarity(
+                                        node_embeddings[0], 
+                                        node_embeddings[1], 
+                                        dim=0
+                                    ).item()
+                                
+                                # Normaliser la similarité entre 0 et 1
+                                similarity = (similarity + 1) / 2
+                                
+                                if similarity >= 0.3:  # Seuil de similarité minimal
+                                    filtered_matches.append((match, similarity))
+
+                        # Trier par similarité décroissante et prendre les meilleurs
+                        filtered_matches.sort(key=lambda x: x[1], reverse=True)
+                        filtered_matches = filtered_matches[:max_nodes_per_level]
+
+                        # Ajouter les nœuds filtrés au graphe
+                        for match, similarity in filtered_matches:
+                            match_label = match.metadata.get("preferredLabel", match.id)
+                            graph.add_node(match.id, label=match_label, type="skill", level=level, metadata=match.metadata)
+                            graph.add_edge(node_id, match.id, weight=similarity)
+                            next_level_nodes.append((match.id, match.values))
 
                     except Exception as e:
                         logger.error(f"Erreur lors de la recherche de voisins pour {node_id}: {str(e)}")
 
-                # Limiter et passer au niveau suivant
                 current_level_nodes = next_level_nodes[:max_nodes_per_level]
                 if not current_level_nodes:
                     break
@@ -224,7 +296,7 @@ class CompetenceTreeService:
             } for u, v, d in graph.edges(data=True)]
 
             return {
-                "nodes": nodes,
+                "nodes": {node["id"]: node for node in nodes},
                 "edges": edges,
                 "anchor_nodes": [s["id"] for s in anchor_skills]
             }
@@ -404,85 +476,67 @@ class CompetenceTreeService:
     def create_skill_tree(self, db: Session, user_id: int, max_depth: int = 3, max_nodes_per_level: int = 5) -> Dict[str, Any]:
         """
         Crée un arbre de compétences complet pour un utilisateur.
-        
-        Args:
-            db: Session de base de données
-            user_id: ID de l'utilisateur
-            max_depth: Profondeur maximale de l'arbre
-            max_nodes_per_level: Nombre maximum de nœuds par niveau
-            
-        Returns:
-            Dict[str, Any]: Arbre de compétences complet
         """
         try:
-            # Récupérer l'âge de l'utilisateur pour la génération de défis
+            # Récupérer l'âge de l'utilisateur
             query = text("SELECT age FROM user_profiles WHERE user_id = :user_id")
             result = db.execute(query, {"user_id": user_id}).fetchone()
-            user_age = result[0] if result and result[0] else 25  # Âge par défaut
+            user_age = result[0] if result and result[0] else 25
             
             # Extraire les compétences d'ancrage
-            anchor_skill_ids = self.extract_anchor_skills(db, user_id)
-            if not anchor_skill_ids:
+            anchor_skills = self.extract_anchor_skills(db, user_id)
+            if not anchor_skills:
                 logger.error(f"Aucune compétence d'ancrage trouvée pour l'utilisateur {user_id}")
                 return {}
             
-            # Traverser le graphe de compétences
-            graph_data = self.traverse_skill_graph(anchor_skill_ids, max_depth, max_nodes_per_level)
-            if not graph_data:
-                logger.error(f"Échec de la traversée du graphe pour l'utilisateur {user_id}")
-                return {}
+            # Créer un graphe pour chaque compétence d'ancrage
+            all_nodes = []
+            all_edges = []
             
-            # Créer un graphe NetworkX à partir des données
-            graph = nx.DiGraph()
-            
-            # Ajouter les nœuds
-            for node in graph_data.get("nodes", []):
-                graph.add_node(node["id"], **node)
-            
-            # Ajouter les arêtes
-            for edge in graph_data.get("edges", []):
-                graph.add_edge(edge["source"], edge["target"], weight=edge["weight"])
-            
-            # Marquer la visibilité des nœuds
-            visibility = self.mark_visibility(graph)
-            
-            # Générer des défis pour chaque nœud visible
-            challenges = {}
-            for node_id, is_visible in visibility.items():
-                if is_visible:
-                    node_data = graph.nodes[node_id]
-                    skill_label = node_data.get("label", f"Compétence {node_id}")
-                    challenges[node_id] = self.generate_challenge(skill_label, user_age)
-            
-            # Convertir les données au format attendu par le frontend
-            competence_nodes = []
-            for node in graph_data.get("nodes", []):
-                node_id = node["id"]
-                node_data = graph.nodes[node_id]
-                challenge_data = challenges.get(node_id, {})
+            for anchor_skill in anchor_skills:
+                # Créer un graphe pour cette compétence
+                graph_data = self.traverse_skill_graph([anchor_skill], max_depth, max_nodes_per_level)
                 
-                competence_node = {
-                    "id": node_id,
-                    "skill_id": node_id,
-                    "skill_label": node_data.get("label", f"Compétence {node_id}"),
-                    "challenge": challenge_data.get("description", ""),
-                    "xp_reward": challenge_data.get("xp_reward", 25),
-                    "visible": visibility.get(node_id, False),
-                    "revealed": visibility.get(node_id, False),
-                    "state": "locked",  # Par défaut, tous les nœuds sont verrouillés
-                    "notes": ""
-                }
-                competence_nodes.append(competence_node)
+                # Convertir les nœuds et les arêtes au format attendu par le frontend
+                nodes = []
+                for node_id, node_data in graph_data.get("nodes", {}).items():
+                    # Marquer la visibilité des nœuds
+                    is_visible = node_id in graph_data.get("anchor_nodes", [])
+                    
+                    # Générer un défi pour les nœuds visibles
+                    challenge_data = {}
+                    if is_visible:
+                        skill_label = node_data.get("label", f"Compétence {node_id}")
+                        challenge_data = self.generate_challenge(skill_label, user_age)
+                    
+                    competence_node = {
+                        "id": node_id,
+                        "skill_id": node_id,
+                        "skill_label": node_data.get("label", f"Compétence {node_id}"),
+                        "challenge": challenge_data.get("description", ""),
+                        "xp_reward": challenge_data.get("xp_reward", 25),
+                        "visible": is_visible,
+                        "revealed": is_visible,
+                        "state": "locked",
+                        "notes": "",
+                        "graph_id": str(uuid4())  # Unique graph ID for each anchor skill's tree
+                    }
+                    nodes.append(competence_node)
+                
+                # Ajouter les nœuds et les arêtes à la liste principale
+                all_nodes.extend(nodes)
+                all_edges.extend(graph_data.get("edges", []))
             
             # Construire la réponse finale
             skill_tree = {
-                "nodes": competence_nodes,
-                "edges": graph_data.get("edges", []),
-                "graph_id": str(uuid4())  # Générer un nouvel ID de graphe
+                "nodes": all_nodes,
+                "edges": all_edges,
+                "graph_id": str(uuid4())
             }
             
             logger.info(f"Arbre de compétences créé avec succès pour l'utilisateur {user_id}")
             return skill_tree
+            
         except Exception as e:
             logger.error(f"Erreur lors de la création de l'arbre de compétences: {str(e)}")
             return {}

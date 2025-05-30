@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 # Replace these with your actual PostgreSQL credentials
-DATABASE_URL = "postgresql://postgres:Mac.phil.007@localhost:5432/orientor_db"
+DATABASE_URL = "postgresql://postgres:Mac.phil.007@localhost:5432/navigo_local"
 
 def test_connection():
     try:
