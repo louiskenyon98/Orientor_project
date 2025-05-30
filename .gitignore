@@ -33,57 +33,73 @@ out/
 logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
 # Data
 df_students.csv
 df_users.csv
 KnowledgeBase.csv
-# Ignore all files in the data_n_notebook/data directory
 data_n_notebook/data/
 
+# Docker
 docker-compose.yml
+docker-compose.yml.save
 
-.env.production
+# Environment files
+.env*
 backend/.env.example
 
+# Project specific
 /Reactive-Resume/
 /aws-elastic-beanstalk-cli-setup/
 /data_n_notebook/siamese_pipeline/mlruns/
 /data_n_notebook/MLflow_Huggingface/mlruns/
-
 siamese_pairs.pkl
-
 navigo-hero.png
 trees.png
 career_comparison.png
-
-docker-compose.yml.save
-
 demo.txt
-
-# Notes
 black_n_white.txt
 problem_n_solution.txt
 
-# models 
+# Models
 backend/app/models/*.pkl
 backend/app/models/finetuned_model/
 backend/app/models/finetuned_model_quantized/
 
-# Fonts
-# Start of Selection
+# Frontend assets
 frontend/public/fonts/
 frontend/public/avatar/
 
-# GNN_experiment
+# GNN experiment
 data_n_notebook/gnn_experiment/data/
 data_n_notebook/gnn_experiment/results/
 data_n_notebook/gnn_experiment/checkpoints/
 data_n_notebook/gnn_experiment/experiment_results/
 data_n_notebook/gnn_experiment/mlruns/
-# End of Selection
-
-# Data
 backend/app/services/gnn_experiment/data/
 backend/app/services/gnn_experiment/data_1024/
 backend/SkillsTree_eval/data
+
+# Next.js
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/coverage
+/build
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# Elastic Beanstalk
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
