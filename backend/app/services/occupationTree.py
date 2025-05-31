@@ -222,8 +222,8 @@ class JobRecommendationService:
             Dict[str, Any]: Arbre de compétences généré avec visualisation
         """
         try:
-            from SkillsTree_eval.graph_traversal_service import GraphTraversalService
-            from SkillsTree_eval.skill_tree_visualization import SkillTreeVisualization
+            from competenceTree_dev.graph_traversal_service import GraphTraversalService
+            from competenceTree_dev.skill_tree_visualization import SkillTreeVisualization
             
             # Valider les paramètres
             depth = max(1, min(3, depth))  # Limiter entre 1 et 3

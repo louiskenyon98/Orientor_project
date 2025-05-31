@@ -34,5 +34,5 @@ cd /Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/ba
 streamlit run esco_gnn_evaluation.py
 
 # Streamlite graph 
-cd /Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/backend/SkillsTree_eval
+cd /Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/backend/competenceTree_dev
 streamlit run skill_tree_app.py

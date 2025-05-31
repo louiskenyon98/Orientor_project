@@ -81,7 +81,7 @@ data_n_notebook/gnn_experiment/experiment_results/
 data_n_notebook/gnn_experiment/mlruns/
 backend/app/services/gnn_experiment/data/
 backend/app/services/gnn_experiment/data_1024/
-backend/SkillsTree_eval/data
+backend/competenceTree_dev/data
 
 # Next.js
 .pnp

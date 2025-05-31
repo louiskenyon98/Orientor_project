@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # 2. Import compatibility fixes and apply them
-from SkillsTree_eval.utils.streamlit_compat import apply_compatibility_fixes, verify_torch_model
+from competenceTree_dev.utils.streamlit_compat import apply_compatibility_fixes, verify_torch_model
 
 # Apply all compatibility fixes
 if not apply_compatibility_fixes():
@@ -75,9 +75,9 @@ if not os.path.exists(networkx_graph_path):
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Importer les services
-from SkillsTree_eval.anchor_discovery_service import AnchorDiscoveryService
-from SkillsTree_eval.graph_traversal_service import GraphTraversalService
-from SkillsTree_eval.skill_tree_visualization import SkillTreeVisualization
+from competenceTree_dev.anchor_discovery_service import AnchorDiscoveryService
+from competenceTree_dev.graph_traversal_service import GraphTraversalService
+from competenceTree_dev.skill_tree_visualization import SkillTreeVisualization
 
 # Configuration du logger
 logging.basicConfig(level=logging.INFO, 
