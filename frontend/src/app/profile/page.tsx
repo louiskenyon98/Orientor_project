@@ -280,11 +280,7 @@ export default function ProfilePage() {
                 decision_making: processedProfile.decision_making,
                 stress_tolerance: processedProfile.stress_tolerance
             };
-            <div className="bg-blue-500 text-white p-4">
-                Tailwind is working!
-                </div>
-
-
+            
             // Update user info
             if (email || password) {
                 await axios.put(

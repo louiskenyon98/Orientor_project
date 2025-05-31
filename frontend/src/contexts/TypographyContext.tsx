@@ -77,23 +77,33 @@ export const useTypography = () => useContext(TypographyContext);
 // Provider pour le contexte de typographie
 export const TypographyProvider = ({ children }: { children: ReactNode }) => {
   const [currentTheme, setCurrentTheme] = useState<TypographyTheme>(typographyThemes.departure);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Récupérer le thème de typographie stocké dans localStorage
-    const storedTheme = localStorage.getItem('typography-theme');
-    if (storedTheme && typographyThemes[storedTheme as FontFamily]) {
-      setCurrentTheme(typographyThemes[storedTheme as FontFamily]);
-    }
-
-    // Remove all typography classes first
-    document.documentElement.classList.remove('font-departure', 'font-khand', 'font-kola', 'font-nippo', 'font-technor');
+    // Set mounted state to true
+    setIsMounted(true);
     
-    // Add the current typography class
-    document.documentElement.classList.add(`font-${currentTheme.id}`);
+    // Only run on client-side
+    if (typeof window !== 'undefined') {
+      // Récupérer le thème de typographie stocké dans localStorage
+      const storedTheme = localStorage.getItem('typography-theme');
+      if (storedTheme && typographyThemes[storedTheme as FontFamily]) {
+        setCurrentTheme(typographyThemes[storedTheme as FontFamily]);
+      }
+
+      // Remove all typography classes first
+      document.documentElement.classList.remove('font-departure', 'font-khand', 'font-kola', 'font-nippo', 'font-technor');
+      
+      // Add the current typography class
+      document.documentElement.classList.add(`font-${currentTheme.id}`);
+    }
   }, [currentTheme]);
 
   // Fonction pour changer le thème de typographie
   const setTypographyTheme = (themeId: FontFamily) => {
+    // Only run if component is mounted and on client-side
+    if (!isMounted || typeof window === 'undefined') return;
+    
     if (typographyThemes[themeId]) {
       setCurrentTheme(typographyThemes[themeId]);
       localStorage.setItem('typography-theme', themeId);

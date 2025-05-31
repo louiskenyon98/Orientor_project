@@ -13,27 +13,37 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Check if user has a theme preference in localStorage
-    const storedTheme = localStorage.getItem('theme');
+    // Set mounted state to true
+    setIsMounted(true);
     
-    // Check if user has a system preference
-    const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Only run on client-side
+    if (typeof window !== 'undefined') {
+      // Check if user has a theme preference in localStorage
+      const storedTheme = localStorage.getItem('theme');
       
-    // Set initial theme based on stored preference or system preference
-    const initialDarkMode = storedTheme === 'dark' || (!storedTheme && systemPreference);
-    setIsDarkMode(initialDarkMode);
-      
-    // Apply the theme to the document
-    if (initialDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+      // Check if user has a system preference
+      const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+      // Set initial theme based on stored preference or system preference
+      const initialDarkMode = storedTheme === 'dark' || (!storedTheme && systemPreference);
+      setIsDarkMode(initialDarkMode);
+        
+      // Apply the theme to the document
+      if (initialDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, []);
 
   const toggleDarkMode = () => {
+    // Only run if component is mounted and on client-side
+    if (!isMounted || typeof window === 'undefined') return;
+    
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
     localStorage.setItem('theme', newMode ? 'dark' : 'light');

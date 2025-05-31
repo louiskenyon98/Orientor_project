@@ -1,4 +1,5 @@
 'use client';
+import React, { useMemo } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -7,11 +8,39 @@ import ReactFlow, {
   MiniMap,
   Position,
   ReactFlowProvider,
+  NodeTypes,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { motion } from 'framer-motion';
 import { SkillNode } from '@/components/branches/career_growth_skill';
 import { MarkerType } from 'reactflow';
+
+// Create a separate component for node content
+const NodeContent = ({ data, type }: { data: any; type: string }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.6 }}
+    className={`text-sm font-medium text-center rounded-xl px-4 py-3 ${getNodeStyle(type)}`}
+  >
+    {data.label}
+    {data.improvementSuggestion && (
+      <div className="text-xs italic mt-2 text-white/80">
+        {data.improvementSuggestion}
+      </div>
+    )}
+    {data.taskSuggestion && (
+      <div className="absolute hidden group-hover:block text-[11px] bg-black/90 text-white px-2 py-1 rounded bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap z-50">
+        💡 {data.taskSuggestion}
+      </div>
+    )}
+  </motion.div>
+);
+
+// Define node types outside the component
+const nodeTypes: NodeTypes = {
+  default: ({ data }) => <NodeContent data={data} type={data.type} />,
+};
 
 function getNodeStyle(type: string) {
   switch (type) {
@@ -30,6 +59,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
   let yGap = 350;
   let xGap = 300;
   let skillMap: Record<string, { x: number, y: number }> = {};
+  let nodeCounter = 0; // Compteur pour générer des IDs uniques
 
   let queue: { node: SkillNode; depth: number; column: number; parentId?: string; type?: string }[] = [
     { node: root, depth: 0, column: 2, type: 'root' },
@@ -48,26 +78,10 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
       position,
       draggable: true,
       data: {
-        label: (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className={`text-sm font-medium text-center rounded-xl px-4 py-3 ${getNodeStyle(type)}`}
-          >
-            {node.skillDescription}
-            {node.improvementSuggestion && (
-              <div className="text-xs italic mt-2 text-white/80">
-                {node.improvementSuggestion}
-              </div>
-            )}
-            {node.taskSuggestion && (
-              <div className="absolute hidden group-hover:block text-[11px] bg-black/90 text-white px-2 py-1 rounded bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap z-50">
-                💡 {node.taskSuggestion}
-              </div>
-            )}
-          </motion.div>
-        ),
+        label: node.skillDescription,
+        improvementSuggestion: node.improvementSuggestion,
+        taskSuggestion: node.taskSuggestion,
+        type,
       },
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
@@ -98,11 +112,11 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
     });
 
     if (node.reachableJobs?.length) {
-      const jobId = `${id}-outcome`;
-      const metaSkillId = `${id}-meta-skill`;
-      const finalId = `${id}-final-outcome`;
+      nodeCounter++;
+      const jobId = `${id}-outcome-${nodeCounter}`;
+      const metaSkillId = `${id}-meta-skill-${nodeCounter}`;
+      const finalId = `${id}-final-outcome-${nodeCounter}`;
 
-      // const jobY = position.y + 150;
       const siblingOffset = (node.id.endsWith('-1') ? -1 : node.id.endsWith('-x') ? 1 : 0) * 60;
       const jobY = position.y + 180 + siblingOffset;
       const metaY = jobY + 100;
@@ -115,12 +129,7 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
         draggable: true,
         data: {
           label: (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className={`rounded-xl px-4 py-3 text-sm text-center ${getNodeStyle('outcome')}`}
-            >
+            <div>
               <strong className="text-md font-semibold">Outcome</strong>
               <div className="mt-1">
                 {node.reachableJobs.map((j) => (
@@ -129,8 +138,9 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ),
+          type: 'outcome',
         },
         sourcePosition: Position.Top,
         targetPosition: Position.Bottom,
@@ -189,12 +199,12 @@ function convertToFlowGraph(root: SkillNode): { nodes: Node[]; edges: Edge[] } {
 }
 const root: SkillNode = {
   id: 'root',
-  skillDescription: 'You’re just starting to explore. You’re curious—and that’s powerful.',
+  skillDescription: 'You\'re just starting to explore. You\'re curious—and that\'s powerful.',
   nextSkills: [
     {
       id: 's1',
       skillDescription: 'You listen and support others',
-      improvementSuggestion: 'Practice noticing and validating people’s feelings',
+      improvementSuggestion: 'Practice noticing and validating people\'s feelings',
       taskSuggestion: 'Organize a peer support activity at school or online',
       nextSkills: [
         {
@@ -301,6 +311,16 @@ export default function SkillTreeFlow() {
   const width = maxX - minX;
   const height = maxY - minY;
 
+  // Utiliser useMemo pour les options de ReactFlow qui dépendent de calculs
+  const fitViewOptions = useMemo(() => ({
+    padding: 0.2,
+    maxZoom: 1.5
+  }), []);
+
+  const translateExtent = useMemo(() => 
+    [[minX, minY], [maxX, maxY]] as [[number, number], [number, number]]
+  , [minX, maxX, minY, maxY]);
+
   return (
     <div style={{ 
       width: '100%', 
@@ -314,13 +334,14 @@ export default function SkillTreeFlow() {
         <ReactFlow 
           nodes={nodes} 
           edges={edges} 
+          nodeTypes={nodeTypes}
           fitView 
           panOnScroll 
           zoomOnScroll 
-          fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
+          fitViewOptions={fitViewOptions}
           minZoom={0.2}
           maxZoom={1.5}
-          translateExtent={[[minX, minY], [maxX, maxY]]} // This limits the pan area
+          translateExtent={translateExtent}
         >
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
           <Background color="#f3f4f6" gap={24} />

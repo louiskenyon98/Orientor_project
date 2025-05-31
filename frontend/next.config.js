@@ -28,7 +28,7 @@ const nextConfig = {
   poweredByHeader: false,
   // Performance optimizations
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Désactivé pour résoudre les problèmes de styles
     scrollRestoration: true,
   },
   // Error handling and performance

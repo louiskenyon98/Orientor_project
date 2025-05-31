@@ -101,23 +101,33 @@ export const useColor = () => useContext(ColorContext);
 // Provider pour le contexte de couleurs
 export const ColorProvider = ({ children }: { children: ReactNode }) => {
   const [currentTheme, setCurrentTheme] = useState<ColorTheme>(colorThemes.green);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Récupérer le thème de couleurs stocké dans localStorage
-    const storedTheme = localStorage.getItem('color-theme');
-    if (storedTheme && colorThemes[storedTheme as ColorPalette]) {
-      setCurrentTheme(colorThemes[storedTheme as ColorPalette]);
-    }
-
-    // Remove all theme classes first
-    document.documentElement.classList.remove('theme-green', 'theme-blue', 'theme-gray', 'theme-yellow', 'theme-gray-black');
+    // Set mounted state to true
+    setIsMounted(true);
     
-    // Add the current theme class
-    document.documentElement.classList.add(`theme-${currentTheme.id}`);
+    // Only run on client-side
+    if (typeof window !== 'undefined') {
+      // Récupérer le thème de couleurs stocké dans localStorage
+      const storedTheme = localStorage.getItem('color-theme');
+      if (storedTheme && colorThemes[storedTheme as ColorPalette]) {
+        setCurrentTheme(colorThemes[storedTheme as ColorPalette]);
+      }
+
+      // Remove all theme classes first
+      document.documentElement.classList.remove('theme-green', 'theme-blue', 'theme-gray', 'theme-yellow', 'theme-gray-black');
+      
+      // Add the current theme class
+      document.documentElement.classList.add(`theme-${currentTheme.id}`);
+    }
   }, [currentTheme]);
 
   // Fonction pour changer le thème de couleurs
   const setColorTheme = (themeId: ColorPalette) => {
+    // Only run if component is mounted and on client-side
+    if (!isMounted || typeof window === 'undefined') return;
+    
     if (colorThemes[themeId]) {
       setCurrentTheme(colorThemes[themeId]);
       localStorage.setItem('color-theme', themeId);
