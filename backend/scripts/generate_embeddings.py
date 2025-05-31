@@ -18,7 +18,7 @@ parent_dir = current_dir.parent
 sys.path.append(str(parent_dir))
 
 from app.utils.database import SessionLocal
-from app.services.embedding_service import generate_embedding, store_embedding
+from app.services.Oasisembedding_service import generate_embedding, store_embedding
 from app.models import UserProfile
 
 # Configure logging

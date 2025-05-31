@@ -7,7 +7,7 @@ from sqlalchemy import text
 import ast
 import subprocess
 from app.models.user_profile import UserProfile
-from app.services.embedding_service import generate_embedding
+from app.services.Oasisembedding_service import generate_embedding
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

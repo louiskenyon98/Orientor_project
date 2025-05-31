@@ -7,7 +7,7 @@ from sqlalchemy import text
 import pickle
 import random
 import json
-from app.services.embedding_service import parse_embedding, get_user_oasis_embedding
+from app.services.Oasisembedding_service import parse_embedding, get_user_oasis_embedding
 import pinecone
 import re
 from app.models.user_profile import UserProfile

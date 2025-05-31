@@ -19,13 +19,13 @@ logger = logging.getLogger(__name__)
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Importer les services nécessaires
-from app.services.embedding_service import (
+from app.services.Oasisembedding_service import (
     format_user_profile_oasis,
     generate_oasis_embedding,
     process_user_oasis_embedding,
     get_user_oasis_embedding
 )
-from app.services.career_recommendation_service import get_career_recommendations
+from app.services.Swipe_career_recommendation_service import get_career_recommendations
 
 def get_db_session():
     """

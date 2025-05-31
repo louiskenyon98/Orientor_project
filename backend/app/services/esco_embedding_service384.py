@@ -63,7 +63,7 @@ def import_esco_formatter():
 esco_formatter = import_esco_formatter()
 
 # Importer le service d'embedding existant
-from app.services.embedding_service import (
+from app.services.Oasisembedding_service import (
     model_state, fetch_user_data, generate_embedding_from_text_384, store_embedding
 )
 

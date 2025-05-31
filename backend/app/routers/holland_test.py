@@ -5,7 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from ..utils.database import get_db
 from ..routers.user import get_current_user
-from ..services.llm_service import LLMService
+from ..services.LLMholland_service import LLMService
 from uuid import uuid4
 import uuid  # Ajout de l'import complet du module uuid
 import logging

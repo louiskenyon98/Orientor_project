@@ -3,8 +3,8 @@ from pydantic import BaseModel
 from typing import Dict, Any, Optional
 import logging
 from sqlalchemy.orm import Session
-from app.services.tree_service import TreeService
-from app.services.career_tree_service import CareerTreeService
+from app.services.LLMskillsTree import TreeService
+from app.services.LLMcareerTree import CareerTreeService
 from app.routers.user import get_current_user
 from app.models.user import User
 from app.utils.database import get_db

@@ -6,7 +6,7 @@ import logging
 from app.utils.database import get_db
 from app.models import User, UserProfile, UserSkill
 from app.routers.user import get_current_user
-from app.services.embedding_service import process_user_embedding, process_user_oasis_embedding
+from app.services.Oasisembedding_service import process_user_embedding, process_user_oasis_embedding
 from app.services.esco_embedding_service384 import process_user_esco_embeddings
 from app.services.peer_matching_service import generate_peer_suggestions
 from sqlalchemy.sql import text

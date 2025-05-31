@@ -5,7 +5,7 @@ from typing import Dict, Any, List
 import logging
 import json
 
-from ..services.competence_tree_service import CompetenceTreeService
+from ..services.competenceTree import CompetenceTreeService
 from ..utils.database import get_db
 from ..routers.user import get_current_user
 from ..models import User, UserSkillTree
