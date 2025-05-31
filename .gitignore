@@ -103,3 +103,7 @@ next-env.d.ts
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Nodes 
+backend/app/services/occupation_tree/gnn_experiment/data
+backend/app/services/occupation_tree/gnn_experiment/data_1024
