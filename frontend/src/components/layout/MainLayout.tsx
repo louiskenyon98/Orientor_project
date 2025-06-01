@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import XPProgress from '../ui/XPProgress';
 import DarkModeToggle from '../ui/DarkModeToggle';
 import TypographyToggle from '../ui/TypographyToggle';
+import ThemeToggle from '../ui/ThemeToggle';
 import styles from '@/styles/patterns.module.css';
 
 // Composants pour les menus déroulants
@@ -306,6 +307,9 @@ export default function MainLayout({
                                 {/* XP Progress Bar */}
                                 <XPProgress className="mr-2" />
                                 
+                                {/* Theme Toggle */}
+                                <ThemeToggle />
+                                
                                 {/* Settings Link */}
                                 <Link
                                     href="/settings"
@@ -327,7 +331,7 @@ export default function MainLayout({
                                         href="/profile"
                                         className="p-2 text-sm font-bold rounded-md text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30 transition-colors duration-150 ease-in-out"
                                     >
-                                        <span className="material-icons-outlined">settings</span>
+                                        <span className="material-icons-outlined">account_circle</span>
                                     </Link>
                                 </div>
 
@@ -435,6 +439,13 @@ export default function MainLayout({
                                             Test Holland (RIASEC)
                                         </Link>
                                         <div className="border-t border-stitch-border mt-1"></div>
+                                        
+                                        {/* Theme Toggle in mobile menu */}
+                                        <div className="flex items-center px-4 py-3">
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">palette</span>
+                                            <span className="text-sm text-stitch-sage mr-auto">Thème</span>
+                                            <ThemeToggle />
+                                        </div>
                                         
                                         {/* Settings Link in mobile menu */}
                                         <Link

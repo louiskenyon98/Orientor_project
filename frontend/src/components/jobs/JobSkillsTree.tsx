@@ -455,6 +455,120 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
 
   return (
     <div className={`w-full ${className}`}>
+      {/* Visualisation de l'arbre de compétences ESCO */}
+      <div className="rounded-lg p-6" style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
+          Arbre de compétences ESCO
+          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
+            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
+          </span>
+        </h3>
+        
+        <p className="text-sm mb-4" style={{ color: 'var(--text-color)' }}>
+          Cette visualisation montre les relations entre les différentes compétences requises pour ce poste, générées à partir du graphe ESCO.
+        </p>
+        
+        {/* Légende */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Emploi</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Compétence</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Groupe de compétences</span>
+          </div>
+        </div>
+        
+        {/* Visualisation ReactFlow */}
+        <div className="border rounded-lg overflow-hidden" style={{
+          height: '500px',
+          borderColor: 'var(--border-color)',
+          backgroundColor: 'var(--primary-color)'
+        }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            fitView
+            attributionPosition="bottom-right"
+          >
+            <Controls />
+            <MiniMap />
+            <Background color="#aaa" gap={16} />
+          </ReactFlow>
+        </div>
+        
+        <div className="mt-4 text-center">
+          <p className="text-xs italic" style={{ color: 'var(--text-color)' }}>
+            Nombre total de nœuds: {Object.keys(skillTreeData.nodes).length} | 
+            Nombre total de relations: {skillTreeData.edges.length}
+          </p>
+        </div>
+      </div>
+
+      {/* Top des compétences */}
+      <div className="rounded-lg p-6 mb-6" style={{
+        backgroundColor: 'var(--primary-color)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: 'var(--border-color)'
+      }}>
+        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
+          Top {nodesPerLevel} des compétences à acquérir
+          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
+            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
+          </span>
+        </h3>
+        
+        <div className="space-y-3">
+          {topSkills.map((skill, index) => (
+            <div 
+              key={skill.id} 
+              className="flex items-center p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--primary-color)' }}
+            >
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white rounded-full mr-3"
+                   style={{ backgroundColor: 'var(--accent-color)' }}>
+                {index + 1}
+              </div>
+              <div>
+                <p className="font-medium" style={{ color: 'var(--accent-color)' }}>{skill.label}</p>
+                {skill.description && (
+                  <p className="text-sm mt-1 line-clamp-2" style={{ color: 'var(--text-color)' }}>
+                    {skill.description}
+                  </p>
+                )}
+              </div>
+              {skill.score !== undefined && (
+                <div className="ml-auto">
+                  <span className="text-white text-xs font-bold px-2 py-1 rounded-full"
+                        style={{ backgroundColor: 'var(--accent-color)' }}>
+                    {Math.round(skill.score * 100)}%
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+          
+          {topSkills.length === 0 && (
+            <p className="text-center py-4" style={{ color: 'var(--text-color)' }}>
+              Aucune compétence à développer identifiée.
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Contrôles pour les paramètres de l'arbre */}
       <div className="rounded-lg p-4 mb-4" style={{
         backgroundColor: 'var(--primary-color)',
@@ -560,119 +674,6 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
           >
             Réinitialiser
           </button>
-        </div>
-      </div>
-      {/* Top des compétences */}
-      <div className="rounded-lg p-6 mb-6" style={{
-        backgroundColor: 'var(--primary-color)',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'var(--border-color)'
-      }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
-          Top {nodesPerLevel} des compétences à acquérir
-          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
-            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
-          </span>
-        </h3>
-        
-        <div className="space-y-3">
-          {topSkills.map((skill, index) => (
-            <div 
-              key={skill.id} 
-              className="flex items-center p-3 rounded-lg"
-              style={{ backgroundColor: 'var(--primary-color)' }}
-            >
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white rounded-full mr-3"
-                   style={{ backgroundColor: 'var(--accent-color)' }}>
-                {index + 1}
-              </div>
-              <div>
-                <p className="font-medium" style={{ color: 'var(--accent-color)' }}>{skill.label}</p>
-                {skill.description && (
-                  <p className="text-sm mt-1 line-clamp-2" style={{ color: 'var(--text-color)' }}>
-                    {skill.description}
-                  </p>
-                )}
-              </div>
-              {skill.score !== undefined && (
-                <div className="ml-auto">
-                  <span className="text-white text-xs font-bold px-2 py-1 rounded-full"
-                        style={{ backgroundColor: 'var(--accent-color)' }}>
-                    {Math.round(skill.score * 100)}%
-                  </span>
-                </div>
-              )}
-            </div>
-          ))}
-          
-          {topSkills.length === 0 && (
-            <p className="text-center py-4" style={{ color: 'var(--text-color)' }}>
-              Aucune compétence à développer identifiée.
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Visualisation de l'arbre de compétences ESCO */}
-      <div className="rounded-lg p-6" style={{
-        backgroundColor: 'var(--primary-color)',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'var(--border-color)'
-      }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
-          Arbre de compétences ESCO
-          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
-            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
-          </span>
-        </h3>
-        
-        <p className="text-sm mb-4" style={{ color: 'var(--text-color)' }}>
-          Cette visualisation montre les relations entre les différentes compétences requises pour ce poste, générées à partir du graphe ESCO.
-        </p>
-        
-        {/* Légende */}
-        <div className="flex flex-wrap gap-3 mb-4">
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Emploi</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Compétence</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-            <span className="text-xs" style={{ color: 'var(--text-color)' }}>Groupe de compétences</span>
-          </div>
-        </div>
-        
-        {/* Visualisation ReactFlow */}
-        <div className="border rounded-lg overflow-hidden" style={{
-          height: '500px',
-          borderColor: 'var(--border-color)',
-          backgroundColor: 'var(--primary-color)'
-        }}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            fitView
-            attributionPosition="bottom-right"
-          >
-            <Controls />
-            <MiniMap />
-            <Background color="#aaa" gap={16} />
-          </ReactFlow>
-        </div>
-        
-        <div className="mt-4 text-center">
-          <p className="text-xs italic" style={{ color: 'var(--text-color)' }}>
-            Nombre total de nœuds: {Object.keys(skillTreeData.nodes).length} | 
-            Nombre total de relations: {skillTreeData.edges.length}
-          </p>
         </div>
       </div>
     </div>

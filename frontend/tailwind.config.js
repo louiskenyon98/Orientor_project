@@ -19,6 +19,31 @@ module.exports = {
         ...grayColors,
         ...yellowColors,
         ...grayBlackColors,
+        // Premium Theme Colors
+        premium: {
+          'royal-blue': '#00296b',
+          'marian-blue': '#003f88',
+          'polynesian-blue': '#00509d',
+          'mikado-yellow': '#fdc500',
+          'gold': '#ffd500',
+          'bg-primary': '#000000',
+          'bg-secondary': '#0a0a0a',
+          'text-primary': '#ffffff',
+          'text-secondary': '#b0b0b0',
+        },
+        // Theme-aware colors
+        theme: {
+          background: 'var(--background)',
+          'background-secondary': 'var(--background-secondary)',
+          card: 'var(--card)',
+          'card-hover': 'var(--card-hover)',
+          border: 'var(--border)',
+          'border-hover': 'var(--border-hover)',
+          text: 'var(--text)',
+          'text-secondary': 'var(--text-secondary)',
+          accent: 'var(--accent)',
+          'accent-secondary': 'var(--accent-secondary)',
+        },
         // Stitch Design Theme Colors
         stitch: {
           primary: 'var(--primary-color)', // Utilise la variable CSS dynamique
@@ -89,12 +114,19 @@ module.exports = {
       boxShadow: {
         'soft': '0 2px 12px rgba(0,0,0,0.05)',
         'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+        'premium-glow': '0 0 20px rgba(253, 197, 0, 0.3)',
+        'premium-glow-hover': '0 0 25px rgba(253, 197, 0, 0.5)',
+        'premium-blue-glow': '0 0 15px rgba(0, 80, 157, 0.4)',
+        'premium-card': '0 4px 20px rgba(0, 0, 0, 0.3)',
+        'premium-card-hover': '0 8px 30px rgba(0, 0, 0, 0.4)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'float': 'float 6s ease-in-out infinite',
         'grow': 'grow 0.3s ease-out',
         'pulse-subtle': 'pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'twinkle': 'twinkle 2s ease-in-out infinite',
+        'glow-pulse': 'glowPulse 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -112,6 +144,20 @@ module.exports = {
         pulseSubtle: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.85' },
+        },
+        twinkle: {
+          '0%, 100%': { opacity: '0.3' },
+          '50%': { opacity: '1' },
+        },
+        glowPulse: {
+          '0%, 100%': {
+            boxShadow: '0 0 20px rgba(253, 197, 0, 0.3)',
+            filter: 'drop-shadow(0 0 8px rgba(253, 197, 0, 0.3))'
+          },
+          '50%': {
+            boxShadow: '0 0 30px rgba(253, 197, 0, 0.5)',
+            filter: 'drop-shadow(0 0 12px rgba(253, 197, 0, 0.5))'
+          },
         },
       },
       typography: {

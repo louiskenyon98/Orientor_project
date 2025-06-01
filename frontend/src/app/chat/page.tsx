@@ -228,21 +228,23 @@ export default function ChatPage() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                <form onSubmit={handleSubmit} className="relative">
+                <form onSubmit={handleSubmit} className="search-header">
                     <input
                         type="text"
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         placeholder="Ask anything about your career path, interests, or goals..."
-                        className="input pr-20 py-3"
+                        className="search-header__input"
                         disabled={isTyping}
                     />
                     <button
                         type="submit"
                         disabled={!inputMessage.trim() || isTyping}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-primary py-1 px-4"
+                        className="search-header__button"
                     >
-                        Send
+                        <svg className="search-header__icon" viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
                     </button>
                 </form>
             </div>

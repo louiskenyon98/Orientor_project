@@ -20,17 +20,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
       </head>
       <Providers>
-        <body className="min-h-screen bg-light-background dark:bg-dark-background text-neutral-700 dark:text-gray-200 antialiased">
-          {/* Background patterns */}
-          <div 
-            className="fixed inset-0 -z-10 bg-[url('/patterns/branch.svg')] bg-repeat opacity-90 dark:opacity-300"
-            style={{ backgroundSize: '200px 200px' }}
-          ></div>
-          <div 
-            className="fixed inset-0 -z-10 bg-[url('/patterns/grid.svg')] bg-repeat opacity-90 dark:opacity-300"
-            style={{ backgroundSize: '200px 200px' }}
-          ></div>
-          
+        <body className="min-h-screen antialiased">
           {/* Main content */}
           <main>
             {children}

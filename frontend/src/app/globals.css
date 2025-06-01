@@ -2,605 +2,256 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google fonts */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+/* Import Premium Theme */
+@import '../styles/premium-theme.css';
 
-/* Configuration des polices locales */
-
-/* DepartureMono */
-@font-face {
-  font-family: "DepartureMono";
-  src: url("/fonts/DepartureMono-1.422/DepartureMono-Regular.woff2") format("woff2"),
-       url("/fonts/DepartureMono-1.422/DepartureMono-Regular.woff") format("woff"),
-       url("/fonts/DepartureMono-1.422/DepartureMono-Regular.otf") format("opentype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
+/* Global Premium Styles */
+* {
+  box-sizing: border-box;
 }
 
-/* Khand */
-@font-face {
-  font-family: "Khand";
-  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Regular.woff2") format("woff2"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Regular.woff") format("woff"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
+/* Layout container for consistent width */
+.layout-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-@font-face {
-  font-family: "Khand";
-  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Light.woff2") format("woff2"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Light.woff") format("woff"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Light.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
+html {
+  scroll-behavior: smooth;
 }
 
-@font-face {
-  font-family: "Khand";
-  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Medium.woff2") format("woff2"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Medium.woff") format("woff"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Medium.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
+body {
+  font-family: var(--font-geist-sans);
+  background: var(--background);
+  color: var(--text);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@font-face {
-  font-family: "Khand";
-  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-SemiBold.woff2") format("woff2"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-SemiBold.woff") format("woff"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-SemiBold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
+/* Ensure proper z-index layering */
+.premium-container {
+  position: relative;
+  z-index: 0;
 }
 
-@font-face {
-  font-family: "Khand";
-  src: url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Bold.woff2") format("woff2"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Bold.woff") format("woff"),
-       url("/fonts/Khand_Complete/Fonts/WEB/fonts/Khand-Bold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
+/* Star constellation background */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* Kola */
-@font-face {
-  font-family: "Kola";
-  src: url("/fonts/Kola_Complete/Fonts/WEB/fonts/Kola-Regular.woff2") format("woff2"),
-       url("/fonts/Kola_Complete/Fonts/WEB/fonts/Kola-Regular.woff") format("woff"),
-       url("/fonts/Kola_Complete/Fonts/WEB/fonts/Kola-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
+/* Main content above stars */
+.premium-container > .relative {
+  position: relative;
+  z-index: 10;
 }
 
-/* Nippo */
-@font-face {
-  font-family: "Nippo";
-  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Regular.woff2") format("woff2"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Regular.woff") format("woff"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
+/* Custom scrollbar for premium theme */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-@font-face {
-  font-family: "Nippo";
-  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Light.woff2") format("woff2"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Light.woff") format("woff"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Light.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+  transition: background-color 0.3s ease;
 }
 
-@font-face {
-  font-family: "Nippo";
-  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Extralight.woff2") format("woff2"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Extralight.woff") format("woff"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Extralight.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
-@font-face {
-  font-family: "Nippo";
-  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Medium.woff2") format("woff2"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Medium.woff") format("woff"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Medium.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
-@font-face {
-  font-family: "Nippo";
-  src: url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Bold.woff2") format("woff2"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Bold.woff") format("woff"),
-       url("/fonts/Nippo_Complete/Fonts/WEB/fonts/Nippo-Bold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
+/* Selection styling */
+::selection {
+  background: var(--accent);
+  color: var(--background);
 }
 
-/* Technor */
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Regular.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Regular.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
+/* Focus styles for accessibility */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Light.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Light.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Light.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
+/* Smooth transitions for all interactive elements */
+button,
+a,
+.premium-card,
+.premium-nav-card,
+.premium-activity-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Extralight.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Extralight.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Extralight.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
+/* Enhanced glow effects */
+.premium-icon:hover {
+  animation: glow-pulse 2s ease-in-out infinite;
 }
 
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Medium.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Medium.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Medium.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
+/* Text glow for premium titles */
+.premium-title,
+.premium-section-title {
+  text-shadow: var(--glow-primary);
 }
 
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Semibold.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Semibold.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Semibold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
+/* Backdrop blur support */
+@supports (backdrop-filter: blur(10px)) {
+  .premium-card,
+  .premium-nav-card,
+  .premium-activity-card {
+    backdrop-filter: blur(10px);
+  }
 }
 
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Bold.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Bold.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Bold.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
+/* Fallback for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(10px)) {
+  .premium-card,
+  .premium-nav-card,
+  .premium-activity-card {
+    background: rgba(0, 41, 107, 0.25);
+  }
 }
 
-@font-face {
-  font-family: "Technor";
-  src: url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Black.woff2") format("woff2"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Black.woff") format("woff"),
-       url("/fonts/Technor_Complete/Fonts/WEB/fonts/Technor-Black.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-}
-
-/* Variables CSS pour les polices et les couleurs */
-:root {
-  /* Variables pour les polices */
-  --font-departure: DepartureMono, monospace;
-  --font-khand: Khand, sans-serif;
-  --font-kola: Kola, sans-serif;
-  --font-nippo: Nippo, sans-serif;
-  --font-technor: Technor, sans-serif;
-  --font-noto: 'Noto Sans', sans-serif;
-  
-  /* Variables pour le thème de typographie actif */
-  --heading-font: var(--font-departure);
-  --body-font: var(--font-noto);
-  --mono-font: var(--font-departure);
-  
-  /* Variables pour les couleurs vertes */
-  --color-ash_gray: #cad2c5;
-  --color-cambridge_blue: #84a98c;
-  --color-hookers_green: #52796f;
-  --color-dark_slate_gray: #354f52;
-  --color-charcoal: #2f3e46;
-  
-  /* Variables pour les couleurs bleues */
-  --color-true_blue: #0466c8;
-  --color-sapphire: #0353a4;
-  --color-yale_blue: #023e7d;
-  --color-oxford_blue_1: #002855;
-  --color-oxford_blue_2: #001845;
-  --color-oxford_blue_3: #001233;
-  --color-delft_blue: #33415c;
-  --color-paynes_gray: #5c677d;
-  --color-slate_gray: #7d8597;
-  --color-cool_gray: #979dac;
-  
-  /* Variables pour les couleurs grises */
-  --color-seasalt: #f8f9fa;
-  --color-anti-flash_white: #e9ecef;
-  --color-platinum: #dee2e6;
-  --color-french_gray_1: #ced4da;
-  --color-french_gray_2: #adb5bd;
-  --color-slate_gray: #6c757d;
-  --color-outer_space: #495057;
-  --color-onyx: #343a40;
-  --color-eerie_black: #212529;
-
-    /* Variables pour les couleurs jaunes */
-    --color-naples_yellow: #ffe169;
-    --color-mustard: #fad643;
-    --color-saffron: #edc531;
-    --color-golden_brown: #926c15;
-    --color-field_drab_1: #805b10;
-    --color-field_drab_2: #76520e;
-    --color-dark_goldenrod_1: #b69121;
-  
-  /* Variables pour le thème de couleurs actif */
-  --primary-color: var(--color-cambridge_blue);
-  --accent-color: var(--color-hookers_green);
-  --border-color: var(--color-dark_slate_gray);
-  --text-color: var(--color-dark_slate_gray);
-  --text-color-light: var(--color-cambridge_blue);
-  --link-color: var(--color-hookers_green);
-  --link-hover-color: var(--color-charcoal);
-  --color-black: #000;
-}
-
-@layer base {
-  html {
-    scroll-behavior: smooth;
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .premium-container {
+    padding: 0;
   }
   
-  body {
-    @apply min-h-screen antialiased;
-    font-family: var(--body-font);
-    background-color: var(--primary-color);
-    color: var(--text-color);
+  .premium-card,
+  .premium-nav-card,
+  .premium-activity-card {
+    border-radius: 8px;
   }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply tracking-wide;
-    font-family: var(--heading-font);
-    color: var(--text-color);
-  }
-
-  h1 {
-    @apply text-4xl md:text-5xl font-bold mb-8;
-    font-family: var(--heading-font);
-  }
-
-  h2 {
-    @apply text-3xl md:text-4xl font-bold mb-6;
-    font-family: var(--heading-font);
-  }
-
-  h3 {
-    @apply text-2xl md:text-3xl font-bold mb-4;
-    font-family: var(--heading-font);
-  }
-
-  p {
-    @apply leading-relaxed text-base md:text-lg;
-    font-family: var(--body-font);
-    color: var(--text-color);
-  }
-
-  a {
-    @apply transition-colors duration-300;
-    font-family: var(--body-font);
-    color: var(--link-color);
-  }
-
-  a:hover {
-    color: var(--link-hover-color);
+  
+  .premium-section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 }
 
-@layer components {
-  /* Buttons */
-  .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 font-bold tracking-wide rounded-lg
-    transition-all duration-300
-    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-opacity-50
-    disabled:opacity-60 disabled:cursor-not-allowed
-    text-base;
-    font-family: var(--heading-font);
-    focus-ring-offset-color: var(--primary-color);
-    focus-ring-color: var(--accent-color);
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .premium-card,
+  .premium-nav-card,
+  .premium-activity-card {
+    border-width: 2px;
   }
   
-  .btn-primary {
-    @apply shadow-soft hover:bg-opacity-90;
-    background-color: var(--accent-color);
-    color: white;
-    font-family: var(--heading-font);
-  }
-  
-  .btn-secondary {
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    font-family: var(--heading-font);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--accent-color);
-  }
-
-  .btn-ghost {
-    @apply bg-transparent;
-    color: var(--text-color);
-    font-family: var(--heading-font);
-  }
-
-  .btn-ghost:hover {
-    color: var(--link-color);
-  }
-
-  .btn-sm {
-    @apply px-4 py-2 text-sm rounded-md;
-    font-family: var(--heading-font);
-  }
-
-  .btn-lg {
-    @apply px-8 py-4 text-lg rounded-lg;
-    font-family: var(--heading-font);
-  }
-
-  /* Domain-specific buttons */
-  .btn-builder {
-    @apply shadow-soft hover:bg-opacity-90;
-    background-color: var(--accent-color);
-    color: white;
-    font-family: var(--heading-font);
-  }
-
-  .btn-communicator {
-    @apply shadow-soft hover:bg-opacity-90;
-    background-color: var(--link-color);
-    color: white;
-    font-family: var(--heading-font);
-  }
-
-  /* Cards & Containers */
-  .card {
-    @apply backdrop-blur-md rounded-xl p-6 md:p-8
-    shadow-soft
-    transition-all duration-300;
-    background-color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-  }
-  
-  .panel {
-    @apply backdrop-blur-md rounded-xl p-6 shadow-soft;
-    background-color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-  }
-
-  .glass {
-    @apply backdrop-blur-md;
-    background-color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-  }
-
-  /* User card styles */
-  .user-card {
-    @apply card flex items-center gap-4;
-  }
-
-  .avatar {
-    @apply rounded-full overflow-hidden;
-    border: 2px solid var(--accent-color);
-  }
-
-  /* Form Elements */
-  .input {
-    @apply w-full px-4 py-3 rounded-none
-    focus:outline-none;
-    background-color: var(--primary-color);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-  }
-
-  .input:focus {
-    border-color: var(--accent-color);
-  }
-
-  .input::placeholder {
-    color: var(--text-color-light);
-    opacity: 0.5;
-  }
-
-  .input-group {
-    @apply space-y-2;
-  }
-
-  .label {
-    @apply block text-sm font-bold mb-1;
-    color: var(--text-color);
-    font-family: var(--heading-font);
-  }
-
-  /* Navigation */
-  .nav-link {
-    @apply px-4 py-2 rounded-lg transition-all duration-300 relative;
-    color: var(--text-color);
-    font-family: var(--heading-font);
-  }
-
-  .nav-link:hover {
-    color: var(--link-color);
-  }
-
-  .nav-link::after {
-    content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300;
-    background-color: var(--accent-color);
-  }
-
-  .nav-link:hover::after {
-    @apply w-full;
-  }
-
-  .nav-link-active {
-    color: var(--accent-color);
-    font-family: var(--heading-font);
-  }
-
-  .nav-link-active::after {
-    @apply w-full;
-  }
-
-  /* Header styles */
-  .header {
-    @apply py-3 px-10 flex items-center justify-between;
-    border-bottom: 1px solid var(--border-color);
-    font-family: var(--heading-font);
-  }
-
-  /* Chat Elements */
-  .message-bubble {
-    @apply rounded-xl p-4 my-2 max-w-[85%] shadow-soft;
-    font-family: var(--body-font);
-  }
-  
-  .message-user {
-    @apply message-bubble ml-auto;
-    background-color: var(--accent-color);
-    color: white;
-  }
-  
-  .message-system {
-    @apply message-bubble backdrop-blur-md;
-    background-color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-  }
-
-  /* Progress bar styles */
-  .progress-container {
-    @apply w-full h-4 rounded-full overflow-hidden;
-    background-color: var(--border-color);
-  }
-  
-  .progress-fill {
-    @apply h-full origin-left transition-all duration-300;
-    background-color: var(--accent-color);
-  }
-
-  /* Section layouts */
-  .section {
-    @apply py-12 md:py-20;
-  }
-
-  .container-narrow {
-    @apply max-w-4xl mx-auto px-10;
-  }
-
-  /* Layout container as per specs */
-  .layout-container {
-    @apply max-w-[960px] mx-auto px-10;
-  }
-
-  /* Background patterns */
-  .bg-branch {
-    @apply bg-branch-pattern bg-repeat opacity-10;
-  }
-
-  .bg-grid {
-    @apply bg-grid-pattern bg-repeat opacity-10;
-  }
-
-  .bg-stitch {
-    @apply bg-stitch-pattern bg-repeat;
-  }
-
-  /* Animations & Effects */
-  .hover-lift {
-    @apply transition-transform duration-300 hover:-translate-y-1;
-  }
-
-  .fade-in {
-    @apply animate-fade-in;
-  }
-
-  .grow {
-    @apply animate-grow;
-  }
-  
-  /* Gradient Text */
-  .gradient-text {
-    @apply font-bold;
-    background: linear-gradient(to right, var(--accent-color), var(--primary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-    font-family: var(--heading-font);
-  }
-
-  /* ReactFlow customization */
-  .react-flow__node {
-    @apply rounded-lg;
-    border: 1px solid var(--border-color);
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-  }
-
-  .react-flow__edge-path {
-    stroke: var(--border-color);
-    stroke-width: 2px;
-  }
-
-  .react-flow__edge-path:hover {
-    stroke: var(--accent-color);
-  }
-
-  /* Tree/Graph rendering */
-  .tree-node {
-    @apply rounded-lg p-4 shadow-soft;
-    background-color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-  }
-
-  .tree-node-active {
-    border-color: var(--accent-color);
-  }
-
-  .tree-edge {
-    stroke: var(--border-color);
-    stroke-width: 1px;
+  .premium-title,
+  .premium-section-title {
+    text-shadow: none;
+    font-weight: 800;
   }
 }
 
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  canvas {
+    display: none;
+  }
+}
+
+/* Chat Search Header Styles */
+.search-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  width: 100%;
+}
+
+.search-header__input {
+  font-family: inherit;
+  font-size: 16px;
+  background-color: #0a0a0a;
+  border: solid 0.5px #525252;
+  color: #646464;
+  padding: 0.7rem 1rem;
+  border-radius: 25px;
+  width: 100%;
+  height: 48px;
+  transition: all ease-in-out 0.5s;
+  margin-right: 1rem;
+  opacity: 1;
+  text-align: left;
+  flex: 1;
+}
+
+.search-header__input:hover,
+.search-header__input:focus {
+  box-shadow: 0 0 1em #00000013;
+}
+
+.search-header__input:focus {
+  outline: none;
+  background-color: #0a0a0aad;
+}
+
+.search-header__input::-webkit-input-placeholder {
+  font-weight: 100;
+  color: #3a3a3a;
+}
+
+.search-header__input:focus + .search-header__button {
+  background-color: transparent;
+}
+
+.search-header__button {
+  border: none;
+  background-color: transparent;
+  margin-top: 0.1em;
+}
+
+.search-header__button:hover {
+  cursor: pointer;
+}
+
+.search-header__icon {
+  height: 1.3em;
+  width: 1.3em;
+  fill: #3a3a3a;
+}
+
+/* Print styles */
+@media print {
+  .premium-container {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .premium-card,
+  .premium-nav-card,
+  .premium-activity-card {
+    border: 1px solid #ccc !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+  
+  canvas {
+    display: none !important;
+  }
+}
