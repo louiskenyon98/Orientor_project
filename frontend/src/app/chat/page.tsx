@@ -167,96 +167,160 @@ export default function ChatPage() {
     };
 
     return (
-        <MainLayout>
-            <div className="flex flex-col h-[calc(100vh-12rem)] max-w-4xl mx-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <p className="text-sm text-neutral-lightgray opacity-70">Your Socratic mentor for self-discovery</p>
-                    </div>
-                    <button
-                        onClick={handleClearChat}
-                        disabled={isClearingChat || messages.length === 0}
-                        className="btn btn-secondary text-sm"
-                    >
-                        Clear Chat
-                    </button>
-                </div>
-                
-                {authError && (
-                    <div className="bg-red-900/20 border border-secondary-coral text-secondary-coral px-4 py-3 rounded-lg mb-4">
-                        {authError}
-                    </div>
-                )}
-                
-                <div className="relative flex-1 overflow-y-auto rounded-lg mb-4 group">
-                    {/* Animated border */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-stitch-accent via-secondary-teal to-stitch-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-spin-slow"></div>
-                    {/* Background with blur */}
-                    <div className="absolute inset-[1px] bg-stitch-primary/90 backdrop-blur-sm rounded-lg"></div>
-                    {/* Content */}
-                    <div className="relative z-10 p-4 h-full">
-                        {messages.map((message) => (
-                            <div
-                                key={message.id}
-                                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
-                            >
-                                <div className={`relative ${message.sender === 'user' ? 'message-user' : 'message-system'}`}>
-                                    <div className="relative z-10 bg-stitch-primary/90 backdrop-blur-sm rounded-lg p-4">
-                                        <div className="whitespace-pre-wrap">{message.text}</div>
-                                        {message.sender === 'ai' && !feedback.find(f => f.messageId === message.id) && (
-                                            <div className="flex items-center justify-end mt-2 space-x-2 text-xs">
-                                                <button
-                                                    onClick={() => handleFeedback(message.id, 'helpful')}
-                                                    className="text-neutral-lightgray hover:text-secondary-teal transition-colors"
-                                                >
-                                                </button>
-                                                <button
-                                                    onClick={() => handleFeedback(message.id, 'not_helpful')}
-                                                    className="text-neutral-lightgray hover:text-secondary-coral transition-colors"
-                                                >
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        {isTyping && (
-                            <div className="flex justify-start mb-4">
-                                <div className="message-system flex items-center space-x-2">
-                                    <div className="flex space-x-1">
-                                        <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                        <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                        <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce"></div>
-                                    </div>
-                                    <span className="text-sm">Thinking...</span>
-                                </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-                </div>
+        <>
+            {/* Full-screen cinematic background */}
+            <div
+                className="fixed inset-0 z-0"
+                style={{
+                    background: `radial-gradient(circle at 70% center, #fdc500 0%, #ffd500 20%, #fffbe0 50%, #000000 100%)`
+                }}
+            ></div>
 
-                <form onSubmit={handleSubmit} className="search-header">
-                    <input
-                        type="text"
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        placeholder="Ask anything about your career path, interests, or goals..."
-                        className="search-header__input"
-                        disabled={isTyping}
-                    />
-                    <button
-                        type="submit"
-                        disabled={!inputMessage.trim() || isTyping}
-                        className="search-header__button"
-                    >
-                        <svg className="search-header__icon" viewBox="0 0 24 24">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                        </svg>
-                    </button>
-                </form>
+            {/* Grain texture overlay - blends with gradient */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none opacity-[0.03]"
+                style={{
+                    backgroundImage: `url('/patterns/realistic-grainy-texture-background/6497230.jpg')`,
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    mixBlendMode: 'overlay'
+                }}
+            ></div>
+
+            {/* Ambient glow layer */}
+            <div
+                className="fixed inset-0 z-0 pointer-events-none"
+                style={{
+                    background: `radial-gradient(circle at 70% center, rgba(253, 197, 0, 0.2) 0%, transparent 60%)`,
+                    filter: 'blur(80px)'
+                }}
+            ></div>
+
+            {/* Massive translucent watermark behind everything */}
+            <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                <div
+                    className="text-[20vw] font-extrabold text-white opacity-[0.08] select-none whitespace-nowrap tracking-widest"
+                    style={{
+                        fontFamily: 'inherit',
+                        filter: 'blur(1px)',
+                        background: 'linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.2) 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        textShadow: '0 0 20px rgba(255,255,255,0.1)'
+                    }}
+                >
+                    NAVIGO
+                </div>
             </div>
-        </MainLayout>
+
+            {/* MainLayout with navigation */}
+            <MainLayout>
+                <div className="relative z-10 w-full h-[calc(100vh-4rem)]">
+                    {/* Header with clear chat button */}
+                    <div className="absolute top-6 right-6 z-20">
+                        <button
+                            onClick={handleClearChat}
+                            disabled={isClearingChat || messages.length === 0}
+                            className="px-4 py-2 bg-black/60 text-white rounded-lg backdrop-blur-sm hover:bg-black/80 transition-colors disabled:opacity-50 shadow-lg"
+                        >
+                            Clear Chat
+                        </button>
+                    </div>
+
+                    {/* Auth Error */}
+                    {authError && (
+                        <div className="absolute top-6 left-6 right-24 z-20">
+                            <div className="bg-red-900/80 border border-red-500 text-red-200 px-4 py-3 rounded-lg backdrop-blur-sm shadow-lg">
+                                {authError}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Messages Area */}
+                    <div className="absolute inset-x-0 top-20 bottom-32 z-10">
+                        <div className="h-full overflow-y-auto px-6">
+                            <div className="max-w-4xl mx-auto">
+                                {messages.map((message) => (
+                                    <div
+                                        key={message.id}
+                                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
+                                    >
+                                        <div className={`max-w-2xl ${message.sender === 'user' ? 'bg-black/80' : 'bg-white/90'} rounded-xl p-4 backdrop-blur-sm shadow-lg border border-white/10`}>
+                                            <div className={`whitespace-pre-wrap ${message.sender === 'user' ? 'text-white' : 'text-black'}`}>
+                                                {message.text}
+                                            </div>
+                                            {message.sender === 'ai' && !feedback.find(f => f.messageId === message.id) && (
+                                                <div className="flex items-center justify-end mt-2 space-x-2 text-xs">
+                                                    <button
+                                                        onClick={() => handleFeedback(message.id, 'helpful')}
+                                                        className="text-gray-500 hover:text-green-600 transition-colors"
+                                                    >
+                                                        👍
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleFeedback(message.id, 'not_helpful')}
+                                                        className="text-gray-500 hover:text-red-600 transition-colors"
+                                                    >
+                                                        👎
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                                {isTyping && (
+                                    <div className="flex justify-start mb-6">
+                                        <div className="bg-white/90 rounded-xl p-4 backdrop-blur-sm shadow-lg flex items-center space-x-2 border border-white/10">
+                                            <div className="flex space-x-1">
+                                                <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                                <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                                <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce"></div>
+                                            </div>
+                                            <span className="text-sm text-gray-600">Thinking...</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Chat Input */}
+                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-2xl px-6">
+                        <form onSubmit={handleSubmit} className="relative">
+                            <div
+                                className="relative bg-black/80 rounded-xl shadow-lg backdrop-blur-sm border border-yellow-500/20"
+                                style={{
+                                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.4)'
+                                }}
+                            >
+                                <input
+                                    type="text"
+                                    value={inputMessage}
+                                    onChange={(e) => setInputMessage(e.target.value)}
+                                    placeholder="I'm listening...."
+                                    className="w-full px-6 py-4 pr-16 bg-transparent text-white placeholder-gray-400 border-none outline-none rounded-xl"
+                                    disabled={isTyping}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!inputMessage.trim() || isTyping}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                                >
+                                    <svg
+                                        className="w-5 h-5 text-black"
+                                        viewBox="0 0 24 24"
+                                        fill="currentColor"
+                                    >
+                                        <path d="M12 2l10 10-10 10v-6H2v-8h10V2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </MainLayout>
+        </>
     );
 } 
