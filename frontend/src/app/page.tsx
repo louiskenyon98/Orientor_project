@@ -14,6 +14,7 @@ import { Job } from '@/components/jobs/JobCard';
 import styles from '@/styles/patterns.module.css';
 import sidebarStyles from '@/styles/sidebar.module.css';
 import NewSidebar from '@/components/layout/NewSidebar';
+import CareerProgress from '@/components/dashboard/CareerProgress';
 
 // Interface pour la réponse de l'API de recommandations d'emploi
 interface JobRecommendationsResponse {
@@ -22,36 +23,79 @@ interface JobRecommendationsResponse {
 }
 
 export default function Home() {
-  const router = useRouter();
-  const [userData] = useState({
-    name: 'Philippe B.',
-    role: 'Étudiant Msc. in Data Science',
-    level: 3,
-    avatarUrl: '/Avatar.PNG',
-    skills: ['UI Design', 'JavaScript', 'React', 'Node.js'],
-    careerTreesExplored: 3,
-    skillsInProgress: 12,
-    totalXP: 250,
-    careerTreeCompletion: 60,
-    skillTreeCompletion: 40,
-    badgesEarned: 5,
-    challengesCompleted: 8,
-    notesSaved: 15,
-    recentActivities: [
-      {
-        type: 'challenge',
-        title: 'Challenge Complété',
-        description: "Complété challenge: 'Data Analysis Basics'",
-        icon: 'CheckCircle'
-      },
-      {
-        type: 'xp',
-        title: 'XP Gagné',
-        description: 'Gagné 250 XP',
-        icon: 'Star'
-      }
-    ]
-  });
+interface UserDataType {
+  name: string;
+  role: string;
+  level: number;
+  avatarUrl: string;
+  skills: string[];
+  careerTreesExplored: number;
+  skillsInProgress: number;
+  totalXP: number;
+  careerTreeCompletion: number;
+  skillTreeCompletion: number;
+  badgesEarned: number;
+  challengesCompleted: number;
+  notesSaved: number;
+  recentActivities: { type: string; title: string; description: string; icon: string }[];
+}
+
+const [userData] = useState<UserDataType>({
+  name: '',
+  role: '',
+  level: 0,
+  avatarUrl: '',
+  skills: [],
+  careerTreesExplored: 0,
+  skillsInProgress: 0,
+  totalXP: 0,
+  careerTreeCompletion: 0,
+  skillTreeCompletion: 0,
+  badgesEarned: 0,
+  challengesCompleted: 0,
+  notesSaved: 0,
+  recentActivities: [ // Ensure array has proper structure
+    {
+      type: 'challenge',
+      title: 'Exemple',
+      description: 'Description',
+      icon: 'IconName'
+    }
+  ] // Added missing closing parenthesis and semicolon
+}); // Added missing semicolon
+
+// Move progressData declaration after userData initialization
+const progressData = { // Fixed object structure
+  pathways: [{
+    name: 'Data Science Mastery',
+    completion: userData.careerTreeCompletion,
+    badges: ['DS101', 'Python Pro'],
+    xp: userData.totalXP
+  }]
+}; // Added missing semicolon
+// Moved useRouter to top-level component hook
+  // Duplicate userData removed
+    // Supprimé l'objet de chemin de carrière dupliqué
+  ] // Fix array closure
+}; // Close object properly
+
+// Ensure recentActivities is properly initialized
+const initialActivities = [ // New array initialization
+  {
+    type: 'challenge',
+    title: 'Challenge Complété',
+    description: "Complété challenge: 'Data Analysis Basics'",
+    icon: 'CheckCircle'
+  },
+  {
+    type: 'xp',
+    title: 'XP Gagné',
+    description: 'Gagné 250 XP',
+    icon: 'Star'
+  }
+];
+
+// Ensure proper component structure
 
   // État pour stocker les résultats du test Holland (RIASEC)
   const [hollandResults, setHollandResults] = useState<ScoreResponse | null>(null);
@@ -158,13 +202,14 @@ export default function Home() {
   const personalityItems = [
     { name: 'Holland Test', icon: 'Personality', path: '/holland-test' },
     { name: 'Personality', icon: 'Personality', path: '/profile/holland-results' },
-  ];
+  ]; // Ensure proper array closure
 
-  const navigateTo = (path: string) => {
+  // Ensure router is declared at top level
+  const router = useRouter(); // Added missing semicolon
+
+  const navigateTo = (path: string) => { // Added missing function body
     router.push(path);
   };
-
-  return (
     <MainLayout showNav={false}>
       <div className={`relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden ${styles.container}`}>
         <div className="relative z-10 w-full flex h-full grow">
@@ -396,7 +441,31 @@ export default function Home() {
                     fontFamily: 'var(--heading-font)'
                   }}>Activité récente</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8">
-                    {userData.recentActivities.map((activity, index) => (
+                    {userData.recentActivities.map((activity: any, index: number) => ( // Explicit type annotation
+                      <div key={index} className="activity-item">
+                        {activity.icon === 'CheckCircle' ? (
+                          <CheckCircleIcon className="activity-icon success" />
+                        ) : (
+                          <StarIcon className="activity-icon" />
+                        )}
+                        <div className="activity-content">
+                          <p style={{ color: 'var(--accent-color)' }}>{activity.title}</p>
+                          <p style={{ color: 'var(--text-color)' }}>{activity.description}</p>
+                        </div>
+                      </div>
+                    ))} // Ensure proper JSX closure
+                      <div key={index} className="activity-item">
+                        {activity.icon === 'CheckCircle' ? (
+                          <CheckCircleIcon className="activity-icon success" />
+                        ) : (
+                          <StarIcon className="activity-icon" />
+                        )}
+                        <div className="activity-content">
+                          <p style={{ color: 'var(--accent-color)' }}>{activity.title}</p>
+                          <p style={{ color: 'var(--text-color)' }}>{activity.description}</p>
+                        </div>
+                      </div>
+                    ))} {/* Added closing JSX comment */}
                       <div key={index} className="flex items-center gap-4 bg-black/30 p-5 md:p-6 rounded-lg border shadow-md min-h-[100px]"
                            style={{ borderColor: 'var(--border-color)' }}>
                         <div className="flex items-center justify-center rounded-lg shrink-0 size-12 md:size-14"

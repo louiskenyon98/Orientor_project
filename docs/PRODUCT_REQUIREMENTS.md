@@ -521,3 +521,4 @@ graph TD
 **Relationships**:  
 - `user_id` → `users.id`  
 - One-to-Many with `user_notes` (via `UserNote.saved_recommendation_id`)  
+
