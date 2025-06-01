@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { endpoint, logApiDetails } from '@/utils/api';
+import styles from './loginForm.module.css';
 
 interface LoginResponse {
     access_token: string;
@@ -89,99 +90,51 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold font-display gradient-text mb-2">
-                        Navigo
-                    </h1>
-                    <h2 className="text-2xl font-bold text-neutral-500 mb-2">
-                        Welcome Back
-                    </h2>
-                    <p className="text-neutral-500">
-                        Your personal guide for growth and self-discovery
-                    </p>
-                </div>
-                
-                <div className="card backdrop-blur-md">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div className="space-y-4">
-                            <div className="input-group">
-                                <label htmlFor="email" className="label">
-                                    Email address
-                                </label>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="input"
-                                    placeholder="you@example.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                            
-                            <div className="input-group">
-                                <label htmlFor="password" className="label">
-                                    Password
-                                </label>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="input"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                            </div>
-                            
-                            <div className="text-right">
-                                <a href="#" className="text-sm text-primary-teal hover:text-primary-lilac transition-colors duration-300">
-                                    Forgot password?
-                                </a>
-                            </div>
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    <div id="heading" className={styles.heading}>Sign In</div>
+                    <div className={styles.field}>
+                        <span className={styles['input-icon']}>@</span>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            required
+                            className={styles['input-field']}
+                            placeholder="Adresse e-mail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className={styles.field}>
+                        <span className={styles['input-icon']}>🔒</span>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            required
+                            className={styles['input-field']}
+                            placeholder="Mot de passe"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    <div className={`${styles.form} ${styles.btn}`}>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className={styles.button1}
+                        >
+                            {isLoading ? 'Connexion...' : 'Se connecter'}
+                        </button>
+                        <Link href="/register" className={styles.button2}>S'inscrire</Link>
+                    </div>
+                    <button type="button" className={styles.button3} onClick={() => router.push('/')}>Back to Home</button>
+                    {error && (
+                        <div className="text-accent-coral text-sm text-center py-3 px-4 bg-accent-coral/10 border border-accent-coral/20 rounded-lg">
+                            {error}
                         </div>
-
-                        {error && (
-                            <div className="text-accent-coral text-sm text-center py-3 px-4 bg-accent-coral/10 border border-accent-coral/20 rounded-lg">
-                                {error}
-                            </div>
-                        )}
-
-                        <div>
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="btn btn-primary w-full"
-                            >
-                                {isLoading ? (
-                                    <span className="flex items-center justify-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Signing in...
-                                    </span>
-                                ) : 'Sign In'}
-                            </button>
-                        </div>
-                    
-                        <div className="text-center text-sm text-neutral-500 pt-4">
-                            Don't have an account?{' '}
-                            <Link href="/register" className="text-primary-teal hover:text-primary-lilac transition-colors duration-300 font-medium">
-                                Register here
-                            </Link>
-                        </div>
-                    </form>
-                </div>
-                
-                <div className="mt-8 text-center text-xs text-neutral-400">
-                    By signing in, you agree to our
-                    <a href="#" className="text-primary-teal hover:text-primary-lilac mx-1">Terms of Service</a>
-                    and
-                    <a href="#" className="text-primary-teal hover:text-primary-lilac mx-1">Privacy Policy</a>
-                </div>
+                    )}
+                </form>
             </div>
         </div>
     );

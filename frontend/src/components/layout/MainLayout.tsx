@@ -264,9 +264,9 @@ export default function MainLayout({
             {isLoggedIn && (
             //             <div className="min-h-screen bg-light-background dark:bg-dark-background">
             // {showNav && (
-                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/90 backdrop-blur-md border-b border-stitch-border shadow-sm hidden md:block font-departure header">
+                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/80 backdrop-blur-md px-6 py-3 hidden md:block font-departure header">
                     <div className="layout-container mx-auto">
-                        <div className="flex justify-between items-center py-2">
+                        <div className="flex justify-between items-center">
                             {/* Left Side - Logo and Primary Navigation */}
                             <div className="flex items-center space-x-6">
                                 {/* Logo */}
@@ -302,10 +302,13 @@ export default function MainLayout({
                                 </div>
                             </div>
 
-                            {/* Right Side - User Profile & Settings */}
+                            {/* Right Side - XP Progress, Dark Mode Toggle, User Profile & Logout */}
                             <div className="flex items-center space-x-4">
                                 {/* XP Progress Bar */}
-                                <XPProgress className="mr-2" />
+                                <div className="relative group">
+                                    <XPProgress className="mr-2" />
+                                    <div className="absolute inset-0 bg-stitch-accent/10 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+                                </div>
                                 
                                 {/* Theme Toggle */}
                                 <ThemeToggle />
