@@ -188,44 +188,53 @@ export default function ChatPage() {
                     </div>
                 )}
                 
-                <div className="flex-1 overflow-y-auto bg-white/30 backdrop-blur-sm rounded-lg p-4 mb-4">
-                    {messages.map((message) => (
-                        <div
-                            key={message.id}
-                            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
-                        >
-                            <div className={message.sender === 'user' ? 'message-user' : 'message-system'}>
-                                <div className="whitespace-pre-wrap">{message.text}</div>
-                                {message.sender === 'ai' && !feedback.find(f => f.messageId === message.id) && (
-                                    <div className="flex items-center justify-end mt-2 space-x-2 text-xs">
-                                        <button
-                                            onClick={() => handleFeedback(message.id, 'helpful')}
-                                            className="text-neutral-lightgray hover:text-secondary-teal transition-colors"
-                                        >
-                                        </button>
-                                        <button
-                                            onClick={() => handleFeedback(message.id, 'not_helpful')}
-                                            className="text-neutral-lightgray hover:text-secondary-coral transition-colors"
-                                        >
-                                        </button>
+                <div className="relative flex-1 overflow-y-auto rounded-lg mb-4 group">
+                    {/* Animated border */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-stitch-accent via-secondary-teal to-stitch-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-spin-slow"></div>
+                    {/* Background with blur */}
+                    <div className="absolute inset-[1px] bg-stitch-primary/90 backdrop-blur-sm rounded-lg"></div>
+                    {/* Content */}
+                    <div className="relative z-10 p-4 h-full">
+                        {messages.map((message) => (
+                            <div
+                                key={message.id}
+                                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                            >
+                                <div className={`relative ${message.sender === 'user' ? 'message-user' : 'message-system'}`}>
+                                    <div className="relative z-10 bg-stitch-primary/90 backdrop-blur-sm rounded-lg p-4">
+                                        <div className="whitespace-pre-wrap">{message.text}</div>
+                                        {message.sender === 'ai' && !feedback.find(f => f.messageId === message.id) && (
+                                            <div className="flex items-center justify-end mt-2 space-x-2 text-xs">
+                                                <button
+                                                    onClick={() => handleFeedback(message.id, 'helpful')}
+                                                    className="text-neutral-lightgray hover:text-secondary-teal transition-colors"
+                                                >
+                                                </button>
+                                                <button
+                                                    onClick={() => handleFeedback(message.id, 'not_helpful')}
+                                                    className="text-neutral-lightgray hover:text-secondary-coral transition-colors"
+                                                >
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                    {isTyping && (
-                        <div className="flex justify-start mb-4">
-                            <div className="message-system flex items-center space-x-2">
-                                <div className="flex space-x-1">
-                                    <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                    <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                    <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce"></div>
                                 </div>
-                                <span className="text-sm">Thinking...</span>
                             </div>
-                        </div>
-                    )}
-                    <div ref={messagesEndRef} />
+                        ))}
+                        {isTyping && (
+                            <div className="flex justify-start mb-4">
+                                <div className="message-system flex items-center space-x-2">
+                                    <div className="flex space-x-1">
+                                        <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                        <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                        <div className="h-2 w-2 bg-primary-blue rounded-full animate-bounce"></div>
+                                    </div>
+                                    <span className="text-sm">Thinking...</span>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="search-header">
