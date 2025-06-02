@@ -14,6 +14,8 @@ import ReactFlow, {
   Position
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 interface Node {
   id: string;
@@ -517,164 +519,187 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
         </div>
       </div>
 
-      {/* Top des compétences */}
-      <div className="rounded-lg p-6 mb-6" style={{
-        backgroundColor: 'var(--primary-color)',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'var(--border-color)'
-      }}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
-          Top {nodesPerLevel} des compétences à acquérir
-          <span className="text-sm ml-2" style={{ color: 'var(--text-color)' }}>
-            (Profondeur: {treeDepth}, Nœuds par niveau: {nodesPerLevel})
-          </span>
-        </h3>
-        
-        <div className="space-y-3">
-          {topSkills.map((skill, index) => (
-            <div 
-              key={skill.id} 
-              className="flex items-center p-3 rounded-lg"
-              style={{ backgroundColor: 'var(--primary-color)' }}
-            >
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white rounded-full mr-3"
-                   style={{ backgroundColor: 'var(--accent-color)' }}>
-                {index + 1}
-              </div>
-              <div>
-                <p className="font-medium" style={{ color: 'var(--accent-color)' }}>{skill.label}</p>
-                {skill.description && (
-                  <p className="text-sm mt-1 line-clamp-2" style={{ color: 'var(--text-color)' }}>
-                    {skill.description}
-                  </p>
-                )}
-              </div>
-              {skill.score !== undefined && (
-                <div className="ml-auto">
-                  <span className="text-white text-xs font-bold px-2 py-1 rounded-full"
-                        style={{ backgroundColor: 'var(--accent-color)' }}>
-                    {Math.round(skill.score * 100)}%
-                  </span>
+      {/* Dropdown pour les compétences et paramètres */}
+      <div className="mt-4">
+        <Disclosure>
+          {({ open }) => (
+            <>
+              <DisclosureButton 
+                className="w-full flex justify-between items-center px-4 py-2 rounded-lg" 
+                style={{ 
+                  backgroundColor: 'var(--primary-color)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--border-color)'
+                }}
+              >
+                <span style={{ color: 'var(--accent-color)' }}>Options et compétences</span>
+                <ChevronDownIcon
+                  className={`${open ? 'transform rotate-180' : ''} w-5 h-5`}
+                  style={{ color: 'var(--accent-color)' }}
+                />
+              </DisclosureButton>
+              <DisclosurePanel className="mt-2">
+                {/* Top des compétences */}
+                <div className="rounded-lg p-6 mb-6" style={{
+                  backgroundColor: 'var(--primary-color)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--border-color)'
+                }}>
+                  <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--accent-color)' }}>
+                    Top {nodesPerLevel} des compétences à acquérir
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    {topSkills.map((skill, index) => (
+                      <div 
+                        key={skill.id} 
+                        className="flex items-center p-3 rounded-lg"
+                        style={{ backgroundColor: 'var(--primary-color)' }}
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-white rounded-full mr-3"
+                             style={{ backgroundColor: 'var(--accent-color)' }}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="font-medium" style={{ color: 'var(--accent-color)' }}>{skill.label}</p>
+                          {skill.description && (
+                            <p className="text-sm mt-1 line-clamp-2" style={{ color: 'var(--text-color)' }}>
+                              {skill.description}
+                            </p>
+                          )}
+                        </div>
+                        {skill.score !== undefined && (
+                          <div className="ml-auto">
+                            <span className="text-white text-xs font-bold px-2 py-1 rounded-full"
+                                  style={{ backgroundColor: 'var(--accent-color)' }}>
+                              {Math.round(skill.score * 100)}%
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {topSkills.length === 0 && (
+                      <p className="text-center py-4" style={{ color: 'var(--text-color)' }}>
+                        Aucune compétence à développer identifiée.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
-          
-          {topSkills.length === 0 && (
-            <p className="text-center py-4" style={{ color: 'var(--text-color)' }}>
-              Aucune compétence à développer identifiée.
-            </p>
-          )}
-        </div>
-      </div>
 
-      {/* Contrôles pour les paramètres de l'arbre */}
-      <div className="rounded-lg p-4 mb-4" style={{
-        backgroundColor: 'var(--primary-color)',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'var(--border-color)'
-      }}>
-        <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--accent-color)' }}>
-          Paramètres de l'arbre
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-          <div>
-            <label htmlFor="treeDepth" className="block mb-1" style={{ color: 'var(--text-color)' }}>
-              Profondeur (1-3)
-            </label>
-            <div className="flex items-center">
-              <button
-                onClick={() => setTreeDepth(Math.max(1, treeDepth - 1))}
-                className="text-white px-2 py-1 rounded-l-md"
-                style={{ backgroundColor: 'var(--accent-color)' }}
-                disabled={treeDepth <= 1}
-              >
-                -
-              </button>
-              <input
-                id="treeDepth"
-                type="number"
-                min={1}
-                max={3}
-                value={treeDepth}
-                onChange={(e) => setTreeDepth(Math.min(3, Math.max(1, parseInt(e.target.value) || 1)))}
-                className="w-12 text-center border py-1"
-                style={{ borderColor: 'var(--border-color)' }}
-              />
-              <button
-                onClick={() => setTreeDepth(Math.min(3, treeDepth + 1))}
-                className="text-white px-2 py-1 rounded-r-md"
-                style={{ backgroundColor: 'var(--accent-color)' }}
-                disabled={treeDepth >= 3}
-              >
-                +
-              </button>
-            </div>
-          </div>
-          
-          <div>
-            <label htmlFor="nodesPerLevel" className="block mb-1" style={{ color: 'var(--text-color)' }}>
-              Nœuds (3-10)
-            </label>
-            <div className="flex items-center">
-              <button
-                onClick={() => setNodesPerLevel(Math.max(3, nodesPerLevel - 1))}
-                className="text-white px-2 py-1 rounded-l-md"
-                style={{ backgroundColor: 'var(--accent-color)' }}
-                disabled={nodesPerLevel <= 3}
-              >
-                -
-              </button>
-              <input
-                id="nodesPerLevel"
-                type="number"
-                min={3}
-                max={10}
-                value={nodesPerLevel}
-                onChange={(e) => setNodesPerLevel(Math.min(10, Math.max(3, parseInt(e.target.value) || 3)))}
-                className="w-12 text-center border py-1"
-                style={{ borderColor: 'var(--border-color)' }}
-              />
-              <button
-                onClick={() => setNodesPerLevel(Math.min(10, nodesPerLevel + 1))}
-                className="text-white px-2 py-1 rounded-r-md"
-                style={{ backgroundColor: 'var(--accent-color)' }}
-                disabled={nodesPerLevel >= 10}
-              >
-                +
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="flex space-x-2">
-          <button
-            onClick={applyParameters}
-            disabled={isLoading || isApplying}
-            className="text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors"
-            style={{ backgroundColor: 'var(--accent-color)' }}
-          >
-            {isApplying ? 'En cours...' : 'Appliquer'}
-          </button>
-          
-          <button
-            onClick={() => {
-              setIsApplying(true);
-              // Réinitialiser les paramètres
-              setTreeDepth(1);
-              setNodesPerLevel(5);
-              // Forcer un rechargement
-              setParamVersion(prev => prev + 1);
-            }}
-            disabled={isLoading || isApplying}
-            className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors"
-          >
-            Réinitialiser
-          </button>
-        </div>
+                {/* Contrôles pour les paramètres de l'arbre */}
+                <div className="rounded-lg p-4 mb-4" style={{
+                  backgroundColor: 'var(--primary-color)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--border-color)'
+                }}>
+                  <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--accent-color)' }}>
+                    Paramètres de l'arbre
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                    <div>
+                      <label htmlFor="treeDepth" className="block mb-1" style={{ color: 'var(--text-color)' }}>
+                        Profondeur (1-3)
+                      </label>
+                      <div className="flex items-center">
+                        <button
+                          onClick={() => setTreeDepth(Math.max(1, treeDepth - 1))}
+                          className="text-white px-2 py-1 rounded-l-md"
+                          style={{ backgroundColor: 'var(--accent-color)' }}
+                          disabled={treeDepth <= 1}
+                        >
+                          -
+                        </button>
+                        <input
+                          id="treeDepth"
+                          type="number"
+                          min={1}
+                          max={3}
+                          value={treeDepth}
+                          onChange={(e) => setTreeDepth(Math.min(3, Math.max(1, parseInt(e.target.value) || 1)))}
+                          className="w-12 text-center border py-1"
+                          style={{ borderColor: 'var(--border-color)' }}
+                        />
+                        <button
+                          onClick={() => setTreeDepth(Math.min(3, treeDepth + 1))}
+                          className="text-white px-2 py-1 rounded-r-md"
+                          style={{ backgroundColor: 'var(--accent-color)' }}
+                          disabled={treeDepth >= 3}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="nodesPerLevel" className="block mb-1" style={{ color: 'var(--text-color)' }}>
+                        Nœuds (3-10)
+                      </label>
+                      <div className="flex items-center">
+                        <button
+                          onClick={() => setNodesPerLevel(Math.max(3, nodesPerLevel - 1))}
+                          className="text-white px-2 py-1 rounded-l-md"
+                          style={{ backgroundColor: 'var(--accent-color)' }}
+                          disabled={nodesPerLevel <= 3}
+                        >
+                          -
+                        </button>
+                        <input
+                          id="nodesPerLevel"
+                          type="number"
+                          min={3}
+                          max={10}
+                          value={nodesPerLevel}
+                          onChange={(e) => setNodesPerLevel(Math.min(10, Math.max(3, parseInt(e.target.value) || 3)))}
+                          className="w-12 text-center border py-1"
+                          style={{ borderColor: 'var(--border-color)' }}
+                        />
+                        <button
+                          onClick={() => setNodesPerLevel(Math.min(10, nodesPerLevel + 1))}
+                          className="text-white px-2 py-1 rounded-r-md"
+                          style={{ backgroundColor: 'var(--accent-color)' }}
+                          disabled={nodesPerLevel >= 10}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={applyParameters}
+                      disabled={isLoading || isApplying}
+                      className="text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors"
+                      style={{ backgroundColor: 'var(--accent-color)' }}
+                    >
+                      {isApplying ? 'En cours...' : 'Appliquer'}
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        setIsApplying(true);
+                        // Réinitialiser les paramètres
+                        setTreeDepth(1);
+                        setNodesPerLevel(5);
+                        // Forcer un rechargement
+                        setParamVersion(prev => prev + 1);
+                      }}
+                      disabled={isLoading || isApplying}
+                      className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-opacity-90 transition-colors"
+                    >
+                      Réinitialiser
+                    </button>
+                  </div>
+                </div>
+              </DisclosurePanel>
+            </>
+          )}
+        </Disclosure>
       </div>
     </div>
   );
