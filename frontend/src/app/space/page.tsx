@@ -90,8 +90,14 @@ export default function SpacePage() {
 
   return (
     <MainLayout>
-      <div className="flex min-h-screen bg-white text-gray-800 font-inter">
-        <aside className="w-52 shrink-0 border-r border-gray-200 bg-white">
+      <div className="flex min-h-screen font-inter" style={{
+        backgroundColor: 'var(--background)',
+        color: 'var(--text)'
+      }}>
+        <aside className="w-52 shrink-0 border-r" style={{
+          borderColor: 'var(--border)',
+          backgroundColor: 'var(--background-secondary)'
+        }}>
           <Sidebar
             items={recommendations}
             selectedId={selected?.id}
@@ -102,7 +108,9 @@ export default function SpacePage() {
           />
         </aside>
         <main className="flex-1 px-10 py-6 overflow-y-auto">
-          <h1 className="text-xl font-semibold mb-6 tracking-tight">Saved Recommendations</h1>
+          <h1 className="text-xl font-semibold mb-6 tracking-tight" style={{ color: 'var(--text)' }}>
+            Saved Recommendations
+          </h1>
           {selected ? (
             <RecommendationDetail
               recommendation={selected}
@@ -110,7 +118,9 @@ export default function SpacePage() {
               generating={generating}
             />
           ) : (
-            <div className="text-gray-600 text-base text-center mt-20">Select a recommendation to view details.</div>
+            <div className="text-base text-center mt-20" style={{ color: 'var(--text-secondary)' }}>
+              Select a recommendation to view details.
+            </div>
           )}
         </main>
       </div>

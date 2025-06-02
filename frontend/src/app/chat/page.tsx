@@ -161,7 +161,7 @@ export default function ChatPage() {
             <div
                 className="fixed inset-0 z-0"
                 style={{
-                    background: `radial-gradient(circle at 80% center, #000000 0%, #000000 40%, #fdc500 60%, #ffd500 75%, #fffbe0 85%, #000000 100%)`
+                    background: `radial-gradient(circle at 20% center, #000000 0%, #000000 40%, #fdc500 60%, #ffd500 75%, #fffbe0 85%, #000000 100%)`
                 }}
             ></div>
 
