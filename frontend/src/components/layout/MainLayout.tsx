@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import XPProgress from '../ui/XPProgress';
 import DarkModeToggle from '../ui/DarkModeToggle';
-import TypographyToggle from '../ui/TypographyToggle';
 import ThemeToggle from '../ui/ThemeToggle';
 import styles from '@/styles/patterns.module.css';
 
@@ -313,18 +312,6 @@ export default function MainLayout({
                                 {/* Theme Toggle */}
                                 <ThemeToggle />
                                 
-                                {/* Settings Link */}
-                                <Link
-                                    href="/settings"
-                                    className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out
-                                        ${pathname === '/settings'
-                                            ? 'text-stitch-accent bg-stitch-primary/50'
-                                            : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                        }`}
-                                >
-                                    <span className="material-icons-outlined">settings</span>
-                                </Link>
-                                
                                 {/* User Profile */}
                                 <div className="flex items-center space-x-2">
                                     <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-stitch-accent">
@@ -449,20 +436,6 @@ export default function MainLayout({
                                             <span className="text-sm text-stitch-sage mr-auto">Thème</span>
                                             <ThemeToggle />
                                         </div>
-                                        
-                                        {/* Settings Link in mobile menu */}
-                                        <Link
-                                            href="/settings"
-                                            onClick={() => setMoreMenuOpen(false)}
-                                            className={`flex items-center px-4 py-3 text-sm ${
-                                                pathname === '/settings'
-                                                    ? 'bg-stitch-primary/50 text-stitch-accent font-bold'
-                                                    : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'
-                                            }`}
-                                        >
-                                            <span className="material-icons-outlined mr-2 text-stitch-sage">settings</span>
-                                            Paramètres
-                                        </Link>
                                         
                                         <button 
                                             onClick={handleLogout}
