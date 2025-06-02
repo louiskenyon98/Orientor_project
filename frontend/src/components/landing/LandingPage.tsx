@@ -12,6 +12,7 @@ import DemoChat from '@/components/chat/DemoChat';
 import JobSwipeCard from '@/components/chat/swipe_recommendation';
 import SkillSpiderChart from './SkillSpiderChart';
 import { useState } from 'react';
+import './landing-page.css';
 
 // Données fictives pour le constructeur de CV
 const resumeTemplates = [
@@ -25,14 +26,35 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="landing-container">
+      {/* Header avec Logo */}
+      <header className="landing-header">
+        <h1 className="text-4xl md:text-6xl font-bold gradient-text">
+          Welcome to Navigo
+        </h1>
+        <div className="light-button">
+          <button className="bt">
+            <div className="light-holder">
+              <div className="dot"></div>
+              <div className="light"></div>
+            </div>
+            <div className="button-holder">
+              <Image
+                src="/Logo.png"
+                alt="Navigo Logo"
+                width={50}
+                height={50}
+                className="object-contain"
+              />
+            </div>
+          </button>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="section">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <h1 className="text-4xl md:text-6xl font-bold gradient-text">
-              Welcome to Navigo
-            </h1>
             <p className="text-xl text-neutral-500 leading-relaxed">
               Your personal guide to discovering who you are—and who you could become. Navigo helps you reflect, plan, and progress with purpose, backed by intelligent guidance and skill tracking.
             </p>
@@ -40,75 +62,64 @@ export default function LandingPage() {
               <Link href="/login" className="btn btn-primary">Log In</Link>
               <Link href="/register" className="btn btn-outline">Sign Up</Link>
             </div>
-            {/* Hero Background Image
-            <div className="absolute inset-0 -z-10">
-              <Image
-                src="/navigo-hero.png"
-                alt="Navigo forest visual"
-                layout="fill"
-                objectFit="cover"
-                className="opacity-40"
-                priority
-              />
-            </div> */}
           </div>
         </div>
       </section>
       {/* Problem Section */}
       <section className="section mt-1">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">The Problem We're Tackling</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="diagnostic-grid">
 
           {/* Problem 1: Unclear Direction */}
-          <div className="card hover-lift">
-            <div className="mb-6 p-3 bg-red-100 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="card card-problem-1">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m0 14v1m8-8h1M4 12H3m15.36 6.36l.71.71M6.34 6.34l-.71-.71m12.02 0l.71-.71M6.34 17.66l-.71.71" />
               </svg>
+              <h3 className="para">Unclear Direction</h3>
+              <p className="para">
+                Many students don't know what they're good at, what excites them, or where to even begin exploring. Traditional guidance is shallow and generic.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-red-600 mb-4">Unclear Direction</h3>
-            <p className="text-neutral-500">
-              Many students don't know what they're good at, what excites them, or where to even begin exploring. Traditional guidance is shallow and generic.
-            </p>
           </div>
 
-          {/* Problem 2:  Digital Overload */}
-          <div className="card hover-lift">
-            <div className="mb-6 p-3 bg-blue-100 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Problem 2: Digital Overload */}
+          <div className="card card-problem-2">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
+              <h3 className="para">It's easier to type than to talk</h3>
+              <p className="para">
+               Students often turn to screens instead of seeking help face-to-face.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-gray-600 mb-4">It's easier to type than to talk</h3>
-            <p className="text-neutral-500">
-             Students often turn to screens instead of seeking help face-to-face.
-            </p>
           </div>
 
-          {/* Problem 2: Fragmented and Passive Tools */}
-          <div className="card hover-lift">
-            <div className="mb-6 p-3 bg-yellow-100 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Problem 3: Fragmented and Passive Tools */}
+          <div className="card card-problem-1">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z" />
               </svg>
+              <h3 className="para">Fragmented and Passive Tools</h3>
+              <p className="para">
+                Advice is scattered and platforms like job boards or course lists don't engage users in self-reflection or adaptive learning.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-yellow-600 mb-4">Fragmented and Passive Tools</h3>
-            <p className="text-neutral-500">
-              Advice is scattered and platforms like job boards or course lists don't engage users in self-reflection or adaptive learning.
-            </p>
           </div>
 
-          {/* Problem 3: Fading Motivation */}
-          <div className="card hover-lift">
-            <div className="mb-6 p-3 bg-blue-100 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Problem 4: Fading Motivation */}
+          <div className="card card-problem-2">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
+              <h3 className="para">Fading Motivation</h3>
+              <p className="para">
+                Without meaningful feedback or visible progress, learners lose confidence and abandon their efforts prematurely.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-blue-600 mb-4">Fading Motivation</h3>
-            <p className="text-neutral-500">
-              Without meaningful feedback or visible progress, learners lose confidence and abandon their efforts prematurely.
-            </p>
           </div>
 
         </div>
@@ -117,69 +128,80 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="section mt-1">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">How Navigo Helps</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="diagnostic-grid">
 
           {/* Feature 1: Career Guidance */}
-          <div className="card hover-lift border-l-4 border-primary-teal bg-primary-purple/10">
-            <div className="mb-6 p-3 bg-primary-purple/20 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-primary-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="card card-solution-1">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
+              <h3 className="para">Skill-Based Career Mapping</h3>
+              <p className="para">
+                We go beyond job titles. Navigo builds a graph of your skills to suggest personalized next steps—based on what you know, what you're building, and where you want to go.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-primary-teal mb-4">Skill-Based Career Mapping</h3>
-            <p className="text-neutral-600">
-              We go beyond job titles. Navigo builds a graph of your skills to suggest personalized next steps—based on what you know, what you're building, and where you want to go.
-            </p>
           </div>
 
           {/* Feature 2: Deep Personalization */}
-          <div className="card hover-lift border-l-4 border-accent-teal bg-accent-teal/10">
-            <div className="mb-6 p-3 bg-accent-teal/20 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-accent-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="card card-solution-2">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20l9-5-9-5-9 5 9 5z" />
               </svg>
+              <h3 className="para">Built Around You</h3>
+              <p className="para">
+                Every interaction is personal. From career paths to reflection prompts, the platform adapts to who you are—your strengths, values, goals, and even your hesitations—creating a space where growth feels natural, relevant, and entirely yours.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-accent-teal mb-4">Built Around You</h3>
-            <p className="text-neutral-600">
-              Every interaction is personal. From career paths to reflection prompts, the platform adapts to who you are—your strengths, values, goals, and even your hesitations—creating a space where growth feels natural, relevant, and entirely yours.
-            </p>
           </div>
 
-          {/* Feature 2: Personal Growth */}
-          <div className="card hover-lift border-l-4 border-accent-amber bg-accent-amber/10">
-            <div className="mb-6 p-3 bg-accent-amber/20 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-accent-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Feature 3: Personal Growth */}
+          <div className="card card-solution-1">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
+              <h3 className="para">Space: Your Personal Mission Hub</h3>
+              <p className="para">
+                Track your chosen career goals, compare your current skills with what's needed, reflect on daily progress, and receive reflections on how to advance.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-accent-amber mb-4">Space: Your Personal Mission Hub</h3>
-            <p className="text-neutral-600">
-              Track your chosen career goals, compare your current skills with what's needed, reflect on daily progress, and receive reflections on how to advance.
-            </p>
           </div>
 
           {/* Feature 4: Future Path Prediction */}
-          <div className="card hover-lift border-l-4 border-primary-purple bg-primary-teal/10">
-            <div className="mb-6 p-3 bg-primary-teal/20 rounded-full w-14 h-14 flex items-center justify-center">
-              <svg className="w-8 h-8 text-primary-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="card card-solution-2">
+            <div className="content">
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v7" />
               </svg>
+              <h3 className="para">Engaging, not dreading</h3>
+              <p className="para">
+              Youth doesn't want to fill out a questionnaire for 1 hour and get a static answer of what to become. Instead, they engage with the platform interactively, and the platform indirectly learn about them and recommends them.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-primary-purple mb-4">Engaging, not dreading</h3>
-            <p className="text-neutral-600">
-            Youth doesn't want to fill out a questionnaire for 1 hour and get a static answer of what to become. Instead, they engage with the platform interactively, and the platform indirectly learn about them and recommends them.
-            </p>
           </div>
 
         </div>
       </section>
       
-      {/* Demo Chat Section */}
+      {/* Demo Chat Section avec Typewriter */}
       <main className="min-h-screen bg-gradient-to-b from-gray-0 to-white">
         <div className="container mx-auto px-2 py-4">
-          <h1 className="text-4xl font-bold text-center mb-4 text-gray-900">
-            Talk to Navigo, and get him to know yourself
-          </h1>
+          <div className="talk-to-navigo-section">
+            {/* Animation Typewriter */}
+            <div className="typewriter">
+              <div className="slide"><i></i></div>
+              <div className="paper"></div>
+              <div className="keyboard"></div>
+            </div>
+            
+            {/* Titre */}
+            <h1 className="talk-to-navigo-title">
+              Talk to Navigo, and get him to know yourself
+            </h1>
+          </div>
+          
           <p className="text-center text-neutral-600 max-w-xl mx-auto mb-6">
             The chat isn't just a bot—it's a reflection partner. It helps you dig deeper into your interests, reflect on experiences, and receive tailored guidance, in a calm and exploratory tone.
           </p>
@@ -427,7 +449,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      </div>
+    </div>
   );
 }
 

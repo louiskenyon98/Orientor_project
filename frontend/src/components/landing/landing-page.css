@@ -1,0 +1,308 @@
+/* Import des styles UI existants */
+@import './uiverse/problem_solutionCard.css';
+@import './uiverse/typewrite.css';
+@import './uiverse/navigo_hoverIcon.css';
+@import './uiverse/login.css';
+
+/* Styles spécifiques à la landing page */
+.landing-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section {
+  padding: 4rem 0;
+  margin: 2rem 0;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: var(--accent); /* Fallback pour les navigateurs non compatibles */
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Styles pour les boutons premium */
+.btn {
+  font: inherit;
+  background-color: #f0f0f0;
+  border: 0;
+  color: #242424;
+  border-radius: 0.5em;
+  font-size: 1.35rem;
+  padding: 0.375em 1em;
+  font-weight: 600;
+  text-shadow: 0 0.0625em 0 #fff;
+  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
+              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
+              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
+              0 0.425em 0 0 #cacaca, 0 0.425em 0.5em 0 #cecece;
+  transition: 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  min-width: 120px;
+  text-align: center;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
+              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
+              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
+              0 0.425em 0 0 #cacaca, 0 0.625em 1em 0 #cecece;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: white;
+  text-shadow: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Header avec logo */
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+}
+
+/* Section Talk to Navigo avec typewriter */
+.talk-to-navigo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.talk-to-navigo-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Cartes de diagnostic */
+.diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  margin: 2rem 0;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Ajustement de la largeur des cartes pour la grille */
+.diagnostic-grid .card {
+  width: 100%;
+  max-width: 280px;
+  min-width: 250px;
+}
+
+/* Variantes de couleurs pour les cartes */
+.card-problem-1 .content {
+  background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+}
+
+.card-problem-2 .content {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+}
+
+.card-solution-1 .content {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+}
+
+.card-solution-2 .content {
+  background: linear-gradient(135deg, #1abc9c, #16a085) !important;
+}
+
+/* Ajustements pour les titres dans les cartes */
+.content h3.para {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.content p.para {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* Ajustements pour les SVG dans les cartes */
+.content svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  fill: currentColor;
+  color: #ffffff;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .diagnostic-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .diagnostic-grid .card {
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-container {
+    padding: 1rem;
+  }
+  
+  .landing-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .talk-to-navigo-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .talk-to-navigo-title {
+    font-size: 1.8rem;
+  }
+  
+  .typewriter {
+    transform: scale(0.8);
+  }
+  
+  .light-button button.bt {
+    height: 150px;
+  }
+  
+  .light-button button.bt .button-holder {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .diagnostic-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .diagnostic-grid .card {
+    max-width: 320px;
+  }
+  
+  .btn {
+    font-size: 1.1rem;
+    padding: 0.5em 1.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  .talk-to-navigo-title {
+    font-size: 1.5rem;
+  }
+  
+  .typewriter {
+    transform: scale(0.6);
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
+}
+
+/* Support dark mode */
+@media (prefers-color-scheme: dark) {
+  .btn {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    text-shadow: 0 0.0625em 0 #000;
+    box-shadow: inset 0 0.0625em 0 0 #3a3a3a, 0 0.0625em 0 0 #1a1a1a,
+                0 0.125em 0 0 #1a1a1a, 0 0.25em 0 0 #0a0a0a,
+                0 0.3125em 0 0 #0a0a0a, 0 0.375em 0 0 #0a0a0a,
+                0 0.425em 0 0 #000000, 0 0.425em 0.5em 0 #000000;
+  }
+  
+  .btn-outline {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: transparent;
+  }
+}
+
+/* Animations supplémentaires */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Amélioration de l'accessibilité */
+.btn:focus,
+.light-button button.bt:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Optimisation des performances */
+.card,
+.typewriter,
+.light-button {
+  will-change: transform;
+}
+
+.card:hover,
+.typewriter,
+.light-button button.bt:hover {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
