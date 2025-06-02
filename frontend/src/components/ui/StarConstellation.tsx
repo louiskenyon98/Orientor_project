@@ -1,143 +1,7 @@
-// 'use client';
-
-// import React, { useEffect, useRef } from 'react';
-// import { useTheme } from '@/hooks/useTheme';
-
-// interface Star {
-//   x: number;
-//   y: number;
-//   size: number;
-//   opacity: number;
-//   speed: number;
-//   angle: number;
-// }
-
-// const StarConstellation: React.FC = () => {
-//   const canvasRef = useRef<HTMLCanvasElement>(null);
-//   const starsRef = useRef<Star[]>([]);
-//   const animationRef = useRef<number>();
-//   const { resolvedTheme } = useTheme();
-
-//   useEffect(() => {
-//     const canvas = canvasRef.current;
-//     if (!canvas) return;
-
-//     const ctx = canvas.getContext('2d');
-//     if (!ctx) return;
-
-//     const resizeCanvas = () => {
-//       canvas.width = window.innerWidth;
-//       canvas.height = window.innerHeight;
-//     };
-
-//     const createStars = () => {
-//       const stars: Star[] = [];
-//       const numStars = Math.floor((window.innerWidth * window.innerHeight) / 8000);
-      
-//       for (let i = 0; i < numStars; i++) {
-//         stars.push({
-//           x: Math.random() * canvas.width,
-//           y: Math.random() * canvas.height,
-//           size: Math.random() * 2 + 0.5,
-//           opacity: Math.random() * 0.8 + 0.2,
-//           speed: Math.random() * 0.5 + 0.1,
-//           angle: Math.random() * Math.PI * 2,
-//         });
-//       }
-      
-//       starsRef.current = stars;
-//     };
-
-//     const drawStar = (star: Star) => {
-//       ctx.save();
-//       ctx.globalAlpha = star.opacity;
-      
-//       // Couleurs adaptées au thème
-//       const starColor = resolvedTheme === 'dark' ? '#fdc500' : '#00296b';
-//       const glowColor = resolvedTheme === 'dark' ? '#ffd500' : '#003f88';
-      
-//       ctx.fillStyle = starColor;
-//       ctx.shadowColor = starColor;
-//       ctx.shadowBlur = star.size * 2;
-      
-//       ctx.beginPath();
-//       ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-//       ctx.fill();
-      
-//       // Ajouter un effet de scintillement
-//       if (Math.random() > 0.98) {
-//         ctx.shadowBlur = star.size * 4;
-//         ctx.fillStyle = glowColor;
-//         ctx.beginPath();
-//         ctx.arc(star.x, star.y, star.size * 1.5, 0, Math.PI * 2);
-//         ctx.fill();
-//       }
-      
-//       ctx.restore();
-//     };
-
-//     const updateStars = () => {
-//       starsRef.current.forEach(star => {
-//         // Mouvement subtil
-//         star.x += Math.cos(star.angle) * star.speed * 0.1;
-//         star.y += Math.sin(star.angle) * star.speed * 0.1;
-        
-//         // Scintillement
-//         star.opacity += (Math.random() - 0.5) * 0.02;
-//         star.opacity = Math.max(0.1, Math.min(0.9, star.opacity));
-        
-//         // Rebond sur les bords
-//         if (star.x < 0 || star.x > canvas.width) star.angle = Math.PI - star.angle;
-//         if (star.y < 0 || star.y > canvas.height) star.angle = -star.angle;
-        
-//         // Garder dans les limites
-//         star.x = Math.max(0, Math.min(canvas.width, star.x));
-//         star.y = Math.max(0, Math.min(canvas.height, star.y));
-//       });
-//     };
-
-//     const animate = () => {
-//       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-//       updateStars();
-//       starsRef.current.forEach(drawStar);
-      
-//       animationRef.current = requestAnimationFrame(animate);
-//     };
-
-//     resizeCanvas();
-//     createStars();
-//     animate();
-
-//     const handleResize = () => {
-//       resizeCanvas();
-//       createStars();
-//     };
-
-//     window.addEventListener('resize', handleResize);
-
-//     return () => {
-//       window.removeEventListener('resize', handleResize);
-//       if (animationRef.current) {
-//         cancelAnimationFrame(animationRef.current);
-//       }
-//     };
-//   }, []);
-
-//   return (
-//     <canvas
-//       ref={canvasRef}
-//       className="fixed inset-0 w-full h-full pointer-events-none"
-//       style={{ zIndex: 1 }}
-//     />
-//   );
-// };
-
-// export default StarConstellation;
-
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Node {
   angle: number;
@@ -152,6 +16,7 @@ const StarConstellation: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodesRef = useRef<Node[]>([]);
   const animationRef = useRef<number>();
+  const { isDarkMode } = useTheme();
 
   // Pan and zoom state
   const offset = useRef({ x: 0, y: 0 });
@@ -202,8 +67,11 @@ const StarConstellation: React.FC = () => {
       ctx.translate(centerX, centerY);
       ctx.scale(zoom.current, zoom.current);
 
-      // Draw lines
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      // Draw lines - Dark lines in light mode, white lines in dark mode
+      const lineColor = isDarkMode
+        ? 'rgba(255, 255, 255, 0.1)'
+        : 'rgba(50, 50, 50, 0.15)';
+      ctx.strokeStyle = lineColor;
       ctx.lineWidth = 1 / zoom.current;
 
       for (const node of nodesRef.current) {
@@ -213,12 +81,27 @@ const StarConstellation: React.FC = () => {
         ctx.stroke();
       }
 
-      // Draw nodes
+      // Draw nodes - Dark nodes in light mode, white nodes in dark mode
       for (const node of nodesRef.current) {
+        const nodeColor = isDarkMode
+          ? `rgba(255, 255, 255, ${node.opacity})`
+          : `rgba(30, 30, 30, ${node.opacity})`;
+
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 255, 255, ${node.opacity})`;
+        ctx.fillStyle = nodeColor;
         ctx.arc(node.x, node.y, node.size / zoom.current, 0, Math.PI * 2);
         ctx.fill();
+        
+        // Add a subtle glow effect
+        if (isDarkMode) {
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+          ctx.shadowBlur = 2;
+        } else {
+          ctx.shadowColor = 'rgba(30, 30, 30, 0.2)';
+          ctx.shadowBlur = 1;
+        }
+        ctx.fill();
+        ctx.shadowBlur = 0; // Reset shadow
       }
 
       ctx.restore();
@@ -273,7 +156,7 @@ const StarConstellation: React.FC = () => {
       window.removeEventListener('mouseup', onMouseUp);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, []);
+  }, [isDarkMode]);
 
   return (
     <canvas

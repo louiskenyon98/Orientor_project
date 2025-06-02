@@ -11,12 +11,6 @@ interface Message {
     sender: 'user' | 'ai';
     timestamp: Date;
 }
-
-interface MessageFeedback {
-    messageId: number;
-    feedback: 'helpful' | 'not_helpful';
-}
-
 interface ChatResponse {
     text: string;
 }
@@ -33,7 +27,6 @@ export default function ChatPage() {
     const [isClearingChat, setIsClearingChat] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [feedback, setFeedback] = useState<MessageFeedback[]>([]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -162,17 +155,13 @@ export default function ChatPage() {
         }
     };
 
-    const handleFeedback = (messageId: number, feedbackType: 'helpful' | 'not_helpful') => {
-        setFeedback(prev => [...prev, { messageId, feedback: feedbackType }]);
-    };
-
     return (
         <>
             {/* Full-screen cinematic background */}
             <div
                 className="fixed inset-0 z-0"
                 style={{
-                    background: `radial-gradient(circle at 70% center, #fdc500 0%, #ffd500 20%, #fffbe0 50%, #000000 100%)`
+                    background: `radial-gradient(circle at 80% center, #000000 0%, #000000 40%, #fdc500 60%, #ffd500 75%, #fffbe0 85%, #000000 100%)`
                 }}
             ></div>
 
@@ -250,22 +239,6 @@ export default function ChatPage() {
                                             <div className={`whitespace-pre-wrap ${message.sender === 'user' ? 'text-white' : 'text-black'}`}>
                                                 {message.text}
                                             </div>
-                                            {message.sender === 'ai' && !feedback.find(f => f.messageId === message.id) && (
-                                                <div className="flex items-center justify-end mt-2 space-x-2 text-xs">
-                                                    <button
-                                                        onClick={() => handleFeedback(message.id, 'helpful')}
-                                                        className="text-gray-500 hover:text-green-600 transition-colors"
-                                                    >
-                                                        👍
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleFeedback(message.id, 'not_helpful')}
-                                                        className="text-gray-500 hover:text-red-600 transition-colors"
-                                                    >
-                                                        👎
-                                                    </button>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 ))}
