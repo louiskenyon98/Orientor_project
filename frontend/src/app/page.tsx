@@ -234,15 +234,13 @@ export default function Home() {
                 </h2>
                 <div className="w-full overflow-hidden">
                   <div className="max-w-[1400px] mx-auto">
-                    <div className="premium-card p-6">
-                      <JobRecommendationList
-                        recommendations={jobRecommendations}
-                        isLoading={jobsLoading}
-                        error={jobsError}
-                        onSelectJob={handleSelectJob}
-                        className="mb-8"
-                      />
-                    </div>
+                    <JobRecommendationList
+                      recommendations={jobRecommendations}
+                      isLoading={jobsLoading}
+                      error={jobsError}
+                      onSelectJob={handleSelectJob}
+                      className="mb-8"
+                    />
                   </div>
                   
                   {/* Arbre de compétences pour l'emploi sélectionné */}

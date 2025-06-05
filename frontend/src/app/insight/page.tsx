@@ -223,71 +223,45 @@ const InsightPage: React.FC = () => {
               
               {insight && (
                 <div className="space-y-8">
-                  {/* 3D Card Section */}
-                  <div className={styles.insightContainer}>
-                    <div className={styles.cardInner}>
-                      <div className={styles.cardFront}>
-                        <p className="text-center px-4">{insight.preview}</p>
-                      </div>
-                      <div className={styles.cardBack}>
-                        <p className="text-center px-4">{insight.if_you_accept}</p>
-                      </div>
-                    </div>
+                  {/* Accept Section */}
+                  <div className={styles.acceptSection}>
+                    <h2>Si vous acceptez cette vérité</h2>
+                    <p className={styles.acceptText}>{insight.if_you_accept}</p>
                   </div>
                   
-                  {/* Main Content */}
-                  <div className="premium-card p-6">
-                    <button
-                      className="premium-button-secondary mb-6"
-                      onClick={() => setShowFullText(!showFullText)}
-                    >
-                      {showFullText ? 'Masquer le texte complet' : 'Afficher le texte complet'}
-                    </button>
-                    
-                    {showFullText && (
-                      <div className="mb-8">
-                        <h2 className="premium-title text-xl mb-4">Texte complet</h2>
-                        <div className="premium-text-primary text-base leading-relaxed whitespace-pre-wrap">
-                          {insight.full_text}
-                        </div>
-                      </div>
-                    )}
+                  {/* Full Text Section */}
+                  <div className={styles.fullTextSection}>
+                    <h2>Analyse complète</h2>
+                    <div className={styles.fullText}>
+                      {insight.full_text}
+                    </div>
                   </div>
                   
                   {/* Actions Section */}
-                  <div className="premium-card p-6 space-y-6">
-                    <div className="flex flex-wrap gap-4">
-                      <button
-                        className="premium-button-primary"
-                        onClick={handleSaveInsight}
-                        disabled={saving}
-                      >
-                        {saving ? 'Sauvegarde en cours...' : 'Sauvegarder cet insight'}
-                      </button>
-                      
-                      <button
-                        className="premium-button-secondary"
-                        onClick={handleRegenerateInsight}
-                        disabled={regenerating}
-                      >
-                        {regenerating ? 'Régénération en cours...' : 'Régénérer l\'insight'}
-                      </button>
-                    </div>
+                  <div className={styles.actionsSection}>
+                    <button
+                      className={`${styles.actionButton} ${styles.saveButton}`}
+                      onClick={handleSaveInsight}
+                      disabled={saving}
+                    >
+                      {saving ? 'Sauvegarde...' : 'Sauvegarder cette analyse'}
+                    </button>
                     
-                    <div>
-                      <h3 className="premium-title text-lg mb-4">Vous souhaitez une perspective différente?</h3>
+                    <div className={styles.rewriteSection}>
+                      <h3>Vous souhaitez une autre perspective ?</h3>
                       <textarea
-                        className="premium-input w-full h-32 mb-4"
-                        placeholder="Donnez votre feedback pour obtenir un insight réécrit..."
+                        className={styles.feedbackInput}
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
+                        placeholder="Décrivez ce que vous souhaitez explorer différemment..."
+                        rows={4}
                       />
                       <button
-                        className="premium-button-accent"
+                        className={`${styles.actionButton} ${styles.rewriteButton}`}
                         onClick={handleRewriteInsight}
                         disabled={rewriting || !feedback}
                       >
-                        {rewriting ? 'Réécriture en cours...' : 'Réécrire l\'insight'}
+                        {rewriting ? 'Réécriture...' : 'Demander une réécriture'}
                       </button>
                     </div>
                   </div>

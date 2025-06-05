@@ -462,9 +462,11 @@ If the user has insufficient data, acknowledge this limitation in your response.
 IMPORTANT: Return your response in JSON format with the following structure:
 {
   "preview": "A two-line summary for UI preview",
-  "full_text": "A full philosophical reflection",
+  "full_text": "A full philosophical reflection (DO NOT include the 'if you accept' statement here)",
   "if_you_accept": "A sentence beginning with: 'If you accept this truth...'"
 }
+
+The 'if_you_accept' statement should be completely separate from the full_text and should not be repeated in either field.
 """
         
         response = client.chat.completions.create(
@@ -475,7 +477,6 @@ IMPORTANT: Return your response in JSON format with the following structure:
             ],
             max_tokens=1500,
             temperature=0.7  # Température modérée pour équilibrer créativité et précision
-            # Suppression du paramètre response_format qui n'est pas pris en charge par tous les modèles
         )
         
         # Extraire et parser la réponse JSON
@@ -495,6 +496,12 @@ IMPORTANT: Return your response in JSON format with the following structure:
             full_text = response_json["full_text"]
             if len(full_text) < 100:
                 logger.warning(f"La réponse semble trop courte pour être personnalisée: {len(full_text)} caractères")
+            
+            # S'assurer que if_you_accept n'est pas dans full_text
+            if_you_accept = response_json["if_you_accept"]
+            if if_you_accept in full_text:
+                full_text = full_text.replace(if_you_accept, "").strip()
+                response_json["full_text"] = full_text
             
             # Log la réponse complète pour le débogage
             logger.info(f"Réponse complète: {response_json}")
