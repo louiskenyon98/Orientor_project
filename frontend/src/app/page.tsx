@@ -159,7 +159,9 @@ export default function Home() {
   // Personality navigation items
   const personalityItems = [
     { name: 'Holland Test', icon: 'Personality', path: '/holland-test' },
-    { name: 'Personality', icon: 'Personality', path: '/profile/holland-results' },
+    { name: 'HEXACO Test', icon: 'Brain', path: '/hexaco-test/select' },
+    { name: 'Holland Results', icon: 'Personality', path: '/profile/holland-results' },
+    { name: 'HEXACO Results', icon: 'Brain', path: '/profile/hexaco-results' },
   ];
 
   const navigateTo = (path: string) => {
@@ -350,9 +352,15 @@ export default function Home() {
                         className="premium-nav-card flex items-center gap-4 p-5 transition-colors"
                       >
                         <div className="premium-nav-icon premium-icon">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" className="text-white">
-                            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"></path>
-                          </svg>
+                          {item.icon === 'Brain' ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" className="text-white">
+                              <path d="M174,232a8,8,0,0,1-8,8H90a8,8,0,0,1,0-16h76A8,8,0,0,1,174,232ZM224,104a87.51,87.51,0,0,1-33.64,69.21A16.24,16.24,0,0,0,184,187.5c0,2.7.14,5.06.42,7.58.78,7.06,1.58,14.37-1.28,20.65A16,16,0,0,1,168,224H88a16,16,0,0,1-15.14-21.77c-2.86-6.28-2.06-13.59-1.28-20.65.28-2.52.42-4.88.42-7.58a16.24,16.24,0,0,0-6.36-14.29A87.51,87.51,0,0,1,32,104c0-48.6,43.85-88,96-88s96,39.4,96,88Zm-16,0c0-39.4-35.33-72-80-72S48,64.6,48,104a71.64,71.64,0,0,0,27.84,56.33A32.3,32.3,0,0,1,88,187.5c0,4.06-.15,7.52-.46,10.5-.62,5.48-1.12,9.87.21,11.15a.61.61,0,0,0,.25.35h80a.61.61,0,0,0,.25-.35c1.33-1.28.83-5.67.21-11.15-.31-3-.46-6.44-.46-10.5a32.3,32.3,0,0,1,12.16-27.17A71.64,71.64,0,0,0,208,104ZM140,80a12,12,0,1,0-12,12A12,12,0,0,0,140,80Zm-56,0a12,12,0,1,0,12,12A12,12,0,0,0,84,80Zm72,48a8,8,0,0,0-8-8c-13.23,0-24-9-24-20a8,8,0,0,0-16,0c0,11-10.77,20-24,20a8,8,0,0,0,0,16c13.23,0,24,9,24,20a8,8,0,0,0,16,0c0-11,10.77-20,24-20A8,8,0,0,0,156,128Z"></path>
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" className="text-white">
+                              <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"></path>
+                            </svg>
+                          )}
                         </div>
                         <div className="flex flex-col">
                           <p className="premium-text text-lg font-medium">{item.name}</p>

@@ -58,7 +58,7 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
         className={`${styles.card1} ${loading ? styles.loading : ''}`}
         onClick={handleClick}
       >
-        <h3 className={styles.title}>🧠 Philosophical Insight</h3>
+        <h3 className={styles.title}>🧠 Personalité</h3>
         <p className={styles.preview}>
           {preview}
         </p>

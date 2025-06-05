@@ -42,8 +42,8 @@ export default function LandingPage() {
               <Image
                 src="/Logo.png"
                 alt="Navigo Logo"
-                width={50}
-                height={50}
+                width={80}
+                height={80}
                 className="object-contain"
               />
             </div>

@@ -1,0 +1,164 @@
+{
+  "timestamp": 1749137558.350948,
+  "summary": {
+    "data_files": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "success_rate": 100.0
+    },
+    "configuration": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "success_rate": 100.0
+    },
+    "data_integrity": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "success_rate": 100.0
+    },
+    "structure_validation": {
+      "total": 7,
+      "passed": 7,
+      "failed": 0,
+      "success_rate": 100.0
+    }
+  },
+  "details": {
+    "data_files": {
+      "French_60_FULL.csv_exists": {
+        "success": true,
+        "details": "Fichier trouvé (6774 bytes)",
+        "timestamp": 1749137558.3475819
+      },
+      "French_100_FULL.csv_exists": {
+        "success": true,
+        "details": "Fichier trouvé (10586 bytes)",
+        "timestamp": 1749137558.3478222
+      },
+      "English_60_FULL.csv_exists": {
+        "success": true,
+        "details": "Fichier trouvé (6162 bytes)",
+        "timestamp": 1749137558.347837
+      },
+      "English_100_FULL.csv_exists": {
+        "success": true,
+        "details": "Fichier trouvé (10094 bytes)",
+        "timestamp": 1749137558.347849
+      },
+      "config_exists": {
+        "success": true,
+        "details": "Configuration trouvée",
+        "timestamp": 1749137558.347858
+      }
+    },
+    "configuration": {
+      "domains_section": {
+        "success": true,
+        "details": "Section domains présente",
+        "timestamp": 1749137558.348072
+      },
+      "versions_section": {
+        "success": true,
+        "details": "Section versions présente",
+        "timestamp": 1749137558.348076
+      },
+      "languages_section": {
+        "success": true,
+        "details": "Section languages présente",
+        "timestamp": 1749137558.3480809
+      },
+      "domains_complete": {
+        "success": true,
+        "details": "6 domaines HEXACO présents",
+        "timestamp": 1749137558.348085
+      },
+      "versions_complete": {
+        "success": true,
+        "details": "4 versions configurées",
+        "timestamp": 1749137558.348088
+      }
+    },
+    "data_integrity": {
+      "French_60_FULL.csv_count": {
+        "success": true,
+        "details": "60 questions",
+        "timestamp": 1749137558.348387
+      },
+      "French_60_FULL.csv_validation": {
+        "success": true,
+        "details": "Structure des données valide",
+        "timestamp": 1749137558.348396
+      },
+      "French_100_FULL.csv_count": {
+        "success": true,
+        "details": "100 questions",
+        "timestamp": 1749137558.348761
+      },
+      "French_100_FULL.csv_validation": {
+        "success": true,
+        "details": "Structure des données valide",
+        "timestamp": 1749137558.348772
+      },
+      "English_60_FULL.csv_count": {
+        "success": true,
+        "details": "60 questions",
+        "timestamp": 1749137558.349185
+      },
+      "English_60_FULL.csv_validation": {
+        "success": true,
+        "details": "Structure des données valide",
+        "timestamp": 1749137558.349191
+      },
+      "English_100_FULL.csv_count": {
+        "success": true,
+        "details": "100 questions",
+        "timestamp": 1749137558.349628
+      },
+      "English_100_FULL.csv_validation": {
+        "success": true,
+        "details": "Structure des données valide",
+        "timestamp": 1749137558.3496351
+      }
+    },
+    "structure_validation": {
+      "facet_consistency": {
+        "success": true,
+        "details": "24 facettes cohérentes",
+        "timestamp": 1749137558.349955
+      },
+      "French_60_FULL.csv_reverse_distribution": {
+        "success": true,
+        "details": "30/60 inversés (50.0%)",
+        "timestamp": 1749137558.350096
+      },
+      "English_60_FULL.csv_reverse_distribution": {
+        "success": true,
+        "details": "30/60 inversés (50.0%)",
+        "timestamp": 1749137558.3502169
+      },
+      "hexaco_60_fr_item_count": {
+        "success": true,
+        "details": "60 items",
+        "timestamp": 1749137558.3503869
+      },
+      "hexaco_100_fr_item_count": {
+        "success": true,
+        "details": "100 items",
+        "timestamp": 1749137558.350573
+      },
+      "hexaco_60_en_item_count": {
+        "success": true,
+        "details": "60 items",
+        "timestamp": 1749137558.3506858
+      },
+      "hexaco_100_en_item_count": {
+        "success": true,
+        "details": "100 items",
+        "timestamp": 1749137558.350919
+      }
+    }
+  }
+}

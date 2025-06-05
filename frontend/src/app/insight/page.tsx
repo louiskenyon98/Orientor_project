@@ -116,7 +116,7 @@ const InsightPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Philosophical Insight</h1>
+      <h1 className={styles.title}>Personalité</h1>
       
       {insight && (
         <div className={styles.insightContainer}>
