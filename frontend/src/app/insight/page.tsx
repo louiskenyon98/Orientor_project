@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 import { getInsight, generateInsight, regenerateInsight, saveInsight, rewriteInsight, InsightData, mockInsightData } from '@/services/insightService';
 import Link from 'next/link';
+import styles from './insight.module.css';
 
 const InsightPage: React.FC = () => {
   const router = useRouter();
@@ -222,10 +223,16 @@ const InsightPage: React.FC = () => {
               
               {insight && (
                 <div className="space-y-8">
-                  {/* Preview Section */}
-                  <div className="premium-card p-6">
-                    <h2 className="premium-title text-xl mb-4">Aperçu</h2>
-                    <p className="premium-text-primary text-lg leading-relaxed">{insight.preview}</p>
+                  {/* 3D Card Section */}
+                  <div className={styles.insightContainer}>
+                    <div className={styles.cardInner}>
+                      <div className={styles.cardFront}>
+                        <p className="text-center px-4">{insight.preview}</p>
+                      </div>
+                      <div className={styles.cardBack}>
+                        <p className="text-center px-4">{insight.if_you_accept}</p>
+                      </div>
+                    </div>
                   </div>
                   
                   {/* Main Content */}
@@ -245,13 +252,6 @@ const InsightPage: React.FC = () => {
                         </div>
                       </div>
                     )}
-                    
-                    <div>
-                      <h2 className="premium-title text-xl mb-4">Si vous acceptez cette vérité</h2>
-                      <p className="premium-text-primary text-lg leading-relaxed font-medium">
-                        {insight.if_you_accept}
-                      </p>
-                    </div>
                   </div>
                   
                   {/* Actions Section */}

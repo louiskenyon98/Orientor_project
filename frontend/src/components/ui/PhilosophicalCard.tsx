@@ -64,17 +64,25 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
         className={`${styles.card1} ${loading ? styles.loading : ''}`}
         onClick={handleClick}
       >
-        <h3 className={styles.title}>🧠 Personalité</h3>
-        <p className={styles.preview}>
-          {preview}
-        </p>
-        {loading && (
-          <div className={styles.loadingIndicator}>
-            <span className={styles.dot}></span>
-            <span className={styles.dot}></span>
-            <span className={styles.dot}></span>
-          </div>
-        )}
+        <div className={styles.front}>
+          <h3 className={styles.title}>🧠 Personalité</h3>
+          <p className={styles.preview}>
+            {preview}
+          </p>
+          {loading && (
+            <div className={styles.loadingIndicator}>
+              <span className={styles.dot}></span>
+              <span className={styles.dot}></span>
+              <span className={styles.dot}></span>
+            </div>
+          )}
+        </div>
+        <div className={styles.back}>
+          <h3 className={styles.title}>💭 Insight</h3>
+          <p className={styles.preview}>
+            Cliquez pour découvrir votre analyse philosophique personnalisée
+          </p>
+        </div>
       </div>
     </div>
   );
