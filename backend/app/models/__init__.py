@@ -10,10 +10,13 @@ from .tree_path import TreePath
 from .node_note import NodeNote
 from .user_progress import UserProgress
 from .user_skill_tree import UserSkillTree
+from .reflection import StrengthsReflectionResponse
+from .user_representation import UserRepresentation
 from ..utils.database import Base
 
 __all__ = [
-    'User', 'UserProfile', 'SuggestedPeers', 'Message', 
-    'SavedRecommendation', 'UserNote', 'UserSkill', 'UserRecommendation', 
-    'TreePath', 'NodeNote', 'UserProgress', 'UserSkillTree', 'Base'
+    'User', 'UserProfile', 'SuggestedPeers', 'Message',
+    'SavedRecommendation', 'UserNote', 'UserSkill', 'UserRecommendation',
+    'TreePath', 'NodeNote', 'UserProgress', 'UserSkillTree',
+    'StrengthsReflectionResponse', 'UserRepresentation', 'Base'
 ]

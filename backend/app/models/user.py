@@ -22,4 +22,6 @@ class User(Base):
     tree_paths = relationship("TreePath", back_populates="user", cascade="all, delete-orphan")
     node_notes = relationship("NodeNote", back_populates="user", cascade="all, delete-orphan")
     progress = relationship("UserProgress", back_populates="user", uselist=False, cascade="all, delete-orphan")
-    skill_trees = relationship("UserSkillTree", back_populates="user", cascade="all, delete-orphan") 
+    skill_trees = relationship("UserSkillTree", back_populates="user", cascade="all, delete-orphan")
+    reflection_responses = relationship("StrengthsReflectionResponse", back_populates="user", cascade="all, delete-orphan")
+    representations = relationship("UserRepresentation", back_populates="user", cascade="all, delete-orphan")

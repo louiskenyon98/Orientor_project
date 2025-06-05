@@ -12,6 +12,8 @@ from ..utils.database import get_db
 from ..models.user import User
 from ..models.user_profile import UserProfile
 from ..models.saved_recommendation import SavedRecommendation
+from ..models.reflection import StrengthsReflectionResponse
+from ..models.user_representation import UserRepresentation
 from ..routers.user import get_current_user
 
 # Configuration du logging avec plus de détails
@@ -92,6 +94,24 @@ async def get_user_data(db: Session, user_id: int) -> Dict[str, Any]:
             SavedRecommendation.user_id == user_id
         ).all()
         
+        # Récupérer les scores RIASEC depuis user_profiles.personal_analysis
+        riasec_analysis = profile.personal_analysis if profile else None
+        
+        # Récupérer les scores HEXACO depuis personality_profiles.narrative_description
+        hexaco_query = text("""
+            SELECT narrative_description, scores, percentile_ranks
+            FROM personality_profiles
+            WHERE user_id = :user_id AND profile_type = 'hexaco'
+            ORDER BY computed_at DESC
+            LIMIT 1
+        """)
+        hexaco_result = db.execute(hexaco_query, {"user_id": user_id}).fetchone()
+        
+        # Récupérer les réponses de réflexion
+        reflection_responses = db.query(StrengthsReflectionResponse).filter(
+            StrengthsReflectionResponse.user_id == user_id
+        ).all()
+        
         # Vérifier si l'utilisateur a des recommandations sauvegardées
         if not saved_recommendations:
             logger.warning(f"Aucune recommandation sauvegardée trouvée pour l'utilisateur {user_id}")
@@ -159,6 +179,21 @@ async def get_user_data(db: Session, user_id: int) -> Dict[str, Any]:
                     "stress_tolerance": rec.stress_tolerance
                 }
                 for rec in saved_recommendations
+            ],
+            "riasec_analysis": riasec_analysis,
+            "hexaco_data": {
+                "narrative_description": hexaco_result.narrative_description if hexaco_result else None,
+                "scores": hexaco_result.scores if hexaco_result else None,
+                "percentile_ranks": hexaco_result.percentile_ranks if hexaco_result else None
+            },
+            "reflection_responses": [
+                {
+                    "question_id": resp.question_id,
+                    "question_text": resp.prompt_text,
+                    "response_text": resp.response,
+                    "created_at": resp.created_at
+                }
+                for resp in reflection_responses
             ]
         }
         
@@ -174,14 +209,21 @@ async def get_user_data(db: Session, user_id: int) -> Dict[str, Any]:
             "profile_completion": completion_percentage,
             "has_recommendations": len(saved_recommendations) > 0,
             "recommendation_count": len(saved_recommendations),
-            "has_skills": skills_result is not None
+            "has_skills": skills_result is not None,
+            "has_riasec": riasec_analysis is not None,
+            "has_hexaco": hexaco_result is not None,
+            "has_reflection_responses": len(reflection_responses) > 0,
+            "reflection_response_count": len(reflection_responses)
         }
         
         # Log détaillé des données récupérées
         logger.info(f"Données récupérées pour l'utilisateur {user_id}: "
                    f"{len(saved_recommendations)} recommandations, "
                    f"profil complété à {completion_percentage:.2f}%, "
-                   f"compétences: {'présentes' if skills_result else 'absentes'}")
+                   f"compétences: {'présentes' if skills_result else 'absentes'}, "
+                   f"RIASEC: {'présent' if riasec_analysis else 'absent'}, "
+                   f"HEXACO: {'présent' if hexaco_result else 'absent'}, "
+                   f"réflexions: {len(reflection_responses)}")
         
         return user_data
     
@@ -206,10 +248,15 @@ def format_philosophical_prompt(user_data: Dict[str, Any]) -> str:
     profile = user_data["profile"]
     user_skills = user_data["user_skills"]
     saved_recommendations = user_data["saved_recommendations"]
+    riasec_analysis = user_data["riasec_analysis"]
+    hexaco_data = user_data["hexaco_data"]
+    reflection_responses = user_data["reflection_responses"]
     metadata = user_data["metadata"]
     
     # Vérifier si nous avons suffisamment de données pour personnaliser l'insight
-    has_sufficient_data = metadata["profile_completion"] > 30 and metadata["has_recommendations"]
+    has_sufficient_data = (metadata["profile_completion"] > 30 and
+                          (metadata["has_recommendations"] or metadata["has_riasec"] or
+                           metadata["has_hexaco"] or metadata["has_reflection_responses"]))
     
     # Construire un prompt plus directif pour utiliser les données spécifiques de l'utilisateur
     prompt = """
@@ -217,7 +264,7 @@ You are a wise philosopher, speaking truthfully, deeply, and sometimes uncomfort
 
 Be brutally honest. Tell the user what they are *really* going through, what drives them, what they are missing, what they are not seeing clearly about themselves.
 
-IMPORTANT: Your analysis MUST be highly personalized and specifically reference the user's actual data. Do NOT provide generic advice. You MUST mention specific elements from their profile, skills, and saved career recommendations.
+IMPORTANT: Your analysis MUST be highly personalized and specifically reference the user's actual data. Do NOT provide generic advice. You MUST mention specific elements from their profile, skills, saved career recommendations, RIASEC analysis, HEXACO personality scores, and reflection responses.
 
 Use your understanding of psychology, philosophy, and youth development. Reference contradictions or tensions in their saved recommendations, skills, and profile.
 
@@ -253,6 +300,29 @@ Here is the user's profile information:
         if value is not None and key != "last_updated":
             prompt += f"{key}: {value}/5\n"
             non_empty_skills.append(key)
+    
+    # Ajouter l'analyse RIASEC
+    prompt += "\n## RIASEC PERSONAL ANALYSIS\n"
+    if riasec_analysis:
+        prompt += f"{riasec_analysis}\n"
+    else:
+        prompt += "No RIASEC analysis available.\n"
+    
+    # Ajouter les scores HEXACO
+    prompt += "\n## HEXACO SCORES\n"
+    if hexaco_data["narrative_description"]:
+        prompt += f"{hexaco_data['narrative_description']}\n"
+    else:
+        prompt += "No HEXACO analysis available.\n"
+    
+    # Ajouter les réponses de réflexion
+    prompt += "\n## REFLECTION RESPONSES\n"
+    if reflection_responses:
+        for resp in reflection_responses:
+            prompt += f"Q{resp['question_id']}: {resp['question_text']}\n"
+            prompt += f"A: {resp['response_text']}\n\n"
+    else:
+        prompt += "No reflection responses available.\n"
     
     # Ajouter les recommandations sauvegardées
     prompt += "\n## SAVED CAREER RECOMMENDATIONS\n"
@@ -320,6 +390,49 @@ Comparez leurs compétences actuelles avec celles requises par leurs choix de ca
     
     logger.info(f"Prompt généré avec {len(prompt)} caractères")
     return prompt
+
+# Fonction pour sauvegarder l'insight dans user_representation
+async def save_insight_to_representation(db: Session, user_id: int, insight_data: Dict[str, str]) -> bool:
+    """
+    Sauvegarde l'insight généré dans la table user_representation.
+    
+    Args:
+        db: Session de base de données
+        user_id: ID de l'utilisateur
+        insight_data: Données de l'insight (preview, full_text, if_you_accept)
+        
+    Returns:
+        True si la sauvegarde a réussi, False sinon
+    """
+    try:
+        # Vérifier s'il existe déjà un insight pour cet utilisateur
+        existing_insight = db.query(UserRepresentation).filter(
+            UserRepresentation.user_id == user_id,
+            UserRepresentation.source == 'llm_insight'
+        ).first()
+        
+        if existing_insight:
+            # Mettre à jour l'insight existant
+            existing_insight.data = insight_data
+            # generated_at reste inchangé pour les mises à jour
+        else:
+            # Créer un nouvel insight
+            new_insight = UserRepresentation(
+                user_id=user_id,
+                source='llm_insight',
+                format_version='v1',
+                data=insight_data
+            )
+            db.add(new_insight)
+        
+        db.commit()
+        logger.info(f"Insight sauvegardé dans user_representation pour l'utilisateur {user_id}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la sauvegarde de l'insight: {str(e)}")
+        db.rollback()
+        return False
 
 # Fonction pour appeler l'API OpenAI
 async def call_openai_api(prompt: str) -> Dict[str, str]:
@@ -427,7 +540,9 @@ async def generate_insight(
         user_data = await get_user_data(db, user_id)
         
         # Vérifier si nous avons suffisamment de données pour personnaliser l'insight
-        has_sufficient_data = user_data["metadata"]["profile_completion"] > 30 and user_data["metadata"]["has_recommendations"]
+        has_sufficient_data = (user_data["metadata"]["profile_completion"] > 30 and
+                              (user_data["metadata"]["has_recommendations"] or user_data["metadata"]["has_riasec"] or
+                               user_data["metadata"]["has_hexaco"] or user_data["metadata"]["has_reflection_responses"]))
         
         if not has_sufficient_data:
             logger.warning(f"Données insuffisantes pour l'utilisateur {user_id}: "
@@ -444,6 +559,9 @@ async def generate_insight(
         if not has_sufficient_data:
             note_insuffisance = "\n\n[Note: Cette analyse est limitée car votre profil est incomplet ou vous n'avez pas sauvegardé de recommandations de carrière. Pour une analyse plus précise, complétez votre profil et sauvegardez des recommandations qui vous intéressent.]"
             response["full_text"] += note_insuffisance
+        
+        # Sauvegarder automatiquement l'insight dans user_representation
+        await save_insight_to_representation(db, user_id, response)
         
         logger.info(f"Insight généré avec succès pour l'utilisateur {user_id}")
         
@@ -462,6 +580,103 @@ async def generate_insight(
             detail=f"Erreur lors de la génération de l'insight: {str(e)}"
         )
 
+# Endpoint pour récupérer un insight existant
+@router.get("/get", response_model=InsightResponse)
+async def get_insight(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupère l'insight philosophique existant depuis user_representation.
+    """
+    try:
+        user_id = current_user.id
+        
+        # Récupérer l'insight depuis user_representation
+        insight = db.query(UserRepresentation).filter(
+            UserRepresentation.user_id == user_id,
+            UserRepresentation.source == 'llm_insight'
+        ).first()
+        
+        if not insight:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Aucun insight trouvé pour cet utilisateur"
+            )
+        
+        data = insight.data
+        return InsightResponse(
+            preview=data.get("preview", ""),
+            full_text=data.get("full_text", ""),
+            if_you_accept=data.get("if_you_accept", "")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération de l'insight: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la récupération de l'insight: {str(e)}"
+        )
+
+# Endpoint pour régénérer un insight philosophique
+@router.post("/regenerate", response_model=InsightResponse)
+async def regenerate_insight(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Régénère un insight philosophique en forçant une nouvelle analyse.
+    """
+    try:
+        user_id = current_user.id
+        
+        logger.info(f"Régénération d'un insight philosophique pour l'utilisateur {user_id}")
+        
+        # Récupérer les données utilisateur
+        user_data = await get_user_data(db, user_id)
+        
+        # Vérifier si nous avons suffisamment de données pour personnaliser l'insight
+        has_sufficient_data = (user_data["metadata"]["profile_completion"] > 30 and
+                              (user_data["metadata"]["has_recommendations"] or user_data["metadata"]["has_riasec"] or
+                               user_data["metadata"]["has_hexaco"] or user_data["metadata"]["has_reflection_responses"]))
+        
+        if not has_sufficient_data:
+            logger.warning(f"Données insuffisantes pour l'utilisateur {user_id}: "
+                          f"profil complété à {user_data['metadata']['profile_completion']:.2f}%")
+        
+        # Formater le prompt pour le LLM
+        prompt = format_philosophical_prompt(user_data)
+        
+        # Appeler l'API OpenAI
+        response = await call_openai_api(prompt)
+        
+        # Si les données sont insuffisantes, ajouter une note dans la réponse
+        if not has_sufficient_data:
+            note_insuffisance = "\n\n[Note: Cette analyse est limitée car votre profil est incomplet. Pour une analyse plus précise, complétez votre profil, passez les tests RIASEC/HEXACO, et répondez aux questions de réflexion.]"
+            response["full_text"] += note_insuffisance
+        
+        # Sauvegarder automatiquement l'insight régénéré dans user_representation
+        await save_insight_to_representation(db, user_id, response)
+        
+        logger.info(f"Insight régénéré avec succès pour l'utilisateur {user_id}")
+        
+        return InsightResponse(
+            preview=response["preview"],
+            full_text=response["full_text"],
+            if_you_accept=response["if_you_accept"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la régénération de l'insight: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la régénération de l'insight: {str(e)}"
+        )
+
 # Endpoint pour sauvegarder un insight philosophique
 @router.patch("/save", response_model=SaveResponse)
 async def save_insight(
@@ -470,7 +685,7 @@ async def save_insight(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Sauvegarde le texte philosophique dans le profil utilisateur.
+    Sauvegarde le texte philosophique dans le profil utilisateur et dans user_representation.
     """
     try:
         # TOUJOURS utiliser l'ID de l'utilisateur actuellement connecté
@@ -490,7 +705,20 @@ async def save_insight(
         # Mettre à jour le champ philosophical_description
         profile.philosophical_description = request.philosophical_text
         
-        # Sauvegarder les modifications
+        # Sauvegarder aussi dans user_representation
+        insight_data = {
+            "preview": "Insight sauvegardé manuellement",
+            "full_text": request.philosophical_text,
+            "if_you_accept": "Si vous acceptez cette vérité, vous pourrez avancer avec plus de clarté."
+        }
+        
+        # Appeler la fonction de sauvegarde dans user_representation
+        representation_saved = await save_insight_to_representation(db, user_id, insight_data)
+        
+        if not representation_saved:
+            logger.warning(f"Échec de la sauvegarde dans user_representation pour l'utilisateur {user_id}")
+        
+        # Sauvegarder les modifications du profil
         db.commit()
         
         logger.info(f"Insight philosophique sauvegardé pour l'utilisateur {user_id}")
@@ -556,6 +784,9 @@ Return JSON:
         
         # Appeler l'API OpenAI
         response = await call_openai_api(rewrite_prompt)
+        
+        # Sauvegarder automatiquement l'insight réécrit dans user_representation
+        await save_insight_to_representation(db, request.user_id, response)
         
         return InsightResponse(
             preview=response["preview"],

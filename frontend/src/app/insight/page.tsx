@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { generateInsight, saveInsight, rewriteInsight, InsightData, mockInsightData } from '@/services/insightService';
-import styles from './insight.module.css';
+import MainLayout from '@/components/layout/MainLayout';
+import { getInsight, generateInsight, regenerateInsight, saveInsight, rewriteInsight, InsightData, mockInsightData } from '@/services/insightService';
+import Link from 'next/link';
 
 const InsightPage: React.FC = () => {
   const router = useRouter();
@@ -14,6 +15,7 @@ const InsightPage: React.FC = () => {
   const [showFullText, setShowFullText] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [rewriting, setRewriting] = useState<boolean>(false);
+  const [regenerating, setRegenerating] = useState<boolean>(false);
 
   useEffect(() => {
     // Récupérer l'ID de l'utilisateur depuis le localStorage
@@ -49,16 +51,20 @@ const InsightPage: React.FC = () => {
         setLoading(true);
         const id = fetchUserId();
         
-        // Appeler l'API même en mode développement pour tester les modifications
-        console.log("Appel de l'API pour générer un insight...");
-        const data = await generateInsight(id);
-        console.log("Réponse de l'API:", data);
-        setInsight(data);
+        // D'abord essayer de récupérer un insight existant
+        try {
+          console.log("Tentative de récupération d'un insight existant...");
+          const existingData = await getInsight();
+          console.log("Insight existant trouvé:", existingData);
+          setInsight(existingData);
+        } catch (getError) {
+          // Si aucun insight n'existe, ne pas en générer automatiquement
+          console.log("Aucun insight existant trouvé");
+          setInsight(null);
+        }
       } catch (error) {
         console.error('Erreur lors du chargement de l\'insight:', error);
-        // Fallback aux données simulées en cas d'erreur
-        console.warn("Utilisation des données simulées suite à une erreur");
-        setInsight(mockInsightData);
+        setInsight(null);
       } finally {
         setLoading(false);
       }
@@ -103,86 +109,195 @@ const InsightPage: React.FC = () => {
     }
   };
 
+  const handleGenerateFirstInsight = async () => {
+    if (!userId) return;
+    
+    try {
+      setLoading(true);
+      console.log("Génération du premier insight...");
+      const newInsight = await generateInsight(userId);
+      console.log("Premier insight généré:", newInsight);
+      setInsight(newInsight);
+    } catch (error) {
+      console.error('Erreur lors de la génération du premier insight:', error);
+      alert('Erreur lors de la génération. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegenerateInsight = async () => {
+    try {
+      setRegenerating(true);
+      console.log("Régénération de l'insight...");
+      const newInsight = await regenerateInsight();
+      console.log("Insight régénéré:", newInsight);
+      setInsight(newInsight);
+    } catch (error) {
+      console.error('Erreur lors de la régénération de l\'insight:', error);
+      alert('Erreur lors de la régénération. Veuillez réessayer.');
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.loadingContainer}>
-          <div className={styles.loadingSpinner}></div>
-          <p>Génération de votre insight philosophique...</p>
+      <MainLayout showNav={true}>
+        <div className="premium-container relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden">
+          <div className="relative z-10 w-full flex h-full grow">
+            <div className="flex flex-col flex-1 w-full">
+              <div className="flex flex-wrap justify-between gap-3 p-4 md:p-6 lg:p-8 mb-2">
+                <div className="flex items-center gap-4">
+                  <Link
+                    href="/"
+                    className="premium-button-icon"
+                    title="Retour à l'accueil"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </Link>
+                  <h1 className="premium-title text-[32px] md:text-4xl font-bold leading-tight">
+                    Insight Philosophique
+                  </h1>
+                </div>
+              </div>
+              <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16 max-w-[2000px] mx-auto">
+                <div className="flex items-center justify-center min-h-[400px]">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="premium-text-secondary">Génération de votre insight philosophique...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Personalité</h1>
-      
-      {insight && (
-        <div className={styles.insightContainer}>
-          <div className={styles.previewSection}>
-            <h2>Aperçu</h2>
-            <p className={styles.previewText}>{insight.preview}</p>
-          </div>
-          
-          <div className={styles.mainSection}>
-            <button 
-              className={styles.toggleButton}
-              onClick={() => setShowFullText(!showFullText)}
-            >
-              {showFullText ? 'Masquer le texte complet' : 'Afficher le texte complet'}
-            </button>
-            
-            {showFullText && (
-              <div className={styles.fullTextSection}>
-                <h2>Texte complet</h2>
-                <p className={styles.fullText}>{insight.full_text}</p>
+    <MainLayout showNav={true}>
+      <div className="premium-container relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden">
+        <div className="relative z-10 w-full flex h-full grow">
+          <div className="flex flex-col flex-1 w-full">
+            {/* Header */}
+            <div className="flex flex-wrap justify-between gap-3 p-4 md:p-6 lg:p-8 mb-2">
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/"
+                  className="premium-button-icon"
+                  title="Retour à l'accueil"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </Link>
+                <h1 className="premium-title text-[32px] md:text-4xl font-bold leading-tight">
+                  Insight Philosophique
+                </h1>
               </div>
-            )}
-            
-            <div className={styles.acceptSection}>
-              <h2>Si vous acceptez cette vérité</h2>
-              <p className={styles.acceptText}>{insight.if_you_accept}</p>
             </div>
-          </div>
-          
-          <div className={styles.actionsSection}>
-            <button 
-              className={`${styles.actionButton} ${styles.saveButton}`}
-              onClick={handleSaveInsight}
-              disabled={saving}
-            >
-              {saving ? 'Sauvegarde en cours...' : 'Sauvegarder cet insight'}
-            </button>
-            
-            <div className={styles.rewriteSection}>
-              <h3>Vous souhaitez une perspective différente?</h3>
-              <textarea
-                className={styles.feedbackInput}
-                placeholder="Donnez votre feedback pour obtenir un insight réécrit..."
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                rows={4}
-              />
-              <button 
-                className={`${styles.actionButton} ${styles.rewriteButton}`}
-                onClick={handleRewriteInsight}
-                disabled={rewriting || !feedback}
-              >
-                {rewriting ? 'Réécriture en cours...' : 'Réécrire l\'insight'}
-              </button>
+
+            {/* Main Content Container */}
+            <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16 max-w-[2000px] mx-auto">
+              {!insight && !loading && (
+                <div className="text-center py-12">
+                  <div className="max-w-2xl mx-auto">
+                    <h2 className="premium-title text-2xl mb-4">Aucune analyse philosophique disponible</h2>
+                    <p className="premium-text-secondary text-lg mb-8">
+                      Générez votre première analyse personnalisée basée sur votre profil, vos tests de personnalité et vos réflexions.
+                    </p>
+                    <button
+                      className="premium-button-primary px-8 py-3 text-lg"
+                      onClick={handleGenerateFirstInsight}
+                    >
+                      Générer mon analyse philosophique
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {insight && (
+                <div className="space-y-8">
+                  {/* Preview Section */}
+                  <div className="premium-card p-6">
+                    <h2 className="premium-title text-xl mb-4">Aperçu</h2>
+                    <p className="premium-text-primary text-lg leading-relaxed">{insight.preview}</p>
+                  </div>
+                  
+                  {/* Main Content */}
+                  <div className="premium-card p-6">
+                    <button
+                      className="premium-button-secondary mb-6"
+                      onClick={() => setShowFullText(!showFullText)}
+                    >
+                      {showFullText ? 'Masquer le texte complet' : 'Afficher le texte complet'}
+                    </button>
+                    
+                    {showFullText && (
+                      <div className="mb-8">
+                        <h2 className="premium-title text-xl mb-4">Texte complet</h2>
+                        <div className="premium-text-primary text-base leading-relaxed whitespace-pre-wrap">
+                          {insight.full_text}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <h2 className="premium-title text-xl mb-4">Si vous acceptez cette vérité</h2>
+                      <p className="premium-text-primary text-lg leading-relaxed font-medium">
+                        {insight.if_you_accept}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Actions Section */}
+                  <div className="premium-card p-6 space-y-6">
+                    <div className="flex flex-wrap gap-4">
+                      <button
+                        className="premium-button-primary"
+                        onClick={handleSaveInsight}
+                        disabled={saving}
+                      >
+                        {saving ? 'Sauvegarde en cours...' : 'Sauvegarder cet insight'}
+                      </button>
+                      
+                      <button
+                        className="premium-button-secondary"
+                        onClick={handleRegenerateInsight}
+                        disabled={regenerating}
+                      >
+                        {regenerating ? 'Régénération en cours...' : 'Régénérer l\'insight'}
+                      </button>
+                    </div>
+                    
+                    <div>
+                      <h3 className="premium-title text-lg mb-4">Vous souhaitez une perspective différente?</h3>
+                      <textarea
+                        className="premium-input w-full h-32 mb-4"
+                        placeholder="Donnez votre feedback pour obtenir un insight réécrit..."
+                        value={feedback}
+                        onChange={(e) => setFeedback(e.target.value)}
+                      />
+                      <button
+                        className="premium-button-accent"
+                        onClick={handleRewriteInsight}
+                        disabled={rewriting || !feedback}
+                      >
+                        {rewriting ? 'Réécriture en cours...' : 'Réécrire l\'insight'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      )}
-      
-      <button 
-        className={styles.backButton}
-        onClick={() => router.back()}
-      >
-        Retour
-      </button>
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

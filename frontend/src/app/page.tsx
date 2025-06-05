@@ -160,6 +160,7 @@ export default function Home() {
   const personalityItems = [
     { name: 'Holland Test', icon: 'Personality', path: '/holland-test' },
     { name: 'HEXACO Test', icon: 'Brain', path: '/hexaco-test/select' },
+    { name: 'Self-Reflection', icon: 'Reflection', path: '/self-reflection' },
     { name: 'Holland Results', icon: 'Personality', path: '/profile/holland-results' },
     { name: 'HEXACO Results', icon: 'Brain', path: '/profile/hexaco-results' },
   ];
@@ -355,6 +356,10 @@ export default function Home() {
                           {item.icon === 'Brain' ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" className="text-white">
                               <path d="M174,232a8,8,0,0,1-8,8H90a8,8,0,0,1,0-16h76A8,8,0,0,1,174,232ZM224,104a87.51,87.51,0,0,1-33.64,69.21A16.24,16.24,0,0,0,184,187.5c0,2.7.14,5.06.42,7.58.78,7.06,1.58,14.37-1.28,20.65A16,16,0,0,1,168,224H88a16,16,0,0,1-15.14-21.77c-2.86-6.28-2.06-13.59-1.28-20.65.28-2.52.42-4.88.42-7.58a16.24,16.24,0,0,0-6.36-14.29A87.51,87.51,0,0,1,32,104c0-48.6,43.85-88,96-88s96,39.4,96,88Zm-16,0c0-39.4-35.33-72-80-72S48,64.6,48,104a71.64,71.64,0,0,0,27.84,56.33A32.3,32.3,0,0,1,88,187.5c0,4.06-.15,7.52-.46,10.5-.62,5.48-1.12,9.87.21,11.15a.61.61,0,0,0,.25.35h80a.61.61,0,0,0,.25-.35c1.33-1.28.83-5.67.21-11.15-.31-3-.46-6.44-.46-10.5a32.3,32.3,0,0,1,12.16-27.17A71.64,71.64,0,0,0,208,104ZM140,80a12,12,0,1,0-12,12A12,12,0,0,0,140,80Zm-56,0a12,12,0,1,0,12,12A12,12,0,0,0,84,80Zm72,48a8,8,0,0,0-8-8c-13.23,0-24-9-24-20a8,8,0,0,0-16,0c0,11-10.77,20-24,20a8,8,0,0,0,0,16c13.23,0,24,9,24,20a8,8,0,0,0,16,0c0-11,10.77-20,24-20A8,8,0,0,0,156,128Z"></path>
+                            </svg>
+                          ) : item.icon === 'Reflection' ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" className="text-white">
+                              <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216V88H40ZM40,200V104H216v96H40Zm32-80a8,8,0,0,1,8-8h96a8,8,0,0,1,0,16H80A8,8,0,0,1,72,120Zm0,32a8,8,0,0,1,8-8h96a8,8,0,0,1,0,16H80A8,8,0,0,1,72,152Zm0,32a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H80A8,8,0,0,1,72,184Z"></path>
                             </svg>
                           ) : (
                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" className="text-white">

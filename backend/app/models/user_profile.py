@@ -32,6 +32,9 @@ class UserProfile(Base):
     education_level = Column(String)
     career_goals = Column(String)
     skills = Column(ARRAY(String))
+    
+    # RIASEC analysis field (already exists in database)
+    personal_analysis = Column(Text, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

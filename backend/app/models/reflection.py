@@ -9,9 +9,9 @@ class StrengthsReflectionResponse(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     question_id = Column(Integer, nullable=False)
-    question_text = Column(Text, nullable=False)
+    prompt_text = Column(Text, nullable=False)
     response = Column(Text, nullable=True)
-    category = Column(String(100), nullable=True)
+    response_time_ms = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     

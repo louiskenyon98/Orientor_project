@@ -84,6 +84,41 @@ export const rewriteInsight = async (userId: number, feedback: string): Promise<
   }
 };
 
+/**
+ * Récupère l'insight philosophique existant pour l'utilisateur connecté
+ * @returns Les données d'insight existantes
+ */
+export const getInsight = async (): Promise<InsightData> => {
+  try {
+    const response = await axios.get<InsightData>(
+      `${API_URL}/insight/get`,
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'insight philosophique:', error);
+    throw error;
+  }
+};
+
+/**
+ * Régénère un insight philosophique pour l'utilisateur connecté
+ * @returns Les nouvelles données d'insight générées
+ */
+export const regenerateInsight = async (): Promise<InsightData> => {
+  try {
+    const response = await axios.post<InsightData>(
+      `${API_URL}/insight/regenerate`,
+      {},
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de la régénération de l\'insight philosophique:', error);
+    throw error;
+  }
+};
+
 // Données simulées pour le développement et les tests
 export const mockInsightData: InsightData = {
   preview: "Your life seems structured but contains hidden creative impulses...",

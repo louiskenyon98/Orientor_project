@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './philosophical-card.module.css';
-import { generateInsight, mockInsightData } from '@/services/insightService';
+import { getInsight, generateInsight, mockInsightData } from '@/services/insightService';
 
 interface PhilosophicalCardProps {
   previewText?: string;
@@ -22,7 +22,7 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
       return;
     }
     
-    // Sinon, essayer de générer un insight
+    // Sinon, essayer de récupérer un insight existant ou en générer un nouveau
     const fetchInsightPreview = async () => {
       try {
         // En développement, utiliser les données simulées
@@ -34,9 +34,15 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
           return;
         }
         
-        // En production, appeler l'API
-        const insightData = await generateInsight(userId);
-        setPreview(insightData.preview);
+        // En production, essayer de récupérer un insight existant
+        try {
+          const existingInsight = await getInsight();
+          setPreview(existingInsight.preview);
+        } catch (getError) {
+          // Si aucun insight n'existe, afficher un message d'invitation
+          console.log('Aucun insight existant trouvé');
+          setPreview("Cliquez pour générer votre première analyse philosophique personnalisée...");
+        }
       } catch (error) {
         console.error('Erreur lors du chargement de l\'aperçu de l\'insight:', error);
         setPreview("Explorez des perspectives philosophiques qui élargissent votre vision du monde et stimulent votre réflexion critique...");
