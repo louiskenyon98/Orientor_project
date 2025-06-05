@@ -190,6 +190,56 @@ const hexacoTestService = {
     }
   },
 
+  // Récupérer l'analyse LLM de l'utilisateur connecté
+  getMyAnalysis: async (assessmentVersion?: string, forceRegenerate: boolean = false): Promise<{
+    analysis: string;
+    assessment_version: string;
+    language: string;
+    generated_at: string;
+  }> => {
+    try {
+      const params = new URLSearchParams();
+      if (assessmentVersion) {
+        params.append('assessment_version', assessmentVersion);
+      }
+      if (forceRegenerate) {
+        params.append('force_regenerate', 'true');
+      }
+      
+      const url = `${HEXACO_TEST_API}/my-analysis${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de l\'analyse HEXACO:', error);
+      throw error;
+    }
+  },
+
+  // Récupérer l'analyse LLM d'un utilisateur spécifique
+  getUserAnalysis: async (userId: number, assessmentVersion?: string, forceRegenerate: boolean = false): Promise<{
+    analysis: string;
+    assessment_version: string;
+    language: string;
+    generated_at: string;
+  }> => {
+    try {
+      const params = new URLSearchParams();
+      if (assessmentVersion) {
+        params.append('assessment_version', assessmentVersion);
+      }
+      if (forceRegenerate) {
+        params.append('force_regenerate', 'true');
+      }
+      
+      const url = `${HEXACO_TEST_API}/analysis/${userId}${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de l\'analyse utilisateur HEXACO:', error);
+      throw error;
+    }
+  },
+
   // Générer un nouvel ID de session (utilisé côté client pour le suivi)
   generateSessionId: (): string => {
     return crypto.randomUUID ? crypto.randomUUID() :

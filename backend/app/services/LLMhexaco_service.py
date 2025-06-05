@@ -294,6 +294,64 @@ class LLMHexacoService:
         return descriptions.get(language, {}).get(domain, "")
     
     @staticmethod
+    async def get_or_generate_personality_insights(
+        user_id: int,
+        hexaco_scores: Dict[str, Any],
+        db_session,
+        user_profile: Optional[Dict[str, Any]] = None,
+        user_skills: Optional[List[Dict[str, Any]]] = None,
+        saved_recommendations: Optional[List[Dict[str, Any]]] = None,
+        language: str = "fr",
+        force_regenerate: bool = False
+    ) -> str:
+        """
+        Récupère l'analyse de personnalité existante ou en génère une nouvelle si nécessaire.
+        
+        Args:
+            user_id: ID de l'utilisateur
+            hexaco_scores: Scores HEXACO
+            db_session: Session de base de données
+            user_profile: Profil utilisateur (optionnel)
+            user_skills: Compétences utilisateur (optionnel)
+            saved_recommendations: Recommandations sauvegardées (optionnel)
+            language: Langue pour la description
+            force_regenerate: Forcer la régénération même si une analyse existe
+            
+        Returns:
+            str: Description de personnalité (existante ou nouvellement générée)
+        """
+        if not force_regenerate:
+            # Essayer de récupérer l'analyse existante depuis la base de données
+            try:
+                from sqlalchemy import text
+                query = text("""
+                    SELECT narrative_description
+                    FROM personality_profiles
+                    WHERE user_id = :user_id AND profile_type = 'hexaco'
+                    AND narrative_description IS NOT NULL
+                    ORDER BY computed_at DESC
+                    LIMIT 1
+                """)
+                
+                result = db_session.execute(query, {"user_id": user_id}).fetchone()
+                if result and result.narrative_description:
+                    logger.info(f"Analyse HEXACO existante récupérée pour utilisateur {user_id}")
+                    return result.narrative_description
+                    
+            except Exception as e:
+                logger.warning(f"Erreur lors de la récupération de l'analyse existante: {e}")
+        
+        # Générer une nouvelle analyse si aucune n'existe ou si forcée
+        logger.info(f"Génération d'une nouvelle analyse HEXACO pour utilisateur {user_id}")
+        return await LLMHexacoService.generate_hexaco_profile_description(
+            hexaco_scores=hexaco_scores,
+            user_profile=user_profile,
+            user_skills=user_skills,
+            saved_recommendations=saved_recommendations,
+            language=language
+        )
+    
+    @staticmethod
     async def generate_career_recommendations(
         hexaco_scores: Dict[str, Any],
         user_context: Optional[Dict[str, Any]] = None,

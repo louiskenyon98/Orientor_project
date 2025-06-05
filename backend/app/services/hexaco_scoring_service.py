@@ -194,9 +194,9 @@ class HexacoScoringService:
         
         return reliability
     
-    def save_hexaco_profile(self, db: Session, user_id: int, session_id: str, 
+    def save_hexaco_profile(self, db: Session, user_id: int, session_id: str,
                            scores: Dict[str, Any], assessment_version: str,
-                           language: str = "fr") -> bool:
+                           language: str = "fr", narrative_description: str = None) -> bool:
         """
         Sauvegarde le profil HEXACO calculé dans la base de données.
         
@@ -240,12 +240,13 @@ class HexacoScoringService:
             if existing_profile:
                 # Mettre à jour le profil existant
                 update_query = text("""
-                    UPDATE personality_profiles 
+                    UPDATE personality_profiles
                     SET assessment_id = :assessment_id,
                         scores = :scores,
                         percentile_ranks = :percentiles,
                         reliability_estimates = :reliability,
                         language = :language,
+                        narrative_description = :narrative_description,
                         computed_at = NOW(),
                         updated_at = NOW()
                     WHERE id = :profile_id
@@ -257,7 +258,8 @@ class HexacoScoringService:
                     "scores": json.dumps(scores),
                     "percentiles": json.dumps(scores.get("percentiles", {})),
                     "reliability": json.dumps(scores.get("reliability", {})),
-                    "language": language
+                    "language": language,
+                    "narrative_description": narrative_description
                 })
             else:
                 # Créer un nouveau profil
@@ -265,11 +267,11 @@ class HexacoScoringService:
                     INSERT INTO personality_profiles (
                         user_id, assessment_id, profile_type, language,
                         scores, percentile_ranks, reliability_estimates,
-                        assessment_version
+                        assessment_version, narrative_description
                     ) VALUES (
                         :user_id, :assessment_id, 'hexaco', :language,
                         :scores, :percentiles, :reliability,
-                        :assessment_version
+                        :assessment_version, :narrative_description
                     )
                 """)
                 
@@ -280,7 +282,8 @@ class HexacoScoringService:
                     "scores": json.dumps(scores),
                     "percentiles": json.dumps(scores.get("percentiles", {})),
                     "reliability": json.dumps(scores.get("reliability", {})),
-                    "assessment_version": assessment_version
+                    "assessment_version": assessment_version,
+                    "narrative_description": narrative_description
                 })
             
             db.commit()

@@ -315,36 +315,37 @@ async def get_hexaco_score(
         # Calculer les scores HEXACO
         scores = scoring_service.calculate_hexaco_scores(responses, questions)
         
-        # Sauvegarder le profil calculé
+        # Récupérer les métadonnées de version et langue
         version_metadata = hexaco_service.get_version_metadata(assessment_version)
         language = version_metadata.get("language", "fr") if version_metadata else "fr"
         
+        # Générer l'analyse LLM (toujours, pas seulement si demandée)
+        narrative_description = None
+        try:
+            # Récupérer le contexte utilisateur pour une description plus personnalisée
+            user_context = {
+                "user_id": current_user.id,
+                "assessment_version": assessment_version
+            }
+            
+            narrative_description = await llm_service.generate_hexaco_profile_description(
+                hexaco_scores=scores,
+                user_profile=user_context,
+                language=language
+            )
+            logger.info(f"Analyse LLM HEXACO générée avec succès pour utilisateur {current_user.id}")
+        except Exception as e:
+            logger.warning(f"Erreur lors de la génération de la description LLM: {e}")
+            narrative_description = "Description personnalisée temporairement indisponible"
+        
+        # Sauvegarder le profil calculé avec l'analyse LLM
         scoring_service.save_hexaco_profile(
-            db, current_user.id, session_id, scores, 
-            assessment_version, language
+            db, current_user.id, session_id, scores,
+            assessment_version, language, narrative_description
         )
         
         # Marquer l'évaluation comme complétée
         hexaco_service.complete_assessment(db, session_id)
-        
-        # Générer une description narrative si demandée
-        narrative_description = None
-        if include_description:
-            try:
-                # Récupérer le contexte utilisateur pour une description plus personnalisée
-                user_context = {
-                    "user_id": current_user.id,
-                    "assessment_version": assessment_version
-                }
-                
-                narrative_description = await llm_service.generate_hexaco_profile_description(
-                    hexaco_scores=scores,
-                    user_profile=user_context,
-                    language=language
-                )
-            except Exception as e:
-                logger.warning(f"Erreur lors de la génération de la description LLM: {e}")
-                narrative_description = "Description personnalisée temporairement indisponible"
         
         result = HexacoScoreResponse(
             domains=scores["domains"],
@@ -353,7 +354,7 @@ async def get_hexaco_score(
             reliability=scores["reliability"],
             total_responses=scores["total_responses"],
             completion_rate=scores["completion_rate"],
-            narrative_description=narrative_description
+            narrative_description=narrative_description if include_description else None
         )
         
         logger.info(f"Scores HEXACO calculés pour session {session_id}")
@@ -425,3 +426,91 @@ async def get_my_hexaco_profile(
     Retourne le profil HEXACO de l'utilisateur connecté.
     """
     return await get_user_hexaco_profile(current_user.id, assessment_version, db, current_user)
+
+@router.get("/analysis/{user_id}", response_model=Dict[str, str])
+async def get_hexaco_analysis(
+    user_id: int,
+    assessment_version: Optional[str] = Query(None),
+    force_regenerate: bool = Query(False),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Retourne l'analyse LLM du profil HEXACO d'un utilisateur.
+    Récupère l'analyse existante ou en génère une nouvelle si nécessaire.
+    """
+    try:
+        # Vérifier que l'utilisateur peut accéder à cette analyse
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Accès non autorisé à cette analyse"
+            )
+        
+        # Récupérer le profil HEXACO
+        profile = scoring_service.get_user_hexaco_profile(db, user_id, assessment_version)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Aucun profil HEXACO trouvé pour cet utilisateur"
+            )
+        
+        # Récupérer ou générer l'analyse
+        analysis = await llm_service.get_or_generate_personality_insights(
+            user_id=user_id,
+            hexaco_scores=profile["scores"],
+            db_session=db,
+            language=profile.get("language", "fr"),
+            force_regenerate=force_regenerate
+        )
+        
+        # Si une nouvelle analyse a été générée, mettre à jour la base de données
+        if force_regenerate or not profile.get("narrative_description"):
+            try:
+                from sqlalchemy import text
+                update_query = text("""
+                    UPDATE personality_profiles
+                    SET narrative_description = :narrative_description,
+                        updated_at = NOW()
+                    WHERE user_id = :user_id AND profile_type = 'hexaco'
+                    AND (:assessment_version IS NULL OR assessment_version = :assessment_version)
+                """)
+                
+                db.execute(update_query, {
+                    "user_id": user_id,
+                    "narrative_description": analysis,
+                    "assessment_version": assessment_version
+                })
+                db.commit()
+                logger.info(f"Analyse LLM mise à jour pour utilisateur {user_id}")
+            except Exception as e:
+                logger.warning(f"Erreur lors de la mise à jour de l'analyse: {e}")
+                db.rollback()
+        
+        return {
+            "analysis": analysis,
+            "assessment_version": profile.get("assessment_version"),
+            "language": profile.get("language", "fr"),
+            "generated_at": profile.get("computed_at")
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération de l'analyse HEXACO: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de la récupération de l'analyse: {str(e)}"
+        )
+
+@router.get("/my-analysis", response_model=Dict[str, str])
+async def get_my_hexaco_analysis(
+    assessment_version: Optional[str] = Query(None),
+    force_regenerate: bool = Query(False),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Retourne l'analyse LLM du profil HEXACO de l'utilisateur connecté.
+    """
+    return await get_hexaco_analysis(current_user.id, assessment_version, force_regenerate, db, current_user)
