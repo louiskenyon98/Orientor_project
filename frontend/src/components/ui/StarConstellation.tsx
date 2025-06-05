@@ -23,6 +23,7 @@ const StarConstellation: React.FC = () => {
   const dragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const zoom = useRef(1);
+  const targetZoom = useRef(1);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -61,6 +62,9 @@ const StarConstellation: React.FC = () => {
       const { width, height } = canvas;
       const centerX = width / 2 + offset.current.x;
       const centerY = height / 2 + offset.current.y;
+
+      // Smooth zoom transition
+      zoom.current += (targetZoom.current - zoom.current) * 0.1;
 
       ctx.clearRect(0, 0, width, height);
       ctx.save();
@@ -131,13 +135,14 @@ const StarConstellation: React.FC = () => {
     };
 
     const onWheel = (e: WheelEvent) => {
-      const zoomFactor = 0.1;
+      e.preventDefault();
+      const zoomFactor = 0.05; // Reduced from 0.1 to 0.05
       if (e.deltaY < 0) {
-        zoom.current *= 1 + zoomFactor;
+        targetZoom.current *= 1 + zoomFactor;
       } else {
-        zoom.current *= 1 - zoomFactor;
+        targetZoom.current *= 1 - zoomFactor;
       }
-      zoom.current = Math.max(0.1, Math.min(zoom.current, 5));
+      targetZoom.current = Math.max(0.5, Math.min(targetZoom.current, 2)); // Reduced zoom range
     };
 
     resizeCanvas();
@@ -148,12 +153,13 @@ const StarConstellation: React.FC = () => {
     canvas.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
-    canvas.addEventListener('wheel', onWheel);
+    canvas.addEventListener('wheel', onWheel, { passive: false });
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
+      canvas.removeEventListener('wheel', onWheel);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [isDarkMode]);

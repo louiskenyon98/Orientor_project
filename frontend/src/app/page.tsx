@@ -16,6 +16,7 @@ import styles from '@/styles/patterns.module.css';
 import sidebarStyles from '@/styles/sidebar.module.css';
 import NewSidebar from '@/components/layout/NewSidebar';
 import '@/styles/premium-theme.css';
+import PersonalityCard from '@/components/ui/PersonalityCard';
 
 // Interface pour la réponse de l'API de recommandations d'emploi
 interface JobRecommendationsResponse {
@@ -210,10 +211,19 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Philosophical Card Section */}
-              <div className="w-full mb-10">
-                <div className="premium-card p-6">
+              {/* Cards Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                {/* Philosophical Card */}
+                <div>
                   <PhilosophicalCard />
+                </div>
+
+                {/* Personality Card */}
+                <div className="premium-card p-6">
+                  <h2 className="premium-section-title mb-6">
+                    Personality Tests
+                  </h2>
+                  <PersonalityCard items={personalityItems} />
                 </div>
               </div>
 
