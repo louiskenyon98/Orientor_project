@@ -37,7 +37,7 @@ export default function LandingPage() {
         <h1 className="text-4xl md:text-6xl font-bold gradient-text">
           Welcome to Navigo
         </h1>
-        <div className="light-button">
+        {/* <div className="light-button">
           <button className="bt">
             <div className="light-holder">
               <div className="dot"></div>
@@ -53,7 +53,7 @@ export default function LandingPage() {
               />
             </div>
           </button>
-        </div>
+        </div> */}
       </header>
 
       {/* Hero Section */}
