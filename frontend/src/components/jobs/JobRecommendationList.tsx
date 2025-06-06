@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import JobCard, { Job } from './JobCard';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { useRouter } from 'next/navigation';
 
 interface JobRecommendationListProps {
   recommendations: Job[];
@@ -19,6 +20,7 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
   onSelectJob,
   className = '',
 }) => {
+  const router = useRouter();
   const [selectedJobId, setSelectedJobId] = useState<string | null>(
     recommendations.length > 0 ? recommendations[0].id : null
   );
@@ -27,6 +29,10 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
   const handleSelectJob = (job: Job) => {
     setSelectedJobId(job.id);
     onSelectJob(job);
+  };
+
+  const handleViewMore = () => {
+    router.push('/recommendations');
   };
 
   // Afficher un état de chargement
@@ -172,7 +178,7 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
           <button
             className="text-sm hover:underline focus:outline-none"
             style={{ color: 'var(--accent-color)' }}
-            onClick={() => {/* Fonction pour voir plus de recommandations */}}
+            onClick={handleViewMore}
           >
             Voir plus de recommandations →
           </button>

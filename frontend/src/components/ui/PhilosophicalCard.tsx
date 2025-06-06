@@ -15,17 +15,14 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
   const [loading, setLoading] = useState<boolean>(!previewText);
   
   useEffect(() => {
-    // Si un previewText est fourni, l'utiliser directement
     if (previewText) {
       setPreview(previewText);
       setLoading(false);
       return;
     }
     
-    // Sinon, essayer de récupérer un insight existant ou en générer un nouveau
     const fetchInsightPreview = async () => {
       try {
-        // En développement, utiliser les données simulées
         if (process.env.NODE_ENV === 'development') {
           setTimeout(() => {
             setPreview(mockInsightData.preview);
@@ -34,12 +31,10 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
           return;
         }
         
-        // En production, essayer de récupérer un insight existant
         try {
           const existingInsight = await getInsight();
           setPreview(existingInsight.preview);
         } catch (getError) {
-          // Si aucun insight n'existe, afficher un message d'invitation
           console.log('Aucun insight existant trouvé');
           setPreview("Cliquez pour générer votre première analyse philosophique personnalisée...");
         }
@@ -64,25 +59,17 @@ const PhilosophicalCard: React.FC<PhilosophicalCardProps> = ({ previewText, user
         className={`${styles.card1} ${loading ? styles.loading : ''}`}
         onClick={handleClick}
       >
-        <div className={styles.front}>
-          <h3 className={styles.title}>🧠 Personalité</h3>
-          <p className={styles.preview}>
-            {preview}
-          </p>
-          {loading && (
-            <div className={styles.loadingIndicator}>
-              <span className={styles.dot}></span>
-              <span className={styles.dot}></span>
-              <span className={styles.dot}></span>
-            </div>
-          )}
-        </div>
-        <div className={styles.back}>
-          <h3 className={styles.title}>💭 Insight</h3>
-          <p className={styles.preview}>
-            Cliquez pour découvrir votre analyse philosophique personnalisée
-          </p>
-        </div>
+        <h3 className={styles.title}>🧠 Personalité</h3>
+        <p className={styles.preview}>
+          {preview}
+        </p>
+        {loading && (
+          <div className={styles.loadingIndicator}>
+            <span className={styles.dot}></span>
+            <span className={styles.dot}></span>
+            <span className={styles.dot}></span>
+          </div>
+        )}
       </div>
     </div>
   );
