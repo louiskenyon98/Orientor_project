@@ -204,7 +204,7 @@ a,
   font-size: 16px;
   background-color: #0a0a0a;
   border: solid 0.5px #525252;
-  color: #646464;
+  color: #ffffff;
   padding: 0.7rem 1rem;
   border-radius: 25px;
   width: 100%;
@@ -228,7 +228,8 @@ a,
 
 .search-header__input::-webkit-input-placeholder {
   font-weight: 100;
-  color: #3a3a3a;
+  color: #ffffff;
+  opacity: 0.7;
 }
 
 .search-header__input:focus + .search-header__button {

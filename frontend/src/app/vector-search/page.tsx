@@ -137,20 +137,22 @@ export default function VectorSearchPage() {
         <h1 className="text-2xl font-bold mb-6 gradient-text">Career Recommendations</h1>
 
         <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex gap-2">
+          <div className="search-header">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Enter skills, interests, or desired career..."
-              className="input flex-1"
+              className="search-header__input"
             />
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary"
+              className="search-header__button"
             >
-              {loading ? 'Searching...' : 'Search'}
+              <svg className="search-header__icon" viewBox="0 0 24 24">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+              </svg>
             </button>
           </div>
           {error && <p className="text-red-400 mt-2">{error}</p>}
