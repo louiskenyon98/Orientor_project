@@ -24,6 +24,11 @@ const resumeTemplates = [
 
 export default function LandingPage() {
   const router = useRouter();
+  const [selectedTest, setSelectedTest] = useState<string | null>(null);
+
+  const handleTestSelect = (testId: string) => {
+    setSelectedTest(testId);
+  };
 
   return (
     <div className="landing-container">
@@ -320,7 +325,14 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto">
           <div className="radiogroup" onClick={(e) => e.preventDefault()}>
             <div className="wrapper">
-              <input type="radio" name="test" id="hexaco" className="state" />
+              <input 
+                type="radio" 
+                name="test" 
+                id="hexaco" 
+                className="state" 
+                checked={selectedTest === 'hexaco'}
+                onChange={() => handleTestSelect('hexaco')}
+              />
               <label htmlFor="hexaco" className="label">
                 <div className="indicator"></div>
                 <div className="text">
@@ -330,7 +342,14 @@ export default function LandingPage() {
               </label>
             </div>
             <div className="wrapper">
-              <input type="radio" name="test" id="riasec" className="state" />
+              <input 
+                type="radio" 
+                name="test" 
+                id="riasec" 
+                className="state"
+                checked={selectedTest === 'riasec'}
+                onChange={() => handleTestSelect('riasec')}
+              />
               <label htmlFor="riasec" className="label">
                 <div className="indicator"></div>
                 <div className="text">
@@ -340,7 +359,14 @@ export default function LandingPage() {
               </label>
             </div>
             <div className="wrapper">
-              <input type="radio" name="test" id="longform" className="state" />
+              <input 
+                type="radio" 
+                name="test" 
+                id="longform" 
+                className="state"
+                checked={selectedTest === 'longform'}
+                onChange={() => handleTestSelect('longform')}
+              />
               <label htmlFor="longform" className="label">
                 <div className="indicator"></div>
                 <div className="text">
