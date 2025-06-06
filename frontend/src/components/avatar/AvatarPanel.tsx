@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import AvatarCard from './AvatarCard';
 import AvatarService, { AvatarData } from '@/services/avatarService';
 import styles from './AvatarPanel.module.css';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 interface AvatarPanelProps {
   className?: string;
@@ -65,14 +66,7 @@ const AvatarPanel: React.FC<AvatarPanelProps> = ({ className = '' }) => {
     : undefined;
 
   if (isLoading) {
-    return (
-      <div className={`${styles.avatarPanel} ${className}`}>
-        <div className={styles.loadingContainer}>
-          <div className={styles.spinner}></div>
-          <p className={styles.loadingText}>Chargement de votre avatar...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Chargement de votre avatar..." />;
   }
 
   return (

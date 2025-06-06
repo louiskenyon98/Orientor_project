@@ -5,6 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { getAllJobRecommendations } from '@/services/api';
 import JobSkillsTree from '@/components/jobs/JobSkillsTree';
 import JobCard, { Job } from '@/components/jobs/JobCard';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 export default function CareerRecommendationsPage() {
   const [recommendations, setRecommendations] = useState<Job[]>([]);
@@ -39,9 +40,7 @@ export default function CareerRecommendationsPage() {
   if (loading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
+        <LoadingScreen message="Loading career recommendations..." />
       </MainLayout>
     );
   }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 // Define API URL with fallback and trim any trailing spaces
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -85,9 +86,7 @@ export default function MessagesPage() {
                 </div>
                 
                 {loading ? (
-                    <div className="flex justify-center py-10">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-secondary-purple"></div>
-                    </div>
+                    <LoadingScreen message="Loading messages..." />
                 ) : error ? (
                     <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                         {error}

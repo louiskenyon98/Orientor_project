@@ -6,6 +6,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { getInsight, generateInsight, regenerateInsight, saveInsight, rewriteInsight, InsightData, mockInsightData } from '@/services/insightService';
 import Link from 'next/link';
 import styles from './insight.module.css';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 const InsightPage: React.FC = () => {
   const router = useRouter();
@@ -163,12 +164,7 @@ const InsightPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16 max-w-[2000px] mx-auto">
-                <div className="flex items-center justify-center min-h-[400px]">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="premium-text-secondary">Génération de votre insight philosophique...</p>
-                  </div>
-                </div>
+                <LoadingScreen message="Generating your insight philosophique..." />
               </div>
             </div>
           </div>

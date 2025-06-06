@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import hexacoTestService, { HexacoScoreResponse } from '@/services/hexacoTestService';
 import HexacoChart from '@/components/hexaco-test/HexacoChart';
 import { useRouter } from 'next/navigation';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 const HexacoResultsView: React.FC = () => {
   const router = useRouter();
@@ -60,16 +61,7 @@ const HexacoResultsView: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Chargement de votre profil HEXACO...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Chargement de votre profil HEXACO..." />;
   }
 
   if (error) {

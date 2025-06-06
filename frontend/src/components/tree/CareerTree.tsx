@@ -18,6 +18,7 @@ import { convertToFlowGraph, TreeNode } from '../../utils/convertToFlowGraph';
 import { saveTreePath, getTreePath } from '../../utils/treeStorage';
 import XPProgress from '../ui/XPProgress';
 import { useSearchParams } from 'next/navigation';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 // Define custom node types
 const nodeTypes: NodeTypes = {
@@ -248,12 +249,7 @@ export default function CareerTree() {
           </div>
         </div>
       ) : isLoading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-            <p className="text-gray-600">Generating your personal career tree...</p>
-          </div>
-        </div>
+        <LoadingScreen message="Generating your personal career tree..." />
       ) : error ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="bg-red-50 p-4 rounded-lg border border-red-200 max-w-md">

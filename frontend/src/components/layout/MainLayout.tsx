@@ -6,6 +6,7 @@ import XPProgress from '../ui/XPProgress';
 import DarkModeToggle from '../ui/DarkModeToggle';
 import ThemeToggle from '../ui/ThemeToggle';
 import styles from '@/styles/patterns.module.css';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
 // Composants pour les menus déroulants
 const ProfileDropdown = ({ pathname }: { pathname: string | null }) => {
@@ -245,11 +246,7 @@ export default function MainLayout({
 
     // Show loading state while checking authentication
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
+        return <LoadingScreen message="Loading..." />;
     }
 
     // Check if current path is in career path section
