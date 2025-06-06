@@ -118,4 +118,29 @@ export const getJobSkillsTree = async (jobId: string, depth: number = 1, maxNode
   }
 };
 
+// Function to get all job recommendations for the career recommendations page
+export const getAllJobRecommendations = async (limit: number = 30) => {
+  try {
+    // Use the /recommendations/me endpoint with a higher limit
+    const endpoint = `/api/v1/jobs/recommendations/me?top_k=${limit}&embedding_type=esco_embedding`;
+    console.log('Calling all job recommendations API:', `${API_URL}${endpoint}`);
+    const response = await api.get(endpoint);
+    console.log('All job recommendations API response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all job recommendations:', error);
+    console.error('API Error Details:', {
+      status: (error as any)?.response?.status,
+      statusText: (error as any)?.response?.statusText,
+      data: (error as any)?.response?.data,
+      config: {
+        baseURL: (error as any)?.config?.baseURL,
+        url: (error as any)?.config?.url,
+        headers: (error as any)?.config?.headers
+      }
+    });
+    throw error;
+  }
+};
+
 export default api;

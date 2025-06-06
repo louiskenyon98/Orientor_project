@@ -349,7 +349,7 @@ export default function Home() {
                 </div>
 
                 {/* Personality Section */}
-                <div className="md:col-span-12 mt-4">
+                {/* <div className="md:col-span-12 mt-4">
                   <h2 className="premium-section-title">
                     Personality
                   </h2>
@@ -381,7 +381,7 @@ export default function Home() {
                       </Link>
                     ))}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Recent Activity - occupe toute la largeur */}
                 <div className="md:col-span-12 mt-4">

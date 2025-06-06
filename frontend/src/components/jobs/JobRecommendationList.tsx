@@ -32,7 +32,7 @@ const JobRecommendationList: React.FC<JobRecommendationListProps> = ({
   };
 
   const handleViewMore = () => {
-    router.push('/recommendations');
+    router.push('/career/recommendations');
   };
 
   // Afficher un état de chargement

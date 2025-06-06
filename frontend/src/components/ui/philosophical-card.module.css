@@ -3,6 +3,7 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  min-height: 200px; /* Increased height for a longer container */
 }
 
 .card1 {
@@ -18,6 +19,7 @@
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease-out;
+  height: 400px; /* Set a fixed height for a longer card */
 }
 
 .card1:before {
