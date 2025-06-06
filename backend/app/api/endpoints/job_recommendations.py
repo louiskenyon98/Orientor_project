@@ -96,15 +96,18 @@ async def get_current_user_job_recommendations(
         stored_recommendations = job_recommendation_service.get_stored_recommendations(db, user_id)
         logger.info(f"📥 Stored recommendations: {len(stored_recommendations) if stored_recommendations else 0}")
         
-        # Si aucune recommandation n'est stockée, si un type d'embedding spécifique est demandé,
-        # OU si le nombre de recommandations demandées est différent de 3, générer de nouvelles recommandations
-        recommendations = stored_recommendations
-        if not recommendations or embedding_type != "esco_embedding" or top_k != 3:
+        # Logique pour déterminer si on utilise les recommandations stockées ou on en génère de nouvelles
+        logger.info(f"🔍 Decision logic: top_k={top_k}, has_stored={bool(stored_recommendations)}, embedding_type={embedding_type}")
+        
+        # Pour la page d'accueil (top_k=3), utiliser les recommandations stockées si disponibles
+        if top_k == 3 and stored_recommendations and len(stored_recommendations) > 0 and embedding_type == "esco_embedding":
+            logger.info(f"📋 Using stored recommendations for homepage ({len(stored_recommendations)} recommendations)")
+            recommendations = stored_recommendations[:3]  # S'assurer qu'on ne retourne que 3
+        else:
+            # Pour tous les autres cas (top_k != 3, pas de recommandations stockées, ou embedding_type différent)
             logger.info(f"🔄 Generating new recommendations for user {user_id} (top_k={top_k}, embedding_type={embedding_type})")
             recommendations = job_recommendation_service.get_job_recommendations(db, user_id, embedding_type, top_k)
             logger.info(f"✅ Generated {len(recommendations) if recommendations else 0} recommendations")
-        else:
-            logger.info(f"📋 Using stored recommendations ({len(stored_recommendations)} recommendations)")
         
         if not recommendations:
             logger.warning(f"⚠️ No recommendations found for user {user_id}, creating dummy data")

@@ -47,9 +47,10 @@ interface SkillTreeData {
 interface JobSkillsTreeProps {
   jobId: string | null;
   className?: string;
+  height?: string;
 }
 
-const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) => {
+const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '', height = '600px' }) => {
   const [skillTreeData, setSkillTreeData] = useState<SkillTreeData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -493,7 +494,7 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '' }) 
         
         {/* Visualisation ReactFlow */}
         <div className="border rounded-lg overflow-hidden" style={{
-          height: '500px',
+          height: height,
           borderColor: 'var(--border-color)',
           backgroundColor: 'var(--primary-color)'
         }}>

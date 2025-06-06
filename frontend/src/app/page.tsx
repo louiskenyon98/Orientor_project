@@ -93,11 +93,14 @@ export default function Home() {
         const response = await getJobRecommendations() as JobRecommendationsResponse;
         
         if (response && response.recommendations) {
-          setJobRecommendations(response.recommendations);
+          // S'assurer qu'on n'affiche que 3 recommandations maximum sur la page d'accueil
+          const limitedRecommendations = response.recommendations.slice(0, 3);
+          setJobRecommendations(limitedRecommendations);
+          console.log(`🏠 Homepage: Limited to ${limitedRecommendations.length} recommendations`);
           
           // Sélectionner automatiquement le premier emploi
-          if (response.recommendations.length > 0) {
-            setSelectedJob(response.recommendations[0]);
+          if (limitedRecommendations.length > 0) {
+            setSelectedJob(limitedRecommendations[0]);
           }
         }
       } catch (err) {
@@ -260,6 +263,7 @@ export default function Home() {
                       <JobSkillsTree
                         jobId={selectedJob.id}
                         className="mt-8"
+                        height="400px"
                       />
                     </div>
                   )}

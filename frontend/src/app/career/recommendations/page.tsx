@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getAllJobRecommendations } from '@/services/api';
 import JobSkillsTree from '@/components/jobs/JobSkillsTree';
+import JobCard, { Job } from '@/components/jobs/JobCard';
 
 export default function CareerRecommendationsPage() {
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [recommendations, setRecommendations] = useState<Job[]>([]);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,11 +17,9 @@ export default function CareerRecommendationsPage() {
       try {
         setLoading(true);
         const response = await getAllJobRecommendations(30);
-        
+        console.log('Fetched recommendations:', response);
         if (response && response.recommendations) {
           setRecommendations(response.recommendations);
-          console.log(`✅ Loaded ${response.recommendations.length} career recommendations`);
-          
           // Set the first job as selected by default
           if (response.recommendations.length > 0) {
             setSelectedJob(response.recommendations[0]);
@@ -59,38 +58,55 @@ export default function CareerRecommendationsPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Career Recommendations</h1>
-        <p className="text-gray-600 mb-8">
+      <style jsx>{`
+        .career-recommendations-card .glass {
+          transform: rotate(0deg) !important;
+          margin: 0 !important;
+        }
+        .career-recommendations-card:hover .glass {
+          transform: rotate(0deg) !important;
+          margin: 0 !important;
+        }
+      `}</style>
+      <div className="max-w-[1800px] mx-auto px-6 py-8">
+        <h1 className="text-4xl font-bold mb-3">Career Recommendations</h1>
+        <p className="text-gray-600 mb-10 text-lg">
           Discover personalized career recommendations based on your profile
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left side: Job Cards */}
-          <div className="space-y-4 max-h-[800px] overflow-y-auto pr-4">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          {/* Left side: Job Cards - 6 columns */}
+          <div className="xl:col-span-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 max-h-[2000px] overflow-y-auto pr-4">
             {recommendations.map((job) => (
               <div
                 key={job.id}
-                className={`bgblue w-full cursor-pointer transition-all duration-200 ${
-                  selectedJob?.id === job.id ? 'ring-2 ring-blue-500' : ''
-                }`}
-                onClick={() => setSelectedJob(job)}
+                className="career-recommendations-card"
+                style={{ '--r': '0' } as React.CSSProperties}
               >
-                <div className="card">
-                  <h3 className="text-xl font-semibold mb-2">{job.metadata.title}</h3>
-                  <p className="text-gray-300">{job.metadata.description}</p>
-                </div>
+                <JobCard
+                  job={job}
+                  isSelected={selectedJob?.id === job.id}
+                  onClick={() => setSelectedJob(job)}
+                  className="h-72"
+                />
               </div>
             ))}
           </div>
 
-          {/* Right side: Skills Tree */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          {/* Right side: Skills Tree - 6 columns */}
+          <div className="xl:col-span-6 bg-white rounded-lg shadow-lg p-8 min-h-[1200px]">
             {selectedJob ? (
-              <JobSkillsTree jobId={selectedJob.id} />
+              <div className="h-full">
+                <h2 className="text-3xl font-semibold mb-6">
+                  {selectedJob.metadata.preferred_label || selectedJob.metadata.title || selectedJob.id.replace('occupation::key_', '')}
+                </h2>
+                <div className="h-[calc(100%-5rem)]">
+                  <JobSkillsTree jobId={selectedJob.id} height="800px" />
+                </div>
+              </div>
             ) : (
               <div className="flex items-center justify-center h-full">
-                <p className="text-gray-500">Select a job to view its skills tree</p>
+                <p className="text-gray-500 text-xl">Select a job to view its skills tree</p>
               </div>
             )}
           </div>
