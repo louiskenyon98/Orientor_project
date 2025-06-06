@@ -380,7 +380,7 @@ export default function LandingPage() {
       </section>
 
       {/* Section: Recommended School Programs */}
-        <section className="section bg-white mt-12">
+        <section className="section">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold gradient-text">Explore Programs That Match Your Growth</h2>
             <p className="text-neutral-600 mt-4 max-w-2xl mx-auto">
@@ -446,13 +446,13 @@ export default function LandingPage() {
         </section>
 
       {/* Section: Resume Builder */}
-      <section className="min-h-screen py-16 bg-gray-50">
+      <section className="min-h-screen py-16">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-800">
             Build your resume
           </h2>
 
-          <div className="bg-white p-6 rounded-xl shadow-md">
+          <div>
             <h3 className="text-xl font-semibold mb-4 text-gray-800">Choose a model</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

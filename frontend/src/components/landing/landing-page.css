@@ -1,5 +1,4 @@
 /* Import des styles UI existants */
-@import './uiverse/problem_solutionCard.css';
 @import './uiverse/typewrite.css';
 @import './uiverse/navigo_hoverIcon.css';
 @import './uiverse/login.css';
@@ -131,50 +130,110 @@
 
 /* Ajustement de la largeur des cartes pour la grille */
 .diagnostic-grid .card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  border-radius: 24px;
+  line-height: 1.6;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  background: transparent;
+}
+
+.diagnostic-grid .card .content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 36px;
+  border-radius: 22px;
+  color: #ffffff;
+  overflow: hidden;
   width: 100%;
-  max-width: 280px;
-  min-width: 250px;
+  height: 100%;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card .content::before {
+  position: absolute;
+  content: "";
+  top: -4%;
+  left: 50%;
+  width: 90%;
+  height: 90%;
+  transform: translate(-50%);
+  background: #ced8ff;
+  z-index: -1;
+  transform-origin: bottom;
+  border-radius: inherit;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card .content::after {
+  position: absolute;
+  content: "";
+  top: -8%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%);
+  background: #e7ecff;
+  z-index: -2;
+  transform-origin: bottom;
+  border-radius: inherit;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card .content svg {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  z-index: 1;
+}
+
+.diagnostic-grid .card .content .para {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  font-size: 18px;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card:hover {
+  transform: translate(0px, -16px);
+}
+
+.diagnostic-grid .card:hover .content::before {
+  rotate: -8deg;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.diagnostic-grid .card:hover .content::after {
+  rotate: 8deg;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* Variantes de couleurs pour les cartes */
-.card-problem-1 .content {
+.diagnostic-grid .card-problem-1 .content {
   background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
 }
 
-.card-problem-2 .content {
+.diagnostic-grid .card-problem-2 .content {
   background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
 }
 
-.card-solution-1 .content {
+.diagnostic-grid .card-solution-1 .content {
   background: linear-gradient(135deg, #3498db, #2980b9) !important;
 }
 
-.card-solution-2 .content {
+.diagnostic-grid .card-solution-2 .content {
   background: linear-gradient(135deg, #1abc9c, #16a085) !important;
-}
-
-/* Ajustements pour les titres dans les cartes */
-.content h3.para {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #ffffff;
-}
-
-.content p.para {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #ffffff;
-  opacity: 0.9;
-}
-
-/* Ajustements pour les SVG dans les cartes */
-.content svg {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 1rem;
-  fill: currentColor;
-  color: #ffffff;
 }
 
 /* Responsive design */
@@ -182,10 +241,6 @@
   .diagnostic-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
-  }
-  
-  .diagnostic-grid .card {
-    max-width: 350px;
   }
 }
 
@@ -228,7 +283,7 @@
   }
   
   .diagnostic-grid .card {
-    max-width: 320px;
+    max-width: 280px;
   }
   
   .btn {
