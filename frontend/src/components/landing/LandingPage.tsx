@@ -258,7 +258,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-900">Pick Your Goals</h4>
-                  <p className="text-gray-600 mt-1 text-sm">Save the careers you’re aiming for.</p>
+                  <p className="text-gray-600 mt-1 text-sm">Save the careers you're aiming for.</p>
                 </div>
               </li>
 
@@ -282,7 +282,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-900">Track the Gap</h4>
-                  <p className="text-gray-600 mt-1 text-sm">Get a clear view of what’s missing—and what’s next.</p>
+                  <p className="text-gray-600 mt-1 text-sm">Get a clear view of what's missing—and what's next.</p>
                 </div>
               </li>
 
@@ -308,13 +308,57 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Psychological Tests Section */}
+      <section className="section mt-16 mb-16">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 gradient-text">
+          Discover Yourself Through Psychological Tests
+        </h2>
+        <p className="text-center text-neutral-600 max-w-2xl mx-auto mb-12 text-lg">
+          Take our scientifically validated psychological assessments to better understand your personality, interests, and career preferences.
+        </p>
+
+        <div className="max-w-3xl mx-auto">
+          <div className="radiogroup" onClick={(e) => e.preventDefault()}>
+            <div className="wrapper">
+              <input type="radio" name="test" id="hexaco" className="state" />
+              <label htmlFor="hexaco" className="label">
+                <div className="indicator"></div>
+                <div className="text">
+                  <span className="font-medium text-gray-900">HEXACO Personality Test</span>
+                  <p className="text-gray-600 mt-1 text-sm">A comprehensive personality assessment measuring six major dimensions of personality: Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, and Openness to Experience.</p>
+                </div>
+              </label>
+            </div>
+            <div className="wrapper">
+              <input type="radio" name="test" id="riasec" className="state" />
+              <label htmlFor="riasec" className="label">
+                <div className="indicator"></div>
+                <div className="text">
+                  <span className="font-medium text-gray-900">RIASEC Career Interest Test</span>
+                  <p className="text-gray-600 mt-1 text-sm">Discover your career interests across six types: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional.</p>
+                </div>
+              </label>
+            </div>
+            <div className="wrapper">
+              <input type="radio" name="test" id="longform" className="state" />
+              <label htmlFor="longform" className="label">
+                <div className="indicator"></div>
+                <div className="text">
+                  <span className="font-medium text-gray-900">Longform Questions</span>
+                  <p className="text-gray-600 mt-1 text-sm">Deep dive into your values, motivations, and aspirations through thoughtful, open-ended questions.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Section: Recommended School Programs */}
         <section className="section bg-white mt-12">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold gradient-text">Explore Programs That Match Your Growth</h2>
             <p className="text-neutral-600 mt-4 max-w-2xl mx-auto">
-              As your skills grow, so do your options. Based on your aspirations, here are curated school programs designed to accelerate your journey. Each one builds on the strengths you’re developing in Navigo.
+              As your skills grow, so do your options. Based on your aspirations, here are curated school programs designed to accelerate your journey. Each one builds on the strengths you're developing in Navigo.
             </p>
           </div>
 
