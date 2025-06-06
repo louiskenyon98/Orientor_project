@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 import logging
@@ -25,6 +26,7 @@ from app.routers.insight_router import router as insight_router
 from app.routers.competence_tree import router as competence_tree_router
 from app.routers.users import router as users_router
 from app.routers.reflection_router import router as reflection_router
+from app.routers.avatar import router as avatar_router
 from app.api.endpoints.job_recommendations import router as job_recommendations_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
@@ -43,6 +45,9 @@ app = FastAPI(
     description="API for the Navigo Career and Skill Tree Explorer",
     version="0.1.0",
 )
+
+# Configure static files for avatars
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Configure CORS
 origins = [
@@ -121,13 +126,17 @@ app.include_router(insight_router)
 app.include_router(competence_tree_router, prefix="/api/v1")
 app.include_router(users_router, prefix="/api/v1")
 app.include_router(reflection_router)
+app.include_router(avatar_router, prefix="/api/v1")
 app.include_router(job_recommendations_router, prefix="/api/v1/jobs")
 logger.info("All routers included successfully")
 
 # Explicitly capture route after including it
 logger.info("=== Available Routes ===")
 for route in app.routes:
-    logger.info(f"Route: {route.path}, Methods: {route.methods}")
+    if hasattr(route, 'methods'):
+        logger.info(f"Route: {route.path}, Methods: {route.methods}")
+    else:
+        logger.info(f"Mount: {route.path}")
 logger.info("======================")
 
 @app.get("/")

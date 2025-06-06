@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
+    # OpenAI Settings
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+
     @property
     def get_database_url(self) -> str:
         """

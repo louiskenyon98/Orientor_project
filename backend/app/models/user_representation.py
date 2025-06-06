@@ -16,5 +16,10 @@ class UserRepresentation(Base):
     summary = Column(Text)
     notes = Column(Text)
     
+    # Champs pour l'avatar
+    avatar_name = Column(String(255))
+    avatar_description = Column(Text)
+    avatar_image_url = Column(String(500))
+    
     # Relation avec l'utilisateur
     user = relationship("User", back_populates="representations")

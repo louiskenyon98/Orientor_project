@@ -203,7 +203,6 @@ export default function Home() {
                     <UserCard
                       name={userData.name}
                       role={userData.role}
-                      avatarUrl={userData.avatarUrl}
                       skills={userData.skills}
                       hollandResults={hollandResults}
                       loading={loading}

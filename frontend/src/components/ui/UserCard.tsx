@@ -1,13 +1,14 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import styles from '@/styles/card.module.css';
 import { ScoreResponse } from '@/services/hollandTestService';
+import AvatarService, { AvatarData } from '@/services/avatarService';
 
 interface UserCardProps {
   name: string;
   role: string;
-  avatarUrl: string;
   skills: string[];
   className?: string;
   hollandResults?: ScoreResponse | null;
@@ -33,30 +34,90 @@ const riasecLabels = {
   C: 'Conventionnel',
 };
 
-const UserCard: React.FC<UserCardProps> = ({ 
-  name, 
-  role, 
-  avatarUrl, 
-  skills, 
+const UserCard: React.FC<UserCardProps> = ({
+  name,
+  role,
+  skills,
   className,
   hollandResults,
   loading,
-  error 
+  error
 }) => {
+  const router = useRouter();
+  const [avatarData, setAvatarData] = useState<AvatarData | null>(null);
+  const [avatarLoading, setAvatarLoading] = useState(true);
+
+  // Charger l'avatar de l'utilisateur
+  useEffect(() => {
+    const loadAvatar = async () => {
+      try {
+        setAvatarLoading(true);
+        const data = await AvatarService.getUserAvatar();
+        setAvatarData(data);
+      } catch (err) {
+        console.log('Aucun avatar trouvé pour cet utilisateur');
+        setAvatarData(null);
+      } finally {
+        setAvatarLoading(false);
+      }
+    };
+
+    loadAvatar();
+  }, []);
+
+  const handleProfileClick = () => {
+    router.push('/profile_avatar');
+  };
+
+  const avatarImageUrl = avatarData?.avatar_image_url
+    ? AvatarService.getAvatarImageUrl(avatarData.avatar_image_url)
+    : null;
+
   return (
     <div className={`${styles.card} ${className || ''}`}>
       <div className={styles.card__img} />
+      
+      {/* Avatar Section */}
       <div className={styles.card__avatar}>
-        <Image
-          src={avatarUrl}
-          alt={name}
-          width={200}
-          height={200}
-          className="rounded-full"
-        />
+        {avatarLoading ? (
+          <div className={styles.avatar__loading}>
+            <div className={styles.avatar__spinner}></div>
+          </div>
+        ) : avatarImageUrl ? (
+          <div className={styles.avatar__container}>
+            <Image
+              src={avatarImageUrl}
+              alt={avatarData?.avatar_name || name}
+              width={200}
+              height={200}
+              className={styles.avatar__image}
+            />
+            <div className={styles.avatar__glow}></div>
+          </div>
+        ) : (
+          <div className={styles.avatar__placeholder}>
+            <svg
+              width="80"
+              height="80"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+              <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+            <p className={styles.avatar__placeholder_text}>Générer Avatar</p>
+          </div>
+        )}
       </div>
-      <h2 className={styles.card__title}>{name}</h2>
+
+      <h2 className={styles.card__title}>{avatarData?.avatar_name || name}</h2>
       <p className={styles.card__subtitle}>{role}</p>
+      
+      {/* Avatar Description */}
+      {avatarData?.avatar_description && (
+        <p className={styles.card__description}>{avatarData.avatar_description}</p>
+      )}
       
       {/* RIASEC Profile Section */}
       {loading ? (
@@ -84,7 +145,9 @@ const UserCard: React.FC<UserCardProps> = ({
         <p className={styles.card__subtitle}>Pas de profil RIASEC</p>
       )}
       
-      <button className={styles.card__btn}>Profile</button>
+      <button className={styles.card__btn} onClick={handleProfileClick}>
+        {avatarData ? 'Voir Profil' : 'Créer Avatar'}
+      </button>
     </div>
   );
 };
