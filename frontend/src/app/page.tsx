@@ -229,9 +229,20 @@ export default function Home() {
 
               {/* Section des recommandations d'emploi - occupe toute la largeur */}
               <div className="md:col-span-12 mt-8">
-                <h2 className="premium-section-title">
-                  Recommandations d'emploi
-                </h2>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="premium-section-title">
+                    Recommandations d'emploi
+                  </h2>
+                  <Link
+                    href="/career/recommendations"
+                    className="premium-nav-card flex items-center gap-2 px-4 py-2 text-sm transition-colors"
+                  >
+                    <span>Voir plus de recommandations</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
+                    </svg>
+                  </Link>
+                </div>
                 <div className="w-full overflow-hidden">
                   <div className="max-w-[1400px] mx-auto">
                     <JobRecommendationList

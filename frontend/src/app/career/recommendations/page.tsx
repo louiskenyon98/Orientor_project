@@ -16,9 +16,11 @@ export default function CareerRecommendationsPage() {
       try {
         setLoading(true);
         const response = await getAllJobRecommendations(30);
-        console.log('Fetched recommendations:', response);
+        
         if (response && response.recommendations) {
           setRecommendations(response.recommendations);
+          console.log(`✅ Loaded ${response.recommendations.length} career recommendations`);
+          
           // Set the first job as selected by default
           if (response.recommendations.length > 0) {
             setSelectedJob(response.recommendations[0]);

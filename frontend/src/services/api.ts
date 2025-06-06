@@ -123,21 +123,40 @@ export const getAllJobRecommendations = async (limit: number = 30) => {
   try {
     // Use the /recommendations/me endpoint with a higher limit
     const endpoint = `/api/v1/jobs/recommendations/me?top_k=${limit}&embedding_type=esco_embedding`;
-    console.log('Calling all job recommendations API:', `${API_URL}${endpoint}`);
+    console.log('🔍 Fetching recommendations with limit:', limit);
     const response = await api.get(endpoint);
-    console.log('All job recommendations API response:', response.data);
-    return response.data;
+    
+    // Filter out base64 data from the response
+    const cleanResponse = {
+      ...response.data,
+      recommendations: response.data?.recommendations?.map((rec: any) => ({
+        id: rec.id,
+        score: rec.score,
+        metadata: {
+          ...rec.metadata,
+          // Remove any base64 data from metadata
+          visualizations: undefined,
+          plotly: undefined,
+          matplotlib: undefined,
+          streamlit: undefined
+        }
+      }))
+    };
+    
+    // Log only relevant information
+    if (cleanResponse.recommendations) {
+      console.log('📊 Recommendations summary:', {
+        count: cleanResponse.recommendations.length,
+        titles: cleanResponse.recommendations.map((r: any) => r.metadata?.title || r.metadata?.preferred_label),
+        userId: cleanResponse.user_id
+      });
+    }
+    
+    return cleanResponse;
   } catch (error) {
-    console.error('Error fetching all job recommendations:', error);
-    console.error('API Error Details:', {
+    console.error('❌ Error fetching recommendations:', {
       status: (error as any)?.response?.status,
-      statusText: (error as any)?.response?.statusText,
-      data: (error as any)?.response?.data,
-      config: {
-        baseURL: (error as any)?.config?.baseURL,
-        url: (error as any)?.config?.url,
-        headers: (error as any)?.config?.headers
-      }
+      message: (error as any)?.response?.data?.detail || 'Unknown error'
     });
     throw error;
   }

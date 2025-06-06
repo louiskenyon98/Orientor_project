@@ -136,10 +136,14 @@ class JobRecommendationService:
                 }
                 recommendations.append(recommendation)
             
-            logger.info(f"Récupération de {len(recommendations)} recommandations d'emploi réussie")
+            # Log only relevant information
+            logger.info(f"📊 Retrieved {len(recommendations)} job recommendations")
+            for i, rec in enumerate(recommendations):
+                logger.info(f"  {i+1}. {rec['metadata'].get('title', rec['metadata'].get('preferred_label', 'Unknown'))} (score: {rec['score']:.2f})")
+            
             return recommendations
         except Exception as e:
-            logger.error(f"Erreur lors de la requête Pinecone: {str(e)}")
+            logger.error(f"❌ Error querying Pinecone: {str(e)}")
             return []
     
     def store_recommendations(self, db: Session, user_id: int, recommendations: List[Dict[str, Any]]) -> bool:
@@ -192,21 +196,21 @@ class JobRecommendationService:
             # Récupérer l'embedding de l'utilisateur
             embedding = self.get_user_embedding(db, user_id, embedding_type)
             if embedding is None:
-                logger.error(f"Impossible de récupérer l'embedding pour l'utilisateur {user_id}")
+                logger.error(f"❌ No embedding found for user {user_id}")
                 return []
             
             # Interroger Pinecone pour les recommandations
             recommendations = self.query_job_recommendations(embedding, top_k)
             if not recommendations:
-                logger.error(f"Aucune recommandation trouvée pour l'utilisateur {user_id}")
+                logger.warning(f"⚠️ No recommendations found for user {user_id}")
                 return []
             
-            # Stocker les recommandations dans la base de données
+            # Stocker les recommandations
             self.store_recommendations(db, user_id, recommendations)
             
             return recommendations
         except Exception as e:
-            logger.error(f"Erreur lors de la récupération des recommandations: {str(e)}")
+            logger.error(f"❌ Error getting job recommendations: {str(e)}")
             return []
     
     def generate_skill_tree_for_job(self, job_id: str, depth: int = 1, max_nodes: int = 5) -> Dict[str, Any]:

@@ -68,54 +68,56 @@ async def get_current_user_job_recommendations(
     Récupère les recommandations d'emploi pour l'utilisateur actuellement authentifié.
     """
     try:
-        logger.info("=== DÉBUT DE LA REQUÊTE ===")
-        logger.info(f"Paramètres reçus: embedding_type={embedding_type}, top_k={top_k}, test_user_id={test_user_id}")
+        logger.info("=== 📊 Job Recommendations Request ===")
+        logger.info(f"Parameters: embedding_type={embedding_type}, top_k={top_k}")
         
         # Pour le débogage, permettre l'utilisation d'un ID utilisateur de test
         if test_user_id is not None:
-            logger.warning(f"Utilisation de l'ID utilisateur de test: {test_user_id}")
+            logger.warning(f"⚠️ Using test user ID: {test_user_id}")
             user_id = test_user_id
         else:
             # Vérifier que l'utilisateur est authentifié
             if not current_user:
-                logger.warning("Tentative d'accès aux recommandations sans authentification")
+                logger.warning("⚠️ Unauthenticated access attempt")
                 # Pour le débogage, utiliser un ID utilisateur par défaut
                 user_id = 22  # Utiliser un ID utilisateur par défaut pour le débogage
-                logger.warning(f"Utilisation de l'ID utilisateur par défaut: {user_id}")
+                logger.warning(f"⚠️ Using default user ID: {user_id}")
             else:
                 # Utiliser l'ID de l'utilisateur authentifié
                 user_id = current_user.id
-                logger.info(f"Utilisateur authentifié: {user_id}")
+                logger.info(f"👤 Authenticated user: {user_id}")
         
         # Vérifier que le type d'embedding est valide
         valid_types = ["esco_embedding", "esco_embedding_occupation", "esco_embedding_skill", "esco_embedding_skillsgroup"]
         if embedding_type not in valid_types:
-            raise HTTPException(status_code=400, detail=f"Type d'embedding invalide. Valeurs acceptées: {', '.join(valid_types)}")
+            raise HTTPException(status_code=400, detail=f"Invalid embedding type. Valid values: {', '.join(valid_types)}")
         
         # Vérifier si des recommandations sont déjà stockées
         stored_recommendations = job_recommendation_service.get_stored_recommendations(db, user_id)
-        logger.info(f"Recommandations stockées pour l'utilisateur {user_id}: {stored_recommendations}")
+        logger.info(f"📥 Stored recommendations: {len(stored_recommendations) if stored_recommendations else 0}")
         
-        # Si aucune recommandation n'est stockée ou si un type d'embedding spécifique est demandé,
-        # générer de nouvelles recommandations
+        # Si aucune recommandation n'est stockée, si un type d'embedding spécifique est demandé,
+        # OU si le nombre de recommandations demandées est différent de 3, générer de nouvelles recommandations
         recommendations = stored_recommendations
-        if not recommendations or embedding_type != "esco_embedding":
-            logger.info(f"Génération de nouvelles recommandations pour l'utilisateur {user_id} avec le type d'embedding {embedding_type}")
+        if not recommendations or embedding_type != "esco_embedding" or top_k != 3:
+            logger.info(f"🔄 Generating new recommendations for user {user_id} (top_k={top_k}, embedding_type={embedding_type})")
             recommendations = job_recommendation_service.get_job_recommendations(db, user_id, embedding_type, top_k)
-            logger.info(f"Nouvelles recommandations générées: {recommendations}")
+            logger.info(f"✅ Generated {len(recommendations) if recommendations else 0} recommendations")
+        else:
+            logger.info(f"📋 Using stored recommendations ({len(stored_recommendations)} recommendations)")
         
         if not recommendations:
-            logger.warning(f"Aucune recommandation trouvée pour l'utilisateur {user_id}, création de recommandations factices")
+            logger.warning(f"⚠️ No recommendations found for user {user_id}, creating dummy data")
             # Créer des recommandations factices pour le débogage
             recommendations = [
                 {
                     "id": f"dummy_job_{i}",
                     "score": 0.5,
                     "metadata": {
-                        "title": f"Emploi exemple {i+1}",
-                        "description": "Ceci est un emploi exemple pour le débogage",
-                        "preferred_label": f"Emploi exemple {i+1}",
-                        "skills": ["Compétence 1", "Compétence 2", "Compétence 3"]
+                        "title": f"Example Job {i+1}",
+                        "description": "This is an example job for debugging",
+                        "preferred_label": f"Example Job {i+1}",
+                        "skills": ["Skill 1", "Skill 2", "Skill 3"]
                     }
                 } for i in range(3)
             ]
@@ -123,32 +125,30 @@ async def get_current_user_job_recommendations(
         # Vérifier la structure des recommandations et les corriger si nécessaire
         valid_recommendations = []
         for i, rec in enumerate(recommendations):
-            logger.info(f"Traitement de la recommandation {i}: {rec}")
-            
             try:
                 # Créer une nouvelle recommandation correctement formatée
                 valid_rec = {
                     "id": str(rec.get('id', f"unknown_job_{i}")),
                     "score": float(rec.get('score', 0.5)),
                     "metadata": rec.get('metadata', {
-                        "title": f"Emploi {i+1}",
-                        "description": "Aucune description disponible",
-                        "preferred_label": f"Emploi {i+1}"
+                        "title": f"Job {i+1}",
+                        "description": "No description available",
+                        "preferred_label": f"Job {i+1}"
                     })
                 }
                 
                 # S'assurer que metadata est un dictionnaire
                 if not isinstance(valid_rec['metadata'], dict):
                     valid_rec['metadata'] = {
-                        "title": f"Emploi {i+1}",
-                        "description": "Aucune description disponible",
-                        "preferred_label": f"Emploi {i+1}"
+                        "title": f"Job {i+1}",
+                        "description": "No description available",
+                        "preferred_label": f"Job {i+1}"
                     }
                 
                 valid_recommendations.append(valid_rec)
-                logger.info(f"Recommandation {i} validée: {valid_rec}")
+                logger.info(f"✅ Recommendation {i+1}: {valid_rec['metadata'].get('title', valid_rec['metadata'].get('preferred_label', 'Unknown'))} (score: {valid_rec['score']:.2f})")
             except Exception as e:
-                logger.error(f"Erreur lors du traitement de la recommandation {i}: {str(e)}")
+                logger.error(f"❌ Error processing recommendation {i}: {str(e)}")
                 continue
         
         # Formater la réponse
@@ -157,24 +157,23 @@ async def get_current_user_job_recommendations(
             "user_id": int(user_id)
         }
         
-        logger.info("=== DÉTAILS DE LA RÉPONSE FINALE ===")
-        logger.info(f"Réponse: {response}")
+        logger.info("=== 📊 Response Summary ===")
+        logger.info(f"Total recommendations: {len(valid_recommendations)}")
         
         try:
             # Tenter de valider avec le modèle Pydantic
             validated_response = JobRecommendationsResponse(**response)
-            logger.info("Validation Pydantic réussie!")
+            logger.info("✅ Pydantic validation successful")
             return validated_response.dict()
         except Exception as e:
-            logger.error(f"ERREUR DE VALIDATION PYDANTIC: {str(e)}")
-            # En cas d'erreur de validation, retourner la réponse brute
+            logger.error(f"❌ Pydantic validation error: {str(e)}")
             return response
             
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Erreur lors de la récupération des recommandations: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Erreur lors de la récupération des recommandations: {str(e)}")
+        logger.error(f"❌ Error getting recommendations: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting recommendations: {str(e)}")
 
 @router.get("/recommendations/{user_id}", response_model=JobRecommendationsResponse)
 async def get_job_recommendations(
