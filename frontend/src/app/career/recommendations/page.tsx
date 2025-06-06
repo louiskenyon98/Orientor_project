@@ -68,15 +68,15 @@ export default function CareerRecommendationsPage() {
           margin: 0 !important;
         }
       `}</style>
-      <div className="max-w-[1800px] mx-auto px-6 py-8">
+      <div className="max-w-[3000px] mx-auto px-18 py-20">
         <h1 className="text-4xl font-bold mb-3">Career Recommendations</h1>
         <p className="text-gray-600 mb-10 text-lg">
           Discover personalized career recommendations based on your profile
         </p>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-20">
           {/* Left side: Job Cards - 6 columns */}
-          <div className="xl:col-span-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 max-h-[2000px] overflow-y-auto pr-4">
+          <div className="xl:col-span-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-12 max-h-[3000px] overflow-y-auto pr-6">
             {recommendations.map((job) => (
               <div
                 key={job.id}
@@ -94,14 +94,14 @@ export default function CareerRecommendationsPage() {
           </div>
 
           {/* Right side: Skills Tree - 6 columns */}
-          <div className="xl:col-span-6 bg-white rounded-lg shadow-lg p-8 min-h-[1200px]">
+          <div className="xl:col-span-6 bg-white rounded-lg shadow-lg p-10 min-h-[1400px]">
             {selectedJob ? (
               <div className="h-full">
                 <h2 className="text-3xl font-semibold mb-6">
                   {selectedJob.metadata.preferred_label || selectedJob.metadata.title || selectedJob.id.replace('occupation::key_', '')}
                 </h2>
                 <div className="h-[calc(100%-5rem)]">
-                  <JobSkillsTree jobId={selectedJob.id} height="800px" />
+                  <JobSkillsTree jobId={selectedJob.id} height="1000px" />
                 </div>
               </div>
             ) : (
