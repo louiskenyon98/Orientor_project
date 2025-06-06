@@ -19,7 +19,7 @@ const StarConstellation: React.FC = () => {
   const { isDarkMode } = useTheme();
 
   // Pan and zoom state
-  const offset = useRef({ x: 0, y: 0 });
+  const offset = useRef({ x: window.innerWidth * 0.25, y: 0 });
   const dragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const zoom = useRef(1);

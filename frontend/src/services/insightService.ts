@@ -20,15 +20,14 @@ const getAuthHeader = () => {
 };
 
 /**
- * Génère un insight philosophique pour l'utilisateur spécifié
- * @param userId - L'ID de l'utilisateur
+ * Génère un insight philosophique pour l'utilisateur connecté
  * @returns Les données d'insight générées
  */
-export const generateInsight = async (userId: number): Promise<InsightData> => {
+export const generateInsight = async (): Promise<InsightData> => {
   try {
     const response = await axios.post<InsightData>(
       `${API_URL}/insight/generate`,
-      { user_id: userId },
+      {},
       getAuthHeader()
     );
     return response.data;
@@ -39,17 +38,15 @@ export const generateInsight = async (userId: number): Promise<InsightData> => {
 };
 
 /**
- * Sauvegarde un insight philosophique pour l'utilisateur spécifié
- * @param userId - L'ID de l'utilisateur
+ * Sauvegarde un insight philosophique pour l'utilisateur connecté
  * @param philosophicalText - Le texte philosophique à sauvegarder
  * @returns Le statut de succès
  */
-export const saveInsight = async (userId: number, philosophicalText: string): Promise<{ success: boolean }> => {
+export const saveInsight = async (philosophicalText: string): Promise<{ success: boolean }> => {
   try {
     const response = await axios.patch<{ success: boolean }>(
       `${API_URL}/insight/save`,
-      { 
-        user_id: userId,
+      {
         philosophical_text: philosophicalText
       },
       getAuthHeader()
@@ -62,17 +59,15 @@ export const saveInsight = async (userId: number, philosophicalText: string): Pr
 };
 
 /**
- * Réécrit un insight philosophique basé sur le feedback de l'utilisateur
- * @param userId - L'ID de l'utilisateur
+ * Réécrit un insight philosophique basé sur le feedback de l'utilisateur connecté
  * @param feedback - Le feedback de l'utilisateur pour la réécriture
  * @returns Les nouvelles données d'insight générées
  */
-export const rewriteInsight = async (userId: number, feedback: string): Promise<InsightData> => {
+export const rewriteInsight = async (feedback: string): Promise<InsightData> => {
   try {
     const response = await axios.post<InsightData>(
       `${API_URL}/insight/rewrite`,
-      { 
-        user_id: userId,
+      {
         feedback: feedback
       },
       getAuthHeader()

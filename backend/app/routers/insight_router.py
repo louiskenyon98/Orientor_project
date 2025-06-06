@@ -36,14 +36,12 @@ router = APIRouter(prefix="/insight", tags=["insight"])
 
 # Modèles Pydantic pour les requêtes et réponses
 class InsightRequest(BaseModel):
-    user_id: int
+    pass  # Pas de champs requis, utilise l'utilisateur connecté
 
 class InsightSaveRequest(BaseModel):
-    user_id: int
     philosophical_text: str
 
 class InsightRewriteRequest(BaseModel):
-    user_id: int
     feedback: str
 
 class InsightResponse(BaseModel):
@@ -709,10 +707,7 @@ async def save_insight(
                 detail="Profil utilisateur non trouvé"
             )
         
-        # Mettre à jour le champ philosophical_description
-        profile.philosophical_description = request.philosophical_text
-        
-        # Sauvegarder aussi dans user_representation
+        # Sauvegarder dans user_representation (pas besoin de sauvegarder dans UserProfile)
         insight_data = {
             "preview": "Insight sauvegardé manuellement",
             "full_text": request.philosophical_text,
@@ -752,16 +747,23 @@ async def rewrite_insight(
     Réécrit un insight philosophique en tenant compte du feedback de l'utilisateur.
     """
     try:
-        # Pour le développement et les tests, permettre à n'importe quel utilisateur d'accéder aux données
-        # Note: En production, vous voudriez probablement rétablir la vérification d'autorisation
-        logger.info(f"Accès aux données de l'utilisateur {request.user_id} par l'utilisateur {current_user.id} (autorisé pour le développement)")
+        # TOUJOURS utiliser l'ID de l'utilisateur actuellement connecté
+        user_id = current_user.id
+        
+        logger.info(f"Réécriture d'insight pour l'utilisateur actuellement connecté (ID: {user_id})")
         
         # Récupérer les données utilisateur
-        user_data = await get_user_data(db, request.user_id)
+        user_data = await get_user_data(db, user_id)
         
-        # Récupérer l'analyse précédente
-        profile = db.query(UserProfile).filter(UserProfile.user_id == request.user_id).first()
-        previous_analysis = profile.philosophical_description if profile and profile.philosophical_description else ""
+        # Récupérer l'analyse précédente depuis user_representation
+        existing_insight = db.query(UserRepresentation).filter(
+            UserRepresentation.user_id == user_id,
+            UserRepresentation.source == 'llm_insight'
+        ).first()
+        
+        previous_analysis = ""
+        if existing_insight and existing_insight.data:
+            previous_analysis = existing_insight.data.get("full_text", "")
         
         # Formater le prompt pour le LLM
         base_prompt = format_philosophical_prompt(user_data)
@@ -793,7 +795,7 @@ Return JSON:
         response = await call_openai_api(rewrite_prompt)
         
         # Sauvegarder automatiquement l'insight réécrit dans user_representation
-        await save_insight_to_representation(db, request.user_id, response)
+        await save_insight_to_representation(db, user_id, response)
         
         return InsightResponse(
             preview=response["preview"],

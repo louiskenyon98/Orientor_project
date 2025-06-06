@@ -75,11 +75,11 @@ const InsightPage: React.FC = () => {
   }, []);
 
   const handleSaveInsight = async () => {
-    if (!userId || !insight) return;
+    if (!insight) return;
     
     try {
       setSaving(true);
-      await saveInsight(userId, insight.full_text);
+      await saveInsight(insight.full_text);
       alert('Insight sauvegardé avec succès!');
       router.push('/profile'); // Rediriger vers le profil ou une autre page appropriée
     } catch (error) {
@@ -91,14 +91,14 @@ const InsightPage: React.FC = () => {
   };
 
   const handleRewriteInsight = async () => {
-    if (!userId || !feedback) return;
+    if (!feedback) return;
     
     try {
       setRewriting(true);
       
       // Appeler l'API même en mode développement pour tester les modifications
       console.log("Appel de l'API pour réécrire l'insight avec le feedback:", feedback);
-      const newInsight = await rewriteInsight(userId, feedback);
+      const newInsight = await rewriteInsight(feedback);
       console.log("Réponse de l'API pour la réécriture:", newInsight);
       setInsight(newInsight);
       setFeedback('');
@@ -111,12 +111,10 @@ const InsightPage: React.FC = () => {
   };
 
   const handleGenerateFirstInsight = async () => {
-    if (!userId) return;
-    
     try {
       setLoading(true);
       console.log("Génération du premier insight...");
-      const newInsight = await generateInsight(userId);
+      const newInsight = await generateInsight();
       console.log("Premier insight généré:", newInsight);
       setInsight(newInsight);
     } catch (error) {
