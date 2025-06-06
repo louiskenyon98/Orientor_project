@@ -1,224 +1,263 @@
+/* From Uiverse.io by Smit-Prajapati - Adapted for UserCard with Avatar Integration */
 .card {
-  --main-color: var(--text);
-  --submain-color: var(--text-secondary);
-  --bg-color: var(--card);
-  --background-color: var(--accent);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  width: 350px; /* Increased width */
+  height: 350px; /* Increased height */
+  background: white;
+  border-radius: 32px;
+  padding: 3px;
   position: relative;
-  width: 400px; /* Increased width */
-  height: 500px; /* Increased height */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 20px;
-  background: var(--bg-color);
-  overflow: hidden;
-  /* background: var(--background-color); Updated to use new background color */
+  box-shadow: #604b4a30 0px 70px 30px -50px;
+  transition: all 0.5s ease-in-out;
 }
 
-.card__img {
-  height: 500px; /* Increased height */
-  width: 100%;
-  background: linear-gradient(
-      30deg,
-      #111111 12%,
-      transparent 12.5%,
-      transparent 87%,
-      #111111 87.5%,
-      #111111
-    ),
-    linear-gradient(
-      150deg,
-      #111111 12%,
-      transparent 12.5%,
-      transparent 87%,
-      #111111 87.5%,
-      #111111
-    ),
-    linear-gradient(
-      30deg,
-      #111111 12%,
-      transparent 12.5%,
-      transparent 87%,
-      #111111 87.5%,
-      #111111
-    ),
-    linear-gradient(
-      150deg,
-      #111111 12%,
-      transparent 12.5%,
-      transparent 87%,
-      #111111 87.5%,
-      #111111
-    ),
-    linear-gradient(
-      60deg,
-      #77777777 25%,
-      transparent 25.5%,
-      transparent 75%,
-      #77777777 75%,
-      #77777777
-    ),
-    linear-gradient(
-      60deg,
-      #77777777 25%,
-      transparent 25.5%,
-      transparent 75%,
-      #77777777 75%,
-      #77777777
-    );
-  background-position:
-    0 0,
-    0 0,
-    40px 70px,
-    40px 70px,
-    0 0,
-    40px 70px;
-  background-color: #000000;
-  background-size: 80px 140px;
-  box-shadow: inset 0 0 100px rgba(255, 215, 0, 0.1);
-  border-radius: 20px 20px 0 0;
+.card .mail {
+  position: absolute;
+  right: 2rem;
+  top: 1.4rem;
+  background: transparent;
+  border: none;
 }
 
-.card__img svg {
-  display: none;
+.card .mail svg {
+  stroke: #fbb9b6;
+  stroke-width: 3px;
+}
+
+.card .mail svg:hover {
+  stroke: #f55d56;
 }
 
 .card__avatar {
   position: absolute;
-  width: 140px; /* Increased width */
-  height: 140px; /* Increased height */
-  background: var(--bg-color);
-  border-radius: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  top: 100px; /* Adjusted position to be higher */
-  border: 4px solid var(--bg-color);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  top: 3px;
+  left: 3px;
+  border-radius: 29px;
+  z-index: 1;
+  border: 0px solid #fbb9b6;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out 0.2s, z-index 0.5s ease-in-out 0.2s;
 }
 
-.card__avatar svg {
-  width: 120px; /* Increased width */
-  height: 120px; /* Increased height */
+.avatar__image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-position: 0px 0px;
+  transition: all 0.5s ease-in-out 0s;
 }
 
-.card__title {
-  margin-top: 100px; /* Adjusted margin to account for new avatar position */
-  font-weight: 500;
-  font-size: 20px; /* Increased font size */
-  color: var(--text);
-}
-
-.card__subtitle {
-  margin-top: 15px; /* Adjusted for new card size */
-  font-weight: 400;
-  font-size: 17px; /* Increased font size */
-  color: var(--submain-color);
-}
-
-.card__riasec {
-  margin-top: 20px;
+.avatar__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 0px 0px;
+  transform-origin: 45% 20%;
+  transition: all 0.5s ease-in-out 0s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  background: linear-gradient(135deg, #fbb9b6, #f55d56);
+  color: white;
+}
+
+.avatar__loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fbb9b6, #f55d56);
+}
+
+.avatar__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.avatar__placeholder_text {
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.card .bottom {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  right: 3px;
+  background: #fbb9b6;
+  top: 80%;
+  border-radius: 29px;
+  z-index: 2;
+  box-shadow: rgba(96, 75, 74, 0.1882352941) 0px 5px 5px 0px inset;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1) 0s;
+}
+
+.card .bottom .content {
+  position: absolute;
+  bottom: 0;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 160px;
+}
+
+.card__title {
+  display: block;
+  font-size: 1.2rem;
+  color: white;
+  font-weight: bold;
+  margin: 0;
+}
+
+.card__subtitle {
+  display: block;
+  font-size: 0.9rem;
+  color: white;
+  margin-top: 0.5rem;
+}
+
+.card__description {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 0.5rem;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+.card__riasec {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .card__riasec_codes {
   display: flex;
-  gap: 8px;
+  gap: 0.3rem;
 }
 
 .card__riasec_code {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: bold;
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .card__riasec_label {
-  font-size: 15px;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: var(--main-color);
-  text-align: center;
+  color: white;
+  text-align: left;
+}
+
+.card .bottom .bottom-bottom {
+  position: absolute;
+  bottom: 1rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card .bottom .bottom-bottom .social-links-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.card .bottom .bottom-bottom .social-links-container svg {
+  height: 20px;
+  fill: white;
+  filter: drop-shadow(0 5px 5px rgba(165, 132, 130, 0.1333333333));
+}
+
+.card .bottom .bottom-bottom .social-links-container svg:hover {
+  fill: #f55d56;
+  transform: scale(1.2);
 }
 
 .card__btn {
-  margin-top: 20px; /* Adjusted for new card size */
-  width: 90px; /* Increased width */
-  height: 36px; /* Increased height */
-  border: 2px solid var(--main-color);
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 13px; /* Increased font size */
-  color: var(--main-color);
-  background: var(--bg-color);
-  text-transform: uppercase;
-  transition: all 0.3s;
+  background: white;
+  color: #fbb9b6;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  padding: 0.5rem 0.8rem;
+  box-shadow: rgba(165, 132, 130, 0.1333333333) 0px 5px 5px 0px;
   cursor: pointer;
-}
-
-.card__btn-solid {
-  background: var(--main-color);
-  color: var(--bg-color);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .card__btn:hover {
-  background: var(--main-color);
-  color: var(--bg-color);
+  background: #f55d56;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: rgba(165, 132, 130, 0.3) 0px 8px 15px 0px;
 }
 
-.card__btn-solid:hover {
-  background: var(--bg-color);
-  color: var(--main-color);
+.card:hover {
+  border-top-left-radius: 55px;
 }
 
-/* Nouveaux styles pour l'avatar fantastique */
-.avatar__loading {
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.card:hover .bottom {
+  top: 20%;
+  border-radius: 80px 29px 29px 29px;
+  transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1) 0.2s;
+}
+
+.card:hover .card__avatar {
+  width: 120px; /* Increased width */
+  height: 120px; /* Increased height */
+  aspect-ratio: 1;
+  top: 10px;
+  left: 10px;
   border-radius: 50%;
-  background: rgba(255, 215, 0, 0.1);
+  z-index: 3;
+  border: 7px solid #fbb9b6;
+  box-shadow: rgba(96, 75, 74, 0.1882352941) 0px 5px 5px 0px;
+  transition: all 0.5s ease-in-out, z-index 0.5s ease-in-out 0.1s;
 }
 
-.avatar__spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 215, 0, 0.3);
-  border-top: 3px solid #ffd700;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.card:hover .card__avatar:hover {
+  transform: scale(1.3);
+  border-radius: 0px;
 }
 
+.card:hover .avatar__image {
+  transform: scale(2.5);
+  object-position: 0px 25px;
+  transition: all 0.5s ease-in-out 0.5s;
+}
+
+.card:hover .avatar__placeholder {
+  transform: scale(2.5);
+  transition: all 0.5s ease-in-out 0.5s;
+}
+
+/* Avatar glow effect for fantasy avatars */
 .avatar__container {
   position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.avatar__image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-}
-
-.avatar__image:hover {
-  transform: scale(1.05);
 }
 
 .avatar__glow {
@@ -227,49 +266,12 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  border-radius: 50%;
+  border-radius: inherit;
   background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1);
   background-size: 400% 400%;
   animation: glow 3s ease-in-out infinite;
   z-index: -1;
-}
-
-.avatar__placeholder {
-  width: 120px;
-  height: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 215, 0, 0.1);
-  border: 2px dashed rgba(255, 215, 0, 0.3);
-  color: var(--submain-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.avatar__placeholder:hover {
-  background: rgba(255, 215, 0, 0.2);
-  border-color: rgba(255, 215, 0, 0.5);
-  transform: scale(1.02);
-}
-
-.avatar__placeholder_text {
-  font-size: 12px;
-  margin-top: 8px;
-  text-align: center;
-  font-weight: 500;
-}
-
-.card__description {
-  margin-top: 10px;
-  font-size: 14px;
-  color: var(--submain-color);
-  text-align: center;
-  padding: 0 20px;
-  line-height: 1.4;
-  font-style: italic;
+  opacity: 0.7;
 }
 
 @keyframes spin {
@@ -283,5 +285,27 @@
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: #2a2a2a;
+    box-shadow: #00000030 0px 70px 30px -50px;
+  }
+  
+  .card .bottom {
+    background: #3a3a3a;
+  }
+  
+  .card__btn {
+    background: #4a4a4a;
+    color: #fbb9b6;
+  }
+  
+  .card__btn:hover {
+    background: #f55d56;
+    color: white;
   }
 }

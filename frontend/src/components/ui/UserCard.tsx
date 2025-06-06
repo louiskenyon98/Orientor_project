@@ -152,4 +152,13 @@ const UserCard: React.FC<UserCardProps> = ({
   );
 };
 
+export default UserCard;ame={styles.card__btn} onClick={handleProfileClick}>
+            Profile
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default UserCard;
