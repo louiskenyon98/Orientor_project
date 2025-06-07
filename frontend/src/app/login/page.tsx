@@ -82,59 +82,79 @@ export default function LoginPage() {
             } else {
                 setError(err.response?.data?.detail || 'Login failed. Please try again.');
             }
-            
+        } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-12">
-            <div className="w-full max-w-md">
-                <form className={styles.form} onSubmit={handleSubmit}>
-                    <div id="heading" className={styles.heading}>Sign In</div>
-                    <div className={styles.field}>
-                        <span className={styles['input-icon']}>@</span>
+        <div className={styles.container}>
+            <input type="checkbox" id={styles.signup_toggle} />
+            <div className={styles.form}>
+                <div className={styles.form_front}>
+                    <div className={styles.form_details}>Sign In To Navigo</div>
+                    <form onSubmit={handleSubmit}>
                         <input
-                            id="email"
-                            name="email"
                             type="email"
-                            required
-                            className={styles['input-field']}
-                            placeholder="Adresse e-mail"
+                            className={styles.input}
+                            placeholder="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-                    <div className={styles.field}>
-                        <span className={styles['input-icon']}>🔒</span>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
                             required
-                            className={styles['input-field']}
-                            placeholder="Mot de passe"
+                        />
+                        <input
+                            type="password"
+                            className={styles.input}
+                            placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
-                    </div>
-                    <div className={`${styles.form} ${styles.btn}`}>
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className={styles.button1}
-                        >
-                            {isLoading ? 'Connexion...' : 'Se connecter'}
+                        <button type="submit" className={styles.btn} disabled={isLoading}>
+                            {isLoading ? 'Signing in...' : 'Sign In'}
                         </button>
-                        <Link href="/register" className={styles.button2}>S'inscrire</Link>
+                        {error && <div className={styles.error}>{error}</div>}
+                    </form>
+                    <div className={styles.switch}>
+                        Don't have an account?{' '}
+                        <label htmlFor={styles.signup_toggle} className={styles.signup_tog}>
+                            Sign Up
+                        </label>
                     </div>
-                    <button type="button" className={styles.button3} onClick={() => router.push('/')}>Back to Home</button>
-                    {error && (
-                        <div className="text-accent-coral text-sm text-center py-3 px-4 bg-accent-coral/10 border border-accent-coral/20 rounded-lg">
-                            {error}
-                        </div>
-                    )}
-                </form>
+                </div>
+
+                <div className={styles.form_back}>
+                    <div className={styles.form_details}>Sign Up</div>
+                    <form>
+                        <input
+                            type="email"
+                            className={styles.input}
+                            placeholder="Email"
+                            required
+                        />
+                        <input
+                            type="password"
+                            className={styles.input}
+                            placeholder="Password"
+                            required
+                        />
+                        <input
+                            type="password"
+                            className={styles.input}
+                            placeholder="Confirm Password"
+                            required
+                        />
+                        <Link href="/register" className={styles.btn}>
+                            Sign Up
+                        </Link>
+                    </form>
+                    <div className={styles.switch}>
+                        Already have an account?{' '}
+                        <label htmlFor={styles.signup_toggle} className={styles.signup_tog}>
+                            Sign In
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
     );
