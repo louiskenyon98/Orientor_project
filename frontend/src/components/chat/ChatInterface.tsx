@@ -119,9 +119,9 @@ export default function Chatinterface() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg shadow-md border border-gray-700 flex flex-col h-[calc(100vh-12rem)] md:h-[600px] max-w-4xl mx-auto">
-      <div className="px-4 py-3 border-b border-gray-700">
-        <h2 className="text-lg font-medium text-gray-100">Career Advisor Chat</h2>
+    <div className="premium-card flex flex-col h-[calc(100vh-12rem)] md:h-[600px] max-w-4xl mx-auto">
+      <div className="px-4 py-3 border-b border-theme-border">
+        <h2 className="text-lg font-medium text-theme-text">Career Advisor Chat</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 scroll-smooth">
@@ -130,22 +130,22 @@ export default function Chatinterface() {
             key={message.id}
             message={message.text}
             type={message.type}
-            userColor="bg-blue-600"
-            aiColor="bg-gray-700"
+            userColor="bg-theme-accent"
+            aiColor="bg-theme-card"
           />
         ))}
         {isTyping && (
           <ChatMessage 
             message="Typing..."
             type="ai"
-            userColor="bg-blue-600"
-            aiColor="bg-gray-700"
+            userColor="bg-theme-accent"
+            aiColor="bg-theme-card"
           />
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t border-gray-700 p-3 md:p-4">
+      <div className="border-t border-theme-border p-3 md:p-4">
         <div className="flex items-center space-x-2">
           <input
             ref={inputRef}
@@ -154,13 +154,13 @@ export default function Chatinterface() {
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && !isTyping && handleSend()}
             placeholder="Type your message..."
-            className="flex-1 p-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 p-3 rounded-lg bg-theme-card border border-theme-border text-theme-text placeholder-theme-text-secondary focus:outline-none focus:ring-2 focus:ring-theme-accent focus:border-transparent"
             disabled={isTyping}
           />
           <button 
             onClick={handleSend}
             disabled={!inputText.trim() || isTyping}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 h-[46px] min-w-[80px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="bg-theme-accent hover:bg-theme-accent-secondary text-theme-text px-4 py-3 h-[46px] min-w-[80px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             aria-label="Send message"
           >
             <span className="hidden xs:inline">Send</span>

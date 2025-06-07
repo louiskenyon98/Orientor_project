@@ -161,7 +161,7 @@ export default function ChatPage() {
             <div
                 className="fixed inset-0 z-0"
                 style={{
-                    background: `radial-gradient(circle at 20% center, #000000 0%, #000000 40%, #fdc500 60%, #ffd500 75%, #fffbe0 85%, #000000 100%)`
+                    background: `radial-gradient(circle at 20% center, var(--background) 0%, var(--background) 40%, var(--accent) 60%, var(--accent-secondary) 75%, var(--background-secondary) 85%, var(--background) 100%)`
                 }}
             ></div>
 
@@ -180,23 +180,24 @@ export default function ChatPage() {
             <div
                 className="fixed inset-0 z-0 pointer-events-none"
                 style={{
-                    background: `radial-gradient(circle at 70% center, rgba(253, 197, 0, 0.2) 0%, transparent 60%)`,
-                    filter: 'blur(80px)'
+                    background: `radial-gradient(circle at 70% center, var(--accent) 0%, transparent 60%)`,
+                    filter: 'blur(80px)',
+                    opacity: '0.2'
                 }}
             ></div>
 
             {/* Massive translucent watermark behind everything */}
             <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
                 <div
-                    className="text-[20vw] font-extrabold text-white opacity-[0.08] select-none whitespace-nowrap tracking-widest"
+                    className="text-[20vw] font-extrabold text-theme-text opacity-[0.08] select-none whitespace-nowrap tracking-widest"
                     style={{
                         fontFamily: 'inherit',
                         filter: 'blur(1px)',
-                        background: 'linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.2) 100%)',
+                        background: 'linear-gradient(90deg, var(--text) 0%, var(--text-secondary) 50%, var(--text-secondary) 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text',
-                        textShadow: '0 0 20px rgba(255,255,255,0.1)'
+                        textShadow: '0 0 20px var(--text)'
                     }}
                 >
                     NAVIGO
@@ -211,7 +212,7 @@ export default function ChatPage() {
                         <button
                             onClick={handleClearChat}
                             disabled={isClearingChat || messages.length === 0}
-                            className="px-4 py-2 bg-black/60 text-white rounded-lg backdrop-blur-sm hover:bg-black/80 transition-colors disabled:opacity-50 shadow-lg"
+                            className="px-4 py-2 bg-theme-card text-theme-text rounded-lg backdrop-blur-sm hover:bg-theme-card-hover transition-colors disabled:opacity-50 shadow-lg border border-theme-border"
                         >
                             Clear Chat
                         </button>
@@ -235,8 +236,8 @@ export default function ChatPage() {
                                         key={message.id}
                                         className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
                                     >
-                                        <div className={`max-w-2xl ${message.sender === 'user' ? 'bg-black/80' : 'bg-white/90'} rounded-xl p-4 backdrop-blur-sm shadow-lg border border-white/10`}>
-                                            <div className={`whitespace-pre-wrap ${message.sender === 'user' ? 'text-white' : 'text-black'}`}>
+                                        <div className={`max-w-2xl ${message.sender === 'user' ? 'bg-theme-accent' : 'bg-theme-card'} rounded-xl p-4 backdrop-blur-sm shadow-lg border border-theme-border`}>
+                                            <div className={`whitespace-pre-wrap ${message.sender === 'user' ? 'text-theme-text' : 'text-theme-text'}`}>
                                                 {message.text}
                                             </div>
                                         </div>
@@ -244,13 +245,13 @@ export default function ChatPage() {
                                 ))}
                                 {isTyping && (
                                     <div className="flex justify-start mb-6">
-                                        <div className="bg-white/90 rounded-xl p-4 backdrop-blur-sm shadow-lg flex items-center space-x-2 border border-white/10">
+                                        <div className="bg-theme-card rounded-xl p-4 backdrop-blur-sm shadow-lg flex items-center space-x-2 border border-theme-border">
                                             <div className="flex space-x-1">
-                                                <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                                <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                                <div className="h-2 w-2 bg-gray-600 rounded-full animate-bounce"></div>
+                                                <div className="h-2 w-2 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                                <div className="h-2 w-2 bg-theme-accent rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                                <div className="h-2 w-2 bg-theme-accent rounded-full animate-bounce"></div>
                                             </div>
-                                            <span className="text-sm text-gray-600">Thinking...</span>
+                                            <span className="text-sm text-theme-text-secondary">Thinking...</span>
                                         </div>
                                     </div>
                                 )}
@@ -263,7 +264,7 @@ export default function ChatPage() {
                     <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-2xl px-6">
                         <form onSubmit={handleSubmit} className="relative">
                             <div
-                                className="relative bg-black/80 rounded-xl shadow-lg backdrop-blur-sm border border-yellow-500/20"
+                                className="relative bg-theme-card rounded-xl shadow-lg backdrop-blur-sm border border-theme-border"
                                 style={{
                                     boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.4)'
                                 }}
@@ -273,16 +274,16 @@ export default function ChatPage() {
                                     value={inputMessage}
                                     onChange={(e) => setInputMessage(e.target.value)}
                                     placeholder="I'm listening...."
-                                    className="w-full px-6 py-4 pr-16 bg-transparent text-white placeholder-gray-400 border-none outline-none rounded-xl"
+                                    className="w-full px-6 py-4 pr-16 bg-transparent text-theme-text placeholder-theme-text-secondary border-none outline-none rounded-xl"
                                     disabled={isTyping}
                                 />
                                 <button
                                     type="submit"
                                     disabled={!inputMessage.trim() || isTyping}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-theme-accent rounded-full flex items-center justify-center hover:bg-theme-accent-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                                 >
                                     <svg
-                                        className="w-5 h-5 text-black"
+                                        className="w-5 h-5 text-theme-text"
                                         viewBox="0 0 24 24"
                                         fill="currentColor"
                                     >
