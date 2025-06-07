@@ -161,7 +161,7 @@ export default function ChatPage() {
             <div
                 className="fixed inset-0 z-0"
                 style={{
-                    background: `radial-gradient(circle at 20% center, var(--background) 0%, var(--background) 40%, var(--accent) 60%, var(--accent-secondary) 75%, var(--background-secondary) 85%, var(--background) 100%)`
+                    background: `radial-gradient(circle at 80% center, var(--background) 0%, var(--background) 40%, var(--accent) 60%, var(--accent-secondary) 75%, var(--background-secondary) 85%, var(--background) 100%)`
                 }}
             ></div>
 
@@ -180,7 +180,7 @@ export default function ChatPage() {
             <div
                 className="fixed inset-0 z-0 pointer-events-none"
                 style={{
-                    background: `radial-gradient(circle at 70% center, var(--accent) 0%, transparent 60%)`,
+                    background: `radial-gradient(circle at 90% center, var(--accent) 0%, transparent 60%)`,
                     filter: 'blur(80px)',
                     opacity: '0.2'
                 }}
@@ -189,15 +189,12 @@ export default function ChatPage() {
             {/* Massive translucent watermark behind everything */}
             <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
                 <div
-                    className="text-[20vw] font-extrabold text-theme-text opacity-[0.08] select-none whitespace-nowrap tracking-widest"
+                    className="text-[20vw] font-extrabold text-theme-text select-none whitespace-nowrap tracking-widest"
                     style={{
                         fontFamily: 'inherit',
-                        filter: 'blur(1px)',
-                        background: 'linear-gradient(90deg, var(--text) 0%, var(--text-secondary) 50%, var(--text-secondary) 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        textShadow: '0 0 20px var(--text)'
+                        filter: 'blur(0.5px)',
+                        opacity: '0.3',
+                        textShadow: '0 0 20px var(--accent)'
                     }}
                 >
                     NAVIGO
