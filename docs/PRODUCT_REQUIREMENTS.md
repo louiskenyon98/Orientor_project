@@ -104,6 +104,52 @@ Orientor is a career guidance platform that leverages machine learning and Holla
 
 ---
 
+### 2.18 Peer Compatibility Recommendations
+#### LLM-Based Compatibility Trait Extraction
+- [ ] Backend service (`compatibility_service.py`) to generate compatibility vectors from user profiles
+- [ ] LLM prompt to extract desired peer traits in JSON format:
+  ```json
+  {
+    "desired_riasec_codes": ["S", "E"],
+    "target_skill_deltas": ["leadership", "public speaking"],
+    "goal_overlap_keywords": ["mental health", "youth empowerment"],
+    "career_stage_preference": "early-career or pivoting",
+    "industry_overlap": ["creative tech", "education"]
+  }
+  ```
+- [ ] Store compatibility vectors in `user_profiles.compatibility_vector` field
+
+#### Matching Logic
+- [ ] Embed compatibility vectors using Sentence-BERT
+- [ ] Vector similarity search across user profiles
+- [ ] Retrieve top 3 most compatible peers
+- [ ] Store recommended peers in `suggested_peers` table with similarity scores
+
+#### Frontend Integration
+- [ ] New component `PeerRecommendations.tsx` for homepage display
+- [ ] Horizontal card layout under "Suggested Allies for Your Journey"
+- [ ] Each card shows:
+  - Peer avatar
+  - Name
+  - Short goal tagline
+- [ ] Clicking card opens modal with:
+  - LLM-generated compatibility explanation
+  - "Start Chat" button using existing messaging infrastructure
+
+#### Backend Storage
+- [ ] Add `compatibility_vector` field to `user_profiles` table
+- [ ] Update `suggested_peers` table to store:
+  - Compatibility scores
+  - Timestamp of last recommendation
+- [ ] Optional: Cache recommendations in user record for faster loading
+
+#### Triggering & Updating
+- [ ] Weekly batch job to update compatibility vectors
+- [ ] On-demand update via API when profile changes
+- [ ] Track interaction metrics to improve future matching
+
+---
+
 ## 3. Non-Functional Requirements
 
 ### 3.1 Performance
@@ -520,4 +566,4 @@ graph TD
 
 **Relationships**:  
 - `user_id` → `users.id`  
-- One-to-Many with `user_notes` (via `UserNote.saved_recommendation_id`)  
+- One-to-Many with `user_notes` (via `UserNote.saved_recommendation_id`)
