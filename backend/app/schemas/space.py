@@ -40,6 +40,9 @@ class SavedRecommendation(SavedRecommendationBase):
     user_id: int
     saved_at: datetime
     all_fields: Optional[Dict[str, str]] = None
+    personal_analysis: Optional[str] = None
+    entry_qualifications: Optional[str] = None
+    suggested_improvements: Optional[str] = None
     class Config:
         orm_mode = True
         from_attributes = True
@@ -110,6 +113,9 @@ class CognitiveTraits(BaseModel):
 class RecommendationWithNotes(SavedRecommendation):
     notes: List[UserNote] = []
     skill_comparison: Optional[SkillsComparison] = None
+    personal_analysis: Optional[str] = None
+    entry_qualifications: Optional[str] = None
+    suggested_improvements: Optional[str] = None
     class Config:
         orm_mode = True
         from_attributes = True 

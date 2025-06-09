@@ -28,6 +28,11 @@ class SavedRecommendation(Base):
     all_fields = Column(JSON, nullable=True)
     saved_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     
+    # LLM Analysis fields
+    personal_analysis = Column(Text, nullable=True)
+    entry_qualifications = Column(Text, nullable=True)
+    suggested_improvements = Column(Text, nullable=True)
+    
     # Define unique constraint to prevent duplicates
     __table_args__ = (
         UniqueConstraint('user_id', 'oasis_code', name='uq_user_oasis_code'),

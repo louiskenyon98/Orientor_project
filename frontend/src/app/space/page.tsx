@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 import Sidebar from '@/components/space/Sidebar';
 import RecommendationDetail from '@/components/space/RecommendationDetail';
-import { fetchSavedRecommendations, deleteRecommendation, generateLLMAnalysis } from '@/services/spaceService';
+import { fetchSavedRecommendations, deleteRecommendation, generateLLMAnalysisForRecommendation } from '@/services/spaceService';
 import type { Recommendation } from '@/services/spaceService';
 import { toast } from 'react-hot-toast';
 
@@ -50,39 +50,16 @@ export default function SpacePage() {
   };
 
   const handleGenerate = async () => {
-    if (!selected) return;
+    if (!selected || !selected.id) return;
     try {
       setGenerating(true);
-      const analysis = await generateLLMAnalysis({
-        oasis_code: selected.oasis_code,
-        job_description: selected.description ?? '',
-        user_profile: {
-          skills: {
-            creativity: 3,
-            leadership: 4,
-            digital_literacy: 4,
-            critical_thinking: 3,
-            problem_solving: 4,
-            analytical_thinking: 3,
-            attention_to_detail: 4,
-            collaboration: 3,
-            adaptability: 4,
-            independence: 3,
-            evaluation: 3,
-            decision_making: 4,
-            stress_tolerance: 3
-          },
-          experience: "5 ans d'expérience en développement web",
-          education: "Master en informatique",
-          interests: 'IA, développement web, UX/UI'
-        }
-      });
-      const updated = { ...selected, ...analysis };
-      setSelected(updated);
-      setRecommendations(prev => prev.map(r => (r.id === updated.id ? updated : r)));
-      toast.success('LLM analysis ready');
+      const updatedRecommendation = await generateLLMAnalysisForRecommendation(selected.id);
+      setSelected(updatedRecommendation);
+      setRecommendations(prev => prev.map(r => (r.id === updatedRecommendation.id ? updatedRecommendation : r)));
+      toast.success('LLM analysis generated successfully');
     } catch (err) {
-      toast.error('Failed to generate');
+      console.error('Error generating LLM analysis:', err);
+      toast.error('Failed to generate analysis');
     } finally {
       setGenerating(false);
     }

@@ -240,57 +240,38 @@ export interface LLMAnalysisResult {
   suggested_improvements: string;
 }
 
-// Générer une analyse LLM pour une recommandation
-export const generateLLMAnalysis = async (input: LLMAnalysisInput): Promise<LLMAnalysisResult> => {
+// Generate LLM analysis for a recommendation by recommendation ID
+export const generateLLMAnalysisForRecommendation = async (recommendationId: number): Promise<Recommendation> => {
   try {
-    // Simulation côté client en attendant que l'API soit implémentée
-    console.log('Simulation de génération d\'analyse LLM pour:', input.oasis_code);
-    
-    // Délai artificiel pour simuler le traitement
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Générer des analyses simulées basées sur le code OASIS et la description
-    const jobTitle = input.job_description.split('.')[0] || 'ce poste';
-    const userSkills = Object.entries(input.user_profile.skills)
-      .filter(([_, value]) => value >= 4)
-      .map(([key]) => key.replace(/_/g, ' '))
-      .slice(0, 3)
-      .join(', ');
-    
-    return {
-      personal_analysis: `Votre profil correspond bien à ${jobTitle}. Vos compétences en ${userSkills} sont particulièrement pertinentes pour ce rôle. Votre formation et votre expérience vous donnent une base solide pour réussir dans ce domaine. Ce poste vous permettrait de mettre à profit vos points forts tout en développant de nouvelles compétences.`,
-      
-      entry_qualifications: `Pour réussir dans ce rôle, les qualifications suivantes sont généralement requises :
-- Formation en lien avec le domaine d'activité
-- Maîtrise des outils et technologies spécifiques au secteur
-- Capacité d'analyse et de résolution de problèmes
-- Compétences en communication et travail d'équipe
-- Adaptabilité et volonté d'apprentissage continu`,
-      
-      suggested_improvements: `Pour améliorer votre adéquation avec ce poste, vous pourriez :
-1. Développer davantage vos compétences techniques spécifiques au domaine
-2. Acquérir des certifications pertinentes pour valider vos connaissances
-3. Participer à des projets collaboratifs pour renforcer votre expérience pratique
-4. Élargir votre réseau professionnel dans ce secteur
-5. Suivre les dernières tendances et innovations du domaine`
-    };
-    
-    // Quand l'API sera implémentée, décommenter le code ci-dessous
-    /*
-    const response = await axios.post<LLMAnalysisResult>(
-      `${API_URL}/space/recommendations/llm-analysis`,
-      input,
+    const response = await axios.post<Recommendation>(
+      `${API_URL}/space/recommendations/${recommendationId}/generate-analysis`,
+      {},
       getAuthHeader()
     );
     return response.data;
-    */
   } catch (error) {
-    console.error('Erreur lors de la génération de l\'analyse LLM:', error);
-    // Retourner des valeurs par défaut en cas d'erreur
+    console.error('Error generating LLM analysis:', error);
+    throw error;
+  }
+};
+
+// Legacy function kept for compatibility - now shows deprecation warning
+export const generateLLMAnalysis = async (input: LLMAnalysisInput): Promise<LLMAnalysisResult> => {
+  console.warn('generateLLMAnalysis is deprecated. Use generateLLMAnalysisForRecommendation instead.');
+  
+  try {
+    // For backward compatibility, return empty analysis
     return {
-      personal_analysis: "Une erreur s'est produite lors de la génération de l'analyse personnelle.",
-      entry_qualifications: "Les qualifications requises n'ont pas pu être générées.",
-      suggested_improvements: "Les suggestions d'amélioration n'ont pas pu être générées."
+      personal_analysis: "Please use the new analysis generation method.",
+      entry_qualifications: "Please use the new analysis generation method.",
+      suggested_improvements: "Please use the new analysis generation method."
+    };
+  } catch (error) {
+    console.error('Error in legacy generateLLMAnalysis:', error);
+    return {
+      personal_analysis: "Error generating analysis.",
+      entry_qualifications: "Error generating analysis.",
+      suggested_improvements: "Error generating analysis."
     };
   }
 };

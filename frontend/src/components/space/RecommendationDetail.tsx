@@ -101,38 +101,36 @@ export default function RecommendationDetail({ recommendation, onGenerate, gener
             AI Job Analysis
           </h3>
           
-          {!(recommendation.personal_analysis ||
-             recommendation.entry_qualifications ||
-             recommendation.suggested_improvements) && (
-            <button
-              onClick={onGenerate}
-              disabled={generating}
-              className="px-4 py-2 rounded-md text-white transition-colors"
-              style={{
-                backgroundColor: generating ? 'var(--text-secondary)' : 'var(--accent)',
-                cursor: generating ? 'not-allowed' : 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                if (!generating) {
-                  e.currentTarget.style.opacity = '0.8';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!generating) {
-                  e.currentTarget.style.opacity = '1';
-                }
-              }}
-            >
-              {generating ? (
-                <span className="flex items-center">
-                  <span className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
-                  Generating...
-                </span>
-              ) : (
-                'Generate Analysis'
-              )}
-            </button>
-          )}
+          <button
+            onClick={onGenerate}
+            disabled={generating}
+            className="px-4 py-2 rounded-md text-white transition-colors"
+            style={{
+              backgroundColor: generating ? 'var(--text-secondary)' : 'var(--accent)',
+              cursor: generating ? 'not-allowed' : 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              if (!generating) {
+                e.currentTarget.style.opacity = '0.8';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!generating) {
+                e.currentTarget.style.opacity = '1';
+              }
+            }}
+          >
+            {generating ? (
+              <span className="flex items-center">
+                <span className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
+                Generating...
+              </span>
+            ) : (
+              (recommendation.personal_analysis ||
+               recommendation.entry_qualifications ||
+               recommendation.suggested_improvements) ? 'Regenerate Analysis' : 'Generate Analysis'
+            )}
+          </button>
         </div>
         
         {/* Personal Analysis */}

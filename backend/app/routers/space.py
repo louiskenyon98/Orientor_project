@@ -17,6 +17,7 @@ from ..schemas.space import (
     UserSkillUpdate,
     RecommendationWithNotes, SkillComparison, SkillsComparison, CognitiveTraits
 )
+from ..services.llm_analysis_service import update_recommendation_analysis, generate_personalized_analysis
 
 router = APIRouter(
     prefix="/space",
@@ -89,6 +90,27 @@ def create_saved_recommendation(
     db.add(db_recommendation)
     db.commit()
     db.refresh(db_recommendation)
+    
+    # Generate LLM analysis for the recommendation asynchronously
+    try:
+        import asyncio
+        # Run the async function in a sync context
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        analysis = loop.run_until_complete(
+            generate_personalized_analysis(current_user.id, db_recommendation, db)
+        )
+        loop.close()
+        
+        # Update the recommendation with the analysis
+        db_recommendation.personal_analysis = analysis['personal_analysis']
+        db_recommendation.entry_qualifications = analysis['entry_qualifications']
+        db_recommendation.suggested_improvements = analysis['suggested_improvements']
+        db.commit()
+        db.refresh(db_recommendation)
+    except Exception as e:
+        logger.error(f"Failed to generate LLM analysis: {str(e)}")
+        # Continue without analysis if it fails
     
     return db_recommendation
 
@@ -174,7 +196,10 @@ def get_saved_recommendations(
             user_stress_tolerance=rec.user_stress_tolerance,
             saved_at=rec.saved_at,
             notes=notes,
-            skill_comparison=skill_comparison
+            skill_comparison=skill_comparison,
+            personal_analysis=rec.personal_analysis,
+            entry_qualifications=rec.entry_qualifications,
+            suggested_improvements=rec.suggested_improvements
         )
         
         result.append(recommendation_with_notes)
@@ -385,4 +410,42 @@ def get_skill_comparison(
             role_skill=getattr(recommendation, role_skill_name)
         )
     
-    return SkillsComparison(**comparison) 
+    return SkillsComparison(**comparison)
+
+# ===== LLM Analysis Endpoints =====
+@router.post("/recommendations/{recommendation_id}/generate-analysis", response_model=SavedRecommendationSchema)
+async def generate_recommendation_analysis(
+    recommendation_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Generate or regenerate LLM analysis for a saved recommendation.
+    """
+    # Get the recommendation
+    recommendation = db.query(SavedRecommendation).filter(
+        SavedRecommendation.id == recommendation_id,
+        SavedRecommendation.user_id == current_user.id
+    ).first()
+    
+    if not recommendation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Recommendation not found"
+        )
+    
+    try:
+        # Generate the analysis
+        updated_recommendation = await update_recommendation_analysis(
+            recommendation_id=recommendation_id,
+            user_id=current_user.id,
+            db=db
+        )
+        
+        return updated_recommendation
+    except Exception as e:
+        logger.error(f"Failed to generate analysis for recommendation {recommendation_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate analysis. Please try again later."
+        ) 
