@@ -2030,3 +2030,609 @@ La fonctionnalité s'intègre parfaitement avec :
 - **Rétention** : Retour utilisateur dans les 7 jours
 
 Cette architecture garantit une expérience d'apprentissage **personnalisée**, **engageante** et **évolutive** qui transforme l'exploration des compétences ESCO en un parcours gamifié et découverte progressive.
+## Détails d'Implémentation Spécifiques
+
+### 1. Pipeline d'Extraction LLM des 5 Compétences Principales
+
+#### Service d'Extraction Automatique
+```python
+# backend/app/services/llm_skill_extractor.py
+class LLMSkillExtractorService:
+    """
+    Service pour extraire automatiquement les 5 compétences principales
+    basé sur le profil utilisateur complet
+    """
+    
+    def __init__(self):
+        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.esco_alignment_service = ESCOAlignmentService()
+        
+    def extract_top_skills_from_profile(self, db: Session, user_id: int) -> List[Dict[str, Any]]:
+        """
+        Extrait les 5 compétences principales du profil utilisateur complet
+        """
+        # 1. Récupérer toutes les données utilisateur
+        user_profile = self._get_comprehensive_user_profile(db, user_id)
+        
+        # 2. Construire le prompt contextualisé
+        extraction_prompt = self._build_skill_extraction_prompt(user_profile)
+        
+        # 3. Appel LLM pour extraction
+        extracted_skills = self._call_llm_for_extraction(extraction_prompt)
+        
+        # 4. Alignement sémantique avec ESCO
+        aligned_skills = self.esco_alignment_service.align_skills_with_esco(extracted_skills)
+        
+        # 5. Validation et scoring
+        validated_skills = self._validate_and_score_skills(aligned_skills, user_profile)
+        
+        return validated_skills[:5]  # Top 5
+    
+    def _get_comprehensive_user_profile(self, db: Session, user_id: int) -> Dict[str, Any]:
+        """Récupère le profil utilisateur complet"""
+        
+        # Profil de base
+        user_query = text("""
+            SELECT u.*, up.* FROM users u 
+            LEFT JOIN user_profiles up ON u.id = up.user_id 
+            WHERE u.id = :user_id
+        """)
+        user_data = db.execute(user_query, {"user_id": user_id}).fetchone()
+        
+        # Tests de personnalité HEXACO
+        hexaco_query = text("""
+            SELECT * FROM hexaco_results 
+            WHERE user_id = :user_id 
+            ORDER BY created_at DESC LIMIT 1
+        """)
+        hexaco_data = db.execute(hexaco_query, {"user_id": user_id}).fetchone()
+        
+        # Tests Holland/RIASEC
+        holland_query = text("""
+            SELECT * FROM holland_results 
+            WHERE user_id = :user_id 
+            ORDER BY created_at DESC LIMIT 1
+        """)
+        holland_data = db.execute(holland_query, {"user_id": user_id}).fetchone()
+        
+        # Historique d'interactions
+        interactions_query = text("""
+            SELECT action_type, metadata, created_at 
+            FROM user_interactions 
+            WHERE user_id = :user_id 
+            ORDER BY created_at DESC LIMIT 50
+        """)
+        interactions = db.execute(interactions_query, {"user_id": user_id}).fetchall()
+        
+        return {
+            "basic_profile": dict(user_data) if user_data else {},
+            "hexaco_traits": dict(hexaco_data) if hexaco_data else {},
+            "holland_codes": dict(holland_data) if holland_data else {},
+            "recent_interactions": [dict(i) for i in interactions]
+        }
+    
+    def _build_skill_extraction_prompt(self, user_profile: Dict[str, Any]) -> str:
+        """Construit le prompt pour l'extraction LLM"""
+        
+        return f"""
+        Tu es un expert en analyse de profils professionnels et en extraction de compétences.
+        
+        MISSION: Extraire les 5 compétences principales les plus pertinentes pour ce profil utilisateur.
+        
+        PROFIL UTILISATEUR COMPLET:
+        
+        INFORMATIONS DE BASE:
+        - Âge: {user_profile['basic_profile'].get('age', 'Non spécifié')}
+        - Niveau d'éducation: {user_profile['basic_profile'].get('education_level', 'Non spécifié')}
+        - Industrie: {user_profile['basic_profile'].get('industry', 'Non spécifié')}
+        - Années d'expérience: {user_profile['basic_profile'].get('years_experience', 0)}
+        - Objectifs de carrière: {user_profile['basic_profile'].get('career_goals', 'Non spécifié')}
+        
+        TRAITS HEXACO (Big Five + Honnêteté):
+        - Honnêteté-Humilité: {user_profile['hexaco_traits'].get('honesty_humility', 'N/A')}
+        - Émotionalité: {user_profile['hexaco_traits'].get('emotionality', 'N/A')}
+        - Extraversion: {user_profile['hexaco_traits'].get('extraversion', 'N/A')}
+        - Agréabilité: {user_profile['hexaco_traits'].get('agreeableness', 'N/A')}
+        - Conscienciosité: {user_profile['hexaco_traits'].get('conscientiousness', 'N/A')}
+        - Ouverture: {user_profile['hexaco_traits'].get('openness', 'N/A')}
+        
+        CODES HOLLAND/RIASEC:
+        - Réaliste: {user_profile['holland_codes'].get('realistic', 'N/A')}
+        - Investigateur: {user_profile['holland_codes'].get('investigative', 'N/A')}
+        - Artistique: {user_profile['holland_codes'].get('artistic', 'N/A')}
+        - Social: {user_profile['holland_codes'].get('social', 'N/A')}
+        - Entreprenant: {user_profile['holland_codes'].get('enterprising', 'N/A')}
+        - Conventionnel: {user_profile['holland_codes'].get('conventional', 'N/A')}
+        
+        INTERACTIONS RÉCENTES:
+        {self._format_interactions(user_profile['recent_interactions'])}
+        
+        CRITÈRES D'EXTRACTION:
+        1. Les compétences doivent être CONCRÈTES et MESURABLES
+        2. Elles doivent refléter les FORCES naturelles du profil HEXACO/Holland
+        3. Elles doivent être PERTINENTES pour les objectifs de carrière
+        4. Elles doivent avoir un POTENTIEL DE DÉVELOPPEMENT élevé
+        5. Elles doivent être ALIGNÉES avec l'expérience existante
+        
+        IMPORTANT: Réponds UNIQUEMENT en JSON avec cette structure exacte:
+        {{
+            "extracted_skills": [
+                {{
+                    "skill_name": "Nom de la compétence",
+                    "description": "Description détaillée",
+                    "relevance_score": 0.95,
+                    "development_potential": 0.88,
+                    "alignment_reasoning": "Pourquoi cette compétence est pertinente",
+                    "hexaco_connection": "Lien avec les traits HEXACO",
+                    "holland_connection": "Lien avec les codes Holland"
+                }}
+            ]
+        }}
+        """
+```
+
+#### Service d'Alignement ESCO
+```python
+# backend/app/services/esco_alignment_service.py
+class ESCOAlignmentService:
+    """
+    Service pour aligner les compétences extraites avec la taxonomie ESCO
+    """
+    
+    def __init__(self):
+        self.pinecone_client = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+        self.index = self.pinecone_client.Index("esco-368")
+        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        
+    def align_skills_with_esco(self, extracted_skills: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Aligne les compétences extraites avec la taxonomie ESCO
+        """
+        aligned_skills = []
+        
+        for skill in extracted_skills:
+            # 1. Recherche sémantique dans ESCO
+            esco_matches = self._semantic_search_esco(skill['skill_name'], skill['description'])
+            
+            # 2. Sélection du meilleur match
+            best_match = self._select_best_esco_match(skill, esco_matches)
+            
+            # 3. Enrichissement avec métadonnées ESCO
+            enriched_skill = self._enrich_with_esco_metadata(skill, best_match)
+            
+            aligned_skills.append(enriched_skill)
+        
+        return aligned_skills
+    
+    def _semantic_search_esco(self, skill_name: str, description: str) -> List[Dict]:
+        """Recherche sémantique dans l'index ESCO"""
+        
+        # Créer l'embedding de recherche
+        search_text = f"{skill_name} {description}"
+        search_embedding = self.embedding_model.encode(search_text).tolist()
+        
+        # Recherche dans Pinecone
+        results = self.index.query(
+            vector=search_embedding,
+            top_k=10,
+            filter={"type": {"$eq": "skill"}},
+            include_metadata=True
+        )
+        
+        return [
+            {
+                "esco_id": match.id,
+                "esco_label": match.metadata.get("preferredLabel", ""),
+                "esco_description": match.metadata.get("description", ""),
+                "similarity_score": 1 - match.score,
+                "metadata": match.metadata
+            }
+            for match in results.matches
+        ]
+```
+
+### 2. Intégration Page d'Accueil
+
+#### Composant Aperçu des Compétences
+```typescript
+// frontend/src/components/home/SkillsPreview.tsx
+interface SkillsPreviewProps {
+  userId: number;
+  onViewFullTree: () => void;
+}
+
+export const SkillsPreview: React.FC<SkillsPreviewProps> = ({ 
+  userId, 
+  onViewFullTree 
+}) => {
+  const [skills, setSkills] = useState<ExtractedSkill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUserSkills = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/v1/interactive-skills/user/${userId}/top-skills`);
+        if (!response.ok) throw new Error('Erreur lors du chargement');
+        
+        const data = await response.json();
+        setSkills(data.skills);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserSkills();
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <div className="skills-preview-loading">
+        <div className="loading-spinner" />
+        <p>Analyse de votre profil en cours...</p>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div 
+      className="skills-preview-container"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="preview-header">
+        <h2>Vos Compétences Principales</h2>
+        <p>Découvertes automatiquement à partir de votre profil</p>
+      </div>
+
+      <div className="skills-grid">
+        {skills.map((skill, index) => (
+          <motion.div
+            key={skill.esco_id}
+            className="skill-preview-card"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1, duration: 0.4 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+          >
+            <div className="skill-content">
+              <h3>{skill.skill_name}</h3>
+              <p className="skill-description">{skill.description}</p>
+              
+              <div className="skill-metrics">
+                <div className="metric">
+                  <span className="metric-label">Pertinence</span>
+                  <div className="metric-bar">
+                    <div 
+                      className="metric-fill"
+                      style={{ width: `${skill.relevance_score * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="preview-actions">
+        <motion.button
+          className="explore-tree-button"
+          onClick={onViewFullTree}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Explorer l'Arbre Interactif
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+};
+```
+
+### 3. Intégration Système XP Existant
+
+#### Extension du Service XP
+```python
+# backend/app/services/skills_xp_service.py
+class SkillsXPService:
+    """
+    Service pour gérer l'XP spécifique aux compétences
+    """
+    
+    def award_skill_challenge_xp(self, db: Session, user_id: int, 
+                                skill_id: str, challenge_id: str, 
+                                base_xp: int) -> Dict[str, Any]:
+        """
+        Attribue l'XP pour un défi de compétence complété
+        """
+        
+        # 1. Calculer l'XP avec bonus
+        final_xp = self._calculate_xp_with_bonuses(
+            db, user_id, skill_id, base_xp
+        )
+        
+        # 2. Mettre à jour la progression générale
+        self._update_general_progress(db, user_id, final_xp)
+        
+        # 3. Enregistrer l'XP spécifique aux compétences
+        self._record_skill_xp(db, user_id, skill_id, final_xp, challenge_id)
+        
+        # 4. Vérifier les achievements
+        achievements = self._check_skill_achievements(db, user_id, skill_id)
+        
+        return {
+            "xp_awarded": final_xp,
+            "total_xp": self._get_user_total_xp(db, user_id),
+            "skill_xp": self._get_skill_total_xp(db, user_id, skill_id),
+            "achievements": achievements,
+            "level_up": self._check_level_up(db, user_id)
+        }
+    
+    def _calculate_xp_with_bonuses(self, db: Session, user_id: int, 
+                                  skill_id: str, base_xp: int) -> int:
+        """Calcule l'XP avec les bonus applicables"""
+        
+        multiplier = 1.0
+        
+        # Bonus streak (défis complétés consécutivement)
+        streak = self._get_user_streak(db, user_id)
+        if streak >= 7:
+            multiplier += 0.5  # +50% pour 7 jours consécutifs
+        elif streak >= 3:
+            multiplier += 0.25  # +25% pour 3 jours consécutifs
+        
+        # Bonus première fois
+        if self._is_first_skill_completion(db, user_id, skill_id):
+            multiplier += 0.3  # +30% pour première compétence
+        
+        return int(base_xp * multiplier)
+```
+
+### 4. Nouveaux Endpoints API
+
+#### Router pour l'Extraction de Compétences
+```python
+# backend/app/routers/skill_extraction.py
+@router.post("/extract-user-skills", response_model=ExtractedSkillsResponse)
+async def extract_user_skills(
+    user_id: int = Query(..., description="ID de l'utilisateur"),
+    force_refresh: bool = Query(False, description="Forcer une nouvelle extraction"),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Extrait les 5 compétences principales d'un utilisateur
+    """
+    try:
+        # Vérifier les permissions
+        if current_user.id != user_id and not current_user.is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Accès non autorisé"
+            )
+        
+        # Vérifier le cache si pas de refresh forcé
+        if not force_refresh:
+            cached_skills = skill_cache.get(f"user_skills_{user_id}")
+            if cached_skills:
+                return ExtractedSkillsResponse(
+                    skills=cached_skills,
+                    extraction_date=datetime.now(),
+                    cache_hit=True
+                )
+        
+        # Extraction via LLM
+        extractor_service = LLMSkillExtractorService()
+        extracted_skills = extractor_service.extract_top_skills_from_profile(db, user_id)
+        
+        # Cache des résultats (24h)
+        skill_cache.set(f"user_skills_{user_id}", extracted_skills, ttl=86400)
+        
+        return ExtractedSkillsResponse(
+            skills=extracted_skills,
+            extraction_date=datetime.now(),
+            cache_hit=False
+        )
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de l'extraction des compétences pour l'utilisateur {user_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erreur lors de l'extraction des compétences: {str(e)}"
+        )
+
+@router.get("/user/{user_id}/top-skills", response_model=TopSkillsResponse)
+async def get_user_top_skills(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Récupère les compétences principales pour l'aperçu page d'accueil
+    """
+    try:
+        # Récupérer depuis le cache ou la base
+        cached_skills = skill_cache.get(f"user_skills_{user_id}")
+        
+        if not cached_skills:
+            # Déclencher l'extraction si pas en cache
+            extractor_service = LLMSkillExtractorService()
+            cached_skills = extractor_service.extract_top_skills_from_profile(db, user_id)
+            skill_cache.set(f"user_skills_{user_id}", cached_skills, ttl=86400)
+        
+        return TopSkillsResponse(
+            skills=cached_skills,
+            user_id=user_id,
+            last_updated=datetime.now()
+        )
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des compétences: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur lors de la récupération des compétences"
+        )
+```
+
+### 5. Schémas de Base de Données Étendus
+
+#### Nouvelles Tables pour l'Extraction de Compétences
+```sql
+-- Table pour stocker les extractions de compétences
+CREATE TABLE user_skill_extractions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) NOT NULL,
+    extraction_method VARCHAR(50) DEFAULT 'llm_auto',
+    extracted_skills JSONB NOT NULL,
+    confidence_score FLOAT DEFAULT 0.0,
+    extraction_metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Table pour l'historique des compétences extraites
+CREATE TABLE skill_extraction_history (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) NOT NULL,
+    skill_esco_id VARCHAR(255) NOT NULL,
+    skill_name VARCHAR(500) NOT NULL,
+    relevance_score FLOAT NOT NULL,
+    development_potential FLOAT NOT NULL,
+    extraction_reasoning TEXT,
+    source_data JSONB,
+    extracted_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Table pour l'XP des compétences
+CREATE TABLE user_skills_xp (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) NOT NULL,
+    skill_esco_id VARCHAR(255) NOT NULL,
+    skill_name VARCHAR(500) NOT NULL,
+    total_xp INTEGER DEFAULT 0,
+    challenges_completed INTEGER DEFAULT 0,
+    first_completion_at TIMESTAMP,
+    last_activity_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(user_id, skill_esco_id)
+);
+
+-- Index pour les performances
+CREATE INDEX idx_user_skill_extractions_user_id ON user_skill_extractions(user_id);
+CREATE INDEX idx_skill_extraction_history_user_skill ON skill_extraction_history(user_id, skill_esco_id);
+CREATE INDEX idx_user_skills_xp_user_id ON user_skills_xp(user_id);
+CREATE INDEX idx_user_skills_xp_skill_id ON user_skills_xp(skill_esco_id);
+```
+
+### 6. Configuration et Optimisations
+
+#### Configuration Redis pour Cache
+```python
+# backend/app/core/cache_config.py
+class SkillsCacheConfig:
+    """Configuration du cache pour les compétences"""
+    
+    # TTL par type de données
+    USER_SKILLS_TTL = 86400  # 24h pour les compétences extraites
+    ESCO_ALIGNMENT_TTL = 604800  # 7 jours pour l'alignement ESCO
+    LLM_RESPONSES_TTL = 3600  # 1h pour les réponses LLM
+    
+    # Clés de cache
+    USER_SKILLS_KEY = "user_skills_{user_id}"
+    ESCO_ALIGNMENT_KEY = "esco_align_{skill_hash}"
+    LLM_EXTRACTION_KEY = "llm_extract_{profile_hash}"
+    
+    @staticmethod
+    def get_cache_key(key_type: str, **kwargs) -> str:
+        """Génère une clé de cache formatée"""
+        if key_type == "user_skills":
+            return SkillsCacheConfig.USER_SKILLS_KEY.format(**kwargs)
+        elif key_type == "esco_alignment":
+            return SkillsCacheConfig.ESCO_ALIGNMENT_KEY.format(**kwargs)
+        elif key_type == "llm_extraction":
+            return SkillsCacheConfig.LLM_EXTRACTION_KEY.format(**kwargs)
+        else:
+            raise ValueError(f"Type de clé de cache inconnu: {key_type}")
+```
+
+#### Monitoring et Métriques
+```python
+# backend/app/monitoring/skills_metrics.py
+class SkillsMetricsCollector:
+    """Collecteur de métriques pour le système de compétences"""
+    
+    def __init__(self):
+        self.redis_client = Redis()
+        
+    def track_skill_extraction(self, user_id: int, extraction_time: float, 
+                              skills_count: int, method: str):
+        """Enregistre les métriques d'extraction"""
+        
+        metrics = {
+            "user_id": user_id,
+            "extraction_time_ms": extraction_time * 1000,
+            "skills_extracted": skills_count,
+            "extraction_method": method,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # Stocker dans Redis pour analyse
+        self.redis_client.lpush("skills_extraction_metrics", json.dumps(metrics))
+        self.redis_client.ltrim("skills_extraction_metrics", 0, 10000)  # Garder 10k entrées
+        
+    def track_esco_alignment(self, skill_name: str, alignment_time: float, 
+                           similarity_score: float, success: bool):
+        """Enregistre les métriques d'alignement ESCO"""
+        
+        metrics = {
+            "skill_name": skill_name,
+            "alignment_time_ms": alignment_time * 1000,
+            "similarity_score": similarity_score,
+            "alignment_success": success,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        self.redis_client.lpush("esco_alignment_metrics", json.dumps(metrics))
+        self.redis_client.ltrim("esco_alignment_metrics", 0, 10000)
+        
+    def get_extraction_stats(self, days: int = 7) -> Dict[str, Any]:
+        """Récupère les statistiques d'extraction"""
+        
+        # Récupérer les métriques récentes
+        raw_metrics = self.redis_client.lrange("skills_extraction_metrics", 0, -1)
+        
+        # Filtrer par période
+        cutoff_date = datetime.now() - timedelta(days=days)
+        recent_metrics = []
+        
+        for raw_metric in raw_metrics:
+            metric = json.loads(raw_metric)
+            metric_date = datetime.fromisoformat(metric["timestamp"])
+            
+            if metric_date >= cutoff_date:
+                recent_metrics.append(metric)
+        
+        if not recent_metrics:
+            return {"error": "Aucune métrique disponible"}
+        
+        # Calculer les statistiques
+        extraction_times = [m["extraction_time_ms"] for m in recent_metrics]
+        skills_counts = [m["skills_extracted"] for m in recent_metrics]
+        
+        return {
+            "total_extractions": len(recent_metrics),
+            "avg_extraction_time_ms": sum(extraction_times) / len(extraction_times),
+            "max_extraction_time_ms": max(extraction_times),
+            "min_extraction_time_ms": min(extraction_times),
+            "avg_skills_per_extraction": sum(skills_counts) / len(skills_counts),
+            "success_rate": len([m for m in recent_metrics if m["skills_extracted"] > 0]) / len(recent_metrics),
+            "period_days": days
+        }
+```
+
+Cette architecture garantit une expérience d'apprentissage **personnalisée**, **engageante** et **évolutive** qui transforme l'exploration des compétences ESCO en un parcours gamifié et découverte progressive, avec une intégration complète dans l'écosystème existant d'Orientor.
