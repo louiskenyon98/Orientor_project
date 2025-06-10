@@ -158,113 +158,139 @@ const TreeNode: React.FC<{
   );
 };
 
-// Function to calculate radial tree layout
+// Function to calculate clean hierarchical tree layout like the inspiration image
 const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: string; target: string }[]): PositionedNode[] => {
   console.log("Layout calculation - Nodes:", nodes.length, "Edges:", edges.length);
   
-  const centerX = 500;
-  const centerY = 400;
+  const centerX = 1000;
+  const centerY = 700;
   const positioned: PositionedNode[] = [];
   
-  // Separate anchors and other nodes
-  const anchors = nodes.filter(n => n.is_anchor);
-  const nonAnchors = nodes.filter(n => !n.is_anchor);
+  // Filter to only visible nodes
+  const visibleNodes = nodes.filter(n => n.visible !== false);
+  const anchors = visibleNodes.filter(n => n.is_anchor);
   
-  console.log("Anchors:", anchors.length, "Non-anchors:", nonAnchors.length);
+  console.log("Visible nodes:", visibleNodes.length, "Anchors:", anchors.length);
   
-  // Create edge lookup
-  const edgeMap = new Map<string, string[]>();
+  // Build adjacency map for hierarchy
+  const adjacencyMap = new Map<string, string[]>();
+  const parentMap = new Map<string, string>(); // Track parent relationships
+  
   edges.forEach(edge => {
-    if (!edgeMap.has(edge.source)) edgeMap.set(edge.source, []);
-    if (!edgeMap.has(edge.target)) edgeMap.set(edge.target, []);
-    edgeMap.get(edge.source)!.push(edge.target);
-    edgeMap.get(edge.target)!.push(edge.source);
+    const sourceVisible = visibleNodes.find(n => n.id === edge.source);
+    const targetVisible = visibleNodes.find(n => n.id === edge.target);
+    
+    if (sourceVisible && targetVisible) {
+      if (!adjacencyMap.has(edge.source)) adjacencyMap.set(edge.source, []);
+      adjacencyMap.get(edge.source)!.push(edge.target);
+      parentMap.set(edge.target, edge.source);
+    }
   });
   
-  // Position anchor nodes in center circle
-  const anchorRadius = 120;
-  anchors.forEach((anchor, index) => {
-    const angle = (2 * Math.PI * index) / anchors.length;
-    positioned.push({
-      ...anchor,
-      x: centerX + anchorRadius * Math.cos(angle),
-      y: centerY + anchorRadius * Math.sin(angle)
-    });
-  });
+  // Build tree hierarchy starting from anchors
+  const treeHierarchy = new Map<number, CompetenceNode[]>(); // level -> nodes
+  const processedNodes = new Set<string>();
   
-  // Track processed nodes
-  const processedNodes = new Set(anchors.map(a => a.id));
-  
-  // For each anchor, create branching layout
-  anchors.forEach((anchor, anchorIndex) => {
-    const connectedNodeIds = edgeMap.get(anchor.id) || [];
-    const connectedNodes = connectedNodeIds
-      .filter(id => !processedNodes.has(id))
-      .map(id => nodes.find(n => n.id === id))
-      .filter(Boolean) as CompetenceNode[];
+  // Level 0: Anchors - position in center with generous spacing
+  if (anchors.length > 0) {
+    treeHierarchy.set(0, anchors);
     
-    if (connectedNodes.length === 0) return;
-    
-    const baseAngle = (2 * Math.PI * anchorIndex) / anchors.length;
-    const branchSpread = Math.PI / 2; // 90 degrees per anchor
-    
-    connectedNodes.forEach((node, nodeIndex) => {
-      if (processedNodes.has(node.id)) return;
-      
-      const nodeAngle = baseAngle - branchSpread / 2 + (branchSpread * nodeIndex) / (connectedNodes.length - 1 || 1);
-      
-      // Different distances for different node types
-      let distance = 250;
-      if (node.type === 'occupation') distance = 350;
-      if (node.type === 'skillgroup') distance = 200;
-      
+    if (anchors.length === 1) {
+      // Single anchor in center
       positioned.push({
-        ...node,
-        x: centerX + distance * Math.cos(nodeAngle),
-        y: centerY + distance * Math.sin(nodeAngle)
+        ...anchors[0],
+        x: centerX,
+        y: centerY
       });
-      
-      processedNodes.add(node.id);
-      
-      // Add second level connections
-      const secondLevelIds = edgeMap.get(node.id) || [];
-      const secondLevelNodes = secondLevelIds
-        .filter(id => !processedNodes.has(id))
-        .map(id => nodes.find(n => n.id === id))
-        .filter(Boolean)
-        .slice(0, 2) as CompetenceNode[]; // Limit to 2 per node
-      
-      secondLevelNodes.forEach((secondNode, secondIndex) => {
-        if (processedNodes.has(secondNode.id)) return;
-        
-        const secondAngle = nodeAngle + (secondIndex - 0.5) * 0.4;
-        const secondDistance = distance + 120;
-        
+    } else {
+      // Multiple anchors in circle with large radius
+      const anchorRadius = 150;
+      anchors.forEach((anchor, index) => {
+        const angle = (2 * Math.PI * index) / anchors.length;
         positioned.push({
-          ...secondNode,
-          x: centerX + secondDistance * Math.cos(secondAngle),
-          y: centerY + secondDistance * Math.sin(secondAngle)
+          ...anchor,
+          x: centerX + anchorRadius * Math.cos(angle),
+          y: centerY + anchorRadius * Math.sin(angle)
         });
-        
-        processedNodes.add(secondNode.id);
       });
-    });
-  });
+    }
+    
+    anchors.forEach(anchor => processedNodes.add(anchor.id));
+  }
   
-  // Position remaining nodes in outer ring
-  const remainingNodes = nodes.filter(node => !processedNodes.has(node.id));
-  if (remainingNodes.length > 0) {
-    remainingNodes.forEach((node, index) => {
-      const angle = (2 * Math.PI * index) / remainingNodes.length;
-      positioned.push({
-        ...node,
-        x: centerX + 450 * Math.cos(angle),
-        y: centerY + 450 * Math.sin(angle)
-      });
+  // Build subsequent levels with proper hierarchy
+  let currentLevel = 0;
+  const maxLevels = 3;
+  
+  while (currentLevel < maxLevels) {
+    const currentLevelNodes = treeHierarchy.get(currentLevel) || [];
+    const nextLevelNodes: CompetenceNode[] = [];
+    
+    // Find children of current level nodes
+    currentLevelNodes.forEach(parent => {
+      const children = (adjacencyMap.get(parent.id) || [])
+        .map(id => visibleNodes.find(n => n.id === id))
+        .filter(node => node && !processedNodes.has(node.id))
+        .slice(0, 3); // Max 3 children per parent to avoid clutter
+      
+      nextLevelNodes.push(...children as CompetenceNode[]);
+      children.forEach(child => child && processedNodes.add(child.id));
+    });
+    
+    if (nextLevelNodes.length === 0) break;
+    
+    treeHierarchy.set(currentLevel + 1, nextLevelNodes);
+    currentLevel++;
+  }
+  
+  // Position nodes level by level with clean spacing
+  for (let level = 1; level <= currentLevel; level++) {
+    const levelNodes = treeHierarchy.get(level) || [];
+    const baseRadius = 300 + (level - 1) * 200; // Increase radius per level
+    
+    // Group nodes by their parent for proper positioning
+    const nodesByParent = new Map<string, CompetenceNode[]>();
+    levelNodes.forEach(node => {
+      const parent = parentMap.get(node.id);
+      if (parent) {
+        if (!nodesByParent.has(parent)) nodesByParent.set(parent, []);
+        nodesByParent.get(parent)!.push(node);
+      }
+    });
+    
+    // Position children around their parents
+    nodesByParent.forEach((children, parentId) => {
+      const parent = positioned.find(p => p.id === parentId);
+      if (!parent) return;
+      
+      // Calculate parent's angle from center
+      const parentAngle = Math.atan2(parent.y - centerY, parent.x - centerX);
+      
+      if (children.length === 1) {
+        // Single child: extend directly outward from parent
+        positioned.push({
+          ...children[0],
+          x: centerX + baseRadius * Math.cos(parentAngle),
+          y: centerY + baseRadius * Math.sin(parentAngle)
+        });
+      } else {
+        // Multiple children: spread around parent direction
+        const spreadAngle = Math.PI / 4; // 45 degrees spread
+        const angleStep = spreadAngle / Math.max(children.length - 1, 1);
+        
+        children.forEach((child, index) => {
+          const childAngle = parentAngle - spreadAngle / 2 + angleStep * index;
+          positioned.push({
+            ...child,
+            x: centerX + baseRadius * Math.cos(childAngle),
+            y: centerY + baseRadius * Math.sin(childAngle)
+          });
+        });
+      }
     });
   }
   
-  console.log("Positioned nodes:", positioned.length);
+  console.log("Positioned nodes:", positioned.length, "of", visibleNodes.length, "visible");
   return positioned;
 };
 
@@ -353,8 +379,8 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
     );
   }
   
-  const svgWidth = 1000;
-  const svgHeight = 800;
+  const svgWidth = 2000;
+  const svgHeight = 1400;
 
   return (
     <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -366,43 +392,48 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
           <svg 
             width={svgWidth} 
             height={svgHeight}
-            style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}
+            style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', border: '1px solid #e2e8f0' }}
           >
-            {/* Render edges first so they appear behind nodes */}
-            {treeData.edges.map((edge, index) => {
-              const sourceNode = positionedNodes.find(n => n.id === edge.source);
-              const targetNode = positionedNodes.find(n => n.id === edge.target);
-              
-              if (!sourceNode || !targetNode) return null;
-              
-              // Create curved path for more organic look
-              const midX = (sourceNode.x + targetNode.x) / 2;
-              const midY = (sourceNode.y + targetNode.y) / 2;
-              const dx = targetNode.x - sourceNode.x;
-              const dy = targetNode.y - sourceNode.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              
-              // Add curve based on distance
-              const curvature = Math.min(distance * 0.2, 50);
-              const perpX = -dy / distance * curvature;
-              const perpY = dx / distance * curvature;
-              
-              const controlX = midX + perpX;
-              const controlY = midY + perpY;
-              
-              const pathData = `M ${sourceNode.x} ${sourceNode.y} Q ${controlX} ${controlY} ${targetNode.x} ${targetNode.y}`;
-              
-              return (
-                <path
-                  key={index}
-                  d={pathData}
-                  stroke="#4ade80"
-                  strokeWidth="2"
-                  strokeOpacity="0.7"
-                  fill="none"
-                />
+            {/* Render clean hierarchical edges */}
+            {positionedNodes.map((sourceNode) => {
+              const outgoingEdges = treeData.edges.filter(edge => 
+                edge.source === sourceNode.id &&
+                positionedNodes.find(n => n.id === edge.target)
               );
-            })}
+              
+              return outgoingEdges.map((edge) => {
+                const targetNode = positionedNodes.find(n => n.id === edge.target);
+                if (!targetNode) return null;
+                
+                // Calculate clean curved paths like inspiration image
+                const dx = targetNode.x - sourceNode.x;
+                const dy = targetNode.y - sourceNode.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Create subtle curve for better visual flow
+                const midX = (sourceNode.x + targetNode.x) / 2;
+                const midY = (sourceNode.y + targetNode.y) / 2;
+                const curveOffset = distance * 0.1; // Gentle curve
+                const perpX = -dy / distance * curveOffset;
+                const perpY = dx / distance * curveOffset;
+                
+                const pathData = `M ${sourceNode.x} ${sourceNode.y} Q ${midX + perpX} ${midY + perpY} ${targetNode.x} ${targetNode.y}`;
+                
+                return (
+                  <path
+                    key={`${sourceNode.id}-${targetNode.id}`}
+                    d={pathData}
+                    stroke="#64748b"
+                    strokeWidth="2"
+                    strokeOpacity="0.7"
+                    fill="none"
+                    style={{
+                      filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
+                    }}
+                  />
+                );
+              });
+            }).flat()}
             
             {/* Render nodes */}
             {positionedNodes.map((node) => (
