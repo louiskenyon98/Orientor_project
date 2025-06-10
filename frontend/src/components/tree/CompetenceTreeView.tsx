@@ -592,12 +592,14 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
 
   return (
     <div style={{ 
-      width: '100%',
+      width: '100vw',
       height: 'calc(100vh - 80px)', // Account for navigation bar
       display: 'flex', 
       flexDirection: 'column',
       marginTop: '80px', // Space for navigation bar
-      margin: '80px 0 0 0'
+      marginLeft: 'calc(-50vw + 50%)',
+      marginRight: 'calc(-50vw + 50%)',
+      position: 'relative'
     }}>
       <div style={{ 
         display: 'flex', 
@@ -628,11 +630,11 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
         </button>
       </div>
       
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', width: '100%' }}>
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', width: '100vw' }}>
         {/* SVG Tree Visualization */}
         <div style={{ 
           flex: 1,
-          width: '100%',
+          width: '100vw',
           height: '100%',
           overflow: 'auto',
           background: '#f8fafc',
