@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import axios from 'axios';
+
+// Define API URL with fallback and trim any trailing spaces
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const cleanApiUrl = API_URL ? API_URL.trim() : '';
 
 interface PeerDetails {
   user_id: number;
@@ -35,7 +40,7 @@ const PeerDetailPage: React.FC = () => {
   const fetchPeerDetails = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       
       if (!token) {
         router.push('/login');
@@ -43,23 +48,13 @@ const PeerDetailPage: React.FC = () => {
       }
 
       // Fetch from compatible peers endpoint and find the specific peer
-      const response = await fetch('/api/peers/compatible', {
+      const response = await axios.get<PeerDetails[]>(`${cleanApiUrl}/peers/compatible`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const peers = await response.json();
-      const peerDetail = peers.find((p: PeerDetails) => p.user_id.toString() === peerId);
+      const peerDetail = response.data.find((p: PeerDetails) => p.user_id.toString() === peerId);
       
       if (!peerDetail) {
         setError('Peer not found');
@@ -68,8 +63,12 @@ const PeerDetailPage: React.FC = () => {
 
       setPeer(peerDetail);
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching peer details:', err);
+      if (err.response?.status === 401) {
+        router.push('/login');
+        return;
+      }
       setError('Failed to load peer details');
     } finally {
       setLoading(false);

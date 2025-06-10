@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
+
+// Define API URL with fallback and trim any trailing spaces
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const cleanApiUrl = API_URL ? API_URL.trim() : '';
 
 interface HomepagePeer {
   user_id: number;
@@ -30,33 +35,28 @@ const SuggestedAlliesSection: React.FC<SuggestedAlliesSectionProps> = ({ classNa
   const fetchHomepagePeers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       
       if (!token) {
         setError('Authentication required');
+        router.push('/login');
         return;
       }
 
-      const response = await fetch('/api/peers/homepage', {
+      const response = await axios.get<HomepagePeer[]>(`${cleanApiUrl}/peers/homepage`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          router.push('/login');
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setPeers(data);
+      setPeers(response.data);
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching homepage peers:', err);
+      if (err.response?.status === 401) {
+        router.push('/login');
+        return;
+      }
       setError('Failed to load peer suggestions');
     } finally {
       setLoading(false);
