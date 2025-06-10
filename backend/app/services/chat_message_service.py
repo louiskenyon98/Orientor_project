@@ -7,10 +7,16 @@ from sqlalchemy.exc import SQLAlchemyError
 import logging
 import json
 from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+
+# Optional imports for PDF generation
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
 
 from ..models import ChatMessage, Conversation, User
 from ..schemas.chat_message import SearchFilters, MessageStats
@@ -279,6 +285,9 @@ class ChatMessageService:
     @staticmethod
     def _export_as_pdf(conversation: Conversation, messages: List[ChatMessage]) -> bytes:
         """Export conversation as PDF"""
+        if not REPORTLAB_AVAILABLE:
+            raise ValueError("PDF export is not available. Please install reportlab: pip install reportlab")
+        
         buffer = BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=letter)
         story = []

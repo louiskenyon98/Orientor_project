@@ -12,7 +12,7 @@ import datetime
 
 # revision identifiers, used by Alembic.
 revision = 'add_chat_persistence'
-down_revision = 'add_compatibility_vector'
+down_revision = 'add_narrative_description'
 branch_labels = None
 depends_on = None
 
