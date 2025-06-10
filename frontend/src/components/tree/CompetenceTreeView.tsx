@@ -225,8 +225,8 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
   
   console.log("All edges:", edges);
   
-  const centerX = 1000;
-  const centerY = 700;
+  const centerX = 1600; // Center for larger canvas
+  const centerY = 1100; // Center for larger canvas
   const positioned: PositionedNode[] = [];
   
   // Show ALL nodes that have visible !== false (including undefined visible)
@@ -269,7 +269,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
         y: centerY
       });
     } else {
-      const anchorRadius = 150;
+      const anchorRadius = 200; // Increased from 150 for better spacing
       anchors.forEach((anchor, index) => {
         const angle = (2 * Math.PI * index) / anchors.length;
         positioned.push({
@@ -318,7 +318,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
   // Position nodes level by level with clean spacing
   for (let level = 1; level <= currentLevel; level++) {
     const levelNodes = treeHierarchy.get(level) || [];
-    const baseRadius = 300 + (level - 1) * 180; // Slightly closer levels
+    const baseRadius = 400 + (level - 1) * 250; // Much more spacing between levels
     
     console.log(`Positioning level ${level} with ${levelNodes.length} nodes at radius ${baseRadius}`);
     
@@ -356,7 +356,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
         console.log(`Positioned single child ${child.label || child.id} of ${parent.label || parent.id}`);
       } else {
         // Multiple children: spread around parent direction with wider spread
-        const spreadAngle = Math.PI / 3; // 60 degrees spread (wider)
+        const spreadAngle = Math.PI / 2; // 90 degrees spread (much wider)
         const angleStep = spreadAngle / Math.max(children.length - 1, 1);
         
         children.forEach((child, index) => {
@@ -384,7 +384,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
     // Position orphaned nodes in outer ring
     orphanedNodes.forEach((node, index) => {
       const angle = (2 * Math.PI * index) / orphanedNodes.length;
-      const outerRadius = 500 + currentLevel * 180;
+      const outerRadius = 700 + currentLevel * 250; // Much more spacing for orphaned nodes
       positioned.push({
         ...node,
         x: centerX + outerRadius * Math.cos(angle),
@@ -409,6 +409,55 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<PositionedNode | null>(null);
   
+  // Function to automatically save the tree as an image
+  const saveTreeAsImage = useCallback(() => {
+    try {
+      const svgElement = document.querySelector('svg');
+      if (!svgElement) {
+        console.error('SVG element not found');
+        return;
+      }
+
+      // Create a canvas element
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = svgWidth;
+      canvas.height = svgHeight;
+
+      // Convert SVG to data URL
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+
+      // Create an image and draw it on canvas
+      const img = new Image();
+      img.onload = function() {
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          
+          // Convert canvas to blob and download
+          canvas.toBlob(function(blob) {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `competence-tree-${new Date().getTime()}.png`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+              console.log('Tree saved successfully as image');
+            }
+          }, 'image/png');
+        }
+        URL.revokeObjectURL(svgUrl);
+      };
+      img.src = svgUrl;
+    } catch (error) {
+      console.error('Error saving tree as image:', error);
+    }
+  }, [svgWidth, svgHeight]);
+  
   // Fonction pour charger l'arbre de compétences
   const loadCompetenceTree = useCallback(async () => {
     console.log("loadCompetenceTree: Début du chargement avec graphId:", graphId);
@@ -419,7 +468,20 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
     
     try {
       setLoading(true);
-      console.log("loadCompetenceTree: Appel à getCompetenceTree avec graphId:", graphId);
+      
+      // Check localStorage first for cached tree data
+      const cachedTreeData = localStorage.getItem(`competence-tree-${graphId}`);
+      if (cachedTreeData) {
+        console.log("loadCompetenceTree: Found cached tree data, using it");
+        const data = JSON.parse(cachedTreeData);
+        setTreeData(data);
+        const positioned = calculateRadialTreeLayout(data.nodes, data.edges);
+        setPositionedNodes(positioned);
+        setLoading(false);
+        return;
+      }
+      
+      console.log("loadCompetenceTree: No cached data, fetching from API with graphId:", graphId);
       const data = await getCompetenceTree(graphId);
       console.log("loadCompetenceTree: Données reçues:", data);
       console.log("loadCompetenceTree: Nombre de nodes:", data.nodes?.length || 0);
@@ -459,10 +521,18 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
       
       setTreeData(data);
       
+      // Save tree data to localStorage for persistence
+      localStorage.setItem(`competence-tree-${graphId}`, JSON.stringify(data));
+      
       // Calculate positions using radial layout
       const positioned = calculateRadialTreeLayout(data.nodes, data.edges);
       setPositionedNodes(positioned);
       setLoading(false);
+      
+      // Automatically save the tree after it's loaded and positioned
+      setTimeout(() => {
+        saveTreeAsImage();
+      }, 2000); // Wait 2 seconds for rendering to complete
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue lors du chargement de l\'arbre de compétences');
       setLoading(false);
@@ -517,20 +587,66 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
     );
   }
   
-  const svgWidth = 2000;
-  const svgHeight = 1400;
+  const svgWidth = 3200;
+  const svgHeight = 2200;
 
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <h2 style={{ textAlign: 'center', margin: '20px 0' }}>Arbre de Compétences</h2>
+    <div style={{ 
+      width: '100%',
+      height: 'calc(100vh - 80px)', // Account for navigation bar
+      display: 'flex', 
+      flexDirection: 'column',
+      marginTop: '80px', // Space for navigation bar
+      margin: '80px 0 0 0'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '10px 20px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid #e2e8f0',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10
+      }}>
+        <h2 style={{ margin: 0, fontSize: '18px', color: '#1f2937' }}>Arbre de Compétences</h2>
+        <button
+          onClick={saveTreeAsImage}
+          style={{
+            background: '#4ade80',
+            color: 'white',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '600'
+          }}
+        >
+          💾 Save Tree
+        </button>
+      </div>
       
-      <div style={{ flex: 1, display: 'flex' }}>
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', width: '100%' }}>
         {/* SVG Tree Visualization */}
-        <div style={{ flex: 1, overflow: 'auto' }}>
+        <div style={{ 
+          flex: 1,
+          width: '100%',
+          height: '100%',
+          overflow: 'auto',
+          background: '#f8fafc',
+          textAlign: 'center'
+        }}>
           <svg 
             width={svgWidth} 
             height={svgHeight}
-            style={{ background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', border: '1px solid #e2e8f0' }}
+            style={{ 
+              background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', 
+              border: '1px solid #e2e8f0',
+              display: 'block',
+              margin: '0 auto'
+            }}
           >
             {/* Render clean hierarchical edges */}
             {positionedNodes.map((sourceNode) => {
@@ -588,11 +704,12 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
         {/* Node Details Panel */}
         {selectedNode && (
           <div style={{ 
-            width: '300px', 
-            padding: '20px', 
+            width: '280px', 
+            padding: '15px', 
             background: 'white', 
             borderLeft: '1px solid #e2e8f0',
-            overflow: 'auto'
+            overflow: 'auto',
+            boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)'
           }}>
             <h3>{selectedNode.label || selectedNode.skill_label || "Unknown Skill"}</h3>
             <p><strong>Type:</strong> {selectedNode.type || 'skill'}</p>
