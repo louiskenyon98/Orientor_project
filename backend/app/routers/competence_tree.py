@@ -91,6 +91,54 @@ def generate_competence_tree(
             detail=f"Error generating competence tree: {str(e)}"
         )
 
+@router.get("/anchor-skills", response_model=Dict[str, Any])
+def get_user_anchor_skills(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get user's anchor skills from their latest competence tree.
+    
+    Returns anchor skills without regenerating the tree if one exists.
+    """
+    logger.info(f"Request received to get anchor skills for user {current_user.id}")
+    try:
+        # Get the user's latest skill tree
+        skill_tree = db.query(UserSkillTree).filter(
+            UserSkillTree.user_id == current_user.id
+        ).order_by(UserSkillTree.created_at.desc()).first()
+        
+        if not skill_tree:
+            return {
+                "anchor_skills": [],
+                "message": "No competence tree found. Generate one first."
+            }
+        
+        # Parse tree data
+        tree_data = skill_tree.tree_data
+        if isinstance(tree_data, str):
+            tree_data = json.loads(tree_data)
+        
+        logger.info(f"Retrieved tree data for user {current_user.id}: "
+                   f"nodes={len(tree_data.get('nodes', []))}, "
+                   f"anchors={len(tree_data.get('anchors', []))}, "
+                   f"anchor_metadata={len(tree_data.get('anchor_metadata', []))}")
+        
+        anchor_metadata = tree_data.get("anchor_metadata", [])
+        
+        return {
+            "anchor_skills": anchor_metadata,
+            "graph_id": skill_tree.graph_id,
+            "message": f"Found {len(anchor_metadata)} anchor skills"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving anchor skills: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving anchor skills: {str(e)}"
+        )
+
 @router.get("/{graph_id}")
 def get_competence_tree(
     graph_id: str,
@@ -207,52 +255,4 @@ def complete_challenge(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error completing challenge: {str(e)}"
-        )
-
-@router.get("/anchor-skills", response_model=Dict[str, Any])
-def get_user_anchor_skills(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """
-    Get user's anchor skills from their latest competence tree.
-    
-    Returns anchor skills without regenerating the tree if one exists.
-    """
-    logger.info(f"Request received to get anchor skills for user {current_user.id}")
-    try:
-        # Get the user's latest skill tree
-        skill_tree = db.query(UserSkillTree).filter(
-            UserSkillTree.user_id == current_user.id
-        ).order_by(UserSkillTree.created_at.desc()).first()
-        
-        if not skill_tree:
-            return {
-                "anchor_skills": [],
-                "message": "No competence tree found. Generate one first."
-            }
-        
-        # Parse tree data
-        tree_data = skill_tree.tree_data
-        if isinstance(tree_data, str):
-            tree_data = json.loads(tree_data)
-        
-        logger.info(f"Retrieved tree data for user {current_user.id}: "
-                   f"nodes={len(tree_data.get('nodes', []))}, "
-                   f"anchors={len(tree_data.get('anchors', []))}, "
-                   f"anchor_metadata={len(tree_data.get('anchor_metadata', []))}")
-        
-        anchor_metadata = tree_data.get("anchor_metadata", [])
-        
-        return {
-            "anchor_skills": anchor_metadata,
-            "graph_id": skill_tree.graph_id,
-            "message": f"Found {len(anchor_metadata)} anchor skills"
-        }
-        
-    except Exception as e:
-        logger.error(f"Error retrieving anchor skills: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error retrieving anchor skills: {str(e)}"
         )

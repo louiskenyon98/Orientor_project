@@ -27,8 +27,12 @@ interface CompetenceNode {
   xp_reward: number;
   visible: boolean;
   revealed: boolean;
-  state: 'locked' | 'completed';
+  state: 'locked' | 'available' | 'completed' | 'hidden';
   notes: string;
+  is_anchor?: boolean;
+  depth?: number;
+  label?: string;
+  metadata?: any;
 }
 
 interface CompetenceTreeData {
@@ -76,6 +80,85 @@ const nodeTypes: NodeTypes = {
   customNode: CustomNode,
 };
 
+// Function to calculate half-circle layout positions
+const calculateHalfCircleLayout = (nodes: CompetenceNode[], edges: { source: string; target: string }[]) => {
+  // Group nodes by depth (distance from anchor nodes)
+  const nodeDepths = new Map<string, number>();
+  const anchors = nodes.filter(n => n.is_anchor);
+  
+  // Initialize anchor nodes at depth 0
+  anchors.forEach(anchor => nodeDepths.set(anchor.id, 0));
+  
+  // Calculate depths using BFS
+  const queue = [...anchors];
+  const visited = new Set<string>(anchors.map(a => a.id));
+  
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    const currentDepth = nodeDepths.get(current.id)!;
+    
+    // Find connected nodes
+    edges.forEach(edge => {
+      let targetId = null;
+      if (edge.source === current.id && !visited.has(edge.target)) {
+        targetId = edge.target;
+      } else if (edge.target === current.id && !visited.has(edge.source)) {
+        targetId = edge.source;
+      }
+      
+      if (targetId) {
+        const targetNode = nodes.find(n => n.id === targetId);
+        if (targetNode) {
+          nodeDepths.set(targetId, currentDepth + 1);
+          visited.add(targetId);
+          queue.push(targetNode);
+        }
+      }
+    });
+  }
+  
+  // Group nodes by depth
+  const depthGroups = new Map<number, CompetenceNode[]>();
+  nodes.forEach(node => {
+    const depth = nodeDepths.get(node.id) || 0;
+    if (!depthGroups.has(depth)) {
+      depthGroups.set(depth, []);
+    }
+    depthGroups.get(depth)!.push(node);
+  });
+  
+  // Calculate positions
+  const centerX = 800;
+  const baseY = 600;
+  const radiusStep = 150;
+  const maxDepth = Math.max(...Array.from(depthGroups.keys()));
+  
+  const positioned: Node[] = [];
+  
+  depthGroups.forEach((nodesAtDepth, depth) => {
+    const radius = radiusStep * (maxDepth - depth + 1);
+    const angleStep = Math.PI / (nodesAtDepth.length + 1); // Divide semicircle
+    
+    nodesAtDepth.forEach((node, index) => {
+      const angle = angleStep * (index + 1);
+      const x = centerX + radius * Math.cos(angle);
+      const y = baseY - radius * Math.sin(angle); // Negative to go upward
+      
+      positioned.push({
+        id: node.id,
+        type: 'customNode',
+        position: { x, y },
+        data: {
+          ...node,
+          onComplete: () => {} // Will be set later
+        }
+      });
+    });
+  });
+  
+  return positioned;
+};
+
 const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
   console.log("CompetenceTreeView: Composant chargé avec graphId:", graphId);
   
@@ -102,12 +185,14 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
       setTreeData(data);
       
       // Convertir les données en format React Flow
-      const flowNodes: Node[] = data.nodes.map((node: CompetenceNode) => ({
-        id: node.id,
-        type: 'customNode',
-        position: { x: 0, y: 0 }, // Les positions seront calculées par le layout
+      // Use half-circle layout to position nodes
+      const positionedNodes = calculateHalfCircleLayout(data.nodes, data.edges);
+      
+      // Update nodes with onComplete handlers
+      const flowNodes: Node[] = positionedNodes.map((node) => ({
+        ...node,
         data: {
-          ...node,
+          ...node.data,
           onComplete: () => handleCompleteChallenge(node.id),
         },
       }));
@@ -117,6 +202,11 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
         source: edge.source,
         target: edge.target,
         type: 'smoothstep',
+        animated: true,
+        style: {
+          stroke: '#b1b1b7',
+          strokeWidth: 2,
+        },
       }));
       
       setNodes(flowNodes);
