@@ -34,6 +34,12 @@
   border-color: #ed64a6;
 }
 
+.competence-node.skillgroup {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border-color: #3182ce;
+}
+
 .competence-node.available {
   border-color: #48bb78;
   background: white;
