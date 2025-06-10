@@ -25,7 +25,7 @@ competence_tree_service = CompetenceTreeService()
 @router.post("/generate", response_model=Dict[str, Any])
 def generate_competence_tree(
     max_depth: int = Query(3, gt=0, le=6, description="Maximum depth of skill tree traversal"),
-    max_nodes: int = Query(20, gt=5, le=30, description="Maximum total nodes in the tree"),
+    max_nodes: int = Query(50, gt=10, le=100, description="Maximum total nodes in the tree"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -68,13 +68,13 @@ def generate_competence_tree(
         
         try:
             # Create the competence tree with reduced parameters to avoid timeout
-            logger.info(f"Creating competence tree for user {current_user.id} with max_depth={max_depth}, max_nodes_per_level={max(3, max_nodes // max_depth)}")
+            logger.info(f"Creating competence tree for user {current_user.id} with max_depth={max_depth}, max_nodes_per_level={max(5, min(8, max_nodes // max_depth))}")
             
             tree_data = competence_tree_service.create_skill_tree(
                 db, 
                 current_user.id,
                 max_depth=max_depth,
-                max_nodes_per_level=max(3, min(4, max_nodes // max_depth))  # Limit nodes per level to prevent explosion
+                max_nodes_per_level=max(5, min(8, max_nodes // max_depth))  # Increase nodes per level for richer tree
             )
             
             if not tree_data:

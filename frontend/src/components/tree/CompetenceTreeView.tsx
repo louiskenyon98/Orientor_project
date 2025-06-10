@@ -63,7 +63,7 @@ const TreeNode: React.FC<{
     return "🔧";
   };
 
-  const nodeRadius = node.is_anchor ? 45 : 30;
+  const nodeRadius = node.is_anchor ? 60 : 40;
   
   if (!node.visible) {
     return (
@@ -112,8 +112,8 @@ const TreeNode: React.FC<{
       )}
       <text 
         textAnchor="middle" 
-        dy="5" 
-        fontSize="16"
+        dy="8" 
+        fontSize="24"
         fill="white"
         style={{ pointerEvents: 'none' }}
       >
@@ -121,22 +121,22 @@ const TreeNode: React.FC<{
       </text>
       <text
         x="0"
-        y={nodeRadius + 20}
+        y={nodeRadius + 25}
         textAnchor="middle"
-        fontSize="11"
-        fill="#2d3748"
-        fontWeight="500"
+        fontSize="14"
+        fill="#ffffff"
+        fontWeight="600"
         style={{ pointerEvents: 'none' }}
       >
-        {displayLabel.length > 18 ? displayLabel.substring(0, 18) + '...' : displayLabel}
+        {displayLabel.length > 20 ? displayLabel.substring(0, 20) + '...' : displayLabel}
       </text>
       {node.xp_reward && (
         <text
           x="0"
-          y={nodeRadius + 35}
+          y={nodeRadius + 45}
           textAnchor="middle"
-          fontSize="10"
-          fill="#059669"
+          fontSize="12"
+          fill="#10b981"
           fontWeight="600"
           style={{ pointerEvents: 'none' }}
         >
