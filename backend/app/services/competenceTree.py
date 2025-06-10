@@ -1373,9 +1373,17 @@ class CompetenceTreeService:
             processed_nodes = []
             anchor_lookup = {skill["id"]: skill for skill in anchor_skills}
             
+            logger.info(f"Processing {len(graph_data['nodes'])} nodes from graph traversal")
+            logger.info(f"Anchor lookup has {len(anchor_lookup)} entries: {list(anchor_lookup.keys())}")
+            
+            anchor_count = 0
             for node_id, node_info in graph_data["nodes"].items():
                 is_anchor = node_info.get("is_anchor", False)
                 depth = node_info.get("depth", 0)
+                
+                if is_anchor:
+                    anchor_count += 1
+                    logger.info(f"Processing anchor node {anchor_count}: {node_id} -> {node_info.get('label', 'No label')}")
                 
                 # Get skill label from metadata or ESCO label
                 skill_label = node_info.get("label", "")
@@ -1394,8 +1402,8 @@ class CompetenceTreeService:
                 is_revealed = is_anchor  # Anchors always revealed
                 initial_state = "available" if is_anchor else "locked"
                 
-                # Apply 30% visibility rule for non-anchor nodes
-                if not is_anchor and depth == 1 and random.random() < 0.3:
+                # Apply 80% visibility rule for non-anchor nodes (increased for better tree display)
+                if not is_anchor and depth <= 2 and random.random() < 0.8:
                     is_visible = True
                     is_revealed = True
                     initial_state = "available"
