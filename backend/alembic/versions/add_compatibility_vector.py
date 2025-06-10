@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'add_compatibility_vector'
-down_revision = 'update_vector_dimension'
+down_revision = 'add_avatar_fields_to_user_representation'
 branch_labels = None
 depends_on = None
 

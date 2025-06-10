@@ -45,16 +45,19 @@ export default function PeerChatPage() {
                 return;
             }
 
+            console.log('Fetching messages for peer:', peerId);
             const response = await axios.get<Message[]>(
-                `${cleanApiUrl}/api/v1/messages/conversation/${peerId}`,
+                `${cleanApiUrl}/messages/conversation/${peerId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
 
+            console.log('Messages response:', response.data);
             setMessages(response.data);
         } catch (err: any) {
             console.error('Error fetching messages:', err);
+            console.error('Error details:', err.response);
             setError(err.response?.data?.detail || 'Failed to load messages');
         }
     };
@@ -69,7 +72,7 @@ export default function PeerChatPage() {
             }
 
             const response = await axios.get<PeerProfile>(
-                `${cleanApiUrl}/api/v1/profiles/${peerId}`,
+                `${cleanApiUrl}/profiles/${peerId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -91,16 +94,19 @@ export default function PeerChatPage() {
                 return;
             }
 
+            console.log('Fetching current user info...');
             const response = await axios.get<{id: number}>(
-                `${cleanApiUrl}/api/v1/users/me`,
+                `${cleanApiUrl}/users/me`,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
 
+            console.log('Current user response:', response.data);
             setCurrentUserId(response.data.id);
         } catch (err: any) {
             console.error('Error fetching current user:', err);
+            console.error('Error details:', err.response);
             setError(err.response?.data?.detail || 'Failed to load user information');
         }
     };
@@ -115,7 +121,7 @@ export default function PeerChatPage() {
             }
 
             await axios.post(
-                `${cleanApiUrl}/api/v1/messages`,
+                `${cleanApiUrl}/messages`,
                 {
                     recipient_id: parseInt(peerId),
                     body: messageText
@@ -170,6 +176,16 @@ export default function PeerChatPage() {
         };
     }, [peerId]);
 
+    // Debug logging
+    console.log('Component state:', {
+        peerId,
+        loading,
+        error,
+        messagesCount: messages.length,
+        currentUserId,
+        peerName: peer?.name
+    });
+
     if (!peerId) {
         return (
             <MainLayout>
@@ -209,14 +225,16 @@ export default function PeerChatPage() {
                         <div className="flex h-full items-center justify-center">
                             <p className="text-neutral-gray">No messages yet. Start the conversation!</p>
                         </div>
+                    ) : !currentUserId ? (
+                        <div className="flex h-full items-center justify-center">
+                            <p className="text-red-500">Loading user info...</p>
+                        </div>
                     ) : (
-                        currentUserId && (
-                            <MessageList
-                                messages={messages}
-                                currentUserId={currentUserId}
-                                className="min-h-0"
-                            />
-                        )
+                        <MessageList
+                            messages={messages}
+                            currentUserId={currentUserId}
+                            className="min-h-0"
+                        />
                     )}
                 </div>
                 {/* Message input */}

@@ -110,3 +110,4 @@ backend/app/services/occupation_tree/gnn_experiment/data_1024
 
 # images 
 frontend/public/image/  
+backend/static/
