@@ -86,7 +86,11 @@ export default function Home() {
         
         if (response.ok) {
           const userData = await response.json();
+          console.log('Current user data:', userData);
           setCurrentUserId(userData.id);
+          console.log('Set currentUserId to:', userData.id);
+        } else {
+          console.error('Failed to fetch user data:', response.status, response.statusText);
         }
       } catch (err) {
         console.error('Error fetching current user:', err);

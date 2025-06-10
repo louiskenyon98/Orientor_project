@@ -75,37 +75,71 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
   // Check if user already has anchor skills
   useEffect(() => {
     const checkExistingSkills = async () => {
-      if (!userId) return;
+      if (!userId) {
+        console.log('No userId available for checking existing skills');
+        return;
+      }
 
+      setIsLoading(true);
       try {
         const token = localStorage.getItem('access_token');
-        if (!token) return;
+        if (!token) {
+          console.log('No auth token available');
+          setIsLoading(false);
+          return;
+        }
 
+        console.log(`Checking existing anchor skills for user ${userId}...`);
         const response = await fetch('/api/v1/competence-tree/anchor-skills', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
+        console.log(`Anchor skills response status: ${response.status}`);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('Anchor skills response:', data);
+          
           if (data.anchor_skills && data.anchor_skills.length > 0) {
             setSkills(data.anchor_skills.slice(0, 5));
             setHasGenerated(true);
             console.log(`Found ${data.anchor_skills.length} existing anchor skills`);
+          } else {
+            console.log('No anchor skills found in response');
           }
+        } else {
+          console.log(`Failed to fetch anchor skills: ${response.status} ${response.statusText}`);
         }
       } catch (err) {
         console.error('Error checking for existing anchor skills:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkExistingSkills();
   }, [userId]);
 
+  // Don't render until we have a userId
+  if (userId === undefined) {
+    console.log('SkillShowcase: Waiting for userId...');
+    return (
+      <div className="w-full rounded-lg p-6" style={{ backgroundColor: 'var(--primary-color)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--border-color)' }}>
+        <div className="flex items-center justify-center py-8">
+          <p className="text-sm" style={{ color: 'var(--text-color)' }}>Loading skills...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (!userId) {
+    console.log('SkillShowcase: No userId available');
     return null;
   }
+  
+  console.log(`SkillShowcase: Rendering for userId ${userId}`);
 
   return (
     <div className={`w-full ${className}`}>
@@ -191,13 +225,27 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
 
             {/* Action bar */}
             <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-              <div>
+              <div className="flex items-center gap-4">
                 <p 
                   className="text-sm"
                   style={{ color: 'var(--text-color)' }}
                 >
                   Ready to start your learning journey?
                 </p>
+                {/* Debug refresh button */}
+                <button
+                  onClick={() => {
+                    console.log('Manual refresh triggered');
+                    window.location.reload();
+                  }}
+                  className="text-xs px-3 py-1 rounded border"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-color)'
+                  }}
+                >
+                  Refresh
+                </button>
               </div>
               <button
                 onClick={() => window.location.href = '/competence-tree'}

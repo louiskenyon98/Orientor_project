@@ -66,6 +66,11 @@ def generate_competence_tree(
                 detail="Failed to create competence tree"
             )
         
+        # Log tree data structure before saving
+        logger.info(f"Tree data structure before saving: nodes={len(tree_data.get('nodes', []))}, "
+                   f"anchors={len(tree_data.get('anchors', []))}, "
+                   f"anchor_metadata={len(tree_data.get('anchor_metadata', []))}")
+        
         # Save the tree in the database
         graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
         
@@ -74,6 +79,8 @@ def generate_competence_tree(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to save competence tree"
             )
+        
+        logger.info(f"Competence tree saved successfully with graph_id: {graph_id}")
         
         return {"graph_id": graph_id, "message": "Competence tree generated successfully"}
     except HTTPException:
@@ -229,6 +236,11 @@ def get_user_anchor_skills(
         tree_data = skill_tree.tree_data
         if isinstance(tree_data, str):
             tree_data = json.loads(tree_data)
+        
+        logger.info(f"Retrieved tree data for user {current_user.id}: "
+                   f"nodes={len(tree_data.get('nodes', []))}, "
+                   f"anchors={len(tree_data.get('anchors', []))}, "
+                   f"anchor_metadata={len(tree_data.get('anchor_metadata', []))}")
         
         anchor_metadata = tree_data.get("anchor_metadata", [])
         
