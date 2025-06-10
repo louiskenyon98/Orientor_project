@@ -19,54 +19,136 @@ interface PeerProfile {
   interests: string | null;
 }
 
+interface EnhancedPeerProfile {
+  user_id: number;
+  name: string;
+  major: string;
+  year?: number;
+  job_title?: string;
+  industry?: string;
+  compatibility_score: number;
+  explanation: string;
+  score_details: {
+    overall_compatibility: number;
+    timestamp: string;
+  };
+}
+
 export default function SuggestedPeersPage() {
   const router = useRouter();
-  const [peers, setPeers] = useState<PeerProfile[]>([]);
+  const [peers, setPeers] = useState<EnhancedPeerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'compatible' | 'similar'>('compatible');
 
   useEffect(() => {
-    const fetchPeers = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          router.push('/login');
-          return;
-        }
-        
-        const response = await axios.get<PeerProfile[]>(`${cleanApiUrl}/peers/suggested`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        setPeers(response.data);
-      } catch (err: any) {
-        console.error('Error fetching peers:', err);
-        setError(err.response?.data?.detail || 'Failed to load suggested peers');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchPeers();
-  }, [router]);
+  }, [router, viewMode]);
+
+  const fetchPeers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+      
+      const endpoint = viewMode === 'compatible' ? '/peers/compatible' : '/peers/suggested';
+      const response = await axios.get<EnhancedPeerProfile[]>(`${cleanApiUrl}${endpoint}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      setPeers(response.data);
+    } catch (err: any) {
+      console.error('Error fetching peers:', err);
+      setError(err.response?.data?.detail || 'Failed to load suggested peers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshSuggestions = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      await axios.post(`${cleanApiUrl}/peers/refresh`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      // Refresh the peer list
+      await fetchPeers();
+    } catch (err: any) {
+      console.error('Error refreshing suggestions:', err);
+      setError('Failed to refresh suggestions');
+    }
+  };
   
   // Function to format similarity score as percentage
   const formatSimilarity = (value: number) => {
     return `${Math.round(value * 100)}%`;
   };
 
+  const getCompatibilityColor = (score: number): string => {
+    if (score >= 0.8) return 'bg-green-100 text-green-800';
+    if (score >= 0.6) return 'bg-blue-100 text-blue-800';
+    if (score >= 0.4) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-orange-100 text-orange-800';
+  };
+
   return (
     <MainLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-neutral-darkest">Peers</h2>
-          <div className="text-sm text-neutral-gray">
-            Students with similar interests and backgrounds
+          <div>
+            <h2 className="text-3xl font-bold text-neutral-darkest">Peer Connections</h2>
+            <p className="text-neutral-gray mt-1">
+              {viewMode === 'compatible' 
+                ? 'AI-powered compatibility analysis for meaningful connections'
+                : 'Students with similar interests and backgrounds'
+              }
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            {/* View Mode Toggle */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('compatible')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'compatible'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-blue-600'
+                }`}
+              >
+                Compatible
+              </button>
+              <button
+                onClick={() => setViewMode('similar')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'similar'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-blue-600'
+                }`}
+              >
+                Similar
+              </button>
+            </div>
+            
+            {/* Refresh Button */}
+            <button
+              onClick={refreshSuggestions}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              Refresh
+            </button>
           </div>
         </div>
         
@@ -86,51 +168,66 @@ export default function SuggestedPeersPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {peers.map((peer) => (
-              <div key={peer.user_id} className="card hover:shadow-md transition-shadow">
-                <div className="flex flex-col h-full">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-xl font-semibold text-secondary-purple">
-                        {peer.name || `User ${peer.user_id}`}
-                      </h3>
-                      {peer.major && (
-                        <p className="text-neutral-gray">
+              <div key={peer.user_id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {peer.name?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-800">
+                          {peer.name || `User ${peer.user_id}`}
+                        </h3>
+                        <p className="text-gray-600">
                           {peer.major}{peer.year ? `, Year ${peer.year}` : ''}
                         </p>
-                      )}
+                        {peer.job_title && (
+                          <p className="text-sm text-gray-500">
+                            {peer.job_title}{peer.industry ? ` • ${peer.industry}` : ''}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="bg-secondary-teal bg-opacity-10 text-secondary-teal px-2 py-1 rounded text-sm font-medium">
-                      {formatSimilarity(peer.similarity)} Match
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      viewMode === 'compatible' 
+                        ? getCompatibilityColor(peer.compatibility_score || peer.similarity)
+                        : 'bg-secondary-teal bg-opacity-10 text-secondary-teal'
+                    }`}>
+                      {formatSimilarity(peer.compatibility_score || peer.similarity)} Match
                     </div>
                   </div>
                   
-                  <div className="mt-4 flex-grow">
-                    {peer.interests && (
-                      <div className="mb-2">
-                        <span className="text-sm font-medium text-neutral-gray">interests: </span>
-                        <span className="text-sm text-neutral-lightgray">{peer.interests}</span>
-                      </div>
-                    )}
-                    {peer.hobbies && (
-                      <div>
-                        <span className="text-sm font-medium text-neutral-gray">Hobbies: </span>
-                        <span className="text-sm text-neutral-lightgray">{peer.hobbies}</span>
-                      </div>
-                    )}
-                  </div>
+                  {/* Enhanced explanation for compatible view */}
+                  {viewMode === 'compatible' && peer.explanation && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        {peer.explanation}
+                      </p>
+                    </div>
+                  )}
                   
-                  <div className="mt-4 pt-4 border-t border-neutral-lightest">
+                  <div className="flex gap-3">
                     <Link 
                       href={`/chat/${peer.user_id}`}
-                      className="inline-flex items-center justify-center w-full px-4 py-2 bg-secondary-purple bg-opacity-10 hover:bg-opacity-20 text-secondary-purple rounded font-medium transition-colors"
+                      className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                     >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
-                      Start Conversation
+                      Start Chat
                     </Link>
+                    
+                    {viewMode === 'compatible' && (
+                      <Link
+                        href={`/peers/${peer.user_id}`}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                      >
+                        View Details
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

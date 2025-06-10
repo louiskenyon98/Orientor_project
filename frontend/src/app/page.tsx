@@ -18,6 +18,7 @@ import NewSidebar from '@/components/layout/NewSidebar';
 import '@/styles/premium-theme.css';
 import PersonalityCard from '@/components/ui/PersonalityCard';
 import SkillShowcase from '@/components/ui/SkillShowcase';
+import SuggestedAlliesSection from '@/components/landing/SuggestedAlliesSection';
 
 // Interface pour la réponse de l'API de recommandations d'emploi
 interface JobRecommendationsResponse {
@@ -265,6 +266,11 @@ export default function Home() {
                   </h2>
                   <PersonalityCard items={personalityItems} />
                 </div>
+              </div>
+
+              {/* Suggested Allies Section */}
+              <div className="mb-10">
+                <SuggestedAlliesSection />
               </div>
 
               {/* Section des recommandations d'emploi - occupe toute la largeur */}
