@@ -8,6 +8,7 @@ import logging
 # Import routers directly
 from app.routers.user import router as auth_router, get_current_user
 from app.routers.chat import router as chat_router
+from app.routers.conversations import router as conversations_router
 from app.routers.peers import router as peers_router
 from app.routers.messages import router as messages_router
 from app.routers.profiles import router as profiles_router
@@ -110,6 +111,7 @@ logger.info("Profiles router included successfully")
 # Include remaining routers
 app.include_router(test_router)
 app.include_router(chat_router)
+app.include_router(conversations_router)
 app.include_router(peers_router)
 app.include_router(messages_router)
 app.include_router(space_router)

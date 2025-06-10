@@ -12,11 +12,18 @@ from .user_progress import UserProgress
 from .user_skill_tree import UserSkillTree
 from .reflection import StrengthsReflectionResponse
 from .user_representation import UserRepresentation
+from .conversation import Conversation
+from .chat_message import ChatMessage
+from .conversation_category import ConversationCategory
+from .conversation_share import ConversationShare
+from .user_chat_analytics import UserChatAnalytics
 from ..utils.database import Base
 
 __all__ = [
     'User', 'UserProfile', 'SuggestedPeers', 'Message',
     'SavedRecommendation', 'UserNote', 'UserSkill', 'UserRecommendation',
     'TreePath', 'NodeNote', 'UserProgress', 'UserSkillTree',
-    'StrengthsReflectionResponse', 'UserRepresentation', 'Base'
+    'StrengthsReflectionResponse', 'UserRepresentation', 
+    'Conversation', 'ChatMessage', 'ConversationCategory',
+    'ConversationShare', 'UserChatAnalytics', 'Base'
 ]

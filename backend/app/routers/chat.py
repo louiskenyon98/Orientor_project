@@ -1,14 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List, Dict
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from typing import List, Optional
 import os
 import logging
+import time
 from openai import OpenAI
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from app.routers.user import get_current_user
-from app.models import User, UserProfile
 from sqlalchemy.orm import Session
+
+from app.routers.user import get_current_user
+from app.models import User, UserProfile, Conversation, ChatMessage
 from app.utils.database import get_db
+from app.services.conversation_service import ConversationService
+from app.services.chat_message_service import ChatMessageService
+from app.schemas.conversation import ConversationResponse, ConversationListResponse
+from app.schemas.chat_message import ChatMessageResponse
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -32,15 +38,15 @@ client = OpenAI(
     api_key=api_key,
 )
 
-# In-memory conversation history (in a production app, this should be stored in a database)
-conversation_history: Dict[int, List[Dict[str, str]]] = {}
-
 class MessageRequest(BaseModel):
     text: str
+    conversation_id: Optional[int] = None
 
 class MessageResponse(BaseModel):
     text: str
     is_user: bool = False
+    conversation_id: int
+    message_id: int
 
 class ClearHistoryResponse(BaseModel):
     success: bool
@@ -71,15 +77,27 @@ async def send_message(
     try:
         logger.info(f"Received message from user {current_user.id}: {message.text}")
         
-        # Get user's profile information
-        profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
-        
-        # Initialize conversation history for this user if it doesn't exist yet
-        user_id = current_user.id
-        if user_id not in conversation_history:
-            logger.info(f"Initializing conversation history for user {user_id}")
+        # Get or create conversation
+        if message.conversation_id:
+            # Verify the conversation belongs to the user
+            conversation = await ConversationService.get_conversation_by_id(
+                db, message.conversation_id, current_user.id
+            )
+            if not conversation:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Conversation not found"
+                )
+        else:
+            # Create a new conversation
+            conversation = await ConversationService.create_conversation(
+                db, current_user.id, message.text
+            )
             
-            # Create initial system message with user profile context
+            # Get user's profile information for system prompt
+            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+            
+            # Create personalized system message
             system_message = SYSTEM_PROMPT
             if profile:
                 system_message += f"\n\nUser Profile Information:\n"
@@ -114,73 +132,207 @@ async def send_message(
                 if profile.learning_style:
                     system_message += f"- Learning Style: {profile.learning_style}\n"
                 if profile.interests:
-                    system_message += f"- interests: {profile.interests}\n"
+                    system_message += f"- Interests: {profile.interests}\n"
             
-            conversation_history[user_id] = [
-                {"role": "system", "content": system_message}
-            ]
+            # Add system message to the conversation
+            await ChatMessageService.add_message(
+                db, conversation.id, "system", system_message
+            )
         
-        # Add the new user message to history
-        conversation_history[user_id].append({"role": "user", "content": message.text})
+        # Add user message to the database
+        user_message = await ChatMessageService.add_message(
+            db, conversation.id, "user", message.text
+        )
+        
+        # Get recent conversation history for context
+        recent_messages = await ChatMessageService.get_conversation_messages(
+            db, conversation.id, limit=20
+        )
+        
+        # Build messages for OpenAI (reverse to get chronological order)
+        messages_for_openai = [
+            {"role": msg.role, "content": msg.content}
+            for msg in reversed(recent_messages)
+        ]
         
         logger.info("Calling OpenAI API...")
+        start_time = time.time()
+        
         try:
-            # Call OpenAI API with the entire conversation history
+            # Call OpenAI API with the conversation history
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=conversation_history[user_id],
+                messages=messages_for_openai,
                 max_tokens=250,
-                temperature=0.8,  # Slightly higher temperature for more creative responses
-                presence_penalty=0.6,  # Encourage more diverse responses
-                frequency_penalty=0.3,  # Reduce repetition while maintaining coherence
+                temperature=0.8,
+                presence_penalty=0.6,
+                frequency_penalty=0.3,
             )
+            
+            response_time_ms = int((time.time() - start_time) * 1000)
             
             # Extract the assistant's response
             assistant_response = response.choices[0].message.content
+            tokens_used = response.usage.total_tokens if hasattr(response, 'usage') else None
+            
             logger.info(f"Received response from OpenAI: {assistant_response[:50]}...")
+            
         except Exception as openai_error:
             logger.error(f"OpenAI API error: {str(openai_error)}")
             raise HTTPException(
-                status_code=status.HTTP_500_interNAL_SERVER_ERROR,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"OpenAI API error: {str(openai_error)}"
             )
         
-        # Add assistant response to history
-        conversation_history[user_id].append({"role": "assistant", "content": assistant_response})
+        # Add assistant response to the database
+        assistant_message = await ChatMessageService.add_message(
+            db,
+            conversation.id,
+            "assistant",
+            assistant_response,
+            tokens_used=tokens_used,
+            model_used="gpt-3.5-turbo",
+            response_time_ms=response_time_ms
+        )
         
-        # Limit conversation history to the last 10 messages to avoid token limits
-        if len(conversation_history[user_id]) > 11:  # 1 system message + 10 conversation messages
-            conversation_history[user_id] = [
-                conversation_history[user_id][0],  # Keep the system message
-                *conversation_history[user_id][-10:]  # Keep the 10 most recent messages
-            ]
+        # Auto-generate title if this is the first exchange
+        if conversation.auto_generated_title and conversation.message_count >= 3:
+            await ConversationService.auto_generate_title(
+                db, conversation.id, current_user.id
+            )
         
-        return MessageResponse(text=assistant_response)
+        return MessageResponse(
+            text=assistant_response,
+            conversation_id=conversation.id,
+            message_id=assistant_message.id
+        )
+        
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error in send_message: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get response from AI service: {str(e)}"
         )
 
 @router.post("/clear", response_model=ClearHistoryResponse)
-async def clear_history(current_user: User = Depends(get_current_user)):
+async def clear_history(
+    conversation_id: Optional[int] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     try:
         user_id = current_user.id
-        logger.info(f"Clearing chat history for user {user_id}")
-        if user_id in conversation_history:
-            # Reset to just the system message
-            conversation_history[user_id] = [
-                {"role": "system", "content": SYSTEM_PROMPT}
-            ]
+        logger.info(f"Clearing/archiving chat history for user {user_id}")
+        
+        if conversation_id:
+            # Archive specific conversation
+            success = await ConversationService.archive_conversation(
+                db, conversation_id, user_id, archive=True
+            )
+            if not success:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Conversation not found"
+                )
+            message = f"Conversation {conversation_id} archived successfully"
+        else:
+            # Archive all conversations
+            conversations = await ConversationService.get_user_conversations(
+                db, user_id
+            )
+            for conv in conversations:
+                await ConversationService.archive_conversation(
+                    db, conv.id, user_id, archive=True
+                )
+            message = f"All {len(conversations)} conversations archived successfully"
         
         return ClearHistoryResponse(
             success=True,
-            message="Conversation history cleared successfully"
+            message=message
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error in clear_history: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_interNAL_SERVER_ERROR,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to clear conversation history: {str(e)}"
-        ) 
+        )
+
+@router.get("/conversations", response_model=ConversationListResponse)
+async def get_conversations(
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    is_favorite: Optional[bool] = None,
+    is_archived: Optional[bool] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's conversations with optional filters"""
+    try:
+        from app.schemas.conversation import ConversationFilters
+        
+        filters = ConversationFilters(
+            is_favorite=is_favorite,
+            is_archived=is_archived
+        )
+        
+        conversations = await ConversationService.get_user_conversations(
+            db, current_user.id, filters, limit, offset
+        )
+        
+        total = await ConversationService.get_conversation_count(
+            db, current_user.id, filters
+        )
+        
+        return ConversationListResponse(
+            conversations=[ConversationResponse.from_orm(conv) for conv in conversations],
+            total=total,
+            limit=limit,
+            offset=offset
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting conversations: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve conversations"
+        )
+
+@router.get("/conversations/{conversation_id}/messages", response_model=List[ChatMessageResponse])
+async def get_conversation_messages(
+    conversation_id: int,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get messages for a specific conversation"""
+    try:
+        # Verify conversation belongs to user
+        conversation = await ConversationService.get_conversation_by_id(
+            db, conversation_id, current_user.id
+        )
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found"
+            )
+        
+        messages = await ChatMessageService.get_conversation_messages(
+            db, conversation_id, limit, offset
+        )
+        
+        # Return in chronological order for display
+        return [ChatMessageResponse.from_orm(msg) for msg in reversed(messages)]
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting messages: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve messages"
+        )

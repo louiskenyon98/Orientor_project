@@ -25,3 +25,9 @@ class User(Base):
     skill_trees = relationship("UserSkillTree", back_populates="user", cascade="all, delete-orphan")
     reflection_responses = relationship("StrengthsReflectionResponse", back_populates="user", cascade="all, delete-orphan")
     representations = relationship("UserRepresentation", back_populates="user", cascade="all, delete-orphan")
+    
+    # Chat persistence relationships
+    conversations = relationship("Conversation", back_populates="user", cascade="all, delete-orphan")
+    conversation_categories = relationship("ConversationCategory", back_populates="user", cascade="all, delete-orphan")
+    conversation_shares = relationship("ConversationShare", back_populates="user", cascade="all, delete-orphan")
+    chat_analytics = relationship("UserChatAnalytics", back_populates="user", cascade="all, delete-orphan")
