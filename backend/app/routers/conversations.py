@@ -1,19 +1,52 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
 from typing import List, Optional
 import logging
+import os
+import time
 from sqlalchemy.orm import Session
+from openai import OpenAI
+from pydantic import BaseModel
 
 from app.routers.user import get_current_user
-from app.models import User
+from app.models import User, UserProfile
 from app.utils.database import get_db
 from app.services.conversation_service import ConversationService
 from app.services.category_service import CategoryService
 from app.services.chat_message_service import ChatMessageService
+from app.services.analytics_service import AnalyticsService
 from app.schemas.conversation import (
     ConversationCreate, ConversationUpdate, ConversationResponse,
     ConversationListResponse, ConversationFilters
 )
 from app.schemas.chat_message import ExportRequest, MessageStats
+
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+class SendMessageRequest(BaseModel):
+    message: str
+
+class SendMessageResponse(BaseModel):
+    response: str
+    user_message_id: int
+    assistant_message_id: int
+    tokens_used: int
+
+SYSTEM_PROMPT = """
+You are a Socratic mentor guiding students in a fast-paced game of discovery. Your mission:
+
+- Ask short, punchy questions that make them think. No lectures.
+- Keep your tone cool, casual, and encouraging.
+- Never give direct answers. Help them unlock their own.
+- Acknowledge their thoughts in a few words, then nudge them deeper.
+- Build on what they say. Challenge gently. Push for clarity.
+- Use quick examples based on their interests (movies, books, hobbies) when needed.
+- When they share a goal, ask: "Why that one?" "What about it lights you up?"
+- Spot patterns in what they say. Mirror it back simply.
+- Respect their energy: stay sharp, curious, and brief.
+
+Your goal: Make them feel smart, seen, and motivated — by making them figure it out themselves.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -163,6 +196,26 @@ async def generate_title(
         )
     return {"title": title}
 
+@router.get("/{conversation_id}/messages")
+async def get_conversation_messages(
+    conversation_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get all messages in a conversation"""
+    # Verify conversation belongs to user
+    conversation = await ConversationService.get_conversation_by_id(
+        db, conversation_id, current_user.id
+    )
+    if not conversation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation not found"
+        )
+    
+    messages = await ChatMessageService.get_conversation_messages(db, conversation_id)
+    return {"messages": messages}
+
 @router.get("/{conversation_id}/statistics", response_model=MessageStats)
 async def get_conversation_statistics(
     conversation_id: int,
@@ -233,4 +286,90 @@ async def export_conversation(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to export conversation"
+        )
+
+@router.post("/send/{conversation_id}", response_model=SendMessageResponse)
+async def send_message_to_conversation(
+    conversation_id: int,
+    request: SendMessageRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Send a message to an existing conversation"""
+    try:
+        start_time = time.time()
+        
+        # Verify conversation belongs to user
+        conversation = await ConversationService.get_conversation_by_id(
+            db, conversation_id, current_user.id
+        )
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found"
+            )
+        
+        # Get conversation history for context
+        messages = await ChatMessageService.get_conversation_messages(db, conversation_id)
+        
+        # Build OpenAI messages
+        openai_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        
+        # Add conversation history
+        for msg in messages:
+            openai_messages.append({
+                "role": msg.role,
+                "content": msg.content
+            })
+        
+        # Add new user message
+        openai_messages.append({
+            "role": "user", 
+            "content": request.message
+        })
+        
+        # Save user message first
+        user_message = await ChatMessageService.create_message(
+            db, conversation_id, "user", request.message
+        )
+        
+        # Get AI response
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=openai_messages,
+            max_tokens=500,
+            temperature=0.8
+        )
+        
+        ai_response = response.choices[0].message.content
+        tokens_used = response.usage.total_tokens
+        response_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Save AI message
+        ai_message = await ChatMessageService.create_message(
+            db, conversation_id, "assistant", ai_response, tokens_used
+        )
+        
+        # Update conversation stats
+        await ConversationService.update_conversation_stats(
+            db, conversation_id, tokens_used
+        )
+        
+        # Record analytics
+        await AnalyticsService.record_message_sent(
+            db, current_user.id, tokens_used, response_time_ms, conversation.category_id
+        )
+        
+        return SendMessageResponse(
+            response=ai_response,
+            user_message_id=user_message.id,
+            assistant_message_id=ai_message.id,
+            tokens_used=tokens_used
+        )
+        
+    except Exception as e:
+        logger.error(f"Error sending message: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send message"
         )

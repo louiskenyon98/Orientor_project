@@ -13,6 +13,7 @@ from app.models import User, UserProfile, Conversation, ChatMessage
 from app.utils.database import get_db
 from app.services.conversation_service import ConversationService
 from app.services.chat_message_service import ChatMessageService
+from app.services.analytics_service import AnalyticsService
 from app.schemas.conversation import ConversationResponse, ConversationListResponse
 from app.schemas.chat_message import ChatMessageResponse
 
@@ -194,6 +195,21 @@ async def send_message(
             model_used="gpt-3.5-turbo",
             response_time_ms=response_time_ms
         )
+        
+        # Record analytics
+        await AnalyticsService.record_message_sent(
+            db,
+            current_user.id,
+            tokens_used or 0,
+            response_time_ms,
+            conversation.category_id
+        )
+        
+        # Record conversation start if this is the first message
+        if conversation.message_count == 2:  # System + first user message
+            await AnalyticsService.record_conversation_started(
+                db, current_user.id, conversation.category_id
+            )
         
         # Auto-generate title if this is the first exchange
         if conversation.auto_generated_title and conversation.message_count >= 3:
