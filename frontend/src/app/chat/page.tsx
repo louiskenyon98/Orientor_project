@@ -22,8 +22,10 @@ export default function ChatPage() {
         if (userId) {
             setCurrentUserId(parseInt(userId));
         } else {
-            // If no user ID in storage, you might need to fetch it from the API
-            setCurrentUserId(1); // Default fallback
+            // If no user ID, redirect to login
+            console.error('No user ID found in localStorage');
+            router.push('/login');
+            return;
         }
     }, [router]);
 

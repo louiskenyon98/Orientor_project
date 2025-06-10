@@ -91,9 +91,11 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         }
       );
 
-      setMessages(response.data.messages);
+      console.log('Messages API response:', response.data);
+      setMessages(response.data.messages || []);
     } catch (error) {
       console.error('Failed to load conversation messages:', error);
+      setMessages([]);
     }
   };
 
@@ -393,14 +395,14 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-          {messages.length === 0 ? (
+          {!messages || messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <Plus className="w-16 h-16 mb-4 opacity-20" />
               <p className="text-lg mb-2">Start a new conversation</p>
               <p className="text-sm">Ask me anything about your career path!</p>
             </div>
           ) : (
-            messages.map((message) => (
+            (messages || []).map((message) => (
               <div key={message.id} id={`message-${message.id}`} className="transition-colors">
                 <ChatMessage 
                   message={message.content}

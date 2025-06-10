@@ -30,11 +30,30 @@ export default function PeerChatPage() {
     const params = useParams();
     const peerId = params?.peerId as string;
     
+    // If someone navigates to /chat/conversations, redirect to /chat
+    useEffect(() => {
+        if (peerId === 'conversations') {
+            router.replace('/chat');
+            return;
+        }
+    }, [peerId, router]);
+    
     const [messages, setMessages] = useState<Message[]>([]);
     const [peer, setPeer] = useState<PeerProfile | null>(null);
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    // Don't render anything if we're redirecting
+    if (peerId === 'conversations') {
+        return (
+            <MainLayout>
+                <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </MainLayout>
+        );
+    }
 
     // Function to fetch conversation history
     const fetchMessages = async () => {

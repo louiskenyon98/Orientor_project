@@ -5,7 +5,7 @@ import {
   ClockIcon,
   FireIcon,
   HashtagIcon,
-  TrendingUpIcon
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 interface Analytics {
@@ -42,7 +42,7 @@ export default function AnalyticsDashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await fetch('/chat/analytics/summary', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/analytics/summary`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -145,7 +145,7 @@ export default function AnalyticsDashboard() {
       {/* Growth Indicator */}
       {usage_trends.growth_rate_percent !== 0 && (
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow flex items-center">
-          <TrendingUpIcon className={`w-6 h-6 mr-3 ${
+          <ArrowTrendingUpIcon className={`w-6 h-6 mr-3 ${
             usage_trends.growth_rate_percent > 0 ? 'text-green-500' : 'text-red-500'
           }`} />
           <div>

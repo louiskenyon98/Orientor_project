@@ -40,7 +40,7 @@ export default function ConversationManager({
   const handleTitleSubmit = async () => {
     if (editedTitle.trim() && editedTitle !== conversationTitle) {
       try {
-        const response = await fetch(`/chat/conversations/${conversationId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversationId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -61,10 +61,10 @@ export default function ConversationManager({
 
   const handleGenerateTitle = async () => {
     try {
-      const response = await fetch(`/chat/conversations/${conversationId}/generate-title`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversationId}/generate-title`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
       });
 
@@ -79,7 +79,7 @@ export default function ConversationManager({
   };
 
   const handleViewAnalytics = () => {
-    window.open(`/chat/analytics?conversation=${conversationId}`, '_blank');
+    window.open(`${process.env.NEXT_PUBLIC_API_URL}/chat/analytics?conversation=${conversationId}`, '_blank');
   };
 
   return (

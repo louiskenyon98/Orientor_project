@@ -213,8 +213,20 @@ async def get_conversation_messages(
             detail="Conversation not found"
         )
     
-    messages = await ChatMessageService.get_conversation_messages(db, conversation_id)
-    return {"messages": messages}
+    messages = await ChatMessageService.get_conversation_messages(db, conversation_id, limit=100)
+    
+    # Serialize messages to match frontend expectations
+    serialized_messages = []
+    for msg in messages:
+        serialized_messages.append({
+            "id": msg.id,
+            "role": msg.role,
+            "content": msg.content,
+            "created_at": msg.created_at.isoformat(),
+            "tokens_used": msg.tokens_used
+        })
+    
+    return {"messages": serialized_messages}
 
 @router.get("/{conversation_id}/statistics", response_model=MessageStats)
 async def get_conversation_statistics(
@@ -310,7 +322,7 @@ async def send_message_to_conversation(
             )
         
         # Get conversation history for context
-        messages = await ChatMessageService.get_conversation_messages(db, conversation_id)
+        messages = await ChatMessageService.get_conversation_messages(db, conversation_id, limit=100)
         
         # Build OpenAI messages
         openai_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -329,7 +341,7 @@ async def send_message_to_conversation(
         })
         
         # Save user message first
-        user_message = await ChatMessageService.create_message(
+        user_message = await ChatMessageService.add_message(
             db, conversation_id, "user", request.message
         )
         
@@ -346,8 +358,8 @@ async def send_message_to_conversation(
         response_time_ms = int((time.time() - start_time) * 1000)
         
         # Save AI message
-        ai_message = await ChatMessageService.create_message(
-            db, conversation_id, "assistant", ai_response, tokens_used
+        ai_message = await ChatMessageService.add_message(
+            db, conversation_id, "assistant", ai_response, tokens_used=tokens_used
         )
         
         # Update conversation stats

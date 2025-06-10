@@ -50,7 +50,7 @@ export default function ConversationList({
       if (filter === 'favorites') params.append('is_favorite', 'true');
       if (filter === 'archived') params.append('is_archived', 'true');
       
-      const response = await fetch(`/chat/conversations?${params}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations?${params}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -70,7 +70,7 @@ export default function ConversationList({
   const toggleFavorite = async (e: React.MouseEvent, conversationId: number) => {
     e.stopPropagation();
     try {
-      const response = await fetch(`/chat/conversations/${conversationId}/favorite`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversationId}/favorite`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`

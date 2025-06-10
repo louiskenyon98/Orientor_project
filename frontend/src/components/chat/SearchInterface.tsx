@@ -51,7 +51,7 @@ export default function SearchInterface({ onSelectResult, onClose }: SearchInter
           role_filter: filters.role
         });
 
-        const response = await fetch(`/chat/search?${params}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/search?${params}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           }

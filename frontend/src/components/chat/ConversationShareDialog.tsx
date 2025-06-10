@@ -26,7 +26,7 @@ export default function ConversationShareDialog({
   const handleCreateShare = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/chat/share/conversations/${conversationId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/share/conversations/${conversationId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

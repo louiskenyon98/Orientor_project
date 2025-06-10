@@ -89,7 +89,7 @@ class ChatMessageService:
             query = query.filter(ChatMessage.role != "system")
         
         return query.order_by(
-            ChatMessage.created_at.desc()
+            ChatMessage.created_at.asc()
         ).offset(offset).limit(limit).all()
     
     @staticmethod

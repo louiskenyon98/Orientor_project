@@ -55,7 +55,7 @@ export default function CategoryManager({
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/chat/categories', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/categories`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
@@ -76,7 +76,7 @@ export default function CategoryManager({
     if (!formData.name.trim()) return;
 
     try {
-      const response = await fetch('/chat/categories', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ export default function CategoryManager({
     if (!category || !formData.name.trim()) return;
 
     try {
-      const response = await fetch(`/chat/categories/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/categories/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export default function CategoryManager({
     if (!confirm('Are you sure you want to delete this category?')) return;
 
     try {
-      const response = await fetch(`/chat/categories/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/categories/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`

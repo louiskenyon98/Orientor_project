@@ -299,3 +299,31 @@ class ConversationService:
                 query = query.filter(Conversation.category_id == filters.category_id)
         
         return query.scalar() or 0
+    
+    @staticmethod
+    async def update_conversation_stats(
+        db: Session,
+        conversation_id: int,
+        tokens_used: int
+    ) -> bool:
+        """Update conversation statistics after adding a message"""
+        try:
+            conversation = db.query(Conversation).filter(
+                Conversation.id == conversation_id
+            ).first()
+            
+            if not conversation:
+                return False
+            
+            # Update message count and tokens
+            conversation.message_count = conversation.message_count + 2  # user + assistant message
+            conversation.total_tokens_used = conversation.total_tokens_used + tokens_used
+            conversation.last_message_at = datetime.utcnow()
+            
+            db.commit()
+            return True
+            
+        except SQLAlchemyError as e:
+            logger.error(f"Error updating conversation stats: {str(e)}")
+            db.rollback()
+            return False

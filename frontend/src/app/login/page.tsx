@@ -53,8 +53,9 @@ export default function LoginPage() {
             
             console.log('Login successful, token received');
             
-            // Store the token in localStorage
+            // Store the token and user ID in localStorage
             localStorage.setItem('access_token', response.data.access_token);
+            localStorage.setItem('user_id', response.data.user_id.toString());
             
             // Redirect to chat page after successful login
             router.push('/chat');
