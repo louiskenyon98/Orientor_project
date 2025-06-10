@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import hollandTestService, { Question, ScoreResponse, TestMetadata } from '@/services/hollandTestService';
-import Testinterface from '@/components/holland-test/Testinterface';
+import TestInterface from '@/components/holland-test/TestInterface';
 import ResultScreen from '@/components/holland-test/ResultScreen';
 import { motion } from 'framer-motion';
 
@@ -172,7 +172,7 @@ export default function HollandTestPage() {
   if (testState === 'testing' && questions.length > 0) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Testinterface
+        <TestInterface
           questions={questions}
           attemptId={attemptId}
           onTestComplete={handleTestComplete}
