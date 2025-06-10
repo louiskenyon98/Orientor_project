@@ -21,7 +21,7 @@ class PersonalityAssessment(Base):
     total_items = Column(Integer)
     completed_items = Column(Integer, default=0)
     validity_flags = Column(JSON, default=dict)
-    metadata = Column(JSON, default=dict)
+    assessment_metadata = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -41,7 +41,7 @@ class PersonalityResponse(Base):
     response_time_ms = Column(Integer)
     revision_count = Column(Integer, default=0)
     confidence_level = Column(Integer)
-    behavioral_metadata = Column(JSON, default=dict)
+    behavioral_data = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
