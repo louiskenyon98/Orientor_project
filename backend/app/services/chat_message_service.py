@@ -38,7 +38,7 @@ class ChatMessageService:
                 conversation_id=conversation_id,
                 role=role,
                 content=content,
-                metadata=metadata or {},
+                message_metadata=metadata or {},
                 tokens_used=tokens_used,
                 model_used=model_used,
                 response_time_ms=response_time_ms

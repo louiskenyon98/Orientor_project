@@ -69,7 +69,7 @@ def upgrade():
         sa.Column('model_used', sa.String(length=50), nullable=True),
         sa.Column('response_time_ms', sa.Integer(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.Column('metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column('message_metadata', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.CheckConstraint("role IN ('user', 'assistant', 'system')", name='check_role_values'),
         sa.ForeignKeyConstraint(['conversation_id'], ['conversations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')

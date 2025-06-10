@@ -15,7 +15,7 @@ class ChatMessage(Base):
     model_used = Column(String(50), nullable=True)
     response_time_ms = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False, index=True)
-    metadata = Column(JSONB, nullable=True)
+    message_metadata = Column(JSONB, nullable=True)
     
     # Check constraint for role
     __table_args__ = (

@@ -41,7 +41,7 @@ class ChatMessageResponse(ChatMessageBase):
     tokens_used: Optional[int]
     model_used: Optional[str]
     response_time_ms: Optional[int]
-    metadata: Optional[Dict[str, Any]]
+    message_metadata: Optional[Dict[str, Any]]
     
     class Config:
         from_attributes = True
