@@ -24,8 +24,8 @@ competence_tree_service = CompetenceTreeService()
 
 @router.post("/generate", response_model=Dict[str, Any])
 def generate_competence_tree(
-    max_depth: int = Query(6, gt=0, le=10, description="Maximum depth of skill tree traversal"),
-    max_nodes: int = Query(30, gt=5, le=50, description="Maximum total nodes in the tree"),
+    max_depth: int = Query(3, gt=0, le=6, description="Maximum depth of skill tree traversal"),
+    max_nodes: int = Query(20, gt=5, le=30, description="Maximum total nodes in the tree"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -41,8 +41,8 @@ def generate_competence_tree(
     6. Return graph_id for retrieval
     
     Args:
-        max_depth: Maximum depth of the tree (1-10, default 6)
-        max_nodes: Maximum total nodes in tree (5-50, default 30)
+        max_depth: Maximum depth of the tree (1-6, default 3)
+        max_nodes: Maximum total nodes in tree (5-30, default 20)
         current_user: Current authenticated user
         db: Database session
         
@@ -50,45 +50,106 @@ def generate_competence_tree(
         Dict with graph_id for accessing the generated tree
     """
     logger.info(f"Request received to generate competence tree for user {current_user.id}")
+    
     try:
-        # Create the competence tree
-        logger.info(f"Creating competence tree for user {current_user.id}")
-        tree_data = competence_tree_service.create_skill_tree(
-            db, 
-            current_user.id,
-            max_depth=max_depth,
-            max_nodes_per_level=max(3, max_nodes // max_depth)  # Calculate nodes per level from total
-        )
+        # Set response timeout handling
+        import signal
         
-        if not tree_data:
+        def timeout_handler(signum, frame):
+            logger.warning(f"Competence tree generation timed out for user {current_user.id}")
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create competence tree"
+                status_code=status.HTTP_408_REQUEST_TIMEOUT,
+                detail="Tree generation is taking longer than expected. Please try again."
             )
         
-        # Log tree data structure before saving
-        logger.info(f"Tree data structure before saving: nodes={len(tree_data.get('nodes', []))}, "
-                   f"anchors={len(tree_data.get('anchors', []))}, "
-                   f"anchor_metadata={len(tree_data.get('anchor_metadata', []))}")
+        # Set a timeout (adjust as needed - this is for very long operations)
+        # signal.signal(signal.SIGALRM, timeout_handler)
+        # signal.alarm(120)  # 2 minute timeout
         
-        # Save the tree in the database
-        graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
-        
-        if not graph_id:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to save competence tree"
+        try:
+            # Create the competence tree with reduced parameters to avoid timeout
+            logger.info(f"Creating competence tree for user {current_user.id} with max_depth={max_depth}, max_nodes_per_level={max(3, max_nodes // max_depth)}")
+            
+            tree_data = competence_tree_service.create_skill_tree(
+                db, 
+                current_user.id,
+                max_depth=max_depth,
+                max_nodes_per_level=max(3, min(4, max_nodes // max_depth))  # Limit nodes per level to prevent explosion
             )
-        
-        logger.info(f"Competence tree saved successfully with graph_id: {graph_id}")
-        
-        return {"graph_id": graph_id, "message": "Competence tree generated successfully"}
-    except HTTPException:
-        raise
+            
+            if not tree_data:
+                logger.error(f"create_skill_tree returned empty data for user {current_user.id}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to create competence tree - no data returned"
+                )
+            
+            # Log tree data structure before saving
+            nodes_count = len(tree_data.get('nodes', []))
+            edges_count = len(tree_data.get('edges', []))
+            anchors_count = len(tree_data.get('anchors', []))
+            anchor_metadata_count = len(tree_data.get('anchor_metadata', []))
+            
+            logger.info(f"Tree data created successfully: nodes={nodes_count}, edges={edges_count}, "
+                       f"anchors={anchors_count}, anchor_metadata={anchor_metadata_count}")
+            
+            # Validate tree structure
+            if nodes_count == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Generated tree has no nodes"
+                )
+            
+            if anchors_count == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Generated tree has no anchor skills"
+                )
+            
+            # Save the tree in the database
+            logger.info(f"Saving competence tree to database for user {current_user.id}")
+            graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
+            
+            if not graph_id:
+                logger.error(f"save_skill_tree returned empty graph_id for user {current_user.id}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to save competence tree to database"
+                )
+            
+            logger.info(f"Competence tree saved successfully with graph_id: {graph_id}")
+            
+            # Return successful response
+            response_data = {
+                "graph_id": graph_id, 
+                "message": "Competence tree generated successfully",
+                "stats": {
+                    "total_nodes": nodes_count,
+                    "total_edges": edges_count,
+                    "anchor_skills": anchors_count
+                }
+            }
+            
+            logger.info(f"Returning success response for user {current_user.id}: {response_data}")
+            return response_data
+            
+        finally:
+            # Cancel the timeout
+            # signal.alarm(0)
+            pass
+            
+    except HTTPException as he:
+        logger.error(f"HTTP Exception in generate_competence_tree for user {current_user.id}: {he.detail}")
+        raise he
     except Exception as e:
+        logger.error(f"Unexpected error generating competence tree for user {current_user.id}: {str(e)}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error generating competence tree: {str(e)}"
+            detail=f"Internal server error during tree generation: {str(e)}"
         )
 
 @router.get("/anchor-skills", response_model=Dict[str, Any])
@@ -164,8 +225,7 @@ def get_competence_tree(
             )
         
         # Log the type and content of tree_data for debugging
-        logger.debug(f"Type of tree_data: {type(skill_tree.tree_data)}")
-        logger.debug(f"Content of tree_data: {skill_tree.tree_data}")
+        logger.info(f"Type of tree_data: {type(skill_tree.tree_data)}")
         
         try:
             # Handle different types of tree_data
@@ -175,6 +235,28 @@ def get_competence_tree(
             else:
                 # If it's already a dict (JSONB), use it directly
                 tree_data = skill_tree.tree_data
+            
+            # Log what we're actually returning
+            logger.info(f"Returning tree data with {len(tree_data.get('nodes', []))} nodes and {len(tree_data.get('edges', []))} edges")
+            logger.info(f"Tree data keys: {list(tree_data.keys())}")
+            
+            # Sample some nodes and edges for debugging
+            nodes = tree_data.get('nodes', [])
+            edges = tree_data.get('edges', [])
+            
+            if nodes:
+                logger.info(f"Sample node: {nodes[0]}")
+                anchor_nodes = [n for n in nodes if n.get('is_anchor')]
+                non_anchor_nodes = [n for n in nodes if not n.get('is_anchor')]
+                logger.info(f"Anchor nodes: {len(anchor_nodes)}, Non-anchor nodes: {len(non_anchor_nodes)}")
+            
+            if edges:
+                logger.info(f"Sample edge: {edges[0]}")
+                edge_types = {}
+                for edge in edges:
+                    edge_type = edge.get('type', 'unknown')
+                    edge_types[edge_type] = edge_types.get(edge_type, 0) + 1
+                logger.info(f"Edge types: {edge_types}")
             
             # Return as JSONResponse to ensure proper serialization
             return JSONResponse(content=tree_data)

@@ -27,20 +27,46 @@ export const generateCompetenceTree = async (userId: number): Promise<{ graph_id
     if (!token) {
       throw new Error('Authentication token not found');
     }
+    
     const response = await axios.post(
-      `${API_URL}/competence-tree/generate?user_id=${userId}`,
+      `${API_URL}/competence-tree/generate`,
       {},
       {
         headers: {
           'Authorization': `Bearer ${token}`
+        },
+        timeout: 180000, // 3 minute timeout
+        params: {
+          max_depth: 3,
+          max_nodes: 20
         }
       }
     );
+    
     console.log('Réponse de génération:', response.data);
+    
+    // Validate response structure
+    if (!response.data?.graph_id) {
+      throw new Error('Invalid response: missing graph_id');
+    }
+    
     return response.data as { graph_id: string };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur lors de la génération de l\'arbre de compétences:', error);
-    throw error;
+    
+    // Handle specific error types
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Tree generation timed out. The process is complex - please try again.');
+    } else if (error.response?.status === 408) {
+      throw new Error('Tree generation is taking longer than expected. Please try again.');
+    } else if (error.response?.status === 500) {
+      const errorMsg = error.response?.data?.detail || 'Internal server error occurred during tree generation';
+      throw new Error(errorMsg);
+    } else if (error.response?.status === 401) {
+      throw new Error('Authentication failed. Please log in again.');
+    } else {
+      throw new Error(error.message || 'An unexpected error occurred during tree generation');
+    }
   }
 };
 

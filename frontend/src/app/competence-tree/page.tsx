@@ -42,6 +42,7 @@ const CompetenceTreePage: React.FC = () => {
     console.log("handleGenerateTree: Début de la génération de l'arbre");
     try {
       setLoading(true);
+      setError(null); // Clear any previous errors
       console.log("handleGenerateTree: Loading state set to true");
       
       // Get the current user's ID from the JWT token
@@ -94,17 +95,30 @@ const CompetenceTreePage: React.FC = () => {
               onClick={handleGenerateTree}
               disabled={loading}
               style={{
-                padding: '10px 20px',
-                backgroundColor: '#2196f3',
+                padding: '15px 30px',
+                backgroundColor: loading ? '#95a5a6' : '#2196f3',
                 color: 'white',
                 border: 'none',
-                borderRadius: '4px',
+                borderRadius: '8px',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.7 : 1
+                opacity: loading ? 0.8 : 1,
+                fontSize: '16px',
+                fontWeight: '500',
+                transition: 'all 0.3s ease'
               }}
             >
-              {loading ? 'Génération en cours...' : 'Générer mon arbre de compétences'}
+              {loading ? '🧠 Analyzing your profile...' : '🌳 Generate My Skill Tree'}
             </button>
+            {loading && (
+              <div style={{ marginTop: '15px', textAlign: 'center' }}>
+                <p style={{ color: '#666', fontSize: '14px' }}>
+                  🤖 AI is analyzing your profile and building your personalized skill tree...
+                </p>
+                <p style={{ color: '#888', fontSize: '12px', marginTop: '5px' }}>
+                  This may take 1-3 minutes due to the complexity of graph analysis.
+                </p>
+              </div>
+            )}
             {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
           </div>
         ) : (

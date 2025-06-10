@@ -47,29 +47,101 @@ interface CompetenceTreeViewProps {
 
 // Composant de nœud personnalisé
 const CustomNode = ({ data }: { data: any }) => {
-  const { skill_label, challenge, xp_reward, revealed, state, onComplete } = data;
+  const { 
+    label, 
+    skill_label, 
+    challenge, 
+    xp_reward, 
+    revealed, 
+    visible, 
+    state, 
+    onComplete, 
+    type, 
+    is_anchor, 
+    depth,
+    category 
+  } = data;
   
-  if (!revealed) {
+  // Use label first, fallback to skill_label
+  const displayLabel = label || skill_label || "Unknown Skill";
+  
+  if (!visible || !revealed) {
     return (
       <div className="competence-node hidden">
         <div className="node-content">
           <span className="question-mark">?</span>
-          <div className="tooltip">Complétez les défis précédents pour débloquer</div>
+          <div className="tooltip">Complete previous challenges to unlock</div>
         </div>
       </div>
     );
   }
   
+  // Different styling based on node type and depth
+  const getNodeClass = () => {
+    let baseClass = "competence-node";
+    if (is_anchor) baseClass += " anchor";
+    if (type === "occupation") baseClass += " occupation";
+    baseClass += ` depth-${depth}`;
+    baseClass += ` ${state}`;
+    return baseClass;
+  };
+
+  const getNodeIcon = () => {
+    if (type === "occupation") return "💼";
+    if (is_anchor) return "⭐";
+    switch (category) {
+      case "technical": return "⚙️";
+      case "interpersonal": return "🤝";
+      case "cognitive": return "🧠";
+      case "creative": return "🎨";
+      case "leadership": return "👑";
+      default: return "🔧";
+    }
+  };
+  
   return (
-    <div className={`competence-node ${state}`}>
+    <div className={getNodeClass()}>
       <div className="node-content">
-        <h4>{skill_label}</h4>
-        <ChallengeCard 
-          challenge={challenge} 
-          xpReward={xp_reward} 
-          completed={state === 'completed'} 
-          onComplete={onComplete}
-        />
+        <div className="node-header">
+          <span className="node-icon">{getNodeIcon()}</span>
+          <h4 className="node-title">{displayLabel}</h4>
+          {is_anchor && <span className="anchor-badge">ANCHOR</span>}
+        </div>
+        
+        {/* Show XP for skills only */}
+        {type !== "occupation" && xp_reward > 0 && (
+          <div className="xp-indicator">
+            <span className="xp-value">{xp_reward} XP</span>
+          </div>
+        )}
+        
+        {/* Show challenge for skills that have them */}
+        {type !== "occupation" && challenge && (
+          <ChallengeCard 
+            challenge={challenge} 
+            xpReward={xp_reward} 
+            completed={state === 'completed'} 
+            onComplete={onComplete}
+          />
+        )}
+        
+        {/* Show occupation info */}
+        {type === "occupation" && (
+          <div className="occupation-info">
+            <p className="occupation-desc">Career Path</p>
+            {state !== "completed" && (
+              <button 
+                className="explore-button"
+                onClick={() => {
+                  // Navigate to career exploration for this occupation
+                  console.log("Explore occupation:", displayLabel);
+                }}
+              >
+                Explore Career
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -80,81 +152,130 @@ const nodeTypes: NodeTypes = {
   customNode: CustomNode,
 };
 
-// Function to calculate half-circle layout positions
-const calculateHalfCircleLayout = (nodes: CompetenceNode[], edges: { source: string; target: string }[]) => {
-  // Group nodes by depth (distance from anchor nodes)
-  const nodeDepths = new Map<string, number>();
+// Function to calculate enhanced layout inspired by the competence tree image
+const calculateEnhancedTreeLayout = (nodes: CompetenceNode[], edges: { source: string; target: string }[]) => {
+  // Separate nodes by type and depth
   const anchors = nodes.filter(n => n.is_anchor);
-  
-  // Initialize anchor nodes at depth 0
-  anchors.forEach(anchor => nodeDepths.set(anchor.id, 0));
-  
-  // Calculate depths using BFS
-  const queue = [...anchors];
-  const visited = new Set<string>(anchors.map(a => a.id));
-  
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    const currentDepth = nodeDepths.get(current.id)!;
-    
-    // Find connected nodes
-    edges.forEach(edge => {
-      let targetId = null;
-      if (edge.source === current.id && !visited.has(edge.target)) {
-        targetId = edge.target;
-      } else if (edge.target === current.id && !visited.has(edge.source)) {
-        targetId = edge.source;
-      }
-      
-      if (targetId) {
-        const targetNode = nodes.find(n => n.id === targetId);
-        if (targetNode) {
-          nodeDepths.set(targetId, currentDepth + 1);
-          visited.add(targetId);
-          queue.push(targetNode);
-        }
-      }
-    });
-  }
-  
-  // Group nodes by depth
-  const depthGroups = new Map<number, CompetenceNode[]>();
-  nodes.forEach(node => {
-    const depth = nodeDepths.get(node.id) || 0;
-    if (!depthGroups.has(depth)) {
-      depthGroups.set(depth, []);
-    }
-    depthGroups.get(depth)!.push(node);
-  });
-  
-  // Calculate positions
-  const centerX = 800;
-  const baseY = 600;
-  const radiusStep = 150;
-  const maxDepth = Math.max(...Array.from(depthGroups.keys()));
+  const skills = nodes.filter(n => !n.is_anchor && n.type === 'skill');
+  const occupations = nodes.filter(n => n.type === 'occupation');
   
   const positioned: Node[] = [];
+  const centerX = 800;
+  const centerY = 400;
   
-  depthGroups.forEach((nodesAtDepth, depth) => {
-    const radius = radiusStep * (maxDepth - depth + 1);
-    const angleStep = Math.PI / (nodesAtDepth.length + 1); // Divide semicircle
+  // Position anchor nodes in a small circle at the center (like the inspiration image)
+  const anchorRadius = 120;
+  anchors.forEach((anchor, index) => {
+    const angle = (2 * Math.PI * index) / anchors.length;
+    const x = centerX + anchorRadius * Math.cos(angle);
+    const y = centerY + anchorRadius * Math.sin(angle);
     
-    nodesAtDepth.forEach((node, index) => {
-      const angle = angleStep * (index + 1);
-      const x = centerX + radius * Math.cos(angle);
-      const y = baseY - radius * Math.sin(angle); // Negative to go upward
+    positioned.push({
+      id: anchor.id,
+      type: 'customNode',
+      position: { x, y },
+      data: {
+        ...anchor,
+        onComplete: () => {} // Will be set later
+      }
+    });
+  });
+  
+  // Position related skills around each anchor in branches
+  anchors.forEach((anchor, anchorIndex) => {
+    // Find skills connected to this anchor
+    const connectedSkills = skills.filter(skill => 
+      edges.some(edge => 
+        (edge.source === anchor.id && edge.target === skill.id) ||
+        (edge.target === anchor.id && edge.source === skill.id)
+      )
+    );
+    
+    if (connectedSkills.length > 0) {
+      // Create a branch for each anchor
+      const branchAngleStart = (2 * Math.PI * anchorIndex) / anchors.length - Math.PI / 6;
+      const branchAngleEnd = (2 * Math.PI * anchorIndex) / anchors.length + Math.PI / 6;
+      const branchAngleStep = (branchAngleEnd - branchAngleStart) / (connectedSkills.length + 1);
+      
+      connectedSkills.forEach((skill, skillIndex) => {
+        const angle = branchAngleStart + branchAngleStep * (skillIndex + 1);
+        const distance = 250 + (skill.depth * 100); // Vary distance by depth
+        const x = centerX + distance * Math.cos(angle);
+        const y = centerY + distance * Math.sin(angle);
+        
+        positioned.push({
+          id: skill.id,
+          type: 'customNode',
+          position: { x, y },
+          data: {
+            ...skill,
+            onComplete: () => {} // Will be set later
+          }
+        });
+      });
+    }
+  });
+  
+  // Position unconnected skills in outer rings
+  const unconnectedSkills = skills.filter(skill => 
+    !edges.some(edge => 
+      edge.source === skill.id || edge.target === skill.id
+    )
+  );
+  
+  if (unconnectedSkills.length > 0) {
+    const outerRadius = 400;
+    unconnectedSkills.forEach((skill, index) => {
+      const angle = (2 * Math.PI * index) / unconnectedSkills.length;
+      const x = centerX + outerRadius * Math.cos(angle);
+      const y = centerY + outerRadius * Math.sin(angle);
       
       positioned.push({
-        id: node.id,
+        id: skill.id,
         type: 'customNode',
         position: { x, y },
         data: {
-          ...node,
+          ...skill,
           onComplete: () => {} // Will be set later
         }
       });
     });
-  });
+  }
+  
+  // Position occupations in the outer edge
+  if (occupations.length > 0) {
+    const occupationRadius = 550;
+    occupations.forEach((occupation, index) => {
+      // Try to position near connected anchor
+      let angle = (2 * Math.PI * index) / occupations.length;
+      
+      // Find connected anchor for better positioning
+      const connectedAnchor = anchors.find(anchor =>
+        edges.some(edge =>
+          (edge.source === anchor.id && edge.target === occupation.id) ||
+          (edge.target === anchor.id && edge.source === occupation.id)
+        )
+      );
+      
+      if (connectedAnchor) {
+        const anchorIndex = anchors.indexOf(connectedAnchor);
+        angle = (2 * Math.PI * anchorIndex) / anchors.length + (Math.PI / 4) * (index % 2 === 0 ? 1 : -1);
+      }
+      
+      const x = centerX + occupationRadius * Math.cos(angle);
+      const y = centerY + occupationRadius * Math.sin(angle);
+      
+      positioned.push({
+        id: occupation.id,
+        type: 'customNode',
+        position: { x, y },
+        data: {
+          ...occupation,
+          onComplete: () => {} // Will be set later
+        }
+      });
+    });
+  }
   
   return positioned;
 };
@@ -182,11 +303,15 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
       console.log("loadCompetenceTree: Appel à getCompetenceTree avec graphId:", graphId);
       const data = await getCompetenceTree(graphId);
       console.log("loadCompetenceTree: Données reçues:", data);
+      console.log("loadCompetenceTree: Nombre de nodes:", data.nodes?.length || 0);
+      console.log("loadCompetenceTree: Nombre d'edges:", data.edges?.length || 0);
+      console.log("loadCompetenceTree: Premier node:", data.nodes?.[0]);
+      console.log("loadCompetenceTree: Premier edge:", data.edges?.[0]);
       setTreeData(data);
       
       // Convertir les données en format React Flow
-      // Use half-circle layout to position nodes
-      const positionedNodes = calculateHalfCircleLayout(data.nodes, data.edges);
+      // Use enhanced tree layout inspired by the competence tree image
+      const positionedNodes = calculateEnhancedTreeLayout(data.nodes, data.edges);
       
       // Update nodes with onComplete handlers
       const flowNodes: Node[] = positionedNodes.map((node) => ({

@@ -3,6 +3,183 @@
   background-color: #f8fafc;
 }
 
+/* Competence Tree Node Styles */
+.competence-node {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  min-width: 150px;
+  max-width: 200px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.competence-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.2);
+}
+
+.competence-node.anchor {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #5a67d8;
+  box-shadow: 0 8px 20px -6px rgba(102, 126, 234, 0.4);
+}
+
+.competence-node.occupation {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border-color: #ed64a6;
+}
+
+.competence-node.available {
+  border-color: #48bb78;
+  background: white;
+}
+
+.competence-node.completed {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border-color: #38a169;
+}
+
+.competence-node.locked {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  color: #a0aec0;
+}
+
+.competence-node.hidden {
+  background: #edf2f7;
+  border: 2px dashed #cbd5e0;
+  color: #718096;
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.node-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.node-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.node-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.anchor-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.xp-indicator {
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid #48bb78;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #38a169;
+  font-weight: 500;
+}
+
+.competence-node.anchor .xp-indicator {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.occupation-info {
+  text-align: center;
+}
+
+.occupation-desc {
+  font-size: 11px;
+  margin: 0 0 6px 0;
+  opacity: 0.9;
+}
+
+.explore-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.explore-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.question-mark {
+  font-size: 24px;
+  color: #a0aec0;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d3748;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.competence-node.hidden:hover .tooltip {
+  opacity: 1;
+}
+
+/* Depth-based styling */
+.competence-node.depth-0 {
+  /* Anchor nodes - already styled */
+}
+
+.competence-node.depth-1 {
+  border-width: 2px;
+}
+
+.competence-node.depth-2 {
+  border-width: 1px;
+  opacity: 0.9;
+}
+
+.competence-node.depth-3 {
+  border-width: 1px;
+  opacity: 0.8;
+}
+
 /* Node styles */
 .node {
   border-radius: 8px;

@@ -768,7 +768,7 @@
 import os
 import logging
 import numpy as np
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 import pinecone
@@ -1294,7 +1294,7 @@ class CompetenceTreeService:
             # Step 2: For now, use enhanced simple skill tree with connections
             # GraphSAGE traversal is temporarily disabled due to performance issues
             logger.info(f"Creating enhanced skill tree for user {user_id} with {len(anchor_skills)} anchor skills")
-            gamified_graph = self._create_enhanced_skill_tree(anchor_skills, user_age, graph_id, db)
+            gamified_graph = self._create_enhanced_skill_tree(anchor_skills, user_age, graph_id, db, max_depth, max_nodes_per_level)
             
             # Ensure anchors are stored properly
             if not gamified_graph.get("anchors"):
@@ -1314,123 +1314,243 @@ class CompetenceTreeService:
             logger.error(traceback.format_exc())
             return {}
     
-    def _create_enhanced_skill_tree(self, anchor_skills: List[Dict[str, Any]], user_age: int, graph_id: str, db: Session) -> Dict[str, Any]:
+    def _create_enhanced_skill_tree(self, anchor_skills: List[Dict[str, Any]], user_age: int, graph_id: str, db: Session, max_depth: int = 3, max_nodes_per_level: int = 5) -> Dict[str, Any]:
         """
-        Create an enhanced skill tree with connections between anchor skills and related skills.
+        Create an enhanced skill tree using proper graph traversal like the occupation tree.
+        
+        This method:
+        1. Uses GraphTraversalService for proper multi-level expansion
+        2. Creates a connected skill tree similar to the inspiration image
+        3. Applies gamification rules properly
+        4. Generates challenges for all nodes
         
         Args:
-            anchor_skills: List of anchor skills
+            anchor_skills: List of anchor skills with Pinecone IDs
             user_age: User age for challenge generation
             graph_id: Unique graph identifier
             db: Database session
             
         Returns:
-            Enhanced skill tree structure with nodes and edges
+            Enhanced skill tree structure with proper connections
         """
         try:
-            nodes = []
-            edges = []
-            all_nodes = {}
+            # Import GraphTraversalService
+            import sys
+            import os
+            # Add path to competenceTree_dev directory (it's in the backend folder)
+            competence_tree_dev_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "competenceTree_dev")
+            sys.path.append(competence_tree_dev_path)
+            from graph_traversal_service import GraphTraversalService
             
-            # Add anchor nodes
-            for i, skill in enumerate(anchor_skills):
-                # Generate challenge for this skill
-                challenge_data = self.generate_challenge(skill["esco_label"], user_age)
+            # Initialize graph traversal service
+            try:
+                graph_service = GraphTraversalService()
+                logger.info("GraphTraversalService initialized successfully")
+            except Exception as e:
+                logger.warning(f"Failed to initialize GraphTraversalService: {str(e)}")
+                # Fall back to simplified tree if graph service fails
+                return self._create_simple_skill_tree(anchor_skills, user_age, graph_id)
+            
+            # Extract anchor node IDs for graph traversal
+            anchor_node_ids = [skill["id"] for skill in anchor_skills]
+            logger.info(f"Starting graph traversal from {len(anchor_node_ids)} anchor nodes")
+            
+            # Traverse the graph from anchor nodes with conservative parameters to prevent timeouts
+            graph_data = graph_service.traverse_graph(
+                anchor_node_ids=anchor_node_ids,
+                max_depth=min(max_depth, 3),  # Limit depth to prevent explosion
+                min_similarity=0.5,  # Higher threshold for better connections
+                max_nodes_per_level=min(max_nodes_per_level, 3)  # Conservative limit to prevent timeout
+            )
+            
+            if not graph_data.get("nodes"):
+                logger.warning("Graph traversal returned no nodes, falling back to simple tree")
+                return self._create_simple_skill_tree(anchor_skills, user_age, graph_id)
+            
+            logger.info(f"Graph traversal successful: {len(graph_data['nodes'])} nodes, {len(graph_data['edges'])} edges")
+            
+            # Convert graph data to competence tree format
+            processed_nodes = []
+            anchor_lookup = {skill["id"]: skill for skill in anchor_skills}
+            
+            for node_id, node_info in graph_data["nodes"].items():
+                is_anchor = node_info.get("is_anchor", False)
+                depth = node_info.get("depth", 0)
                 
-                node = {
-                    "id": skill["id"],
-                    "label": skill["esco_label"],
-                    "type": "skill",
-                    "depth": 0,
-                    "is_anchor": True,
+                # Get skill label from metadata or ESCO label
+                skill_label = node_info.get("label", "")
+                if not skill_label and node_id in anchor_lookup:
+                    skill_label = anchor_lookup[node_id]["esco_label"]
+                if not skill_label:
+                    skill_label = node_info.get("metadata", {}).get("preferredLabel", node_id)
+                
+                # Generate challenge for anchor nodes only to prevent too many LLM calls
+                challenge_data = {}
+                if is_anchor:  # Only generate challenges for anchor nodes to prevent timeout
+                    challenge_data = self.generate_challenge(skill_label, user_age)
+                
+                # Determine initial visibility based on gamification rules
+                is_visible = is_anchor  # Anchors always visible
+                is_revealed = is_anchor  # Anchors always revealed
+                initial_state = "available" if is_anchor else "locked"
+                
+                # Apply 30% visibility rule for non-anchor nodes
+                if not is_anchor and depth == 1 and random.random() < 0.3:
+                    is_visible = True
+                    is_revealed = True
+                    initial_state = "available"
+                    # Skip challenge generation for non-anchor nodes to prevent timeout
+                    # Challenges will be generated when nodes are revealed through gameplay
+                
+                processed_node = {
+                    "id": node_id,
+                    "label": skill_label,
+                    "type": node_info.get("type", "skill"),
+                    "depth": depth,
+                    "is_anchor": is_anchor,
                     "graph_id": graph_id,
                     "challenge": challenge_data.get("description", ""),
                     "xp_reward": challenge_data.get("xp_reward", 25),
-                    "visible": True,
-                    "revealed": True,
-                    "state": "available",
+                    "visible": is_visible,
+                    "revealed": is_revealed,
+                    "state": initial_state,
                     "notes": "",
-                    "metadata": skill.get("metadata", {}),
-                    "category": skill.get("category", "general"),
-                    "confidence": skill.get("confidence", 0.5)
+                    "metadata": node_info.get("metadata", {}),
+                    "similarity_score": node_info.get("similarity_score", 0.5)
                 }
-                nodes.append(node)
-                all_nodes[skill["id"]] = node
+                
+                # Add anchor-specific metadata
+                if is_anchor and node_id in anchor_lookup:
+                    anchor_data = anchor_lookup[node_id]
+                    processed_node.update({
+                        "esco_label": anchor_data.get("esco_label", skill_label),
+                        "esco_description": anchor_data.get("esco_description", ""),
+                        "justification": anchor_data.get("justification", ""),
+                        "confidence": anchor_data.get("confidence", 0.5),
+                        "category": anchor_data.get("category", "general"),
+                        "applications": anchor_data.get("applications", [])
+                    })
+                
+                processed_nodes.append(processed_node)
             
-            # Query Pinecone for related skills for each anchor
-            if self.index:
-                for anchor_skill in anchor_skills:
-                    try:
-                        # Use the anchor skill's embedding to find related skills
-                        anchor_id = anchor_skill["id"]
-                        
-                        # Query for related skills
-                        results = self.index.query(
-                            id=anchor_id,
-                            top_k=5,  # Get 5 related skills per anchor
-                            include_metadata=True
-                        )
-                        
-                        for j, match in enumerate(results.matches[1:]):  # Skip first match (itself)
-                            if match.id not in all_nodes:
-                                similarity = self._convert_score_to_similarity(match.score)
-                                if similarity >= 0.4:  # Lower threshold for connections
-                                    related_node = {
-                                        "id": match.id,
-                                        "label": match.metadata.get("preferredLabel", match.id),
-                                        "type": "skill",
-                                        "depth": 1,
-                                        "is_anchor": False,
-                                        "graph_id": graph_id,
-                                        "challenge": "",  # Will be generated when revealed
-                                        "xp_reward": 25,
-                                        "visible": False,
-                                        "revealed": False,
-                                        "state": "hidden",
-                                        "notes": "",
-                                        "metadata": match.metadata
-                                    }
-                                    nodes.append(related_node)
-                                    all_nodes[match.id] = related_node
-                                    
-                                    # Add edge from anchor to related skill
-                                    edges.append({
-                                        "source": anchor_id,
-                                        "target": match.id,
-                                        "weight": similarity,
-                                        "type": "similarity"
-                                    })
-                    except Exception as e:
-                        logger.warning(f"Error querying related skills for {anchor_skill['id']}: {str(e)}")
+            # Convert edges to the expected format
+            processed_edges = []
+            for edge in graph_data.get("edges", []):
+                processed_edges.append({
+                    "source": edge["source"],
+                    "target": edge["target"],
+                    "weight": edge.get("weight", 1.0),
+                    "type": edge.get("type", "similarity")
+                })
             
-            # Apply 30% visibility rule (only 30% of non-anchor nodes visible)
-            non_anchor_nodes = [n for n in nodes if not n.get("is_anchor", False)]
-            if non_anchor_nodes:
-                num_to_reveal = max(1, int(len(non_anchor_nodes) * 0.3))
-                nodes_to_reveal = random.sample(non_anchor_nodes, min(num_to_reveal, len(non_anchor_nodes)))
-                for node in nodes_to_reveal:
-                    node["visible"] = True
-                    node["revealed"] = True
-                    node["state"] = "available"
-                    # Generate challenge for revealed nodes
-                    challenge_data = self.generate_challenge(node["label"], user_age)
-                    if challenge_data:
-                        node["challenge"] = challenge_data.get("description", "")
-                        node["xp_reward"] = challenge_data.get("xp_reward", 25)
+            # Add occupations connected to skills (like in the inspiration image)
+            occupation_nodes, occupation_edges = self._add_connected_occupations(
+                processed_nodes, anchor_skills, graph_service, user_age, graph_id
+            )
             
-            logger.info(f"Created enhanced skill tree with {len(nodes)} nodes and {len(edges)} edges")
+            # Combine all nodes and edges
+            all_nodes = processed_nodes + occupation_nodes
+            all_edges = processed_edges + occupation_edges
+            
+            logger.info(f"Enhanced skill tree created with {len(all_nodes)} total nodes ({len(processed_nodes)} skills, {len(occupation_nodes)} occupations) and {len(all_edges)} edges")
+            
             return {
-                "nodes": nodes,
-                "edges": edges,
+                "nodes": all_nodes,
+                "edges": all_edges,
                 "graph_id": graph_id,
                 "anchors": [skill["id"] for skill in anchor_skills],
-                "anchor_metadata": anchor_skills
+                "anchor_metadata": anchor_skills,
+                "tree_type": "enhanced_competence_tree",
+                "generation_method": "graph_traversal"
             }
             
         except Exception as e:
-            logger.error(f"Error creating enhanced skill tree: {str(e)}")
+            logger.error(f"Error creating enhanced skill tree with graph traversal: {str(e)}")
+            logger.error(traceback.format_exc())
             # Fall back to simple tree
             return self._create_simple_skill_tree(anchor_skills, user_age, graph_id)
+    
+    def _add_connected_occupations(self, skill_nodes: List[Dict], anchor_skills: List[Dict], 
+                                 graph_service, user_age: int, graph_id: str) -> Tuple[List[Dict], List[Dict]]:
+        """
+        Add occupation nodes connected to skills (like in the inspiration image).
+        
+        Args:
+            skill_nodes: Current skill nodes
+            anchor_skills: Original anchor skills
+            graph_service: Graph traversal service
+            user_age: User age
+            graph_id: Graph identifier
+            
+        Returns:
+            Tuple of (occupation_nodes, occupation_edges)
+        """
+        try:
+            occupation_nodes = []
+            occupation_edges = []
+            
+            # Find occupations related to anchor skills through Pinecone
+            if self.index:
+                for anchor_skill in anchor_skills:
+                    try:
+                        # Query for related occupations (limited to prevent timeout)
+                        results = self.index.query(
+                            id=anchor_skill["id"],
+                            top_k=1,  # Get only top 1 related occupation per anchor to prevent timeout
+                            filter={"type": {"$eq": "occupation"}},
+                            include_metadata=True
+                        )
+                        
+                        for match in results.matches:
+                            if match.score < 0.6:  # Only high-similarity occupations
+                                continue
+                                
+                            occupation_id = match.id
+                            occupation_metadata = match.metadata
+                            occupation_label = occupation_metadata.get("preferredLabel", 
+                                                                     occupation_metadata.get("title", occupation_id))
+                            
+                            # Check if occupation already added
+                            if any(node["id"] == occupation_id for node in occupation_nodes):
+                                continue
+                            
+                            # Create occupation node
+                            occupation_node = {
+                                "id": occupation_id,
+                                "label": occupation_label,
+                                "type": "occupation",
+                                "depth": 2,  # Occupations at depth 2
+                                "is_anchor": False,
+                                "graph_id": graph_id,
+                                "challenge": "",  # Occupations don't have challenges
+                                "xp_reward": 0,
+                                "visible": random.random() < 0.5,  # 50% visible initially
+                                "revealed": random.random() < 0.5,
+                                "state": "locked",
+                                "notes": "",
+                                "metadata": occupation_metadata,
+                                "similarity_score": self._convert_score_to_similarity(match.score)
+                            }
+                            
+                            occupation_nodes.append(occupation_node)
+                            
+                            # Add edge from anchor skill to occupation
+                            occupation_edges.append({
+                                "source": anchor_skill["id"],
+                                "target": occupation_id,
+                                "weight": self._convert_score_to_similarity(match.score),
+                                "type": "skill_to_occupation"
+                            })
+                            
+                    except Exception as e:
+                        logger.warning(f"Error finding occupations for {anchor_skill['id']}: {str(e)}")
+            
+            logger.info(f"Added {len(occupation_nodes)} occupation nodes connected to skills")
+            return occupation_nodes, occupation_edges
+            
+        except Exception as e:
+            logger.error(f"Error adding connected occupations: {str(e)}")
+            return [], []
     
     def _create_simple_skill_tree(self, anchor_skills: List[Dict[str, Any]], user_age: int, graph_id: str) -> Dict[str, Any]:
         """
