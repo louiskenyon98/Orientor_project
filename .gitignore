@@ -107,3 +107,6 @@ next-env.d.ts
 # Nodes 
 backend/app/services/occupation_tree/gnn_experiment/data
 backend/app/services/occupation_tree/gnn_experiment/data_1024
+
+# images 
+frontend/public/image/  
