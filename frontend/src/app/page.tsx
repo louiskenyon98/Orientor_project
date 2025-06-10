@@ -17,6 +17,7 @@ import sidebarStyles from '@/styles/sidebar.module.css';
 import NewSidebar from '@/components/layout/NewSidebar';
 import '@/styles/premium-theme.css';
 import PersonalityCard from '@/components/ui/PersonalityCard';
+import SkillShowcase from '@/components/ui/SkillShowcase';
 
 // Interface pour la réponse de l'API de recommandations d'emploi
 interface JobRecommendationsResponse {
@@ -66,6 +67,34 @@ export default function Home() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [jobsError, setJobsError] = useState<string | null>(null);
+  
+  // État pour l'ID de l'utilisateur actuel
+  const [currentUserId, setCurrentUserId] = useState<number | undefined>(undefined);
+
+  // Récupérer l'ID de l'utilisateur actuel au chargement
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+        
+        const response = await fetch('/api/v1/users/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setCurrentUserId(userData.id);
+        }
+      } catch (err) {
+        console.error('Error fetching current user:', err);
+      }
+    };
+    
+    fetchCurrentUser();
+  }, []);
 
   // Récupérer les résultats du test Holland au chargement de la page
   useEffect(() => {
@@ -211,6 +240,11 @@ export default function Home() {
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Skill Showcase Section - As specified in palmier documentation */}
+              <div className="mb-10">
+                <SkillShowcase userId={currentUserId} />
               </div>
 
               {/* Cards Section */}

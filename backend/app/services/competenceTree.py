@@ -780,6 +780,12 @@ from app.models import UserSkillTree
 import openai
 import traceback
 import json
+from datetime import datetime
+from sentence_transformers import SentenceTransformer
+
+# Import our new services
+from .LLMcompetence_service import LLMCompetenceService
+from .esco_formatting_service import ESCOFormattingService
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
@@ -812,6 +818,10 @@ class CompetenceTreeService:
         self.index = None
         self.embedding_model = None
         self.gnn_model = None
+        
+        # Initialize new services
+        self.llm_service = LLMCompetenceService()
+        self.esco_service = ESCOFormattingService()
         
         try:
             # Initialize core components
@@ -883,7 +893,7 @@ class CompetenceTreeService:
             checkpoint = torch.load(model_path, map_location="cpu", weights_only=False)
             
             # Initialize the model
-            from ..GNN.GraphSage import CareerTreeModel
+            from .GNN.GraphSage import CareerTreeModel
             self.gnn_model = CareerTreeModel(
                 input_dim=384,  # Embedding dimension
                 hidden_dim=128,
@@ -947,6 +957,92 @@ class CompetenceTreeService:
             logger.error(f"Erreur lors de la récupération de l'embedding: {str(e)}")
             return None
     
+    def infer_anchor_skills(self, db: Session, user_id: int) -> List[Dict[str, Any]]:
+        """
+        Infer 5 anchor skills from user profile following palmier specification.
+        
+        This method:
+        1. Uses LLM to extract 5 skills from user narrative + psychometric data
+        2. Formats skills using ESCO templates
+        3. Generates embeddings and matches in Pinecone
+        4. Returns anchor skill IDs with metadata
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            
+        Returns:
+            List of 5 anchor skill dictionaries with Pinecone matches
+        """
+        try:
+            logger.info(f"Starting anchor skill inference for user {user_id}")
+            
+            # Step 1: LLM Inference - Extract 5 skills from user profile
+            inferred_skills = self.llm_service.infer_anchor_skills(db, user_id)
+            if not inferred_skills:
+                logger.error(f"No skills inferred for user {user_id}")
+                return []
+            
+            logger.info(f"LLM inferred {len(inferred_skills)} skills for user {user_id}")
+            
+            # Step 2: Get user context for ESCO formatting
+            user_context = self.llm_service.get_user_profile_data(db, user_id)
+            
+            # Step 3: ESCO Formatting - Format each skill according to ESCO standards  
+            formatted_skills = self.esco_service.format_multiple_skills(inferred_skills, user_context.get("demographics", {}))
+            
+            # Step 4: Pinecone Matching - Generate embeddings and find matches
+            anchor_skills = []
+            for formatted_skill in formatted_skills:
+                try:
+                    # Create searchable text for embedding
+                    searchable_text = self.esco_service.create_searchable_text(formatted_skill)
+                    
+                    # Generate embedding
+                    if not self.embedding_model:
+                        logger.warning("Embedding model not available, using fallback")
+                        continue
+                    
+                    embedding = self.embedding_model.encode([searchable_text])[0]
+                    
+                    # Query Pinecone for top match
+                    matches = self.query_skill_recommendations(embedding, top_k=1)
+                    
+                    if matches:
+                        match = matches[0]
+                        anchor_skill = {
+                            "id": match["id"],
+                            "original_label": formatted_skill["original_label"], 
+                            "esco_label": formatted_skill["esco_label"],
+                            "esco_description": formatted_skill["esco_description"],
+                            "score": match["score"],
+                            "metadata": match["metadata"],
+                            "justification": formatted_skill.get("original_justification", ""),
+                            "confidence": formatted_skill.get("confidence", 0.5),
+                            "category": formatted_skill.get("category", "general"),
+                            "applications": formatted_skill.get("applications", [])
+                        }
+                        anchor_skills.append(anchor_skill)
+                        logger.info(f"Found Pinecone match for skill '{formatted_skill['esco_label']}': {match['id']}")
+                    else:
+                        logger.warning(f"No Pinecone match found for skill: {formatted_skill['esco_label']}")
+                        
+                except Exception as e:
+                    logger.error(f"Error processing skill '{formatted_skill.get('esco_label', 'unknown')}': {str(e)}")
+                    continue
+            
+            if len(anchor_skills) < 3:
+                logger.error(f"Only found {len(anchor_skills)} valid anchor skills for user {user_id}")
+                return []
+            
+            logger.info(f"Successfully inferred {len(anchor_skills)} anchor skills for user {user_id}")
+            return anchor_skills[:5]  # Ensure exactly 5 or fewer
+            
+        except Exception as e:
+            logger.error(f"Error inferring anchor skills for user {user_id}: {str(e)}")
+            logger.error(traceback.format_exc())
+            return []
+
     def query_skill_recommendations(self, embedding: np.ndarray, top_k: int = 5) -> List[Dict[str, Any]]:
         """
         Interroge l'index Pinecone pour obtenir les recommandations de compétences.
@@ -1043,17 +1139,33 @@ class CompetenceTreeService:
             }}
             """
 
-            # Appeler l'API OpenAI avec le nouveau format
-            response = client.chat.completions.create(
-                model="gpt-4",  # ou "gpt-3.5-turbo" selon vos besoins
-                messages=[
-                    {"role": "system", "content": "Tu es un expert en développement de compétences et en création de défis d'apprentissage. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte supplémentaire."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=500,
-                response_format={"type": "json_object"}  # Force JSON response
-            )
+            # Appeler l'API OpenAI avec fallback
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo-1106",  # This model supports JSON mode
+                    messages=[
+                        {"role": "system", "content": "Tu es un expert en développement de compétences et en création de défis d'apprentissage. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte supplémentaire."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7,
+                    max_tokens=500,
+                    response_format={"type": "json_object"}  # Force JSON response
+                )
+            except Exception as e:
+                if "response_format" in str(e):
+                    logger.warning(f"JSON format not supported for challenge generation, trying without response_format: {str(e)}")
+                    # Fallback without response_format
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": "Tu es un expert en développement de compétences. Réponds UNIQUEMENT en JSON dans ce format exact: {\"title\": \"titre\", \"description\": \"description\", \"success_criteria\": \"critères\", \"estimated_duration\": \"durée\", \"resources_needed\": \"ressources\"}"},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=0.7,
+                        max_tokens=500
+                    )
+                else:
+                    raise e
 
             # Extraire la réponse
             if not response.choices:
@@ -1172,93 +1284,233 @@ class CompetenceTreeService:
             user_age = result[0] if result and result[0] else 25
             logger.info(f"Âge de l'utilisateur {user_id}: {user_age}")
             
-            # Récupérer l'embedding de l'utilisateur
-            embedding = self.get_user_embedding(db, user_id)
-            if embedding is None:
-                logger.error(f"Impossible de récupérer l'embedding pour l'utilisateur {user_id}")
+            # Step 1: Infer anchor skills using new LLM pipeline
+            anchor_skills = self.infer_anchor_skills(db, user_id)
+            if not anchor_skills:
+                logger.error(f"No anchor skills inferred for user {user_id}")
                 return {}
-            logger.info(f"Embedding récupéré avec succès pour l'utilisateur {user_id}: {embedding.shape}")
+            logger.info(f"Anchor skills inferred for user {user_id}: {len(anchor_skills)}")
             
-            # Obtenir les recommandations de compétences initiales
-            initial_recommendations = self.query_skill_recommendations(embedding, top_k=max_nodes_per_level)
-            if not initial_recommendations:
-                logger.error(f"Aucune recommandation trouvée pour l'utilisateur {user_id}")
-                return {}
-            logger.info(f"Recommandations initiales trouvées pour l'utilisateur {user_id}: {len(initial_recommendations)}")
+            # Step 2: Use simple skill tree for now (bypass GraphSAGE to avoid infinite loops)
+            logger.info(f"Creating simple skill tree for user {user_id} with {len(anchor_skills)} anchor skills")
+            gamified_graph = self._create_simple_skill_tree(anchor_skills, user_age, graph_id)
             
-            # Initialiser le service de traversée du graphe
-            from competenceTree_development.graph_traversal_service import GraphTraversalService
-            from competenceTree_development.visualisation.skill_tree_visualization import SkillTreeVisualization
+            # Ensure anchors are stored properly
+            if not gamified_graph.get("anchors"):
+                gamified_graph["anchors"] = [skill["id"] for skill in anchor_skills]
+            if not gamified_graph.get("anchor_metadata"):
+                gamified_graph["anchor_metadata"] = anchor_skills
             
-            graph_service = GraphTraversalService()
-            viz_service = SkillTreeVisualization()
-            
-            # Obtenir les IDs des compétences initiales
-            initial_skill_ids = [rec["id"] for rec in initial_recommendations]
-            
-            # Traverser le graphe à partir des compétences initiales
-            graph_data = graph_service.traverse_graph(
-                anchor_node_ids=initial_skill_ids,
-                max_depth=max_depth,
-                min_similarity=0.7,
-                max_nodes_per_level=max_nodes_per_level
-            )
-            
-            if not graph_data.get("nodes"):
-                logger.error(f"Aucun nœud trouvé lors de la traversée du graphe pour l'utilisateur {user_id}")
-                return {}
-            
-            # Add graph_id to all nodes and generate challenges
-            for node in graph_data["nodes"]:
-                node["graph_id"] = graph_id
-                
-                # Generate challenge for each skill
-                skill_label = node.get("label", node["id"])
-                challenge_data = self.generate_challenge(skill_label, user_age)
-                
-                # Add challenge data to node
-                node.update({
-                    "challenge": challenge_data.get("description", ""),
-                    "xp_reward": challenge_data.get("xp_reward", 25),
-                    "visible": True if node.get("depth", 0) == 0 else False,
-                    "revealed": True if node.get("depth", 0) == 0 else False,
-                    "state": "active" if node.get("depth", 0) == 0 else "locked",
-                    "notes": ""
-                })
-            
-            # Add graph_id to the graph data
-            graph_data["graph_id"] = graph_id
-            
-            # Generate visualizations
-            try:
-                # Create Plotly interactive visualization
-                plotly_viz = viz_service.visualize_plotly(graph_data)
-                
-                # Create Matplotlib static visualization
-                matplotlib_viz = viz_service.visualize_matplotlib(graph_data)
-                
-                # Create Streamlit visualization
-                streamlit_viz = viz_service.create_streamlit_visualization(graph_data)
-                
-                # Add visualizations to graph
-                graph_data["visualizations"] = {
-                    "plotly": plotly_viz,
-                    "matplotlib": matplotlib_viz,
-                    "streamlit": streamlit_viz
-                }
-                
-                logger.info("Visualisations de l'arbre de compétences générées avec succès")
-            except Exception as viz_error:
-                logger.error(f"Erreur lors de la génération des visualisations: {str(viz_error)}")
-                # Continue even if visualization fails
+            logger.info(f"Storing {len(anchor_skills)} anchor skills in tree data for user {user_id}")
+            for skill in anchor_skills:
+                logger.debug(f"Anchor skill: {skill.get('esco_label', skill.get('original_label', 'Unknown'))}")
             
             logger.info(f"Arbre de compétences créé avec succès pour l'utilisateur {user_id} avec graph_id {graph_id}")
-            return graph_data
+            return gamified_graph
             
         except Exception as e:
             logger.error(f"Erreur lors de la création de l'arbre de compétences: {str(e)}")
             logger.error(traceback.format_exc())
             return {}
+    
+    def _create_simple_skill_tree(self, anchor_skills: List[Dict[str, Any]], user_age: int, graph_id: str) -> Dict[str, Any]:
+        """
+        Create a simple skill tree when graph traversal fails.
+        
+        Args:
+            anchor_skills: List of anchor skills
+            user_age: User age for challenge generation
+            graph_id: Unique graph identifier
+            
+        Returns:
+            Simple skill tree structure
+        """
+        try:
+            nodes = []
+            edges = []
+            
+            for i, skill in enumerate(anchor_skills):
+                # Generate challenge for this skill
+                challenge_data = self.generate_challenge(skill["esco_label"], user_age)
+                
+                node = {
+                    "id": skill["id"],
+                    "label": skill["esco_label"],
+                    "type": "skill",
+                    "depth": 0,
+                    "is_anchor": True,
+                    "graph_id": graph_id,
+                    "challenge": challenge_data.get("description", ""),
+                    "xp_reward": challenge_data.get("xp_reward", 25),
+                    "visible": True,
+                    "revealed": True,
+                    "state": "available",
+                    "notes": "",
+                    "metadata": skill.get("metadata", {})
+                }
+                nodes.append(node)
+            
+            logger.info(f"Created simple skill tree with {len(anchor_skills)} anchor skills for user")
+            return {
+                "nodes": nodes,
+                "edges": edges,
+                "graph_id": graph_id,
+                "anchors": [skill["id"] for skill in anchor_skills],
+                "anchor_metadata": anchor_skills
+            }
+            
+        except Exception as e:
+            logger.error(f"Error creating simple skill tree: {str(e)}")
+            return {"nodes": [], "edges": [], "graph_id": graph_id}
+    
+    def _process_graph_nodes(self, graph_data: Dict[str, Any], anchor_skills: List[Dict[str, Any]], user_age: int, graph_id: str) -> Dict[str, Any]:
+        """
+        Process graph nodes and add challenge data.
+        
+        Args:
+            graph_data: Raw graph data from traversal
+            anchor_skills: Anchor skills with metadata
+            user_age: User age for challenge generation
+            graph_id: Unique graph identifier
+            
+        Returns:
+            Processed graph data
+        """
+        try:
+            # Create lookup for anchor skill metadata
+            anchor_lookup = {skill["id"]: skill for skill in anchor_skills}
+            
+            # Process nodes
+            if isinstance(graph_data.get("nodes"), dict):
+                # Convert dict format to list format
+                processed_nodes = []
+                for node_id, node_data in graph_data["nodes"].items():
+                    processed_node = self._process_single_node(node_data, anchor_lookup, user_age, graph_id)
+                    processed_nodes.append(processed_node)
+                graph_data["nodes"] = processed_nodes
+            elif isinstance(graph_data.get("nodes"), list):
+                # Process list format
+                processed_nodes = []
+                for node_data in graph_data["nodes"]:
+                    processed_node = self._process_single_node(node_data, anchor_lookup, user_age, graph_id)
+                    processed_nodes.append(processed_node)
+                graph_data["nodes"] = processed_nodes
+            
+            graph_data["graph_id"] = graph_id
+            return graph_data
+            
+        except Exception as e:
+            logger.error(f"Error processing graph nodes: {str(e)}")
+            return graph_data
+    
+    def _process_single_node(self, node_data: Dict[str, Any], anchor_lookup: Dict[str, Any], user_age: int, graph_id: str) -> Dict[str, Any]:
+        """
+        Process a single node and add required fields.
+        
+        Args:
+            node_data: Raw node data
+            anchor_lookup: Lookup for anchor skill metadata
+            user_age: User age for challenge generation
+            graph_id: Unique graph identifier
+            
+        Returns:
+            Processed node data
+        """
+        node_id = node_data.get("id", "")
+        skill_label = node_data.get("label", node_id)
+        depth = node_data.get("depth", 0)
+        is_anchor = node_id in anchor_lookup
+        
+        # Generate challenge for this skill
+        challenge_data = self.generate_challenge(skill_label, user_age)
+        
+        processed_node = {
+            "id": node_id,
+            "label": skill_label,
+            "type": node_data.get("type", "skill"),
+            "depth": depth,
+            "is_anchor": is_anchor,
+            "graph_id": graph_id,
+            "challenge": challenge_data.get("description", ""),
+            "xp_reward": challenge_data.get("xp_reward", 25),
+            "visible": is_anchor,  # Only anchors visible initially
+            "revealed": is_anchor,  # Only anchors revealed initially
+            "state": "available" if is_anchor else "locked",
+            "notes": "",
+            "metadata": node_data.get("metadata", {})
+        }
+        
+        # Add anchor-specific metadata
+        if is_anchor and node_id in anchor_lookup:
+            anchor_data = anchor_lookup[node_id]
+            processed_node.update({
+                "esco_label": anchor_data.get("esco_label", skill_label),
+                "esco_description": anchor_data.get("esco_description", ""),
+                "justification": anchor_data.get("justification", ""),
+                "confidence": anchor_data.get("confidence", 0.5),
+                "category": anchor_data.get("category", "general"),
+                "applications": anchor_data.get("applications", [])
+            })
+        
+        return processed_node
+    
+    def _apply_gamification_rules(self, graph_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Apply gamification rules including 70% hidden nodes.
+        
+        Args:
+            graph_data: Processed graph data
+            
+        Returns:
+            Gamified graph data
+        """
+        try:
+            nodes = graph_data.get("nodes", [])
+            if not nodes:
+                return graph_data
+            
+            # Separate anchor and non-anchor nodes
+            anchor_nodes = [node for node in nodes if node.get("is_anchor", False)]
+            non_anchor_nodes = [node for node in nodes if not node.get("is_anchor", False)]
+            
+            # Calculate how many non-anchor nodes to reveal (30% as per palmier spec)
+            total_non_anchors = len(non_anchor_nodes)
+            nodes_to_reveal = max(1, int(total_non_anchors * 0.3))
+            
+            # Randomly select nodes to reveal (prioritize depth 1 nodes)
+            depth_1_nodes = [node for node in non_anchor_nodes if node.get("depth", 0) == 1]
+            other_nodes = [node for node in non_anchor_nodes if node.get("depth", 0) != 1]
+            
+            # First reveal some depth 1 nodes, then others
+            revealed_nodes = []
+            if depth_1_nodes:
+                depth_1_to_reveal = min(len(depth_1_nodes), max(1, nodes_to_reveal // 2))
+                revealed_nodes.extend(random.sample(depth_1_nodes, depth_1_to_reveal))
+                nodes_to_reveal -= depth_1_to_reveal
+            
+            if nodes_to_reveal > 0 and other_nodes:
+                other_to_reveal = min(len(other_nodes), nodes_to_reveal)
+                revealed_nodes.extend(random.sample(other_nodes, other_to_reveal))
+            
+            # Update visibility for revealed nodes
+            revealed_ids = {node["id"] for node in revealed_nodes}
+            for node in nodes:
+                if not node.get("is_anchor", False):
+                    if node["id"] in revealed_ids:
+                        node["visible"] = True
+                        node["revealed"] = True
+                        node["state"] = "available"
+                    else:
+                        node["visible"] = False
+                        node["revealed"] = False
+                        node["state"] = "hidden"
+            
+            logger.info(f"Applied gamification: {len(anchor_nodes)} anchors, {len(revealed_nodes)}/{total_non_anchors} non-anchors revealed")
+            return graph_data
+            
+        except Exception as e:
+            logger.error(f"Error applying gamification rules: {str(e)}")
+            return graph_data
     
     def save_skill_tree(self, db: Session, user_id: int, tree_data: Dict[str, Any]) -> str:
         """
@@ -1309,11 +1561,11 @@ class CompetenceTreeService:
                 logger.error("No graph_id found in tree data")
                 return None
             
-            # Créer une nouvelle instance de UserSkillTree
+            # Create new UserSkillTree instance with competenceTree column (as per palmier spec)
             skill_tree = UserSkillTree(
                 user_id=user_id,
                 graph_id=graph_id,  # Use the UUID from tree_data
-                tree_data=json.dumps(clean_tree_data, cls=NumpyEncoder)
+                tree_data=clean_tree_data  # Store as JSONB directly
             )
             
             # Sauvegarder dans la base de données
@@ -1327,4 +1579,117 @@ class CompetenceTreeService:
         except Exception as e:
             logger.error(f"Erreur lors de la sauvegarde de l'arbre de compétences: {str(e)}")
             db.rollback()
-            return None 
+            return None
+    
+    def complete_challenge(self, db: Session, node_id: str, user_id: int) -> Dict[str, Any]:
+        """
+        Complete a challenge and update user progress following palmier specification.
+        
+        Args:
+            db: Database session
+            node_id: ESCO node ID to complete
+            user_id: User ID
+            
+        Returns:
+            Dict with completion status and updated information
+        """
+        try:
+            # Get the user's latest skill tree
+            skill_tree = db.query(UserSkillTree).filter(
+                UserSkillTree.user_id == user_id
+            ).order_by(UserSkillTree.created_at.desc()).first()
+            
+            if not skill_tree:
+                logger.error(f"No skill tree found for user {user_id}")
+                return {"success": False, "error": "No skill tree found"}
+            
+            # Parse tree data
+            tree_data = skill_tree.tree_data
+            if isinstance(tree_data, str):
+                tree_data = json.loads(tree_data)
+            
+            # Find the node to complete
+            nodes = tree_data.get("nodes", [])
+            node_to_complete = None
+            node_index = -1
+            
+            for i, node in enumerate(nodes):
+                if node.get("id") == node_id:
+                    node_to_complete = node
+                    node_index = i
+                    break
+            
+            if not node_to_complete:
+                logger.error(f"Node {node_id} not found in user {user_id}'s skill tree")
+                return {"success": False, "error": "Node not found"}
+            
+            # Check if node is available to complete
+            if node_to_complete.get("state") not in ["available", "locked"]:
+                logger.warning(f"Node {node_id} is not available for completion (state: {node_to_complete.get('state')})")
+                return {"success": False, "error": "Node not available for completion"}
+            
+            # Mark node as completed
+            nodes[node_index]["state"] = "completed"
+            nodes[node_index]["completed_at"] = json.dumps(datetime.now().isoformat())
+            
+            # Get XP reward
+            xp_reward = node_to_complete.get("xp_reward", 25)
+            
+            # Update user progress
+            from ..models.user_progress import UserProgress
+            user_progress = db.query(UserProgress).filter(UserProgress.user_id == user_id).first()
+            
+            if user_progress:
+                user_progress.total_xp = (user_progress.total_xp or 0) + xp_reward
+                # Update level based on XP (simple progression: level = XP // 100 + 1)
+                user_progress.level = (user_progress.total_xp // 100) + 1
+                user_progress.last_completed_node = node_id
+            else:
+                # Create new progress record
+                user_progress = UserProgress(
+                    user_id=user_id,
+                    total_xp=xp_reward,
+                    level=1,
+                    last_completed_node=node_id
+                )
+                db.add(user_progress)
+            
+            # Reveal children nodes (find edges where source is the completed node)
+            edges = tree_data.get("edges", [])
+            children_revealed = 0
+            
+            for edge in edges:
+                if edge.get("source") == node_id:
+                    target_id = edge.get("target")
+                    # Find and reveal the target node
+                    for i, node in enumerate(nodes):
+                        if node.get("id") == target_id and node.get("state") == "hidden":
+                            nodes[i]["visible"] = True
+                            nodes[i]["revealed"] = True
+                            nodes[i]["state"] = "available"
+                            children_revealed += 1
+                            break
+            
+            # Update tree data
+            tree_data["nodes"] = nodes
+            skill_tree.tree_data = tree_data
+            
+            # Commit all changes
+            db.commit()
+            
+            logger.info(f"Challenge {node_id} completed for user {user_id}: +{xp_reward} XP, {children_revealed} children revealed")
+            
+            return {
+                "success": True,
+                "xp_earned": xp_reward,
+                "total_xp": user_progress.total_xp,
+                "level": user_progress.level,
+                "children_revealed": children_revealed,
+                "node_state": "completed"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error completing challenge {node_id} for user {user_id}: {str(e)}")
+            logger.error(traceback.format_exc())
+            db.rollback()
+            return {"success": False, "error": str(e)} 
