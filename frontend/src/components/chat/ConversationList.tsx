@@ -28,12 +28,14 @@ interface ConversationListProps {
   selectedConversationId?: number;
   onSelectConversation: (conversation: Conversation) => void;
   onCreateNew: () => void;
+  refreshTrigger?: number;
 }
 
 export default function ConversationList({ 
   selectedConversationId, 
   onSelectConversation,
-  onCreateNew 
+  onCreateNew,
+  refreshTrigger 
 }: ConversationListProps) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,11 +46,19 @@ export default function ConversationList({
     fetchConversations();
   }, [filter]);
 
+  useEffect(() => {
+    if (refreshTrigger && refreshTrigger > 0) {
+      fetchConversations();
+    }
+  }, [refreshTrigger]);
+
   const fetchConversations = async () => {
     try {
       const params = new URLSearchParams();
       if (filter === 'favorites') params.append('is_favorite', 'true');
       if (filter === 'archived') params.append('is_archived', 'true');
+      
+      console.log('Fetching conversations with filter:', filter);
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations?${params}`, {
         headers: {
@@ -58,7 +68,11 @@ export default function ConversationList({
       
       if (response.ok) {
         const data = await response.json();
-        setConversations(data.conversations);
+        console.log('Conversations fetched:', data.conversations?.length || 0);
+        console.log('Conversations data:', data);
+        setConversations(data.conversations || data || []);
+      } else {
+        console.error('Failed to fetch conversations:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error fetching conversations:', error);

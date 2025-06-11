@@ -57,6 +57,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [showCategories, setShowCategories] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [sidebarView, setSidebarView] = useState<'conversations' | 'categories' | 'analytics'>('conversations');
+  const [refreshConversationList, setRefreshConversationList] = useState(0);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,7 +80,12 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   }, [currentConversation?.id]);
 
   const loadConversationMessages = async () => {
-    if (!currentConversation) return;
+    if (!currentConversation) {
+      console.log('No current conversation to load messages for');
+      return;
+    }
+    
+    console.log('Loading messages for conversation:', currentConversation.id);
     
     try {
       const response = await axios.get(
@@ -92,6 +98,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       );
 
       console.log('Messages API response:', response.data);
+      console.log('Number of messages loaded:', response.data.messages?.length || 0);
       setMessages(response.data.messages || []);
     } catch (error) {
       console.error('Failed to load conversation messages:', error);
@@ -116,7 +123,11 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       // If no conversation exists, create one
       let conversationId = currentConversation?.id;
       
+      console.log('handleSend - currentConversation:', currentConversation);
+      console.log('handleSend - conversationId:', conversationId);
+      
       if (!conversationId) {
+        console.log('No conversation ID found, creating new conversation');
         const createResponse = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations`,
           {
@@ -133,6 +144,8 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         
         conversationId = createResponse.data.id;
         setCurrentConversation(createResponse.data);
+        // Trigger conversation list refresh
+        setRefreshConversationList(prev => prev + 1);
       }
 
       // Send message to existing conversation
@@ -328,6 +341,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
               selectedConversationId={currentConversation?.id}
               onSelectConversation={handleSelectConversation}
               onCreateNew={handleCreateNewConversation}
+              refreshTrigger={refreshConversationList}
             />
           )}
           {sidebarView === 'categories' && (
@@ -395,23 +409,33 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-          {!messages || messages.length === 0 ? (
+          {/* Debug info */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-xs text-gray-400 p-2 bg-gray-100 rounded mb-4">
+              <div>Debug: {messages?.length || 0} total messages ({messages?.filter(m => m.role !== 'system').length || 0} display), Current conversation: {currentConversation?.id || 'none'}</div>
+              <div>Display Messages: {JSON.stringify(messages?.filter(m => m.role !== 'system').map(m => ({id: m.id, role: m.role, content: m.content.substring(0, 30) + '...'})) || [])}</div>
+            </div>
+          )}
+          
+          {!messages || messages.filter(m => m.role !== 'system').length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <Plus className="w-16 h-16 mb-4 opacity-20" />
               <p className="text-lg mb-2">Start a new conversation</p>
               <p className="text-sm">Ask me anything about your career path!</p>
             </div>
           ) : (
-            (messages || []).map((message) => (
-              <div key={message.id} id={`message-${message.id}`} className="transition-colors">
-                <ChatMessage 
-                  message={message.content}
-                  type={message.role === 'user' ? 'user' : 'ai'}
-                  userColor="bg-blue-500"
-                  aiColor="bg-gray-100 dark:bg-gray-800"
-                />
-              </div>
-            ))
+            (messages || [])
+              .filter(message => message.role !== 'system') // Filter out system messages
+              .map((message) => (
+                <div key={message.id} id={`message-${message.id}`} className="transition-colors">
+                  <ChatMessage 
+                    message={message.content}
+                    type={message.role === 'user' ? 'user' : 'ai'}
+                    userColor="bg-blue-500"
+                    aiColor="bg-gray-100 dark:bg-gray-800"
+                  />
+                </div>
+              ))
           )}
           {isTyping && (
             <ChatMessage 

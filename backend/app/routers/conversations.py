@@ -55,6 +55,46 @@ router = APIRouter(
     tags=["conversations"]
 )
 
+@router.get("", response_model=ConversationListResponse)
+async def get_conversations(
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    is_favorite: Optional[bool] = None,
+    is_archived: Optional[bool] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get user's conversations with optional filters"""
+    try:
+        from app.schemas.conversation import ConversationFilters
+        
+        filters = ConversationFilters(
+            is_favorite=is_favorite,
+            is_archived=is_archived
+        )
+        
+        conversations = await ConversationService.get_user_conversations(
+            db, current_user.id, filters, limit, offset
+        )
+        
+        total = await ConversationService.get_conversation_count(
+            db, current_user.id, filters
+        )
+        
+        return ConversationListResponse(
+            conversations=[ConversationResponse.from_orm(conv) for conv in conversations],
+            total=total,
+            limit=limit,
+            offset=offset
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting conversations: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve conversations"
+        )
+
 @router.post("", response_model=ConversationResponse)
 async def create_conversation(
     conversation: ConversationCreate,
