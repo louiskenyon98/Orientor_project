@@ -28,7 +28,7 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasGenerated, setHasGenerated] = useState<boolean>(false);
-  const [showBasicSkills, setShowBasicSkills] = useState<boolean>(false);
+  const [showBasicSkills, setShowBasicSkills] = useState<boolean>(true); // Always show basic skills first
 
   const generateSkills = async () => {
     if (!userId) {
@@ -146,13 +146,99 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
     checkExistingSkills();
   }, [userId]);
 
-  // Don't render until we have a userId
+  // For testing purposes, show basic skills even without userId
   if (userId === undefined) {
-    console.log('SkillShowcase: Waiting for userId...');
+    console.log('SkillShowcase: No userId, showing basic skills demo...');
     return (
-      <div className="w-full rounded-lg p-6" style={{ backgroundColor: 'var(--primary-color)', borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--border-color)' }}>
-        <div className="flex items-center justify-center py-8">
-          <p className="text-sm" style={{ color: 'var(--text-color)' }}>Loading skills...</p>
+      <div className={`w-full ${className}`}>
+        <div 
+          className="rounded-lg p-6"
+          style={{
+            backgroundColor: 'var(--primary-color)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: 'var(--border-color)'
+          }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 
+                className="text-xl font-bold"
+                style={{ color: 'var(--accent-color)' }}
+              >
+                Your Core Skills
+              </h2>
+              <p 
+                className="text-sm mt-1"
+                style={{ color: 'var(--text-color)' }}
+              >
+                Essential abilities for career success
+              </p>
+            </div>
+          </div>
+
+          {/* Basic Skills Grid - Demo */}
+          <div className="mb-4">
+            <p 
+              className="text-sm"
+              style={{ color: 'var(--text-color)' }}
+            >
+              Explore these fundamental skills
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
+            {[
+              { 
+                name: 'Creativity', 
+                description: 'Generate innovative ideas and original solutions'
+              },
+              { 
+                name: 'Leadership', 
+                description: 'Guide teams and inspire others toward goals'
+              },
+              { 
+                name: 'Critical Thinking', 
+                description: 'Analyze information and make logical decisions'
+              },
+              { 
+                name: 'Problem Solving', 
+                description: 'Identify issues and develop effective solutions'
+              },
+              { 
+                name: 'Digital Literacy', 
+                description: 'Use technology effectively and adapt to new tools'
+              }
+            ].map((skill, index) => (
+              <BasicSkillCard
+                key={index}
+                skill={{
+                  name: skill.name,
+                  description: skill.description
+                }}
+                className="h-full"
+              />
+            ))}
+          </div>
+
+          {/* Action bar */}
+          <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+            <div className="flex items-center gap-4">
+              <p 
+                className="text-sm"
+                style={{ color: 'var(--text-color)' }}
+              >
+                Login to get personalized skill insights
+              </p>
+            </div>
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
+              style={{ backgroundColor: 'var(--accent-color)' }}
+            >
+              Login
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -165,211 +251,125 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
   
   console.log(`SkillShowcase: Rendering for userId ${userId}`);
 
+  // Always show basic skills with new card design
   return (
     <div className={`w-full ${className}`}>
-      <div 
-        className="rounded-lg p-6"
-        style={{
-          backgroundColor: 'var(--primary-color)',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: 'var(--border-color)'
-        }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 
-              className="text-xl font-bold"
-              style={{ color: 'var(--accent-color)' }}
-            >
-              Your Personalized Skills
-            </h2>
-            <p 
-              className="text-sm mt-1"
-              style={{ color: 'var(--text-color)' }}
-            >
-              AI-curated skills based on your profile, interests, and personality
-            </p>
-          </div>
-          
-          {!hasGenerated && (
-            <button
-              onClick={generateSkills}
-              disabled={isLoading}
-              className="px-4 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 disabled:opacity-50"
-              style={{ backgroundColor: 'var(--accent-color)' }}
-            >
-              {isLoading ? 'Analyzing...' : 'Discover My Skills'}
-            </button>
-          )}
-        </div>
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <LoadingSpinner size="lg" />
-            <p 
-              className="mt-4 text-sm"
-              style={{ color: 'var(--text-color)' }}
-            >
-              AI is analyzing your profile to discover your key skills...
-            </p>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div 
-            className="rounded-lg p-4 mb-6"
-            style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgb(239, 68, 68)' }}
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 
+            className="text-xl font-bold"
+            style={{ color: 'var(--accent-color)' }}
           >
-            <p className="text-red-600 text-sm">{error}</p>
-            <button
-              onClick={generateSkills}
-              className="mt-2 text-red-600 text-sm underline hover:no-underline"
-            >
-              Try again
-            </button>
-          </div>
-        )}
-
-        {/* Skills Grid - AI-Curated Skills */}
-        {skills.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
-              {skills.map((skill, index) => (
-                <SkillCard
-                  key={skill.id || index}
-                  skill={skill}
-                  className="h-full"
-                />
-              ))}
-            </div>
-
-            {/* Action bar */}
-            <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-              <div className="flex items-center gap-4">
-                <p 
-                  className="text-sm"
-                  style={{ color: 'var(--text-color)' }}
-                >
-                  Ready to start your learning journey?
-                </p>
-                {/* Debug refresh button */}
-                <button
-                  onClick={() => {
-                    console.log('Manual refresh triggered');
-                    window.location.reload();
-                  }}
-                  className="text-xs px-3 py-1 rounded border"
-                  style={{ 
-                    borderColor: 'var(--border-color)',
-                    color: 'var(--text-color)'
-                  }}
-                >
-                  Refresh
-                </button>
-              </div>
-              <button
-                onClick={() => window.location.href = '/competence-tree'}
-                className="px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
-                style={{ backgroundColor: 'var(--accent-color)' }}
-              >
-                Explore Full Skill Tree
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Basic Skills Grid - Fallback when no AI skills */}
-        {showBasicSkills && skills.length === 0 && !hasGenerated && basicSkills && (
-          <>
-            <div className="mb-4">
-              <p 
-                className="text-sm"
-                style={{ color: 'var(--text-color)' }}
-              >
-                Your current skill levels (based on assessments)
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
-              {[
-                { name: 'Creativity', value: basicSkills.creativity, category: 'creative' },
-                { name: 'Leadership', value: basicSkills.leadership, category: 'leadership' },
-                { name: 'Critical Thinking', value: basicSkills.critical_thinking, category: 'cognitive' },
-                { name: 'Problem Solving', value: basicSkills.problem_solving, category: 'cognitive' },
-                { name: 'Digital Literacy', value: basicSkills.digital_literacy, category: 'technical' }
-              ].map((skill, index) => (
-                <BasicSkillCard
-                  key={index}
-                  skill={{
-                    name: skill.name,
-                    value: skill.value,
-                    level: '',
-                    category: skill.category
-                  }}
-                  className="h-full"
-                />
-              ))}
-            </div>
-
-            {/* Action bar for basic skills */}
-            <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-              <div className="flex items-center gap-4">
-                <p 
-                  className="text-sm"
-                  style={{ color: 'var(--text-color)' }}
-                >
-                  Want AI-powered skill insights?
-                </p>
-              </div>
-              <button
-                onClick={generateSkills}
-                disabled={isLoading}
-                className="px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
-                style={{ backgroundColor: 'var(--accent-color)' }}
-              >
-                {isLoading ? 'Analyzing...' : 'Get AI Skills'}
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Empty State */}
-        {!isLoading && !error && skills.length === 0 && !hasGenerated && !showBasicSkills && (
-          <div className="text-center py-12">
-            <div className="mb-4">
-              <div 
-                className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl"
-                style={{ backgroundColor: 'var(--border-color)' }}
-              >
-                🎯
-              </div>
-            </div>
-            <h3 
-              className="text-lg font-medium mb-2"
-              style={{ color: 'var(--accent-color)' }}
-            >
-              Discover Your Key Skills
-            </h3>
-            <p 
-              className="text-sm mb-4 max-w-md mx-auto"
-              style={{ color: 'var(--text-color)' }}
-            >
-              Let our AI analyze your profile, personality, and interests to identify your core skills and create a personalized learning path.
-            </p>
-            <button
-              onClick={generateSkills}
-              disabled={isLoading}
-              className="px-6 py-3 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
-              style={{ backgroundColor: 'var(--accent-color)' }}
-            >
-              Get Started
-            </button>
-          </div>
+            Your Core Skills
+          </h2>
+          <p 
+            className="text-sm mt-1"
+            style={{ color: 'var(--text-color)' }}
+          >
+            Essential abilities for career success
+          </p>
+        </div>
+        
+        {userId && !hasGenerated && (
+          <button
+            onClick={generateSkills}
+            disabled={isLoading}
+            className="px-4 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 disabled:opacity-50"
+            style={{ backgroundColor: 'var(--accent-color)' }}
+          >
+            {isLoading ? 'Analyzing...' : 'Get AI Insights'}
+          </button>
         )}
       </div>
+
+      {/* Always show Basic Skills with new design */}
+      <div className="mb-4">
+        <p 
+          className="text-sm"
+          style={{ color: 'var(--text-color)' }}
+        >
+          {userId ? 'Your fundamental skills' : 'Explore these fundamental skills'}
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-6">
+          {[
+            { 
+              name: 'Creativity', 
+              description: 'Generate innovative ideas and original solutions',
+              icon: '◇'
+            },
+            { 
+              name: 'Leadership', 
+              description: 'Guide teams and inspire others toward goals',
+              icon: '◆'
+            },
+            { 
+              name: 'Critical Thinking', 
+              description: 'Analyze information and make logical decisions',
+              icon: '○'
+            },
+            { 
+              name: 'Problem Solving', 
+              description: 'Identify issues and develop effective solutions',
+              icon: '◎'
+            },
+            { 
+              name: 'Digital Literacy', 
+              description: 'Use technology effectively and adapt to new tools',
+              icon: '□'
+            }
+          ].map((skill, index) => (
+            <BasicSkillCard
+              key={index}
+              skill={{
+                name: skill.name,
+                description: skill.description,
+                icon: skill.icon
+              }}
+              className="h-full"
+            />
+          ))}
+        </div>
+
+      {/* Action bar */}
+      <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="flex items-center gap-4">
+          <p 
+            className="text-sm"
+            style={{ color: 'var(--text-color)' }}
+          >
+            {userId ? 'Want AI-powered insights?' : 'Login to get personalized insights'}
+          </p>
+        </div>
+        <button
+          onClick={() => userId ? generateSkills() : window.location.href = '/login'}
+          disabled={isLoading}
+          className="px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
+          style={{ backgroundColor: 'var(--accent-color)' }}
+        >
+          {userId ? (isLoading ? 'Analyzing...' : 'Get AI Skills') : 'Login'}
+        </button>
+      </div>
+
+      {/* Show loading overlay if AI analysis is running */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 text-center">
+            <LoadingSpinner size="lg" />
+            <p className="mt-4 text-sm text-gray-600">
+              AI is analyzing your profile...
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Show error if any */}
+      {error && (
+        <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -8,32 +8,44 @@
 
 .card {
   position: relative;
-  width: 220px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 20px 10px;
+  justify-content: center;
+  padding: 20px 15px;
   border-radius: 10px;
   backdrop-filter: blur(30px);
   background-color: rgba(65, 65, 65, 0.308);
   border: 1px solid rgba(255, 255, 255, 0.089);
   cursor: pointer;
+  text-align: center;
+  gap: 12px;
+}
+
+.icon {
+  font-size: 1.8em;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  filter: grayscale(1);
 }
 
 .city {
   font-weight: 700;
-  font-size: 0.9em;
+  font-size: 1em;
   letter-spacing: 1.2px;
   color: white;
+  margin-bottom: 4px;
 }
 
 .weather {
   font-weight: 500;
-  font-size: 0.7em;
-  letter-spacing: 1.2px;
+  font-size: 0.75em;
+  letter-spacing: 0.5px;
   color: rgb(197, 197, 197);
+  line-height: 1.4;
+  max-width: 160px;
 }
 
 .temp {
