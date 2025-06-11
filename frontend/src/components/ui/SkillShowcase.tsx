@@ -29,10 +29,12 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
   const [error, setError] = useState<string | null>(null);
   const [hasGenerated, setHasGenerated] = useState<boolean>(false);
   const [showBasicSkills, setShowBasicSkills] = useState<boolean>(true); // Always show basic skills first
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [skillDescriptions, setSkillDescriptions] = useState<{[key: string]: string}>({});
 
-  const generateSkills = async () => {
-    if (!userId) {
-      setError('User ID not available');
+  const generateSkillDescription = async (skillName: string) => {
+    if (skillDescriptions[skillName]) {
+      setSelectedSkill(skillName);
       return;
     }
 
@@ -40,40 +42,47 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
     setError(null);
 
     try {
-      // Generate the competence tree which will infer anchor skills
-      const result = await generateCompetenceTree(userId);
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = localStorage.getItem('access_token');
       
-      if (result.graph_id) {
-        // Fetch the generated tree data to get anchor skills
-        const response = await fetch(`/api/v1/competence-tree/${result.graph_id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
-        });
+      // Generate AI description for the skill
+      const response = await fetch(`${API_URL}/insight/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          prompt: `Generate a detailed, professional description for the skill "${skillName}". Include:
+          - What this skill involves
+          - Why it's important in today's workplace
+          - How to develop this skill
+          - Real-world applications
+          Keep it engaging and practical, around 150-200 words.`,
+          context: `skill_analysis_${skillName.toLowerCase().replace(' ', '_')}`
+        })
+      });
 
-        if (response.ok) {
-          const treeData = await response.json();
-          
-          // Extract anchor skills from tree data
-          const anchorMetadata = treeData.anchor_metadata || [];
-          if (anchorMetadata.length > 0) {
-            setSkills(anchorMetadata.slice(0, 5)); // Show top 5 skills
-            setHasGenerated(true);
-          } else {
-            setError('No anchor skills found in generated tree');
-          }
-        } else {
-          setError('Failed to fetch generated skill tree');
-        }
+      if (response.ok) {
+        const data = await response.json();
+        setSkillDescriptions(prev => ({
+          ...prev,
+          [skillName]: data.content || data.insight || 'Description generated successfully.'
+        }));
+        setSelectedSkill(skillName);
       } else {
-        setError('Failed to generate skill tree');
+        setError('Failed to generate skill description');
       }
     } catch (err) {
-      console.error('Error generating skills:', err);
-      setError('An error occurred while generating your skills');
+      console.error('Error generating skill description:', err);
+      setError('An error occurred while generating the description');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSkillClick = (skillName: string) => {
+    generateSkillDescription(skillName);
   };
 
   // Fetch basic skills
@@ -254,44 +263,6 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
   // Always show basic skills with new card design
   return (
     <div className={`w-full ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 
-            className="text-xl font-bold"
-            style={{ color: 'var(--accent-color)' }}
-          >
-            Your Core Skills
-          </h2>
-          <p 
-            className="text-sm mt-1"
-            style={{ color: 'var(--text-color)' }}
-          >
-            Essential abilities for career success
-          </p>
-        </div>
-        
-        {userId && !hasGenerated && (
-          <button
-            onClick={generateSkills}
-            disabled={isLoading}
-            className="px-4 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: 'var(--accent-color)' }}
-          >
-            {isLoading ? 'Analyzing...' : 'Get AI Insights'}
-          </button>
-        )}
-      </div>
-
-      {/* Always show Basic Skills with new design */}
-      <div className="mb-4">
-        <p 
-          className="text-sm"
-          style={{ color: 'var(--text-color)' }}
-        >
-          {userId ? 'Your fundamental skills' : 'Explore these fundamental skills'}
-        </p>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-6">
           {[
             { 
@@ -328,46 +299,95 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
                 icon: skill.icon
               }}
               className="h-full"
+              onClick={handleSkillClick}
             />
           ))}
-        </div>
-
-      {/* Action bar */}
-      <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-        <div className="flex items-center gap-4">
-          <p 
-            className="text-sm"
-            style={{ color: 'var(--text-color)' }}
-          >
-            {userId ? 'Want AI-powered insights?' : 'Login to get personalized insights'}
-          </p>
-        </div>
-        <button
-          onClick={() => userId ? generateSkills() : window.location.href = '/login'}
-          disabled={isLoading}
-          className="px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
-          style={{ backgroundColor: 'var(--accent-color)' }}
-        >
-          {userId ? (isLoading ? 'Analyzing...' : 'Get AI Skills') : 'Login'}
-        </button>
       </div>
 
-      {/* Show loading overlay if AI analysis is running */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 text-center">
-            <LoadingSpinner size="lg" />
-            <p className="mt-4 text-sm text-gray-600">
-              AI is analyzing your profile...
-            </p>
+      {/* Modal for displaying AI-generated skill descriptions */}
+      {selectedSkill && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div 
+            className="bg-white rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            style={{
+              backgroundColor: 'var(--primary-color)',
+              borderColor: 'var(--border-color)',
+              borderWidth: '1px',
+              borderStyle: 'solid'
+            }}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 
+                className="text-xl font-bold"
+                style={{ color: 'var(--accent-color)' }}
+              >
+                {selectedSkill}
+              </h3>
+              <button
+                onClick={() => setSelectedSkill(null)}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+                style={{ color: 'var(--text-color)' }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner size="md" />
+                  <p 
+                    className="ml-3 text-sm"
+                    style={{ color: 'var(--text-color)' }}
+                  >
+                    Generating description...
+                  </p>
+                </div>
+              ) : skillDescriptions[selectedSkill] ? (
+                <div>
+                  <p 
+                    className="text-sm leading-relaxed whitespace-pre-line"
+                    style={{ color: 'var(--text-color)' }}
+                  >
+                    {skillDescriptions[selectedSkill]}
+                  </p>
+                </div>
+              ) : (
+                <p 
+                  className="text-sm"
+                  style={{ color: 'var(--text-color)' }}
+                >
+                  Click to generate a detailed description for this skill.
+                </p>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setSelectedSkill(null)}
+                className="px-4 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90"
+                style={{ backgroundColor: 'var(--accent-color)' }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Show error if any */}
+      {/* Error notification */}
       {error && (
-        <div className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg">
-          <p className="text-red-600 text-sm">{error}</p>
+        <div className="fixed bottom-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50">
+          <p className="text-sm">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="ml-2 text-white hover:text-gray-200"
+          >
+            ×
+          </button>
         </div>
       )}
     </div>
