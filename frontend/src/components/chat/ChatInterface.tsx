@@ -69,7 +69,19 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   };
 
   useEffect(() => {
-    scrollToBottom();
+    // Only auto-scroll on new messages if user is already at bottom
+    if (messagesEndRef.current) {
+      const container = messagesEndRef.current.parentElement;
+      if (container) {
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+        
+        // Always scroll to bottom for new conversations or when user is at bottom
+        if (isAtBottom || messages.length <= 2) {
+          setTimeout(() => scrollToBottom(), 50);
+        }
+      }
+    }
   }, [messages]);
 
   // Load conversation when selected
@@ -221,7 +233,10 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsTyping(false);
-      inputRef.current?.focus();
+      // Keep focus on input after sending message
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   };
 
@@ -239,6 +254,10 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     if (window.innerWidth < 768) {
       setShowSidebar(false);
     }
+    // Focus on input for new conversation
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   const handleSearchResult = (conversationId: number, messageId: number) => {
@@ -431,13 +450,6 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-          {/* Debug info */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="text-xs text-gray-400 p-2 bg-gray-100 rounded mb-4">
-              <div>Debug: {messages?.length || 0} total messages ({messages?.filter(m => m.role !== 'system').length || 0} display), Current conversation: {currentConversation?.id || 'none'}</div>
-              <div>Display Messages: {JSON.stringify(messages?.filter(m => m.role !== 'system').map(m => ({id: m.id, role: m.role, content: m.content.substring(0, 30) + '...'})) || [])}</div>
-            </div>
-          )}
           
           {!messages || messages.filter(m => m.role !== 'system').length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
