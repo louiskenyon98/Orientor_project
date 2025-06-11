@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import SkillCard from './SkillCard';
+import BasicSkillCard from './BasicSkillCard';
 import LoadingSpinner from './LoadingSpinner';
 import { generateCompetenceTree } from '@/services/competenceTreeService';
+import { getUserSkills, UserSkills } from '@/services/spaceService';
 
 interface SkillShowcaseProps {
   userId?: number;
@@ -22,9 +24,11 @@ interface AnchorSkill {
 
 const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' }) => {
   const [skills, setSkills] = useState<AnchorSkill[]>([]);
+  const [basicSkills, setBasicSkills] = useState<UserSkills | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasGenerated, setHasGenerated] = useState<boolean>(false);
+  const [showBasicSkills, setShowBasicSkills] = useState<boolean>(false);
 
   const generateSkills = async () => {
     if (!userId) {
@@ -72,6 +76,20 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
     }
   };
 
+  // Fetch basic skills
+  const fetchBasicSkills = async () => {
+    try {
+      const userSkills = await getUserSkills();
+      setBasicSkills(userSkills);
+      
+      // Check if user has any non-null skill values
+      const hasSkillData = Object.values(userSkills).some(value => value !== null && value !== undefined);
+      setShowBasicSkills(hasSkillData);
+    } catch (err) {
+      console.error('Error fetching basic skills:', err);
+    }
+  };
+
   // Check if user already has anchor skills
   useEffect(() => {
     const checkExistingSkills = async () => {
@@ -108,12 +126,18 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
             console.log(`Found ${data.anchor_skills.length} existing anchor skills`);
           } else {
             console.log('No anchor skills found in response');
+            // Fetch basic skills as fallback
+            await fetchBasicSkills();
           }
         } else {
           console.log(`Failed to fetch anchor skills: ${response.status} ${response.statusText}`);
+          // Fetch basic skills as fallback
+          await fetchBasicSkills();
         }
       } catch (err) {
         console.error('Error checking for existing anchor skills:', err);
+        // Fetch basic skills as fallback
+        await fetchBasicSkills();
       } finally {
         setIsLoading(false);
       }
@@ -210,7 +234,7 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
           </div>
         )}
 
-        {/* Skills Grid */}
+        {/* Skills Grid - AI-Curated Skills */}
         {skills.length > 0 && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
@@ -258,8 +282,62 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
           </>
         )}
 
+        {/* Basic Skills Grid - Fallback when no AI skills */}
+        {showBasicSkills && skills.length === 0 && !hasGenerated && basicSkills && (
+          <>
+            <div className="mb-4">
+              <p 
+                className="text-sm"
+                style={{ color: 'var(--text-color)' }}
+              >
+                Your current skill levels (based on assessments)
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
+              {[
+                { name: 'Creativity', value: basicSkills.creativity, category: 'creative' },
+                { name: 'Leadership', value: basicSkills.leadership, category: 'leadership' },
+                { name: 'Critical Thinking', value: basicSkills.critical_thinking, category: 'cognitive' },
+                { name: 'Problem Solving', value: basicSkills.problem_solving, category: 'cognitive' },
+                { name: 'Digital Literacy', value: basicSkills.digital_literacy, category: 'technical' }
+              ].map((skill, index) => (
+                <BasicSkillCard
+                  key={index}
+                  skill={{
+                    name: skill.name,
+                    value: skill.value,
+                    level: '',
+                    category: skill.category
+                  }}
+                  className="h-full"
+                />
+              ))}
+            </div>
+
+            {/* Action bar for basic skills */}
+            <div className="flex items-center justify-between pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+              <div className="flex items-center gap-4">
+                <p 
+                  className="text-sm"
+                  style={{ color: 'var(--text-color)' }}
+                >
+                  Want AI-powered skill insights?
+                </p>
+              </div>
+              <button
+                onClick={generateSkills}
+                disabled={isLoading}
+                className="px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 hover:opacity-90 hover:transform hover:scale-105"
+                style={{ backgroundColor: 'var(--accent-color)' }}
+              >
+                {isLoading ? 'Analyzing...' : 'Get AI Skills'}
+              </button>
+            </div>
+          </>
+        )}
+
         {/* Empty State */}
-        {!isLoading && !error && skills.length === 0 && !hasGenerated && (
+        {!isLoading && !error && skills.length === 0 && !hasGenerated && !showBasicSkills && (
           <div className="text-center py-12">
             <div className="mb-4">
               <div 

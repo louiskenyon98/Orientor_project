@@ -331,6 +331,34 @@ def delete_note(
     return None
 
 # ===== User Skills Endpoints =====
+@router.get("/skills", response_model=UserSkillUpdate)
+def get_user_skills(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Get the user's skills record
+    user_skill = db.query(UserSkill).filter(UserSkill.user_id == current_user.id).first()
+    if not user_skill:
+        # Return default values if no record exists
+        return UserSkillUpdate()
+    
+    # Return the skills
+    return UserSkillUpdate(
+        creativity=user_skill.creativity,
+        leadership=user_skill.leadership,
+        digital_literacy=user_skill.digital_literacy,
+        critical_thinking=user_skill.critical_thinking,
+        problem_solving=user_skill.problem_solving,
+        analytical_thinking=user_skill.analytical_thinking,
+        attention_to_detail=user_skill.attention_to_detail,
+        collaboration=user_skill.collaboration,
+        adaptability=user_skill.adaptability,
+        independence=user_skill.independence,
+        evaluation=user_skill.evaluation,
+        decision_making=user_skill.decision_making,
+        stress_tolerance=user_skill.stress_tolerance
+    )
+
 @router.put("/skills", response_model=UserSkillUpdate)
 def update_user_skills(
     skills: UserSkillUpdate,

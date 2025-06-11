@@ -276,6 +276,20 @@ export const generateLLMAnalysis = async (input: LLMAnalysisInput): Promise<LLMA
   }
 };
 
+// Get user skills
+export const getUserSkills = async (): Promise<UserSkills> => {
+  try {
+    const response = await axios.get<UserSkills>(
+      `${API_URL}/space/skills`, 
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching skills:', error);
+    throw error;
+  }
+};
+
 // Update user skills
 export const updateUserSkills = async (skills: UserSkills): Promise<UserSkills> => {
   try {
