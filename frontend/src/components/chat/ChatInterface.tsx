@@ -53,7 +53,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
@@ -233,9 +233,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
   const handleSelectConversation = (conversation: Conversation) => {
     setCurrentConversation(conversation);
-    if (window.innerWidth < 768) {
-      setShowSidebar(false);
-    }
+    setShowSidebar(false); // Always hide sidebar when selecting conversation
   };
 
   const handleCreateNewConversation = () => {
@@ -244,9 +242,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     setSelectedCategory(null);
     setChatStarted(false); // Reset to initial state
     setShowConversations(false);
-    if (window.innerWidth < 768) {
-      setShowSidebar(false);
-    }
+    setShowSidebar(false); // Always hide sidebar when creating new conversation
     // Focus on input for new conversation
     setTimeout(() => {
       inputRef.current?.focus();
@@ -422,11 +418,22 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
   // Full chat interface after first message
   return (
-    <div className="flex h-[calc(100vh-4rem)] max-w-7xl mx-auto">
-      {/* Sidebar */}
-      <div className={`${showSidebar ? 'block' : 'hidden'} md:block w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex flex-col`}>
+    <div className="flex h-[calc(100vh-4rem)] max-w-7xl mx-auto relative">
+      {/* Sidebar - Hidden by default, slides in when shown */}
+      <div className={`absolute left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out z-20 ${
+        showSidebar ? 'translate-x-0' : '-translate-x-full'
+      } flex flex-col`}>
         {/* Sidebar Navigation */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Chat Menu</h3>
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            >
+              ×
+            </button>
+          </div>
           <div className="flex space-x-1">
             <button
               onClick={() => setSidebarView('conversations')}
@@ -485,8 +492,16 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         </div>
       </div>
 
+      {/* Overlay when sidebar is shown */}
+      {showSidebar && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-10"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full">
         {/* Chat Header */}
         {currentConversation ? (
           <ConversationManager
@@ -504,7 +519,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowSidebar(!showSidebar)}
-                  className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
