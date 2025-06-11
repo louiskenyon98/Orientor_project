@@ -58,39 +58,15 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [sidebarView, setSidebarView] = useState<'conversations' | 'categories' | 'analytics'>('conversations');
   const [refreshConversationList, setRefreshConversationList] = useState(0);
-  const [userScrolledUp, setUserScrolledUp] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // Handle scroll events to detect when user scrolls up
-  const handleScroll = () => {
-    if (messagesContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-      setUserScrolledUp(distanceFromBottom > 100);
-    }
-  };
-
-  useEffect(() => {
-    // Only auto-scroll if user hasn't scrolled up manually
-    if (!userScrolledUp) {
-      setTimeout(() => scrollToBottom(), 50);
-    }
-  }, [messages, userScrolledUp]);
 
   // Load conversation when selected
   useEffect(() => {
     if (currentConversation) {
       loadConversationMessages();
-      setUserScrolledUp(false); // Reset scroll state for new conversation
     }
   }, [currentConversation?.id]);
 
@@ -217,8 +193,6 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       ];
       
       setMessages(prev => [...prev, ...newMessages]);
-      // Force scroll to bottom when user sends a new message
-      setUserScrolledUp(false);
     } catch (error: any) {
       console.error('Failed to send message:', error);
       
@@ -256,7 +230,6 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     setCurrentConversation(null);
     setMessages([]);
     setSelectedCategory(null);
-    setUserScrolledUp(false); // Reset scroll state for new conversation
     if (window.innerWidth < 768) {
       setShowSidebar(false);
     }
@@ -455,11 +428,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         )}
 
         {/* Messages Area */}
-        <div 
-          ref={messagesContainerRef}
-          onScroll={handleScroll}
-          className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4"
-        >
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
           
           {!messages || messages.filter(m => m.role !== 'system').length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
@@ -489,7 +458,6 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
               aiColor="bg-gray-100 dark:bg-gray-800"
             />
           )}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
