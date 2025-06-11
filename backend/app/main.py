@@ -110,10 +110,11 @@ logger.info("Auth router included successfully")
 # Include profiles router after auth router
 app.include_router(profiles_router)
 logger.info("Profiles router included successfully")
-# Include remaining routers
+# Include remaining routers  
 app.include_router(test_router)
-app.include_router(chat_router)
+# Mount conversations_router BEFORE chat_router to prioritize specific routes
 app.include_router(conversations_router)
+app.include_router(chat_router)
 app.include_router(share_router)
 app.include_router(chat_analytics_router)
 app.include_router(peers_router)
