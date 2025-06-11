@@ -10,6 +10,7 @@ import SearchInterface from './SearchInterface';
 import CategoryManager from './CategoryManager';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import { Menu, Search, Folder, BarChart3, Plus } from 'lucide-react';
+import styles from './ChatBot.module.css';
 
 interface Message {
   id: number;
@@ -58,17 +59,27 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [sidebarView, setSidebarView] = useState<'conversations' | 'categories' | 'analytics'>('conversations');
   const [refreshConversationList, setRefreshConversationList] = useState(0);
+  const [chatStarted, setChatStarted] = useState(false);
+  const [showConversations, setShowConversations] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Load conversation when selected
   useEffect(() => {
     if (currentConversation) {
       loadConversationMessages();
+      setChatStarted(true); // Show full chat interface when conversation is loaded
     }
   }, [currentConversation?.id]);
+
+  // Check if chat should be started based on messages
+  useEffect(() => {
+    if (messages && messages.filter(m => m.role !== 'system').length > 0) {
+      setChatStarted(true);
+    }
+  }, [messages]);
 
   const loadConversationMessages = async () => {
     if (!currentConversation) {
@@ -193,6 +204,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       ];
       
       setMessages(prev => [...prev, ...newMessages]);
+      setChatStarted(true); // Transition to full chat interface after sending first message
     } catch (error: any) {
       console.error('Failed to send message:', error);
       
@@ -230,6 +242,8 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     setCurrentConversation(null);
     setMessages([]);
     setSelectedCategory(null);
+    setChatStarted(false); // Reset to initial state
+    setShowConversations(false);
     if (window.innerWidth < 768) {
       setShowSidebar(false);
     }
@@ -314,6 +328,99 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     }
   };
 
+  if (!chatStarted && !currentConversation) {
+    // Initial state - centered chat interface
+    return (
+      <div className="flex h-[calc(100vh-4rem)] relative">
+        {/* Conversations Sidebar - Slides in from left */}
+        <div className={`absolute left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out z-10 ${
+          showConversations ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Conversations</h3>
+              <button
+                onClick={() => setShowConversations(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          <ConversationList
+            selectedConversationId={currentConversation?.id}
+            onSelectConversation={handleSelectConversation}
+            onCreateNew={handleCreateNewConversation}
+            refreshTrigger={refreshConversationList}
+          />
+        </div>
+
+        {/* Main centered content */}
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          {/* NAVIGO Title with Gradient */}
+          <div className="mb-12 text-center">
+            <h1 className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
+              NAVIGO
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Your AI career guidance companion
+            </p>
+          </div>
+
+          {/* Chat Interface Container */}
+          <div className={styles.container_chat_bot}>
+            <div className={styles['container-chat-options']}>
+              <div className={styles.chat}>
+                <div className={styles['chat-bot']}>
+                  <textarea
+                    ref={inputRef}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !isTyping && (e.preventDefault(), handleSend())}
+                    placeholder="Ask me anything about your career path..."
+                    disabled={isTyping}
+                  />
+                </div>
+                <div className={styles.options}>
+                  <div className={styles['btns-add']}>
+                    <button
+                      onClick={() => setShowConversations(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
+                        <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
+                      </svg>
+                      <span className="text-xs">History</span>
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleSend}
+                    disabled={!inputText.trim() || isTyping}
+                    className={styles['btn-submit']}
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Overlay when conversations are shown */}
+        {showConversations && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-5"
+            onClick={() => setShowConversations(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Full chat interface after first message
   return (
     <div className="flex h-[calc(100vh-4rem)] max-w-7xl mx-auto">
       {/* Sidebar */}
@@ -429,27 +536,18 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-          
-          {!messages || messages.filter(m => m.role !== 'system').length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <Plus className="w-16 h-16 mb-4 opacity-20" />
-              <p className="text-lg mb-2">Start a new conversation</p>
-              <p className="text-sm">Ask me anything about your career path!</p>
-            </div>
-          ) : (
-            (messages || [])
-              .filter(message => message.role !== 'system') // Filter out system messages
-              .map((message) => (
-                <div key={message.id} id={`message-${message.id}`} className="transition-colors">
-                  <ChatMessage 
-                    message={message.content}
-                    type={message.role === 'user' ? 'user' : 'ai'}
-                    userColor="bg-blue-500"
-                    aiColor="bg-gray-100 dark:bg-gray-800"
-                  />
-                </div>
-              ))
-          )}
+          {(messages || [])
+            .filter(message => message.role !== 'system') // Filter out system messages
+            .map((message) => (
+              <div key={message.id} id={`message-${message.id}`} className="transition-colors">
+                <ChatMessage 
+                  message={message.content}
+                  type={message.role === 'user' ? 'user' : 'ai'}
+                  userColor="bg-blue-500"
+                  aiColor="bg-gray-100 dark:bg-gray-800"
+                />
+              </div>
+            ))}
           {isTyping && (
             <ChatMessage 
               message="Thinking..."
@@ -460,23 +558,23 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
           )}
         </div>
 
-        {/* Input Area */}
+        {/* Input Area - Fixed at bottom */}
         <div className="border-t border-gray-200 dark:border-gray-700 p-3 md:p-4 bg-white dark:bg-gray-900">
           <div className="flex items-center space-x-2">
-            <input
+            <textarea
               ref={inputRef}
-              type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !isTyping && handleSend()}
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !isTyping && (e.preventDefault(), handleSend())}
               placeholder="Type your message..."
-              className="flex-1 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              rows="1"
               disabled={isTyping}
             />
             <button 
               onClick={handleSend}
               disabled={!inputText.trim() || isTyping}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 h-[46px] min-w-[80px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 min-w-[80px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               aria-label="Send message"
             >
               <span className="hidden xs:inline">Send</span>
