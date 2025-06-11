@@ -9,6 +9,7 @@ import styles from './loginForm.module.css';
 interface LoginResponse {
     access_token: string;
     token_type: string;
+    user_id: number;
 }
 
 export default function LoginPage() {

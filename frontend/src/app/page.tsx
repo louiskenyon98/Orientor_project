@@ -77,9 +77,14 @@ export default function Home() {
     const fetchCurrentUser = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        if (!token) return;
+        if (!token) {
+          console.log('No access token found - user needs to login');
+          return;
+        }
         
-        const response = await fetch('/api/v1/users/me', {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        console.log('Fetching current user with token...');
+        const response = await fetch(`${API_URL}/users/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -92,6 +97,11 @@ export default function Home() {
           console.log('Set currentUserId to:', userData.id);
         } else {
           console.error('Failed to fetch user data:', response.status, response.statusText);
+          if (response.status === 401) {
+            console.log('Token expired or invalid - user needs to login again');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_id');
+          }
         }
       } catch (err) {
         console.error('Error fetching current user:', err);
@@ -249,6 +259,7 @@ export default function Home() {
 
               {/* Skill Showcase Section - As specified in palmier documentation */}
               <div className="mb-10">
+                {console.log('Rendering SkillShowcase with currentUserId:', currentUserId)}
                 <SkillShowcase userId={currentUserId} />
               </div>
 
