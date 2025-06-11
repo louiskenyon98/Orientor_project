@@ -98,8 +98,23 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       );
 
       console.log('Messages API response:', response.data);
-      console.log('Number of messages loaded:', response.data.messages?.length || 0);
-      setMessages(response.data.messages || []);
+      
+      // Handle both unified format {"messages": [...]} and legacy format [...]
+      let messagesData;
+      if (response.data.messages) {
+        // Unified format from conversations_router  
+        messagesData = response.data.messages;
+        console.log('Using unified format - Number of messages loaded:', messagesData.length);
+      } else if (Array.isArray(response.data)) {
+        // Legacy format from chat_router (fallback)
+        messagesData = response.data;
+        console.log('Using legacy format - Number of messages loaded:', messagesData.length);
+      } else {
+        console.warn('Unexpected response format:', response.data);
+        messagesData = [];
+      }
+      
+      setMessages(messagesData);
     } catch (error) {
       console.error('Failed to load conversation messages:', error);
       setMessages([]);
@@ -120,8 +135,9 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     setInputText('');
 
     try {
-      // If no conversation exists, create one
+      // If no conversation exists, create one and wait for completion
       let conversationId = currentConversation?.id;
+      let conversationToUse = currentConversation;
       
       console.log('handleSend - currentConversation:', currentConversation);
       console.log('handleSend - conversationId:', conversationId);
@@ -143,9 +159,15 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         );
         
         conversationId = createResponse.data.id;
-        setCurrentConversation(createResponse.data);
+        conversationToUse = createResponse.data;
+        
+        // Update state and wait for it to propagate  
+        setCurrentConversation(conversationToUse);
         // Trigger conversation list refresh
         setRefreshConversationList(prev => prev + 1);
+        
+        // Small delay to ensure state has propagated
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
 
       // Send message to existing conversation

@@ -239,34 +239,52 @@ async def generate_title(
 @router.get("/{conversation_id}/messages")
 async def get_conversation_messages(
     conversation_id: int,
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get all messages in a conversation"""
-    # Verify conversation belongs to user
-    conversation = await ConversationService.get_conversation_by_id(
-        db, conversation_id, current_user.id
-    )
-    if not conversation:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Conversation not found"
+    """Get messages for a conversation with unified response format"""
+    try:
+        # Verify conversation belongs to user
+        conversation = await ConversationService.get_conversation_by_id(
+            db, conversation_id, current_user.id
         )
-    
-    messages = await ChatMessageService.get_conversation_messages(db, conversation_id, limit=100)
-    
-    # Serialize messages to match frontend expectations
-    serialized_messages = []
-    for msg in messages:
-        serialized_messages.append({
-            "id": msg.id,
-            "role": msg.role,
-            "content": msg.content,
-            "created_at": msg.created_at.isoformat(),
-            "tokens_used": msg.tokens_used
-        })
-    
-    return {"messages": serialized_messages}
+        if not conversation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Conversation not found"
+            )
+        
+        messages = await ChatMessageService.get_conversation_messages(
+            db, conversation_id, limit, offset
+        )
+        
+        # Serialize messages in chronological order with consistent format
+        serialized_messages = []
+        for msg in reversed(messages):  # Chronological order for display
+            serialized_messages.append({
+                "id": msg.id,
+                "role": msg.role,
+                "content": msg.content,
+                "created_at": msg.created_at.isoformat(),
+                "tokens_used": msg.tokens_used
+            })
+        
+        return {
+            "messages": serialized_messages,
+            "total": len(serialized_messages),
+            "conversation_id": conversation_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting messages: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve messages"
+        )
 
 @router.get("/{conversation_id}/statistics", response_model=MessageStats)
 async def get_conversation_statistics(
