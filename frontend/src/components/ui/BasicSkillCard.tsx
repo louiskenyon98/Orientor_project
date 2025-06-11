@@ -10,12 +10,16 @@ interface BasicSkillCardProps {
     icon: string;
   };
   className?: string;
+  onClick?: (skillName: string) => void;
 }
 
-const BasicSkillCard: React.FC<BasicSkillCardProps> = ({ skill, className = '' }) => {
+const BasicSkillCard: React.FC<BasicSkillCardProps> = ({ skill, className = '', onClick }) => {
   return (
     <div className={`${styles.cardContainer} ${className}`}>
-      <div className={styles.card}>
+      <div 
+        className={styles.card}
+        onClick={() => onClick?.(skill.name)}
+      >
         {/* Skill icon */}
         <div className={styles.icon}>
           {skill.icon}
