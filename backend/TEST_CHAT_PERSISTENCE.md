@@ -18,7 +18,7 @@ The comprehensive chat persistence system has been successfully implemented with
 - `POST /chat/send` - Send message (now with persistence)
 - `POST /chat/clear` - Archive conversations instead of clearing memory
 - `GET /chat/conversations` - List user's conversations with filters
-- `GET /chat/conversations/{id}/messages` - Get conversation messages
+- `GET /chat/conversations/{id}/messages` - Get conversation messages*
 
 #### Conversation Management:
 - `POST /chat/conversations` - Create new conversation
