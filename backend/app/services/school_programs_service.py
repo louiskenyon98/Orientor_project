@@ -10,7 +10,14 @@ import logging
 import hashlib
 import json
 
-import redis.asyncio as redis
+# Make Redis optional
+try:
+    import redis.asyncio as redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    redis = None
+    REDIS_AVAILABLE = False
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.school_programs import ProgramSearchQuery, SearchResultsResponse, SaveProgramRequest
@@ -22,9 +29,9 @@ logger = logging.getLogger(__name__)
 class ProgramSearchService:
     """Service for program search operations"""
     
-    def __init__(self, db: AsyncSession, cache: redis.Redis, user: User):
+    def __init__(self, db: AsyncSession, cache, user: User):
         self.db = db
-        self.cache = cache
+        self.cache = cache  # Can be None if Redis is not available
         self.user = user
         self.cache_ttl = 3600  # 1 hour
     
@@ -34,13 +41,19 @@ class ProgramSearchService:
             # Generate cache key
             cache_key = self._generate_cache_key(query)
             
-            # Check cache first
-            cached_result = await self.cache.get(cache_key)
-            if cached_result:
-                logger.info(f"Cache hit for search query: {cache_key}")
-                result_data = json.loads(cached_result)
-                result_data['metadata']['cache_hit'] = True
-                return SearchResultsResponse(**result_data)
+            # Check cache first (if available)
+            cached_result = None
+            if self.cache:
+                try:
+                    cached_result = await self.cache.get(cache_key)
+                    if cached_result:
+                        logger.info(f"Cache hit for search query: {cache_key}")
+                        result_data = json.loads(cached_result)
+                        result_data['metadata']['cache_hit'] = True
+                        return SearchResultsResponse(**result_data)
+                except Exception as e:
+                    logger.warning(f"Cache read failed: {e}")
+                    # Continue without cache
             
             # Perform database search
             search_start = datetime.utcnow()
@@ -72,12 +85,17 @@ class ProgramSearchService:
                 }
             }
             
-            # Cache the results
-            await self.cache.setex(
-                cache_key,
-                self.cache_ttl,
-                json.dumps(response_data, default=str)
-            )
+            # Cache the results (if cache is available)
+            if self.cache:
+                try:
+                    await self.cache.setex(
+                        cache_key,
+                        self.cache_ttl,
+                        json.dumps(response_data, default=str)
+                    )
+                except Exception as e:
+                    logger.warning(f"Cache write failed: {e}")
+                    # Continue without cache
             
             return SearchResultsResponse(**response_data)
             
