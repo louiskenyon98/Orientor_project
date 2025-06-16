@@ -295,6 +295,18 @@ export default function MainLayout({
                                     >
                                         <span className="material-icons-outlined">chat</span>
                                     </Link>
+                                    
+                                    <Link 
+                                        href="/education" 
+                                        className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure relative
+                                            ${pathname === '/education'
+                                                ? 'text-stitch-accent bg-stitch-primary/50'
+                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
+                                            }`}
+                                    >
+                                        <span className="material-icons-outlined">school</span>
+                                        <span className="absolute -top-1 -right-1 bg-stitch-accent text-white text-xs rounded-full px-1">New</span>
+                                    </Link>
                                 </div>
                             </div>
 
@@ -424,6 +436,18 @@ export default function MainLayout({
                                         >
                                             <span className="material-icons-outlined mr-2 text-stitch-sage">psychology</span>
                                             Test Holland (RIASEC)
+                                        </Link>
+                                        <Link
+                                            href="/education"
+                                            className={`flex items-center px-4 py-3 text-sm ${
+                                                pathname === '/education'
+                                                    ? 'bg-stitch-primary/50 text-stitch-accent font-bold'
+                                                    : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'
+                                            }`}
+                                        >
+                                            <span className="material-icons-outlined mr-2 text-stitch-sage">school</span>
+                                            Education Programs
+                                            <span className="ml-2 px-2 py-1 text-xs bg-stitch-accent text-white rounded-full">New</span>
                                         </Link>
                                         <div className="border-t border-stitch-border mt-1"></div>
                                         

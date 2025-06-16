@@ -58,8 +58,20 @@ export default function LoginPage() {
             localStorage.setItem('access_token', response.data.access_token);
             localStorage.setItem('user_id', response.data.user_id.toString());
             
-            // Redirect to chat page after successful login
-            router.push('/chat');
+            // Check if user needs onboarding
+            try {
+                const { onboardingService } = await import('../../services/onboardingService');
+                const needsOnboarding = await onboardingService.needsOnboarding();
+                
+                if (needsOnboarding) {
+                    router.push('/onboarding');
+                } else {
+                    router.push('/chat');
+                }
+            } catch (onboardingError) {
+                console.log('Could not check onboarding status, redirecting to chat');
+                router.push('/chat');
+            }
         } catch (err: any) {
             console.error('Login error details:', {
                 message: err.message,

@@ -9,6 +9,7 @@ import PhilosophicalCard from '@/components/ui/PhilosophicalCard';
 import StarConstellation from '@/components/ui/StarConstellation';
 import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
 import { getJobRecommendations } from '@/services/api';
+import { onboardingService } from '@/services/onboardingService';
 import JobRecommendationList from '@/components/jobs/JobRecommendationList';
 import JobSkillsTree from '@/components/jobs/JobSkillsTree';
 import { Job } from '@/components/jobs/JobCard';
@@ -72,7 +73,7 @@ export default function Home() {
   // État pour l'ID de l'utilisateur actuel
   const [currentUserId, setCurrentUserId] = useState<number | undefined>(undefined);
 
-  // Récupérer l'ID de l'utilisateur actuel au chargement
+  // Récupérer l'ID de l'utilisateur actuel et vérifier l'onboarding
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -80,6 +81,21 @@ export default function Home() {
         if (!token) {
           console.log('No access token found - user needs to login');
           return;
+        }
+        
+        // Check onboarding status first
+        try {
+          const needsOnboarding = await onboardingService.needsOnboarding();
+          console.log('Onboarding check result:', { needsOnboarding });
+          if (needsOnboarding) {
+            console.log('User needs onboarding, redirecting...');
+            router.push('/onboarding');
+            return;
+          }
+          console.log('User has completed onboarding, continuing to dashboard');
+        } catch (onboardingError) {
+          console.error('Could not check onboarding status:', onboardingError);
+          console.log('Continuing to dashboard due to onboarding check error');
         }
         
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';

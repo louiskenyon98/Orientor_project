@@ -1,0 +1,384 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useTransform, PanInfo, animate } from 'framer-motion';
+import { Heart, X, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
+import { PsychProfile, CareerRecommendation } from '../../types/onboarding';
+import { getAllJobRecommendations, saveCareer } from '../../services/api';
+import { useRouter } from 'next/navigation';
+
+interface SwipeRecommendationsProps {
+  onComplete: () => void;
+  psychProfile?: PsychProfile;
+}
+
+const SwipeRecommendations: React.FC<SwipeRecommendationsProps> = ({ 
+  onComplete, 
+  psychProfile 
+}) => {
+  const router = useRouter();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [savedCareers, setSavedCareers] = useState<CareerRecommendation[]>([]);
+  const [isComplete, setIsComplete] = useState(false);
+  const [recommendations, setRecommendations] = useState<CareerRecommendation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Framer Motion values for swipe animation (same as FindYourWay)
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 200], [-10, 10]);
+  const cardOpacity = useTransform(x, [-200, 0, 200], [0.5, 1, 0.5]);
+  const dragConstraints = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadRecommendations();
+  }, []);
+
+  const loadRecommendations = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await getAllJobRecommendations(10); // Get 10 recommendations for onboarding
+      
+      if (response.recommendations && response.recommendations.length > 0) {
+        const formattedRecommendations: CareerRecommendation[] = response.recommendations.map((rec: any, index: number) => ({
+          id: rec.id || `rec-${index}`,
+          title: rec.metadata?.title || rec.metadata?.preferred_label || 'Career Opportunity',
+          description: rec.metadata?.description || 'Explore this exciting career opportunity based on your personality profile.',
+          match_percentage: Math.round((1 - rec.score) * 100), // Convert distance to percentage
+          skills_required: rec.metadata?.skills || ['Professional Skills', 'Communication', 'Problem Solving'],
+          education_level: rec.metadata?.education_level || 'Bachelor\'s degree or equivalent experience'
+        }));
+        
+        setRecommendations(formattedRecommendations);
+      } else {
+        setError('No recommendations available at the moment');
+      }
+    } catch (error) {
+      console.error('Failed to load recommendations:', error);
+      setError('Failed to load recommendations. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Same drag handling logic as FindYourWay component
+  const handleDragEnd = async (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const swipeThreshold = 100;
+    const career = recommendations[currentIndex];
+    
+    if (!career) return;
+
+    if (info.offset.x > swipeThreshold) {
+      await handleSwipeRight(career);
+    } else if (info.offset.x < -swipeThreshold) {
+      handleSwipeLeft();
+    } else {
+      // Reset position with spring animation
+      animate(x, 0, {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        onComplete: () => {
+          x.set(0);
+        }
+      });
+    }
+  };
+
+  const handleSwipeRight = async (career: CareerRecommendation) => {
+    try {
+      // Save career using existing API (convert string id to number if needed)
+      const careerId = typeof career.id === 'string' ? parseInt(career.id) : career.id;
+      await saveCareer(careerId);
+      setSavedCareers(prev => [...prev, career]);
+      
+      // Reset position and move to next card
+      animate(x, 0, {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        onComplete: () => {
+          x.set(0);
+          if (currentIndex >= recommendations.length - 1) {
+            setIsComplete(true);
+          } else {
+            setCurrentIndex(prev => prev + 1);
+          }
+        }
+      });
+    } catch (err) {
+      console.error('Failed to save career:', err);
+      // Still move to next card even if save fails
+      animate(x, 0, {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        onComplete: () => {
+          x.set(0);
+          if (currentIndex >= recommendations.length - 1) {
+            setIsComplete(true);
+          } else {
+            setCurrentIndex(prev => prev + 1);
+          }
+        }
+      });
+    }
+  };
+
+  const handleSwipeLeft = () => {
+    // Reset position and move to next card
+    animate(x, 0, {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+      onComplete: () => {
+        x.set(0);
+        if (currentIndex >= recommendations.length - 1) {
+          setIsComplete(true);
+        } else {
+          setCurrentIndex(prev => prev + 1);
+        }
+      }
+    });
+  };
+
+  const handleButtonSwipe = (direction: 'left' | 'right') => {
+    const currentCard = recommendations[currentIndex];
+    if (!currentCard) return;
+
+    if (direction === 'right') {
+      handleSwipeRight(currentCard);
+    } else {
+      handleSwipeLeft();
+    }
+  };
+
+  const currentCard = recommendations[currentIndex];
+  const progress = recommendations.length > 0 ? ((currentIndex + 1) / recommendations.length) * 100 : 0;
+  const hasMoreCards = currentIndex < recommendations.length;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading career recommendations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">
+            <X className="w-16 h-16 mx-auto mb-2" />
+            <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+          </div>
+          <button
+            onClick={loadRecommendations}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center mx-auto space-x-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Try Again</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isComplete) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl p-8 shadow-lg max-w-md w-full text-center"
+        >
+          <div className="mb-6">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              Great choices!
+            </h2>
+            <p className="text-gray-600">
+              You've saved {savedCareers.length} career{savedCareers.length !== 1 ? 's' : ''} to explore further.
+            </p>
+          </div>
+
+          {savedCareers.length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-gray-800 mb-3">Your Saved Careers:</h3>
+              <div className="space-y-2">
+                {savedCareers.map((career) => (
+                  <div key={career.id} className="bg-gray-50 rounded-xl p-3 text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">{career.title}</span>
+                      <span className="text-xs text-blue-600 font-semibold">
+                        {career.match_percentage}% match
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                console.log('Completing onboarding and redirecting to dashboard...');
+                onComplete(); // Call the parent callback
+                // Direct redirect as backup
+                setTimeout(() => {
+                  router.push('/');
+                }, 500);
+              }}
+              className="w-full bg-blue-500 text-white py-3 px-6 rounded-xl hover:bg-blue-600 transition-colors font-medium"
+            >
+              Continue to Dashboard
+            </button>
+            <button
+              onClick={() => {
+                setCurrentIndex(0);
+                setSavedCareers([]);
+                setIsComplete(false);
+                loadRecommendations();
+              }}
+              className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+            >
+              Explore More Careers
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!hasMoreCards || !currentCard) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-4">No more recommendations</h2>
+          <button
+            onClick={() => setIsComplete(true)}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            View Results
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+        <button 
+          onClick={onComplete}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        </button>
+        <div className="flex-1 mx-4">
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-blue-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          <p className="text-sm text-gray-600 mt-1 text-center">
+            {currentIndex + 1} of {recommendations.length}
+          </p>
+        </div>
+        <div className="w-9" /> {/* Spacer for balance */}
+      </div>
+
+      {/* Card Container */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div 
+          ref={dragConstraints} 
+          className="w-full max-w-sm h-96 relative"
+        >
+          <motion.div
+            drag="x"
+            dragConstraints={dragConstraints}
+            dragElastic={0.7}
+            onDragEnd={handleDragEnd}
+            style={{
+              x,
+              rotate,
+              opacity: cardOpacity,
+            }}
+            className="w-full h-full absolute cursor-grab active:cursor-grabbing"
+            initial={{ x: 0, rotate: 0 }}
+            animate={{ x: 0, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className="bg-white rounded-2xl shadow-lg h-full p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  {currentCard.match_percentage}% match
+                </span>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                {currentCard.title}
+              </h3>
+              
+              <p className="text-gray-600 text-sm mb-4 flex-1">
+                {currentCard.description}
+              </p>
+              
+              <div className="mb-4">
+                <h4 className="font-semibold text-gray-800 mb-2">Key Skills:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {currentCard.skills_required.slice(0, 3).map((skill, index) => (
+                    <span 
+                      key={index}
+                      className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="text-xs text-gray-500">
+                {currentCard.education_level}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="p-6 bg-white border-t border-gray-200">
+        <div className="flex justify-center space-x-4">
+          <button
+            onClick={() => handleButtonSwipe('left')}
+            className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-600" />
+          </button>
+          <button
+            onClick={() => handleButtonSwipe('right')}
+            className="w-14 h-14 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors"
+          >
+            <Heart className="w-6 h-6 text-white" />
+          </button>
+        </div>
+        <p className="text-center text-gray-500 text-sm mt-4">
+          Swipe or tap to explore careers
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default SwipeRecommendations;

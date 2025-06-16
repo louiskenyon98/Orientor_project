@@ -30,6 +30,7 @@ from app.routers.competence_tree import router as competence_tree_router
 from app.routers.users import router as users_router
 from app.routers.reflection_router import router as reflection_router
 from app.routers.avatar import router as avatar_router
+from app.routers.onboarding import router as onboarding_router
 from app.api.endpoints.job_recommendations import router as job_recommendations_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
@@ -134,6 +135,7 @@ app.include_router(competence_tree_router, prefix="/api/v1")
 app.include_router(users_router)
 app.include_router(reflection_router)
 app.include_router(avatar_router, prefix="/api/v1")
+app.include_router(onboarding_router)
 app.include_router(job_recommendations_router, prefix="/api/v1/jobs")
 logger.info("All routers included successfully")
 

@@ -60,8 +60,8 @@ export default function RegisterPage() {
             
             console.log('Registration successful:', response.data);
             
-            // Redirect to login page after successful registration
-            router.push('/login');
+            // Redirect to onboarding for new users
+            router.push('/onboarding');
         } catch (err) {
             const error = err as ApiError;
             console.error('Registration error:', error);
