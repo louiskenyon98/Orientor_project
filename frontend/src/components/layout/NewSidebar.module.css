@@ -11,6 +11,7 @@
     left: 0;
     top: 64px; /* Position below the navigation bar */
     z-index: 40;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   }
   
   .navContainer {
@@ -89,6 +90,12 @@
     transform: translateY(-50%) translateX(0);
   }
   
+  /* Chat mode styling - full height sidebar */
+  .chatMode {
+    height: 100vh !important;
+    top: 0 !important;
+  }
+  
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .sidebar {
@@ -100,5 +107,10 @@
     .icon {
       width: 20px;
       height: 20px;
+    }
+    
+    .chatMode {
+      height: 100vh !important;
+      top: 0 !important;
     }
   }

@@ -109,6 +109,22 @@ export default function Home() {
         
         if (response && response.recommendations) {
           const limitedRecommendations = response.recommendations.slice(0, 3);
+          
+          // Debug: Log the actual job structure
+          console.log('🔍 Homepage job recommendations:', {
+            count: limitedRecommendations.length,
+            firstJob: limitedRecommendations[0] ? {
+              id: limitedRecommendations[0].id,
+              score: limitedRecommendations[0].score,
+              metadata: limitedRecommendations[0].metadata,
+              metadataKeys: Object.keys(limitedRecommendations[0].metadata || {}),
+              title: limitedRecommendations[0].metadata?.title,
+              preferred_label: limitedRecommendations[0].metadata?.preferred_label,
+              label: limitedRecommendations[0].metadata?.label,
+              description: limitedRecommendations[0].metadata?.description
+            } : null
+          });
+          
           setJobRecommendations(limitedRecommendations);
           
           if (limitedRecommendations.length > 0) {
@@ -376,7 +392,24 @@ export default function Home() {
                           onClick={() => handleSelectJob(job)}
                         >
                           <h4 className="font-medium text-sm mb-1">
-                            {job.metadata.preferred_label || job.metadata.title || 'Job Title'}
+                            {(() => {
+                              // Try different possible title fields
+                              const possibleTitles = [
+                                job.metadata?.preferred_label,
+                                job.metadata?.title,
+                                job.metadata?.label,
+                                job.metadata?.occupation_label,
+                                job.metadata?.job_title,
+                                job.metadata?.name,
+                                (job as any)?.label, // Direct property (like in JobRecommendationVerticalList)
+                                (job as any)?.title,
+                                (job as any)?.job_title,
+                                (job as any)?.occupation_label
+                              ];
+                              
+                              const title = possibleTitles.find(t => t && t.trim() !== '');
+                              return title || `Career Opportunity ${job.id}`;
+                            })()}
                           </h4>
                           <p className="text-xs text-gray-600 line-clamp-2 mb-2">
                             {job.metadata.description || 'No description available'}

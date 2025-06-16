@@ -324,15 +324,91 @@ export default function MainLayout({
 
             {/* Main content area with sidebar */}
             <div className="flex w-full h-full grow relative z-10">
-                {/* Sidebar - visible on desktop only */}
+                {/* Sidebar - hidden on chat page, shows on hover */}
                 {isLoggedIn && showNav && (
-                    <div className="hidden md:block">
-                        <NewSidebar navItems={navItems} />
-                    </div>
+                    <>
+                        {pathname === '/chat' ? (
+                            <div className="hidden md:block group">
+                                {/* Invisible hover trigger area for chat page */}
+                                <div className="fixed left-0 top-20 w-12 h-[calc(100vh-5rem)] z-40 bg-transparent" />
+                                {/* Sidebar wrapper that slides in from left */}
+                                <div className="fixed left-0 top-20 h-[calc(100vh-5rem)] z-50 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out">
+                                    <div className="w-20 h-full bg-white border-r border-gray-200 shadow-lg flex flex-col items-center py-4">
+                                        <div className="flex flex-col gap-6 w-full px-2 flex-1">
+                                            {navItems.map((item, index) => (
+                                                <Link href={item.path} key={index} className="relative flex justify-center items-center w-full p-3 rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-gray-100 hover:transform hover:-translate-y-0.5 group/item">
+                                                    <div className="flex justify-center items-center w-full h-full">
+                                                        {item.icon === 'Dashboard' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11a16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A8,8,0,0,0,32,110.62V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V110.62A8,8,0,0,0,218.83,103.77ZM208,208H160V160a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v48H48V115.55l80-75.48,80,75.48Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Education' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Swipe' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M216,64H176V56a16,16,0,0,0-16-16H136V24a8,8,0,0,0-16,0V40H96A16,16,0,0,0,80,56v8H40A16,16,0,0,0,24,80V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64ZM96,56h64v8H96ZM216,200H40V80H216V200ZM128,96a12,12,0,1,0,12,12A12,12,0,0,0,128,96Zm0,48a12,12,0,1,0,12,12A12,12,0,0,0,128,144Zm40-24a12,12,0,1,0,12,12A12,12,0,0,0,168,120ZM88,120a12,12,0,1,0,12,12A12,12,0,0,0,88,120Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Bookmark' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Trophy' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M232,64H208V56a16,16,0,0,0-16-16H64A16,16,0,0,0,48,56v8H24A16,16,0,0,0,8,80V96a40,40,0,0,0,40,40h3.65A80.13,80.13,0,0,0,120,191.61V216H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V191.58c31.94-3.23,58.44-25.64,68.08-55.58H208a40,40,0,0,0,40-40V80A16,16,0,0,0,232,64ZM48,120A24,24,0,0,1,24,96V80H48v32q0,4,.39,8Zm144-8.9c0,35.52-28.49,64.64-63.51,64.9H128a64,64,0,0,1-64-64V56H192ZM232,96a24,24,0,0,1-24,24h-.5a81.81,81.81,0,0,0,.5-8.9V80h24Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Note' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H216v96H176a16,16,0,0,0-16,16v48H40Zm152,144V168h24v32Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Case Study' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M128,16A112,112,0,1,0,240,128,112.13,112.13,0,0,0,128,16Zm0,208a96,96,0,1,1,96-96A96.11,96.11,0,0,1,128,224Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Tree' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M198.1,62.6a76,76,0,0,0-140.2,0A72.27,72.27,0,0,0,16,127.8C15.89,166.62,47.36,199,86.14,200A71.68,71.68,0,0,0,120,192.49V232a8,8,0,0,0,16,0V192.49A71.45,71.45,0,0,0,168,200l1.86,0c38.78-1,70.25-33.36,70.14-72.18A72.26,72.26,0,0,0,198.1,62.6ZM169.45,184a55.61,55.61,0,0,1-32.52-9.4q-.47-.3-.93-.57V132.94l43.58-21.78a8,8,0,1,0-7.16-14.32L136,115.06V88a8,8,0,0,0-16,0v51.06L83.58,120.84a8,8,0,1,0-7.16,14.32L120,156.94V174q-.47.27-.93.57A55.7,55.7,0,0,1,86.55,184a56,56,0,0,1-22-106.86,15.9,15.9,0,0,0,8.05-8.33,60,60,0,0,1,110.7,0,15.9,15.9,0,0,0,8.05,8.33,56,56,0,0,1-22,106.86Z"></path>
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                    <span className="absolute left-full top-1/2 transform -translate-y-1/2 translate-x-2 bg-gray-900 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/item:opacity-100 transition-opacity duration-200 pointer-events-none ml-2 z-50">
+                                                        {item.name}
+                                                    </span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                        {/* Profile Icon at Bottom */}
+                                        <Link href="/profile" className="relative flex justify-center items-center w-full p-3 rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-gray-100 hover:transform hover:-translate-y-0.5 group/item">
+                                            <div className="flex justify-center items-center w-full h-full">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"></path>
+                                                </svg>
+                                            </div>
+                                            <span className="absolute left-full top-1/2 transform -translate-y-1/2 translate-x-2 bg-gray-900 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/item:opacity-100 transition-opacity duration-200 pointer-events-none ml-2 z-50">
+                                                Profile
+                                            </span>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="hidden md:block">
+                                <NewSidebar navItems={navItems} />
+                            </div>
+                        )}
+                    </>
                 )}
                 
                 {/* Main content */}
-                <main className={`flex-1 w-full ${isLoggedIn && showNav ? 'md:ml-20' : ''} ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`} style={{ backgroundColor: '#ffffff' }}>
+                <main className={`flex-1 w-full ${isLoggedIn && showNav && pathname !== '/chat' ? 'md:ml-20' : ''} ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`} style={{ backgroundColor: '#ffffff' }}>
                     <div className="w-full">
                         {children}
                     </div>
