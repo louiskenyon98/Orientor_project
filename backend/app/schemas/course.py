@@ -193,8 +193,14 @@ class TargetedAnalysisRequest(BaseModel):
     previous_session_id: Optional[str] = None
     user_context: Optional[Dict[str, Any]] = None
 
+class QuestionSchema(BaseModel):
+    id: str
+    question: str
+    intent: str
+    follow_up_triggers: List[str]
+
 class TargetedAnalysisResponse(BaseModel):
     session_id: str
     conversation_started: bool
-    next_questions: List[Dict[str, str]]
-    context_insights: Optional[Dict[str, Any]] = None
+    next_questions: List[QuestionSchema]
+    context_insights: Optional[List[Dict[str, Any]]] = None
