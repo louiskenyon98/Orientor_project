@@ -20,6 +20,16 @@
     gap: 1.5rem;
     width: 100%;
     padding: 0 0.5rem;
+    flex: 1;
+  }
+  
+  .profileContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 0.5rem;
+    margin-top: auto;
+    margin-bottom: 1rem;
   }
   
   .navItem {
