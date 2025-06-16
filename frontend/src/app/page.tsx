@@ -305,8 +305,8 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Recommended Jobs (Center) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3">
+              {/* Recommended Jobs with Vector Search (Center) - Takes 6 columns */}
+              <div className="col-span-12 md:col-span-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Recommended Jobs</h2>
                   <Link
@@ -319,60 +319,64 @@ export default function Home() {
                     </svg>
                   </Link>
                 </div>
-                
-                {jobsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-sm text-gray-600 mt-2">Loading recommendations...</p>
-                  </div>
-                ) : jobsError ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-red-600">{jobsError}</p>
-                  </div>
-                ) : jobRecommendations.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-gray-600">No job recommendations available</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {jobRecommendations.slice(0, 3).map((job) => (
-                      <div
-                        key={job.id}
-                        className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                        onClick={() => handleSelectJob(job)}
-                      >
-                        <h3 className="font-medium text-sm mb-1">
-                          {job.metadata.preferred_label || job.metadata.title || 'Job Title'}
-                        </h3>
-                        <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                          {job.metadata.description || 'No description available'}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <div className="text-xs text-blue-600 font-medium">
-                            {Math.round(job.score * 100)}% match
-                          </div>
-                          {job.metadata.skills && job.metadata.skills.length > 0 && (
-                            <div className="flex gap-1 flex-wrap">
-                              {job.metadata.skills.slice(0, 2).map((skill, index) => (
-                                <span
-                                  key={index}
-                                  className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
 
-              {/* Vector Search (Center Right) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3">
-                <VectorSearchCard />
+                {/* Vector Search Integration */}
+                <div className="mb-6">
+                  <VectorSearchCard />
+                </div>
+                
+                {/* Original Recommendations */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Your Personalized Recommendations</h3>
+                  {jobsLoading ? (
+                    <div className="text-center py-6">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="text-xs text-gray-600 mt-2">Loading recommendations...</p>
+                    </div>
+                  ) : jobsError ? (
+                    <div className="text-center py-6">
+                      <p className="text-xs text-red-600">{jobsError}</p>
+                    </div>
+                  ) : jobRecommendations.length === 0 ? (
+                    <div className="text-center py-6">
+                      <p className="text-xs text-gray-600">No job recommendations available</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {jobRecommendations.slice(0, 2).map((job) => (
+                        <div
+                          key={job.id}
+                          className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                          onClick={() => handleSelectJob(job)}
+                        >
+                          <h4 className="font-medium text-sm mb-1">
+                            {job.metadata.preferred_label || job.metadata.title || 'Job Title'}
+                          </h4>
+                          <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                            {job.metadata.description || 'No description available'}
+                          </p>
+                          <div className="flex justify-between items-center">
+                            <div className="text-xs text-blue-600 font-medium">
+                              {Math.round(job.score * 100)}% match
+                            </div>
+                            {job.metadata.skills && job.metadata.skills.length > 0 && (
+                              <div className="flex gap-1 flex-wrap">
+                                {job.metadata.skills.slice(0, 2).map((skill, index) => (
+                                  <span
+                                    key={index}
+                                    className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Events & Notes (Right) - Takes 3 columns (same as calendar) */}

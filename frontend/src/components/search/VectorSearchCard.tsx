@@ -43,16 +43,9 @@ export default function VectorSearchCard() {
   };
 
   return (
-    <div style={{
-      width: '100%',
-      minHeight: '254px',
-      borderRadius: '30px',
-      background: '#e0e0e0',
-      boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
-      padding: '24px'
-    }}>
+    <div className="w-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Career Search</h2>
+        <h3 className="text-sm font-medium text-gray-700">Career Search</h3>
         <Link
           href="/vector-search"
           className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
@@ -90,19 +83,19 @@ export default function VectorSearchCard() {
         {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
       </form>
 
-      <div className="space-y-2 max-h-32 overflow-y-auto">
+      <div className="space-y-3">
         {results.length > 0 ? (
           results.map((result) => (
             <div
               key={result.id}
-              className="p-2 border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors"
+              className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
             >
               <div className="flex justify-between items-start">
-                <h3 className="font-medium text-sm text-gray-800 line-clamp-1">
+                <h4 className="font-medium text-sm text-gray-900 line-clamp-1">
                   {result.label}
-                </h3>
+                </h4>
                 <span className="text-xs text-blue-600 font-medium ml-2">
-                  {Math.round(result.score * 100)}%
+                  {Math.round(result.score * 100)}% match
                 </span>
               </div>
               {result.lead_statement && (

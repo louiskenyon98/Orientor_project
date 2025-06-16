@@ -169,8 +169,6 @@ export default function MainLayout({
     const navItems = [
         { name: 'Dashboard', icon: 'Dashboard', path: '/' },
         { name: 'Education', icon: 'Education', path: '/education' },
-        { name: 'Chat', icon: 'Chat', path: '/chat' },
-        { name: 'Peers', icon: 'Peers', path: '/peers' },
         { name: 'Swipe', icon: 'Swipe', path: '/find-your-way' },
         { name: 'Saved', icon: 'Bookmark', path: '/space' },
         { name: 'Challenges', icon: 'Trophy', path: '/challenges' },
