@@ -169,6 +169,7 @@ export default function MainLayout({
     const navItems = [
         { name: 'Dashboard', icon: 'Dashboard', path: '/' },
         { name: 'Education', icon: 'Education', path: '/education' },
+        { name: 'Chat', icon: 'Chat', path: '/chat' },
         { name: 'Swipe', icon: 'Swipe', path: '/find-your-way' },
         { name: 'Saved', icon: 'Bookmark', path: '/space' },
         { name: 'Challenges', icon: 'Trophy', path: '/challenges' },
@@ -286,20 +287,8 @@ export default function MainLayout({
                                 </Link>
                             </div>
 
-                            {/* Right Side - Chat, XP Progress, Dark Mode Toggle */}
+                            {/* Right Side - XP Progress, Dark Mode Toggle */}
                             <div className="flex items-center space-x-4">
-                                {/* Chat Icon */}
-                                <Link 
-                                    href="/chat" 
-                                    className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
-                                        ${pathname === '/chat'
-                                            ? 'text-stitch-accent bg-stitch-primary/50'
-                                            : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                        }`}
-                                >
-                                    <span className="material-icons-outlined">chat</span>
-                                </Link>
-                                
                                 {/* XP Progress Bar */}
                                 <div className="relative group">
                                     <XPProgress className="mr-2" />
@@ -346,6 +335,11 @@ export default function MainLayout({
                                                         {item.icon === 'Education' && (
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                                                                 <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path>
+                                                            </svg>
+                                                        )}
+                                                        {item.icon === 'Chat' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M216,48H40A16,16,0,0,0,24,64V224a15.84,15.84,0,0,0,9.25,14.5A16.05,16.05,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78.69.69,0,0,0,.13-.11L82.5,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM40,224V64H216V192H82.5a16,16,0,0,0-10.25,3.78L40,224Z"></path>
                                                             </svg>
                                                         )}
                                                         {item.icon === 'Swipe' && (
