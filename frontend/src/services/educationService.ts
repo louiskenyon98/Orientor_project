@@ -277,6 +277,108 @@ class EducationService {
     
     return traits;
   }
+
+  /**
+   * Get user's education dashboard data
+   */
+  async getUserDashboard(userId: number): Promise<{
+    user: { name: string; completedPrograms: number; totalPrograms: number; completionPercentage: number };
+    progress: Array<{ id: number; subject: string; progress: number; lessonNumber: string }>;
+    activities: Array<{ id: number; user: string; action: string; time: string; subject: string }>;
+    upcomingSchedule: Array<{ time: string; title: string; type: string; date: string }>;
+  }> {
+    // In production, this would be a real API call
+    // For now, return mock data that matches the UI
+    return {
+      user: {
+        name: "Alex",
+        completedPrograms: 204,
+        totalPrograms: 300,
+        completionPercentage: 68
+      },
+      progress: [
+        { id: 1, subject: "Computer Science", progress: 65, lessonNumber: "#13" },
+        { id: 2, subject: "Business Admin", progress: 80, lessonNumber: "#79" },
+        { id: 3, subject: "Engineering", progress: 45, lessonNumber: "#101" }
+      ],
+      activities: [
+        { id: 1, user: "Sia Lubich", action: "Added new assignment", time: "Jan 2, 12:30", subject: "Computer Science, Topic 1" },
+        { id: 2, user: "Christian Driss", action: "Deadline approaching", time: "Jan 2, 12:25", subject: "Mathematics, Topic 2" },
+        { id: 3, user: "Ann Golden", action: "New date of exam posted", time: "Jan 2, 12:04", subject: "History, Topic 1,2" }
+      ],
+      upcomingSchedule: [
+        { time: "09:00", title: "Course Name: Lesson", type: "lesson", date: "Jan 2, 12:31pm" },
+        { time: "10:00", title: "Course Name: Test", type: "test", date: "Jan 2, 12:31pm" },
+        { time: "11:00", title: "Extracurricular activities", type: "activity", date: "Jan 2, 12:31pm" }
+      ]
+    };
+  }
+
+  /**
+   * Get user's enrolled courses/programs
+   */
+  async getUserCourses(userId: number): Promise<Array<{
+    id: number;
+    title: string;
+    instructor: string;
+    section: string;
+    enrolledStudents: number;
+    image: string;
+  }>> {
+    // In production, this would connect to the actual enrollment API
+    return [
+      {
+        id: 1,
+        title: "Introduction to Computer Science",
+        instructor: "Sara Goldman",
+        section: "Section 9A • 9B",
+        enrolledStudents: 24,
+        image: "🧬"
+      },
+      {
+        id: 2,
+        title: "Master of Business Administration",
+        instructor: "Jonathan Weston",
+        section: "Section 10A",
+        enrolledStudents: 18,
+        image: "🗂️"
+      },
+      {
+        id: 3,
+        title: "Software Engineering Fundamentals",
+        instructor: "Jonathan Weston",
+        section: "Section 9A • 9B",
+        enrolledStudents: 32,
+        image: "🧮"
+      }
+    ];
+  }
+
+  /**
+   * Mark activity as read
+   */
+  async markActivityAsRead(activityId: number, userId: number): Promise<void> {
+    // In production, this would update the activity status
+    console.log(`Marking activity ${activityId} as read for user ${userId}`);
+  }
+
+  /**
+   * Get calendar events for a specific month
+   */
+  async getCalendarEvents(userId: number, year: number, month: number): Promise<Array<{
+    date: number;
+    type: 'lesson' | 'test' | 'activity';
+    title: string;
+    time?: string;
+  }>> {
+    // Mock calendar events
+    return [
+      { date: 11, type: 'lesson', title: 'Computer Science Lecture', time: '09:00' },
+      { date: 15, type: 'test', title: 'Mathematics Exam', time: '14:00' },
+      { date: 22, type: 'activity', title: 'Study Group', time: '16:00' },
+      { date: 26, type: 'lesson', title: 'Business Workshop', time: '10:00' }
+    ];
+  }
 }
 
 // Export singleton instance

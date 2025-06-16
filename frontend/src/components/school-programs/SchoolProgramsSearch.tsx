@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * School Programs Search Component
  * 
