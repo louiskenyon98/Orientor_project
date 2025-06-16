@@ -96,7 +96,8 @@ const CareerAnalysisChat: React.FC<CareerAnalysisChatProps> = ({
         throw new Error('Authentication required');
       }
 
-      const response = await fetch(`/api/v1/courses/${courseId}/targeted-analysis`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_URL}/api/v1/courses/${courseId}/targeted-analysis`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -166,7 +167,8 @@ const CareerAnalysisChat: React.FC<CareerAnalysisChatProps> = ({
       setMessages(prev => [...prev, responseMessage]);
       
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`/api/v1/conversations/${sessionId}/respond`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_URL}/api/v1/conversations/${sessionId}/respond`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -259,7 +261,8 @@ const CareerAnalysisChat: React.FC<CareerAnalysisChatProps> = ({
     
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`/api/v1/conversations/${sessionId}/summary`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_URL}/api/v1/conversations/${sessionId}/summary`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -445,7 +448,7 @@ const CareerAnalysisChat: React.FC<CareerAnalysisChatProps> = ({
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => window.location.href = `/courses/${courseId}/insights`}
+                onClick={() => window.location.href = `/classes/${courseId}/insights`}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
                 View Full Report
