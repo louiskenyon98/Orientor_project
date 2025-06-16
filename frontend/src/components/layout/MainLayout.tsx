@@ -7,6 +7,7 @@ import DarkModeToggle from '../ui/DarkModeToggle';
 import ThemeToggle from '../ui/ThemeToggle';
 import styles from '@/styles/patterns.module.css';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import NewSidebar from './NewSidebar';
 
 // Composants pour les menus déroulants
 const ProfileDropdown = ({ pathname }: { pathname: string | null }) => {
@@ -164,6 +165,20 @@ export default function MainLayout({
     const router = useRouter();
     const pathname = usePathname();
 
+    // Navigation items for the sidebar
+    const navItems = [
+        { name: 'Dashboard', icon: 'Dashboard', path: '/' },
+        { name: 'Education', icon: 'Education', path: '/education' },
+        { name: 'Chat', icon: 'Chat', path: '/chat' },
+        { name: 'Peers', icon: 'Peers', path: '/peers' },
+        { name: 'Swipe', icon: 'Swipe', path: '/find-your-way' },
+        { name: 'Saved', icon: 'Bookmark', path: '/space' },
+        { name: 'Challenges', icon: 'Trophy', path: '/challenges' },
+        { name: 'Notes', icon: 'Note', path: '/notes' },
+        { name: 'Case Study', icon: 'Case Study', path: '/case-study-journey' },
+        { name: 'Competence Tree', icon: 'Tree', path: '/competence-tree' },
+    ];
+
     // Public routes that don't require authentication
     const publicRoutes = ['/login', '/register', '/test-page'];
     const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
@@ -260,58 +275,44 @@ export default function MainLayout({
             {isLoggedIn && (
             //             <div className="min-h-screen bg-light-background dark:bg-dark-background">
             // {showNav && (
-                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/80 backdrop-blur-md px-6 py-3 hidden md:block font-departure header">
+                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/80 backdrop-blur-md px-4 py-3 hidden md:block font-departure header">
+                    {/* Logo - Fixed to top-left corner */}
+                    <div className="absolute top-3 left-4">
+                        <Link href="/landing" className="flex-shrink-0 flex items-center">
+                            <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
+                                Navigo
+                            </span>
+                        </Link>
+                    </div>
+                    
                     <div className="layout-container mx-auto">
                         <div className="flex justify-between items-center">
-                            {/* Left Side - Logo and Primary Navigation */}
-                            <div className="flex items-center space-x-6">
-                                {/* Logo */}
-                                <Link href="/landing" className="flex-shrink-0 flex items-center">
-                                    <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
-                                        Navigo
-                                    </span>
-                                </Link>
-                                
-                                {/* Primary Navigation */}
-                                <div className="flex items-center space-x-1">
-                                    <Link 
-                                        href="/" 
-                                        className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
-                                            ${pathname === '/'
-                                                ? 'text-stitch-accent bg-stitch-primary/50'
-                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                            }`}
-                                    >
-                                        <span className="material-icons-outlined">dashboard</span>
-                                    </Link>
-                                    
-                                    <Link 
-                                        href="/chat" 
-                                        className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
-                                            ${pathname === '/chat'
-                                                ? 'text-stitch-accent bg-stitch-primary/50'
-                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                            }`}
-                                    >
-                                        <span className="material-icons-outlined">chat</span>
-                                    </Link>
-                                    
-                                    <Link 
-                                        href="/education" 
-                                        className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure relative
-                                            ${pathname === '/education'
-                                                ? 'text-stitch-accent bg-stitch-primary/50'
-                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
-                                            }`}
-                                    >
-                                        <span className="material-icons-outlined">school</span>
-                                        <span className="absolute -top-1 -right-1 bg-stitch-accent text-white text-xs rounded-full px-1">New</span>
-                                    </Link>
+                            {/* Left Side - User Greeting and Motivational Message (offset for logo) */}
+                            <div className="flex items-center ml-24">
+                                <div className="flex flex-col">
+                                    <h1 className="text-2xl font-bold text-stitch-accent">
+                                        Hey Phil
+                                    </h1>
+                                    <p className="text-sm text-stitch-sage">
+                                        It's sunny today and it's time to explore 🌞
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Right Side - XP Progress, Dark Mode Toggle, User Profile & Logout */}
+                            {/* Right Side - Chat, XP Progress, Dark Mode Toggle */}
                             <div className="flex items-center space-x-4">
+                                {/* Chat Icon */}
+                                <Link 
+                                    href="/chat" 
+                                    className={`p-2 text-sm font-bold rounded-md transition-colors duration-150 ease-in-out font-departure
+                                        ${pathname === '/chat'
+                                            ? 'text-stitch-accent bg-stitch-primary/50'
+                                            : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
+                                        }`}
+                                >
+                                    <span className="material-icons-outlined">chat</span>
+                                </Link>
+                                
                                 {/* XP Progress Bar */}
                                 <div className="relative group">
                                     <XPProgress className="mr-2" />
@@ -321,19 +322,6 @@ export default function MainLayout({
                                 {/* Theme Toggle */}
                                 <ThemeToggle />
                                 
-                                {/* User Profile */}
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-stitch-accent">
-                                        <img src="/Avatar.PNG" alt="Profile" className="w-full h-full object-cover" />
-                                    </div>
-                                    <Link 
-                                        href="/profile"
-                                        className="p-2 text-sm font-bold rounded-md text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30 transition-colors duration-150 ease-in-out"
-                                    >
-                                        <span className="material-icons-outlined">account_circle</span>
-                                    </Link>
-                                </div>
-
                                 {/* Logout Button */}
                                 <button
                                     onClick={handleLogout}
@@ -347,14 +335,22 @@ export default function MainLayout({
                 </header>
             )}
 
-            {/* Main content area */}
-            <main className={`flex-1 layout-container mx-auto w-full ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`}>
-                {children}
-            {/* <main className={`relative min-h-screen ${styles.pattern}`}>
-                <div className="relative z-10">
-                    {children}
-                </div> */}
-            </main>
+            {/* Main content area with sidebar */}
+            <div className="flex w-full h-full grow relative z-10">
+                {/* Sidebar - visible on desktop only */}
+                {isLoggedIn && showNav && (
+                    <div className="hidden md:block">
+                        <NewSidebar navItems={navItems} />
+                    </div>
+                )}
+                
+                {/* Main content */}
+                <main className={`flex-1 w-full ${isLoggedIn && showNav ? 'md:ml-20' : ''} ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`}>
+                    <div className="layout-container mx-auto">
+                        {children}
+                    </div>
+                </main>
+            </div>
 
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
             {isLoggedIn && (

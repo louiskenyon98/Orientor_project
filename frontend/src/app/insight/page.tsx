@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/MainLayout';
 import { getInsight, generateInsight, regenerateInsight, saveInsight, rewriteInsight, InsightData, mockInsightData } from '@/services/insightService';
+import PersonalityCard from '@/components/ui/PersonalityCard';
+import SkillShowcase from '@/components/ui/SkillShowcase';
+import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
 import Link from 'next/link';
 import styles from './insight.module.css';
 import LoadingScreen from '@/components/ui/LoadingScreen';
@@ -18,6 +21,20 @@ const InsightPage: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [rewriting, setRewriting] = useState<boolean>(false);
   const [regenerating, setRegenerating] = useState<boolean>(false);
+  
+  // Personality-related state
+  const [hollandResults, setHollandResults] = useState<ScoreResponse | null>(null);
+  const [personalityLoading, setPersonalityLoading] = useState(true);
+  const [personalityError, setPersonalityError] = useState<string | null>(null);
+  
+  // Personality navigation items
+  const personalityItems = [
+    { name: 'Holland Test', icon: 'Personality', path: '/holland-test' },
+    { name: 'HEXACO Test', icon: 'Brain', path: '/hexaco-test/select' },
+    { name: 'Self-Reflection', icon: 'Reflection', path: '/self-reflection' },
+    { name: 'Holland Results', icon: 'Personality', path: '/profile/holland-results' },
+    { name: 'HEXACO Results', icon: 'Brain', path: '/profile/hexaco-results' },
+  ];
 
   useEffect(() => {
     // Récupérer l'ID de l'utilisateur depuis le localStorage
@@ -73,6 +90,23 @@ const InsightPage: React.FC = () => {
     };
 
     loadInsight();
+  }, []);
+  
+  // Fetch Holland test results
+  useEffect(() => {
+    const fetchHollandResults = async () => {
+      try {
+        const results = await hollandTestService.getUserLatestResults();
+        setHollandResults(results);
+      } catch (err) {
+        console.error('Error fetching Holland results:', err);
+        setPersonalityError('Unable to fetch Holland results');
+      } finally {
+        setPersonalityLoading(false);
+      }
+    };
+
+    fetchHollandResults();
   }, []);
 
   const handleSaveInsight = async () => {
@@ -191,13 +225,81 @@ const InsightPage: React.FC = () => {
                   </svg>
                 </Link>
                 <h1 className="premium-title text-[32px] md:text-4xl font-bold leading-tight">
-                  Insight Philosophique
+                  🧠 Personalité
                 </h1>
               </div>
             </div>
 
             {/* Main Content Container */}
             <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16 max-w-[2000px] mx-auto">
+              
+              {/* Personality Content Section */}
+              <div className="space-y-8 mb-12">
+                
+                {/* Skills Section */}
+                <div className="premium-card p-6">
+                  <h2 className="premium-section-title mb-6">Your Skills</h2>
+                  <SkillShowcase userId={userId || undefined} />
+                </div>
+                
+                {/* Personality Tests Section */}
+                <div className="premium-card p-6">
+                  <h2 className="premium-section-title mb-6">Personality Tests</h2>
+                  <PersonalityCard items={personalityItems} />
+                  
+                  {/* RIASEC Results */}
+                  {hollandResults && (
+                    <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <h3 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300">RIASEC Results</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                          <div className="font-bold text-lg text-red-600">R</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Réaliste</div>
+                          <div className="font-semibold text-gray-800 dark:text-gray-200">{hollandResults.r_score?.toFixed(1)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                          <div className="font-bold text-lg text-blue-600">I</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Investigateur</div>
+                          <div className="font-semibold text-gray-800 dark:text-gray-200">{hollandResults.i_score?.toFixed(1)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                          <div className="font-bold text-lg text-yellow-600">A</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Artistique</div>
+                          <div className="font-semibold text-gray-800 dark:text-gray-200">{hollandResults.a_score?.toFixed(1)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                          <div className="font-bold text-lg text-green-600">S</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Social</div>
+                          <div className="font-semibold text-gray-800 dark:text-gray-200">{hollandResults.s_score?.toFixed(1)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                          <div className="font-bold text-lg text-purple-600">E</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Entreprenant</div>
+                          <div className="font-semibold text-gray-800 dark:text-gray-200">{hollandResults.e_score?.toFixed(1)}</div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded-lg">
+                          <div className="font-bold text-lg text-orange-600">C</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Conventionnel</div>
+                          <div className="font-semibold text-gray-800 dark:text-gray-200">{hollandResults.c_score?.toFixed(1)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* HEXACO Placeholder */}
+                  <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-3 text-blue-700 dark:text-blue-300">HEXACO Results</h3>
+                    <div className="text-sm text-blue-600 dark:text-blue-400">
+                      Take the HEXACO test to see your comprehensive personality analysis here.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Philosophical Insight Section */}
+              <div className="space-y-8">
+                <div className="premium-card p-6">
+                  <h2 className="premium-section-title mb-6">Philosophical Insight</h2>
               {!insight && !loading && (
                 <div className="text-center py-12">
                   <div className="max-w-2xl mx-auto">
@@ -261,6 +363,8 @@ const InsightPage: React.FC = () => {
                   </div>
                 </div>
               )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

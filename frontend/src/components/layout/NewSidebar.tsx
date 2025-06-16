@@ -19,6 +19,16 @@ const NewSidebar: React.FC<NewSidebarProps> = ({ navItems }) => {
         {navItems.map((item, index) => (
           <Link href={item.path} key={index} className={styles.navItem}>
             <div className={styles.iconWrapper}>
+              {item.icon === 'Dashboard' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M112,39.38V104a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V39.38a8,8,0,0,1,13.66-5.66l64,64A8,8,0,0,1,112,39.38ZM104,152a8,8,0,0,0-8-8H40a8,8,0,0,0-8,8v64.62a8,8,0,0,0,13.66,5.66l64-64A8,8,0,0,0,104,152Zm48-112a8,8,0,0,0-8,8V104a8,8,0,0,0,8,8h64.62a8,8,0,0,0,5.66-13.66l-64-64A8,8,0,0,0,152,40Zm64,104H160a8,8,0,0,0-8,8v64.62a8,8,0,0,0,13.66,5.66l64-64A8,8,0,0,0,224,152,8,8,0,0,0,216,144Z"></path>
+                </svg>
+              )}
+              {item.icon === 'Education' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path>
+                </svg>
+              )}
               {item.icon === 'Chat' && (
                 <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                   <path d="M216,48H40A16,16,0,0,0,24,64V224a15.84,15.84,0,0,0,9.25,14.5A16.05,16.05,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78.69.69,0,0,0,.13-.11L82.5,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM40,224V64H216V192H82.5a16,16,0,0,0-10.25,3.78L40,224Z"></path>
