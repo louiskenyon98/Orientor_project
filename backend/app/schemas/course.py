@@ -204,3 +204,13 @@ class TargetedAnalysisResponse(BaseModel):
     conversation_started: bool
     next_questions: List[QuestionSchema]
     context_insights: Optional[List[Dict[str, Any]]] = None
+
+class ConversationResponseRequest(BaseModel):
+    question_id: str
+    response: str
+
+class ConversationAnalysisResponse(BaseModel):
+    next_questions: List[QuestionSchema]
+    insights_discovered: List[Dict[str, Any]]
+    session_complete: bool
+    career_recommendations: List[Dict[str, Any]]
