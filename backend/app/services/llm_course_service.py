@@ -404,6 +404,13 @@ Provide specific, actionable insights with confidence scores."""
             if start_idx != -1 and end_idx != -1:
                 json_str = content[start_idx:end_idx]
                 analysis = json.loads(json_str)
+                
+                # Transform next_questions to match our schema
+                if "next_questions" in analysis:
+                    analysis["next_questions"] = LLMCourseService._transform_questions(
+                        analysis["next_questions"]
+                    )
+                
                 return analysis
             else:
                 # Fallback parsing
@@ -419,6 +426,36 @@ Provide specific, actionable insights with confidence scores."""
         except Exception as e:
             logger.error(f"Error parsing analysis response: {str(e)}")
             return LLMCourseService._get_fallback_analysis("", "")
+    
+    @staticmethod
+    def _transform_questions(questions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Transform questions to match QuestionSchema format.
+        """
+        transformed = []
+        for i, question in enumerate(questions):
+            # Ensure required fields exist
+            transformed_question = {
+                "id": question.get("id", f"question_{i+1}"),
+                "question": question.get("question", ""),
+                "intent": question.get("intent", "general"),
+                "follow_up_triggers": question.get("follow_up_triggers", [])
+            }
+            
+            # If follow_up_triggers is missing, try to extract from other fields
+            if not transformed_question["follow_up_triggers"]:
+                # Generate some basic triggers based on intent
+                intent = transformed_question["intent"]
+                if intent == "explore_deeper":
+                    transformed_question["follow_up_triggers"] = ["more", "example", "specifically"]
+                elif intent == "clarify_contradiction":
+                    transformed_question["follow_up_triggers"] = ["prefer", "compare", "difference"]
+                else:
+                    transformed_question["follow_up_triggers"] = ["experience", "feeling"]
+            
+            transformed.append(transformed_question)
+        
+        return transformed
     
     @staticmethod
     def _get_fallback_analysis(response: str, question_id: str) -> Dict[str, Any]:
@@ -482,9 +519,10 @@ Provide specific, actionable insights with confidence scores."""
             },
             "next_questions": [
                 {
+                    "id": "follow_up_1",
                     "question": "Can you tell me more about what specifically interests you about this subject?",
                     "intent": "explore_deeper",
-                    "priority": "medium"
+                    "follow_up_triggers": ["interest", "subject"]
                 }
             ],
             "session_complete": False,
