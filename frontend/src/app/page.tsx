@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import UserCard from '@/components/ui/UserCard';
 import DailyQuestionCard from '@/components/ui/DailyQuestionCard';
+import ColorfulDailyQuestionCard from '@/components/ui/ColorfulDailyQuestionCard';
+import ColorfulCareerGoalCard from '@/components/ui/ColorfulCareerGoalCard';
+import ClassesCard from '@/components/ui/ClassesCard';
 import Calendar from '@/components/ui/Calendar';
 import EventsNotes from '@/components/ui/EventsNotes';
 import JobRecommendationVerticalList from '@/components/jobs/JobRecommendationVerticalList';
@@ -208,7 +211,7 @@ export default function Home() {
         
         <div className="relative z-10 w-full">
           <div className="flex-1 w-full px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
-            {/* First Section - Avatar, Personality Card, Career Goal Card, Calendar with different widths */}
+            {/* First Section - Avatar, Colorful Cards Row, Calendar */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
               {/* User Avatar Card (Left) - Takes 2 columns (narrower) */}
               <div className="col-span-12 md:col-span-2 flex flex-col">
@@ -224,35 +227,43 @@ export default function Home() {
                     className="p-6 w-full"
                     style={{
                       width: '100%',
-                      minHeight: '254px',
+                      minHeight: '300px',
                       borderRadius: '30px',
                       background: '#e0e0e0',
                       boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff'
                     }}
                   />
                 </div>
-                
               </div>
 
-              {/* Daily Question Card (Center Left) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3" style={{ marginTop: '52px' }}>
-                <DailyQuestionCard userId={currentUserId} />
+              {/* Colorful Cards Row - Takes 7 columns */}
+              <div className="col-span-12 md:col-span-7" style={{ marginTop: '52px' }}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+                  {/* Daily Question Card */}
+                  <div className="col-span-1">
+                    <ColorfulDailyQuestionCard 
+                      userId={currentUserId}
+                      style={{ height: '300px' }}
+                    />
+                  </div>
+
+                  {/* Career Goal Card */}
+                  <div className="col-span-1">
+                    <ColorfulCareerGoalCard
+                      style={{ height: '300px' }}
+                    />
+                  </div>
+
+                  {/* Classes Card */}
+                  <div className="col-span-1">
+                    <ClassesCard
+                      style={{ height: '300px' }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Career Goal Card (Center Right) - Takes 4 columns */}
-              <div className="col-span-12 md:col-span-4" style={{ marginTop: '52px' }}>
-                <CareerGoalCard
-                  style={{
-                    width: '100%',
-                    minHeight: '254px',
-                    borderRadius: '30px',
-                    background: '#e0e0e0',
-                    boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff'
-                  }}
-                />
-              </div>
-
-              {/* Calendar (Right) - Takes 3 columns to align with Activity section below */}
+              {/* Calendar (Right) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3">
                 <Calendar 
                   events={[
