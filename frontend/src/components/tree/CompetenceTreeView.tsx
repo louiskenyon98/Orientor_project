@@ -240,8 +240,9 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
   
   console.log("All edges:", edges);
   
-  const centerX = 1600; // Center for larger canvas
-  const centerY = 1100; // Center for larger canvas
+  // Calculate center based on actual viewport size (with SSR safety)
+  const centerX = typeof window !== 'undefined' ? Math.max(1600, window.innerWidth * 0.75) : 1600;
+  const centerY = typeof window !== 'undefined' ? Math.max(1100, window.innerHeight * 0.75) : 1100;
   const positioned: PositionedNode[] = [];
   
   // Show ALL nodes that have visible !== false (including undefined visible)
@@ -284,7 +285,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
         y: centerY
       });
     } else {
-      const anchorRadius = 200; // Increased from 150 for better spacing
+      const anchorRadius = typeof window !== 'undefined' ? Math.max(300, window.innerWidth * 0.2) : 300;
       anchors.forEach((anchor, index) => {
         const angle = (2 * Math.PI * index) / anchors.length;
         positioned.push({
@@ -333,7 +334,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
   // Position nodes level by level with clean spacing
   for (let level = 1; level <= currentLevel; level++) {
     const levelNodes = treeHierarchy.get(level) || [];
-    const baseRadius = 400 + (level - 1) * 250; // Much more spacing between levels
+    const baseRadius = (typeof window !== 'undefined' ? Math.max(500, window.innerWidth * 0.3) : 500) + (level - 1) * (typeof window !== 'undefined' ? Math.max(300, window.innerHeight * 0.2) : 300);
     
     console.log(`Positioning level ${level} with ${levelNodes.length} nodes at radius ${baseRadius}`);
     
@@ -399,7 +400,7 @@ const calculateRadialTreeLayout = (nodes: CompetenceNode[], edges: { source: str
     // Position orphaned nodes in outer ring
     orphanedNodes.forEach((node, index) => {
       const angle = (2 * Math.PI * index) / orphanedNodes.length;
-      const outerRadius = 700 + currentLevel * 250; // Much more spacing for orphaned nodes
+      const outerRadius = (typeof window !== 'undefined' ? Math.max(800, window.innerWidth * 0.4) : 800) + currentLevel * (typeof window !== 'undefined' ? Math.max(350, window.innerHeight * 0.25) : 350);
       positioned.push({
         ...node,
         x: centerX + outerRadius * Math.cos(angle),
@@ -425,6 +426,15 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
   const [selectedNode, setSelectedNode] = useState<PositionedNode | null>(null);
   const [showNodeModal, setShowNodeModal] = useState<boolean>(false);
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
+  const [zoom, setZoom] = useState<number>(1);
+  const [panX, setPanX] = useState<number>(0);
+  const [panY, setPanY] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [lastMousePos, setLastMousePos] = useState<{x: number, y: number}>({x: 0, y: 0});
+  
+  // Calculate dimensions based on viewport (with SSR safety)
+  const svgWidth = typeof window !== 'undefined' ? Math.max(3200, window.innerWidth * 1.5) : 3200;
+  const svgHeight = typeof window !== 'undefined' ? Math.max(2200, window.innerHeight * 1.5) : 2200;
   
   // Function to automatically save the tree as an image
   const saveTreeAsImage = useCallback(() => {
@@ -589,6 +599,72 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
   const handleJobSaved = (node: CompetenceNode) => {
     setSavedJobs(prev => new Set([...prev, node.id]));
   };
+
+  // Zoom and pan handlers with smooth transitions
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    // Get the SVG bounding box to calculate mouse position relative to SVG
+    const svgRect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - svgRect.left;
+    const mouseY = e.clientY - svgRect.top;
+    
+    // Much smaller zoom increments for smoother zooming
+    const zoomStep = 0.03; // Even smaller for ultra-smooth zooming
+    const zoomDirection = e.deltaY > 0 ? -1 : 1;
+    
+    setZoom(prev => {
+      const newZoom = prev + (zoomStep * zoomDirection);
+      const clampedZoom = Math.max(0.2, Math.min(4, newZoom));
+      
+      // Calculate zoom towards mouse position
+      if (clampedZoom !== prev) {
+        const zoomRatio = clampedZoom / prev;
+        const deltaX = (mouseX - panX) * (1 - zoomRatio);
+        const deltaY = (mouseY - panY) * (1 - zoomRatio);
+        
+        setPanX(currentPanX => currentPanX + deltaX);
+        setPanY(currentPanY => currentPanY + deltaY);
+      }
+      
+      return clampedZoom;
+    });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setLastMousePos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - lastMousePos.x;
+    const deltaY = e.clientY - lastMousePos.y;
+    
+    setPanX(prev => prev + deltaX);
+    setPanY(prev => prev + deltaY);
+    
+    setLastMousePos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const resetView = () => {
+    setZoom(1);
+    setPanX(0);
+    setPanY(0);
+  };
+
+  const zoomIn = () => {
+    setZoom(prev => Math.min(4, prev + 0.2));
+  };
+
+  const zoomOut = () => {
+    setZoom(prev => Math.max(0.2, prev - 0.2));
+  };
   
   if (loading) {
     return (
@@ -613,68 +689,155 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
       </div>
     );
   }
-  
-  const svgWidth = 3200;
-  const svgHeight = 2200;
 
   return (
     <div style={{ 
       width: '100vw',
-      height: 'calc(100vh - 80px)', // Account for navigation bar
+      height: '100vh',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: 1000,
       display: 'flex', 
       flexDirection: 'column',
-      marginTop: '80px', // Space for navigation bar
-      marginLeft: 'calc(-50vw + 50%)',
-      marginRight: 'calc(-50vw + 50%)',
-      position: 'relative'
+      background: '#f8fafc'
     }}>
+      {/* Header bar */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        padding: '10px 20px',
-        background: 'rgba(255, 255, 255, 0.95)',
+        padding: '12px 24px',
+        background: 'rgba(255, 255, 255, 0.98)',
         borderBottom: '1px solid #e2e8f0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        zIndex: 1001
       }}>
-        <h2 style={{ margin: 0, fontSize: '18px', color: '#1f2937' }}>Arbre de Compétences</h2>
-        <button
-          onClick={saveTreeAsImage}
-          style={{
-            background: '#4ade80',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '13px',
-            fontWeight: '600'
-          }}
-        >
-          💾 Save Tree
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => window.history.back()}
+            style={{
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            ← Back
+          </button>
+          <h1 style={{ margin: 0, fontSize: '20px', color: '#1f2937', fontWeight: '600' }}>
+            Competence Tree Explorer
+          </h1>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <span style={{ 
+            fontSize: '14px', 
+            color: '#6b7280',
+            background: '#f3f4f6',
+            padding: '6px 12px',
+            borderRadius: '6px'
+          }}>
+            {positionedNodes.length} nodes • Zoom: {Math.round(zoom * 100)}%
+          </span>
+          <button
+            onClick={zoomOut}
+            style={{
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              padding: '8px 12px',
+              borderRadius: '6px 0 0 6px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '500',
+              borderRight: '1px solid #4b5563'
+            }}
+          >
+            −
+          </button>
+          <button
+            onClick={zoomIn}
+            style={{
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              padding: '8px 12px',
+              borderRadius: '0 6px 6px 0',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '500',
+              marginRight: '8px'
+            }}
+          >
+            +
+          </button>
+          <button
+            onClick={resetView}
+            style={{
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: '500'
+            }}
+          >
+            🎯 Reset View
+          </button>
+          <button
+            onClick={saveTreeAsImage}
+            style={{
+              background: '#10b981',
+              color: 'white',
+              border: 'none',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+            }}
+          >
+            💾 Save Tree
+          </button>
+        </div>
       </div>
       
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', width: '100vw' }}>
-        {/* SVG Tree Visualization */}
-        <div style={{ 
-          flex: 1,
-          width: '100vw',
-          height: '100%',
-          overflow: 'auto',
-          background: '#f8fafc',
-          textAlign: 'center'
-        }}>
-          <svg 
-            width={svgWidth} 
-            height={svgHeight}
-            style={{ 
-              background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', 
-              border: '1px solid #e2e8f0',
-              display: 'block',
-              margin: '0 auto'
+      {/* Full screen tree visualization */}
+      <div style={{ 
+        flex: 1,
+        width: '100vw',
+        height: 'calc(100vh - 60px)',
+        overflow: 'auto',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+        position: 'relative'
+      }}>
+        <svg 
+          width={svgWidth} 
+          height={svgHeight}
+          style={{ 
+            background: 'transparent',
+            display: 'block',
+            cursor: isDragging ? 'grabbing' : 'grab'
+          }}
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          <g 
+            transform={`translate(${panX}, ${panY}) scale(${zoom})`}
+            style={{
+              transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+              transformOrigin: 'center'
             }}
           >
             {/* Render clean hierarchical edges */}
@@ -728,8 +891,8 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
                 isSaved={savedJobs.has(node.id)}
               />
             ))}
-          </svg>
-        </div>
+          </g>
+        </svg>
         
         {/* Node Detail Modal */}
         {showNodeModal && selectedNode && (
