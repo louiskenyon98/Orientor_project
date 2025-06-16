@@ -160,17 +160,16 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <div className="premium-container relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden">
-        <StarConstellation />
+      <div className="relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden" style={{ backgroundColor: '#ffffff' }}>
         
         <div className="relative z-10 w-full">
-          <div className="flex-1 w-full px-4 md:px-8 lg:px-12 xl:px-16 max-w-[2000px] mx-auto">
-            {/* First Section - 3 columns: Avatar, Personality Card, Calendar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {/* User Avatar Card (Left) - Restored Original */}
-              <div className="flex flex-col">
+          <div className="flex-1 w-full px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
+            {/* First Section - Avatar, Personality Card, Calendar with different widths */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+              {/* User Avatar Card (Left) - Takes 4 columns */}
+              <div className="col-span-12 md:col-span-4 flex flex-col">
                 <div className="mb-4">
-                  <h2 className="premium-section-title mb-4">My Progress</h2>
+                  <h2 className="text-xl font-semibold mb-4" style={{ color: '#000000' }}>My Progress</h2>
                   <UserCard
                     name={userData.name}
                     role={userData.role}
@@ -178,19 +177,26 @@ export default function Home() {
                     hollandResults={hollandResults}
                     loading={loading}
                     error={error}
-                    className="premium-card p-6 w-full"
+                    className="p-6 w-full"
+                    style={{
+                      width: '100%',
+                      minHeight: '254px',
+                      borderRadius: '30px',
+                      background: 'lightgrey',
+                      boxShadow: 'rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset'
+                    }}
                   />
                 </div>
                 
               </div>
 
-              {/* Personalité Card (Center) - Clean Interactive Card Only */}
-              <div>
+              {/* Personalité Card (Center) - Takes 5 columns */}
+              <div className="col-span-12 md:col-span-5">
                 <PhilosophicalCard userId={currentUserId} />
               </div>
 
-              {/* Calendar (Right) */}
-              <div className="flex justify-center items-start">
+              {/* Calendar (Right) - Takes 3 columns (narrower) */}
+              <div className="col-span-12 md:col-span-3">
                 <Calendar 
                   events={[
                     { id: '1', date: new Date(2025, 0, 20), title: 'Holland Test Review', type: 'test' },
@@ -202,13 +208,20 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Second Section - 3 columns: Top Peers, Recommended Jobs, Events & Notes */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {/* Top Peers (Left) */}
-              <div>
-                <div className="premium-card p-6">
+            {/* Second Section - Top Peers, Recommended Jobs, Events & Notes with different widths */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+              {/* Top Peers (Left) - Takes 4 columns */}
+              <div className="col-span-12 md:col-span-4">
+                <div style={{
+                  width: '100%',
+                  minHeight: '254px',
+                  borderRadius: '30px',
+                  background: 'lightgrey',
+                  boxShadow: 'rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset',
+                  padding: '24px'
+                }}>
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold">Top Peers</h2>
+                    <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Top Peers</h2>
                     <Link
                       href="/peers"
                       className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
@@ -269,11 +282,18 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Recommended Jobs (Center) */}
-              <div>
-                <div className="premium-card p-6">
+              {/* Recommended Jobs (Center) - Takes 5 columns */}
+              <div className="col-span-12 md:col-span-5">
+                <div style={{
+                  width: '100%',
+                  minHeight: '254px',
+                  borderRadius: '30px',
+                  background: 'lightgrey',
+                  boxShadow: 'rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset',
+                  padding: '24px'
+                }}>
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold">Recommended Jobs</h2>
+                    <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Recommended Jobs</h2>
                     <Link
                       href="/career/recommendations"
                       className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
@@ -336,8 +356,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Events & Notes (Right) */}
-              <div>
+              {/* Events & Notes (Right) - Takes 3 columns (narrower) */}
+              <div className="col-span-12 md:col-span-3">
                 <EventsNotes
                   events={[
                     {
