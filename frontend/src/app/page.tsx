@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import UserCard from '@/components/ui/UserCard';
 import PhilosophicalCard from '@/components/ui/PhilosophicalCard';
 import Calendar from '@/components/ui/Calendar';
@@ -182,11 +183,69 @@ export default function Home() {
 
               {/* Recommended Jobs (Center) */}
               <div>
-                <JobRecommendationVerticalList
-                  jobs={jobRecommendations}
-                  onJobClick={handleSelectJob}
-                  onSaveJob={(job) => console.log('Save job:', job)}
-                />
+                <div className="premium-card p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">Recommended Jobs</h2>
+                    <Link
+                      href="/career/recommendations"
+                      className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                    >
+                      <span>See all</span>
+                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
+                      </svg>
+                    </Link>
+                  </div>
+                  
+                  {jobsLoading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="text-sm text-gray-600 mt-2">Loading recommendations...</p>
+                    </div>
+                  ) : jobsError ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-red-600">{jobsError}</p>
+                    </div>
+                  ) : jobRecommendations.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-gray-600">No job recommendations available</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {jobRecommendations.slice(0, 3).map((job) => (
+                        <div
+                          key={job.id}
+                          className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-colors"
+                          onClick={() => handleSelectJob(job)}
+                        >
+                          <h3 className="font-medium text-sm mb-1">
+                            {job.metadata.preferred_label || job.metadata.title || 'Job Title'}
+                          </h3>
+                          <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                            {job.metadata.description || 'No description available'}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                              {Math.round(job.score * 100)}% match
+                            </div>
+                            {job.metadata.skills && job.metadata.skills.length > 0 && (
+                              <div className="flex gap-1 flex-wrap">
+                                {job.metadata.skills.slice(0, 2).map((skill, index) => (
+                                  <span
+                                    key={index}
+                                    className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Events & Notes (Right) */}
