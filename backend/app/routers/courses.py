@@ -14,7 +14,7 @@ from ..schemas.course import (
     ConversationLogCreate, ConversationLog as ConversationLogSchema,
     CourseAnalysisRequest, CourseAnalysisResponse,
     PsychologicalProfileResponse, CareerSignalsResponse,
-    TargetedAnalysisRequest, TargetedAnalysisResponse
+    TargetedAnalysisRequest, TargetedAnalysisResponse, ConversationResponseRequest, ConversationAnalysisResponse
 )
 from ..services.course_analysis_service import CourseAnalysisService
 from ..services.llm_course_service import LLMCourseService
@@ -244,11 +244,10 @@ async def start_targeted_analysis(
             detail="Failed to start analysis session"
         )
 
-@router.post("/conversations/{session_id}/respond")
+@router.post("/conversations/{session_id}/respond", response_model=ConversationAnalysisResponse)
 async def respond_to_question(
     session_id: str,
-    question_id: str,
-    response: str,
+    request: ConversationResponseRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -270,7 +269,7 @@ async def respond_to_question(
         
         # Process the response with LLM
         analysis_result = await LLMCourseService.analyze_response(
-            response, question_id, session_id, db
+            request.response, request.question_id, session_id, db
         )
         
         # Store the response
@@ -279,8 +278,8 @@ async def respond_to_question(
             course_id=conversation.course_id,
             session_id=session_id,
             question_intent=analysis_result.get("question_intent", "unknown"),
-            question_text=question_id,
-            response=response,
+            question_text=request.question_id,
+            response=request.response,
             extracted_insights=analysis_result.get("insights"),
             sentiment_analysis=analysis_result.get("sentiment"),
             career_implications=analysis_result.get("career_implications")
@@ -296,7 +295,7 @@ async def respond_to_question(
                     insight_type=insight["type"],
                     insight_value=insight["value"],
                     confidence_score=insight.get("confidence", 0.7),
-                    evidence_source=f"session:{session_id}, response:{response[:100]}"
+                    evidence_source=f"session:{session_id}, response:{request.response[:100]}"
                 )
                 db.add(psych_insight)
         
