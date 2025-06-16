@@ -168,6 +168,7 @@ export default function MainLayout({
     // Navigation items for the sidebar
     const navItems = [
         { name: 'Dashboard', icon: 'Dashboard', path: '/' },
+        { name: 'Classes', icon: 'Classes', path: '/classes' },
         { name: 'Education', icon: 'Education', path: '/education' },
         { name: 'Chat', icon: 'Chat', path: '/chat' },
         { name: 'Swipe', icon: 'Swipe', path: '/find-your-way' },
@@ -332,6 +333,11 @@ export default function MainLayout({
                                                                 <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11a16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A8,8,0,0,0,32,110.62V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V110.62A8,8,0,0,0,218.83,103.77ZM208,208H160V160a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v48H48V115.55l80-75.48,80,75.48Z"></path>
                                                             </svg>
                                                         )}
+                                                        {item.icon === 'Classes' && (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                                                <path d="M225.86,102.82c-.03-.07-.07-.13-.11-.2L208,80.51V56a8,8,0,0,0-8-8H56a8,8,0,0,0-8,8V80.51L30.25,102.62c0,.07-.08.13-.11.2A8,8,0,0,0,32,112v96a8,8,0,0,0,8,8H64a8,8,0,0,0,8-8V176h48v32a8,8,0,0,0,8,8h24a8,8,0,0,0,8-8V176h48v32a8,8,0,0,0,8,8h24a8,8,0,0,0,8-8V112A8,8,0,0,0,225.86,102.82ZM64,64H192V158.3l-16-16V104a8,8,0,0,0-8-8H88a8,8,0,0,0-8,8v38.3l-16,16Zm32,48h64v38.3l-32-32Z"></path>
+                                                            </svg>
+                                                        )}
                                                         {item.icon === 'Education' && (
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                                                                 <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path>
@@ -414,12 +420,11 @@ export default function MainLayout({
                 <div className="fixed bottom-0 left-0 right-0 w-full bg-stitch-primary border-t border-stitch-border md:hidden z-50 font-departure">
                     <div className="grid grid-cols-5 py-2">
                         <Link 
-                            href="/education" 
-                            className={`flex flex-col items-center text-xs font-departure relative ${pathname === '/education' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
+                            href="/classes" 
+                            className={`flex flex-col items-center text-xs font-departure relative ${pathname === '/classes' || pathname?.startsWith('/classes/') ? 'text-stitch-accent' : 'text-stitch-sage'}`}
                         >
-                            <span className="material-icons-outlined">school</span>
-                            <span>Education</span>
-                            <span className="absolute -top-1 right-2 bg-stitch-accent text-white text-xs rounded-full px-1">New</span>
+                            <span className="material-icons-outlined">class</span>
+                            <span>Classes</span>
                         </Link>
                         <Link 
                             href="/chat" 

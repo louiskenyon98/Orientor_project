@@ -8,7 +8,7 @@ import UserCard from '@/components/ui/UserCard';
 import DailyQuestionCard from '@/components/ui/DailyQuestionCard';
 import ColorfulDailyQuestionCard from '@/components/ui/ColorfulDailyQuestionCard';
 import ColorfulCareerGoalCard from '@/components/ui/ColorfulCareerGoalCard';
-import ClassesCard from '@/components/ui/ClassesCard';
+import EnhancedClassesCard from '@/components/classes/EnhancedClassesCard';
 import Calendar from '@/components/ui/Calendar';
 import EventsNotes from '@/components/ui/EventsNotes';
 import JobRecommendationVerticalList from '@/components/jobs/JobRecommendationVerticalList';
@@ -256,7 +256,8 @@ export default function Home() {
 
                   {/* Classes Card */}
                   <div className="col-span-1">
-                    <ClassesCard
+                    <EnhancedClassesCard
+                      userId={currentUserId}
                       style={{ height: '300px' }}
                     />
                   </div>

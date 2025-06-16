@@ -2,6 +2,7 @@
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Providers } from './providers';
+import MainLayout from '@/components/layout/MainLayout';
 import './globals.css';
 
 // export const metadata = {
@@ -21,10 +22,10 @@ export default function RootLayout({
       </head>
       <Providers>
         <body className="min-h-screen antialiased">
-          {/* Main content */}
-          <main>
+          {/* Main layout with navigation */}
+          <MainLayout>
             {children}
-          </main>
+          </MainLayout>
 
           <Analytics />
           <SpeedInsights />

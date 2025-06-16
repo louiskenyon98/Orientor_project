@@ -31,3 +31,10 @@ class User(Base):
     conversation_categories = relationship("ConversationCategory", back_populates="user", cascade="all, delete-orphan")
     conversation_shares = relationship("ConversationShare", back_populates="user", cascade="all, delete-orphan")
     chat_analytics = relationship("UserChatAnalytics", back_populates="user", cascade="all, delete-orphan")
+    
+    # Course analysis relationships
+    courses = relationship("Course", back_populates="user", cascade="all, delete-orphan")
+    psychological_insights = relationship("PsychologicalInsight", back_populates="user", cascade="all, delete-orphan")
+    career_signals = relationship("CareerSignal", back_populates="user", cascade="all, delete-orphan")
+    conversation_logs = relationship("ConversationLog", back_populates="user", cascade="all, delete-orphan")
+    career_profile_aggregates = relationship("CareerProfileAggregate", back_populates="user", cascade="all, delete-orphan")
