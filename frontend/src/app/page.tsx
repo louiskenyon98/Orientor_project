@@ -166,8 +166,8 @@ export default function Home() {
           <div className="flex-1 w-full px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
             {/* First Section - Avatar, Personality Card, Calendar with different widths */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
-              {/* User Avatar Card (Left) - Takes 4 columns */}
-              <div className="col-span-12 md:col-span-4 flex flex-col">
+              {/* User Avatar Card (Left) - Takes 3 columns */}
+              <div className="col-span-12 md:col-span-3 flex flex-col">
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold mb-4" style={{ color: '#000000' }}>My Progress</h2>
                   <UserCard
@@ -182,16 +182,16 @@ export default function Home() {
                       width: '100%',
                       minHeight: '254px',
                       borderRadius: '30px',
-                      background: 'lightgrey',
-                      boxShadow: 'rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset'
+                      background: '#e0e0e0',
+                      boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff'
                     }}
                   />
                 </div>
                 
               </div>
 
-              {/* Personalité Card (Center) - Takes 5 columns */}
-              <div className="col-span-12 md:col-span-5">
+              {/* Personalité Card (Center) - Takes 6 columns */}
+              <div className="col-span-12 md:col-span-6">
                 <PhilosophicalCard userId={currentUserId} />
               </div>
 
@@ -210,14 +210,14 @@ export default function Home() {
 
             {/* Second Section - Top Peers, Recommended Jobs, Events & Notes with different widths */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
-              {/* Top Peers (Left) - Takes 4 columns */}
-              <div className="col-span-12 md:col-span-4">
+              {/* Top Peers (Left) - Takes 3 columns */}
+              <div className="col-span-12 md:col-span-3">
                 <div style={{
                   width: '100%',
                   minHeight: '254px',
                   borderRadius: '30px',
-                  background: 'lightgrey',
-                  boxShadow: 'rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset',
+                  background: '#e0e0e0',
+                  boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
                   padding: '24px'
                 }}>
                   <div className="flex justify-between items-center mb-4">
@@ -282,14 +282,14 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Recommended Jobs (Center) - Takes 5 columns */}
-              <div className="col-span-12 md:col-span-5">
+              {/* Recommended Jobs (Center) - Takes 6 columns */}
+              <div className="col-span-12 md:col-span-6">
                 <div style={{
                   width: '100%',
                   minHeight: '254px',
                   borderRadius: '30px',
-                  background: 'lightgrey',
-                  boxShadow: 'rgba(50, 50, 93, 0.25) 0px 30px 50px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 26px -18px inset',
+                  background: '#e0e0e0',
+                  boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
                   padding: '24px'
                 }}>
                   <div className="flex justify-between items-center mb-4">
