@@ -33,6 +33,7 @@ from app.routers.avatar import router as avatar_router
 from app.routers.onboarding import router as onboarding_router
 from app.routers.education import router as education_router
 from app.routers.school_programs import router as school_programs_router
+from app.routers.courses import router as courses_router
 from app.api.endpoints.job_recommendations import router as job_recommendations_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
@@ -140,6 +141,7 @@ app.include_router(avatar_router, prefix="/api/v1")
 app.include_router(onboarding_router)
 app.include_router(education_router)
 app.include_router(school_programs_router)
+app.include_router(courses_router)
 app.include_router(job_recommendations_router, prefix="/api/v1/jobs")
 logger.info("All routers included successfully")
 
