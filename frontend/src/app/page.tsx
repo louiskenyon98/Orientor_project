@@ -12,6 +12,7 @@ import JobRecommendationVerticalList from '@/components/jobs/JobRecommendationVe
 import PersonalityCard from '@/components/ui/PersonalityCard';
 import SkillShowcase from '@/components/ui/SkillShowcase';
 import StarConstellation from '@/components/ui/StarConstellation';
+import VectorSearchCard from '@/components/search/VectorSearchCard';
 import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
 import { getJobRecommendations } from '@/services/api';
 import { Job } from '@/components/jobs/JobCard';
@@ -208,7 +209,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Second Section - Top Peers, Recommended Jobs, Events & Notes with different widths */}
+            {/* Second Section - Top Peers, Recommended Jobs, Vector Search, Events & Notes with different widths */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
               {/* Top Peers (Left) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3">
@@ -282,8 +283,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Recommended Jobs (Center) - Takes 6 columns */}
-              <div className="col-span-12 md:col-span-6">
+              {/* Recommended Jobs (Center Left) - Takes 3 columns */}
+              <div className="col-span-12 md:col-span-3">
                 <div style={{
                   width: '100%',
                   minHeight: '254px',
@@ -356,7 +357,12 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Events & Notes (Right) - Takes 3 columns (narrower) */}
+              {/* Vector Search (Center Right) - Takes 3 columns */}
+              <div className="col-span-12 md:col-span-3">
+                <VectorSearchCard />
+              </div>
+
+              {/* Events & Notes (Right) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3">
                 <EventsNotes
                   events={[
