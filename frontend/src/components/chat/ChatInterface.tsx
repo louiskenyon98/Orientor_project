@@ -81,6 +81,26 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     }
   }, [messages]);
 
+  // Handle initial message from URL parameters
+  useEffect(() => {
+    const initialMessage = searchParams.get('initial_message');
+    const messageType = searchParams.get('type');
+    
+    if (initialMessage && !currentConversation && messages.length === 0) {
+      // Decode the message and set it as the input text
+      const decodedMessage = decodeURIComponent(initialMessage);
+      setInputText(decodedMessage);
+      setChatStarted(true);
+      
+      // Focus the input field
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
+    }
+  }, [searchParams, currentConversation, messages.length]);
+
   const loadConversationMessages = async () => {
     if (!currentConversation) {
       console.log('No current conversation to load messages for');

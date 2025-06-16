@@ -68,7 +68,7 @@ const UserCard: React.FC<UserCardProps> = ({
   }, []);
 
   const handleProfileClick = () => {
-    router.push('/profile_avatar');
+    router.push('/insight');
   };
 
   const avatarImageUrl = avatarData?.avatar_image_url
@@ -76,7 +76,11 @@ const UserCard: React.FC<UserCardProps> = ({
     : null;
 
   return (
-    <div className={`${styles.card} ${className || ''}`} style={style}>
+    <div 
+      className={`${styles.card} ${className || ''}`} 
+      style={{ ...style, cursor: 'pointer' }}
+      onClick={handleProfileClick}
+    >
       {/* Mail/Settings button */}
       <button className={styles.mail}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -156,7 +160,13 @@ const UserCard: React.FC<UserCardProps> = ({
           <div className={styles.social_links_container}>
             {/* Optional: Add social links here */}
           </div>
-          <button className={styles.card__btn} onClick={handleProfileClick}>
+          <button 
+            className={styles.card__btn} 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleProfileClick();
+            }}
+          >
             Profile
           </button>
         </div>
