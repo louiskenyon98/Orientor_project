@@ -1,5 +1,7 @@
 Enhance the competency tree with job saving functionality and complete career planning flow:
 
+I want you to spawn multiple agents if required. organize and document your steps 
+
 PRIORITY 1 - Fix tree generation:
 - Debug the 404 error when generating trees from anchor skills
 - Ensure API endpoint correctly receives 5 anchor skills and returns valid ESCO subgraph

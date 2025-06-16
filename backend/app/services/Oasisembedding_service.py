@@ -206,8 +206,19 @@ class OasisModelState:
                 try:
                     # Load the lighter model for OaSIS embeddings using SentenceTransformer
                     # This will generate embeddings of dimension 384
-                    self.embedding_model = SentenceTransformer(OASIS_MODEL_NAME)
-                    logger.info(f"OaSIS embedding model {OASIS_MODEL_NAME} loaded successfully")
+                    logger.info(f"Loading OaSIS embedding model {OASIS_MODEL_NAME}...")
+                    
+                    # Set PyTorch to use CPU device for better compatibility
+                    import torch
+                    device = 'cpu'  # Force CPU to avoid MPS issues
+                    
+                    self.embedding_model = SentenceTransformer(OASIS_MODEL_NAME, device=device)
+                    logger.info(f"OaSIS embedding model {OASIS_MODEL_NAME} loaded successfully on {device}")
+                    
+                    # Test the model with a simple encode
+                    test_text = "test embedding"
+                    test_embedding = self.embedding_model.encode(test_text, convert_to_numpy=True)
+                    logger.info(f"Model test successful, embedding shape: {test_embedding.shape}")
                     
                     self.models_loaded = True
                     logger.info("OaSIS models loaded successfully")
@@ -218,6 +229,8 @@ class OasisModelState:
                     logger.error(f"Error loading OaSIS models (attempt {retry_count}/{max_retries}): {str(e)}")
                     if retry_count < max_retries:
                         logger.info("Retrying OaSIS model loading...")
+                        # Clean up any partial model loading
+                        self.embedding_model = None
                         continue
                     else:
                         logger.error("Failed to load OaSIS models after maximum retries")
@@ -231,7 +244,7 @@ class OasisModelState:
             return self.load_models()
         return True
 
-# Create a single instance of OasisModelState
+# Create a single instance of OasisModelState (lazy loading - don't load models yet)
 oasis_model_state = OasisModelState()
 
 # Initialize ESCO model state
@@ -254,8 +267,19 @@ class ESCOModelState:
                 try:
                     # Load the model for ESCO embeddings using SentenceTransformer
                     # This will generate embeddings of dimension 384
-                    self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-                    logger.info("ESCO embedding model loaded successfully")
+                    logger.info("Loading ESCO embedding model...")
+                    
+                    # Set PyTorch to use CPU device for better compatibility
+                    import torch
+                    device = 'cpu'  # Force CPU to avoid MPS issues
+                    
+                    self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device=device)
+                    logger.info(f"ESCO embedding model loaded successfully on {device}")
+                    
+                    # Test the model
+                    test_text = "test embedding"
+                    test_embedding = self.embedding_model.encode(test_text, convert_to_numpy=True)
+                    logger.info(f"ESCO model test successful, embedding shape: {test_embedding.shape}")
                     
                     self.models_loaded = True
                     logger.info("ESCO models loaded successfully")
@@ -266,6 +290,8 @@ class ESCOModelState:
                     logger.error(f"Error loading ESCO models (attempt {retry_count}/{max_retries}): {str(e)}")
                     if retry_count < max_retries:
                         logger.info("Retrying ESCO model loading...")
+                        # Clean up any partial model loading
+                        self.embedding_model = None
                         continue
                     else:
                         logger.error("Failed to load ESCO models after maximum retries")
@@ -279,7 +305,7 @@ class ESCOModelState:
             return self.load_models()
         return True
 
-# Create a single instance of ESCOModelState
+# Create a single instance of ESCOModelState (lazy loading - don't load models yet)
 esco_model_state = ESCOModelState()
 
 # --- Core Functions ---
