@@ -17,14 +17,44 @@ import pickle
 from collections import defaultdict, deque
 import sys
 
-# Ajouter le chemin pour importer le modèle GraphSAGE
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app", "services"))
-from app.services.GNN.GraphSage import GraphSAGE, CareerTreeModel
-
-# Configuration du logger
+# Configuration du logger early
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Ajouter le chemin pour importer le modèle GraphSAGE
+backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+services_path = os.path.join(backend_path, "app", "services")
+gnn_path = os.path.join(services_path, "GNN")
+
+# Add both paths to ensure imports work
+if services_path not in sys.path:
+    sys.path.insert(0, services_path)
+if gnn_path not in sys.path:
+    sys.path.insert(0, gnn_path)
+
+try:
+    from GraphSage import GraphSAGE, CareerTreeModel
+    logger.info("GraphSAGE imported successfully from GNN directory")
+except ImportError as e:
+    logger.warning(f"Direct import failed: {e}, trying fallback method")
+    try:
+        # Fallback import method
+        from GNN.GraphSage import GraphSAGE, CareerTreeModel
+        logger.info("GraphSAGE imported successfully using fallback method")
+    except ImportError as e:
+        logger.error(f"All import methods failed: {e}")
+        # Define dummy classes to prevent total failure
+        class GraphSAGE:
+            pass
+        class CareerTreeModel:
+            def __init__(self, *args, **kwargs):
+                pass
+            def eval(self):
+                pass
+            def load_state_dict(self, *args, **kwargs):
+                pass
+
 
 class GraphTraversalService:
     """
@@ -51,7 +81,7 @@ class GraphTraversalService:
         # Chemin par défaut vers le modèle GraphSAGE
         if model_path is None:
             model_path = os.path.join(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                backend_path,
                 "app", "services", "GNN", "best_model_20250520_022237.pt"
             )
         

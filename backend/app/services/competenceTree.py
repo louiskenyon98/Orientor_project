@@ -1416,26 +1416,21 @@ class CompetenceTreeService:
             import sys
             import os
             
-            # Method 1: Try relative import like occupationTree.py does
-            try:
-                from dev.competenceTree_dev.graph_traversal_service import GraphTraversalService
-                logger.info("Imported GraphTraversalService using relative import")
-            except ImportError:
-                # Method 2: Add path to sys.path
-                backend_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-                competence_tree_dev_path = os.path.join(backend_path, "dev", "competenceTree_dev")
+            # Add path to sys.path to import graph_traversal_service
+            backend_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            competence_tree_dev_path = os.path.join(backend_path, "dev", "competenceTree_dev")
+            
+            logger.info(f"Looking for graph_traversal_service at: {competence_tree_dev_path}")
+            
+            if not os.path.exists(competence_tree_dev_path):
+                logger.error(f"competenceTree_dev path does not exist: {competence_tree_dev_path}")
+                raise ImportError(f"Cannot find competenceTree_dev at: {competence_tree_dev_path}")
                 
-                if not os.path.exists(competence_tree_dev_path):
-                    logger.error(f"competenceTree_dev path does not exist: {competence_tree_dev_path}")
-                    # Try another path construction
-                    competence_tree_dev_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", "dev", "competenceTree_dev")
-                    
-                if os.path.exists(competence_tree_dev_path):
-                    sys.path.insert(0, competence_tree_dev_path)
-                    from graph_traversal_service import GraphTraversalService
-                    logger.info(f"Imported GraphTraversalService by adding path: {competence_tree_dev_path}")
-                else:
-                    raise ImportError(f"Cannot find competenceTree_dev at any expected location")
+            if competence_tree_dev_path not in sys.path:
+                sys.path.insert(0, competence_tree_dev_path)
+                
+            from graph_traversal_service import GraphTraversalService
+            logger.info(f"Successfully imported GraphTraversalService from: {competence_tree_dev_path}")
             
             # Initialize graph traversal service
             try:
