@@ -10,11 +10,12 @@ interface NavItem {
 
 interface NewSidebarProps {
   navItems: NavItem[];
+  isChatMode?: boolean;
 }
 
-const NewSidebar: React.FC<NewSidebarProps> = ({ navItems }) => {
+const NewSidebar: React.FC<NewSidebarProps> = ({ navItems, isChatMode = false }) => {
   return (
-    <div className={styles.sidebar}>
+    <div className={`${styles.sidebar} ${isChatMode ? styles.chatMode : ''}`}>
       <div className={styles.navContainer}>
         {navItems.map((item, index) => (
           <Link href={item.path} key={index} className={styles.navItem}>

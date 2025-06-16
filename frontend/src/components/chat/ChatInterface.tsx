@@ -400,26 +400,48 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     }
 
     try {
-      const response = await axios.patch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${currentConversation.id}`,
-        { title: newTitle },
         {
+          method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+          body: JSON.stringify({ title: newTitle })
         }
       );
 
-      // Update local state
-      setCurrentConversation({ ...currentConversation, title: newTitle });
-      setIsEditingTitle(false);
-      setEditingTitleValue('');
+      console.log('Title update response status:', response.status);
+      
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Title update response data:', responseData);
+        
+        // Update local state
+        setCurrentConversation({ ...currentConversation, title: newTitle });
+        setIsEditingTitle(false);
+        setEditingTitleValue('');
+        
+        // Trigger conversation list refresh to show updated title
+        setRefreshConversationList(prev => prev + 1);
+        
+        console.log('Title successfully updated to:', newTitle);
+      } else {
+        const errorData = await response.text();
+        console.error('Failed to update title. Status:', response.status, 'Response:', errorData);
+        throw new Error(`HTTP ${response.status}: ${errorData}`);
+      }
+      
     } catch (error) {
       console.error('Failed to update conversation title:', error);
+      
       // Revert to original title on error
       setIsEditingTitle(false);
       setEditingTitleValue('');
+      
+      // Show error message to user
+      alert('Failed to update conversation title. Please try again.');
     }
   };
 
@@ -564,11 +586,12 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
               />
             ) : (
               <h1 
-                className="text-2xl font-light text-gray-800 tracking-wide cursor-pointer hover:text-blue-600 transition-colors"
+                className="text-2xl font-light text-gray-800 tracking-wide cursor-pointer hover:text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition-all duration-200"
                 onClick={handleTitleEdit}
                 title="Click to edit conversation name"
               >
                 {currentConversation?.title || 'Chat'}
+                <span className="ml-2 text-gray-400 opacity-0 hover:opacity-100 transition-opacity text-sm">✏️</span>
               </h1>
             )}
           </div>
