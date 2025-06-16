@@ -276,19 +276,18 @@ export default function MainLayout({
             //             <div className="min-h-screen bg-light-background dark:bg-dark-background">
             // {showNav && (
                 <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/80 backdrop-blur-md px-4 py-3 hidden md:block font-departure header">
-                    {/* Logo - Fixed to top-left corner */}
-                    <div className="absolute top-3 left-4">
-                        <Link href="/landing" className="flex-shrink-0 flex items-center">
-                            <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
-                                Navigo
-                            </span>
-                        </Link>
-                    </div>
-                    
-                    <div className="layout-container mx-auto">
-                        <div className="flex justify-between items-center">
-                            {/* Left Side - User Greeting and Motivational Message (offset for logo) */}
-                            <div className="flex items-center ml-24">
+                    <div className="w-full px-4">
+                        <div className="flex justify-between items-center w-full">
+                            {/* Left Side - Logo and Greeting side by side - positioned at far left */}
+                            <div className="flex items-center gap-4">
+                                {/* Logo */}
+                                <Link href="/landing" className="flex-shrink-0 flex items-center">
+                                    <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
+                                        Navigo
+                                    </span>
+                                </Link>
+                                
+                                {/* User Greeting - directly to the right */}
                                 <div className="flex flex-col">
                                     <h1 className="text-2xl font-bold text-stitch-accent">
                                         Hey Phil
