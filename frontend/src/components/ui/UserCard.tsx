@@ -11,6 +11,7 @@ interface UserCardProps {
   role: string;
   skills: string[];
   className?: string;
+  style?: React.CSSProperties;
   hollandResults?: ScoreResponse | null;
   loading?: boolean;
   error?: string | null;
@@ -39,6 +40,7 @@ const UserCard: React.FC<UserCardProps> = ({
   role,
   skills,
   className,
+  style,
   hollandResults,
   loading,
   error
@@ -74,7 +76,7 @@ const UserCard: React.FC<UserCardProps> = ({
     : null;
 
   return (
-    <div className={`${styles.card} ${className || ''}`}>
+    <div className={`${styles.card} ${className || ''}`} style={style}>
       {/* Mail/Settings button */}
       <button className={styles.mail}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

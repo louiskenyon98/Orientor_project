@@ -270,12 +270,12 @@ export default function MainLayout({
     console.log('Rendering layout with isLoggedIn:', isLoggedIn);
 
     return (
-        <div className="min-h-screen flex flex-col bg-stitch-primary text-stitch-sage">
+        <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
             {/* Desktop Navigation Bar - Only visible on larger screens */}
             {isLoggedIn && (
             //             <div className="min-h-screen bg-light-background dark:bg-dark-background">
             // {showNav && (
-                <header className="fixed top-0 left-0 right-0 w-full z-50 bg-stitch-primary/80 backdrop-blur-md px-4 py-3 hidden md:block font-departure header">
+                <header className="fixed top-0 left-0 right-0 w-full z-50 px-4 py-3 hidden md:block font-departure header" style={{ backgroundColor: '#ffffff' }}>
                     <div className="w-full px-4">
                         <div className="flex justify-between items-center w-full">
                             {/* Left Side - Logo and Greeting side by side - positioned at far left */}
@@ -289,10 +289,10 @@ export default function MainLayout({
                                 
                                 {/* User Greeting - directly to the right */}
                                 <div className="flex flex-col">
-                                    <h1 className="text-2xl font-bold text-stitch-accent">
+                                    <h1 className="text-2xl font-bold" style={{ color: '#000000' }}>
                                         Hey Phil
                                     </h1>
-                                    <p className="text-sm text-stitch-sage">
+                                    <p className="text-sm" style={{ color: '#666666' }}>
                                         It's sunny today and it's time to explore 🌞
                                     </p>
                                 </div>
@@ -344,8 +344,8 @@ export default function MainLayout({
                 )}
                 
                 {/* Main content */}
-                <main className={`flex-1 w-full ${isLoggedIn && showNav ? 'md:ml-20' : ''} ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`}>
-                    <div className="layout-container mx-auto">
+                <main className={`flex-1 w-full ${isLoggedIn && showNav ? 'md:ml-20' : ''} ${isLoggedIn ? 'pt-0 md:pt-20 pb-50 md:pb-20' : 'py-20'}`} style={{ backgroundColor: '#ffffff' }}>
+                    <div className="w-full">
                         {children}
                     </div>
                 </main>
