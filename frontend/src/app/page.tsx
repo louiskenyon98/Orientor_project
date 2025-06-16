@@ -223,152 +223,151 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Second Section - Top Peers, Recommended Jobs, Vector Search, Events & Notes with different widths */}
+            {/* Second Section - Top Peers, Recommended Jobs, Vector Search blended into white background */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
               {/* Top Peers (Left) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3">
-                <div style={{
-                  width: '100%',
-                  minHeight: '254px',
-                  borderRadius: '30px',
-                  background: '#e0e0e0',
-                  boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
-                  padding: '24px'
-                }}>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Top Peers</h2>
-                    <Link
-                      href="/peers"
-                      className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                    >
-                      <span>See all</span>
-                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
-                      </svg>
-                    </Link>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Activity</h2>
+                  <Link
+                    href="/peers"
+                    className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
+                  >
+                    <span>3</span>
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
+                    </svg>
+                  </Link>
+                </div>
+                
+                {/* Search bar */}
+                <div className="mb-4">
+                  <div className="relative">
+                    <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Find update"
+                      className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-200"
+                    />
                   </div>
-                  
-                  {peersLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="text-sm text-gray-600 mt-2">Loading peers...</p>
-                    </div>
-                  ) : peersError ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-red-600">{peersError}</p>
-                    </div>
-                  ) : peers.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-gray-600">No peer recommendations available</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {peers.map((peer) => (
-                        <div
-                          key={peer.user_id}
-                          className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-colors"
-                          onClick={() => router.push(`/peers/${peer.user_id}`)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                              {peer.name?.charAt(0).toUpperCase() || '?'}
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-medium text-sm">
+                </div>
+                
+                {peersLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-sm text-gray-600 mt-2">Loading peers...</p>
+                  </div>
+                ) : peersError ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-red-600">{peersError}</p>
+                  </div>
+                ) : peers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-600">No peer recommendations available</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {peers.map((peer) => (
+                      <div
+                        key={peer.user_id}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                        onClick={() => router.push(`/peers/${peer.user_id}`)}
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                          {peer.name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm text-gray-900 truncate">
                                 {peer.name || `User ${peer.user_id}`}
                               </h3>
-                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                              <p className="text-xs text-gray-500 mt-1">
                                 {peer.major}{peer.year ? `, Year ${peer.year}` : ''}
                               </p>
-                              {peer.job_title && (
-                                <p className="text-xs text-gray-500">
-                                  {peer.job_title}
-                                </p>
-                              )}
                             </div>
-                            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                              {Math.round((peer.compatibility_score || 0) * 100)}% match
+                            <div className="flex flex-col items-end ml-2">
+                              <span className="text-xs text-gray-400">Jan 2, 12:30</span>
+                              <span className="text-xs text-blue-600 font-medium mt-1">
+                                {Math.round((peer.compatibility_score || 0) * 100)}% match
+                              </span>
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 256 256" className="text-gray-300">
+                          <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Recommended Jobs (Center Left) - Takes 3 columns */}
+              {/* Recommended Jobs (Center) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3">
-                <div style={{
-                  width: '100%',
-                  minHeight: '254px',
-                  borderRadius: '30px',
-                  background: '#e0e0e0',
-                  boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
-                  padding: '24px'
-                }}>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Recommended Jobs</h2>
-                    <Link
-                      href="/career/recommendations"
-                      className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
-                    >
-                      <span>See all</span>
-                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
-                      </svg>
-                    </Link>
-                  </div>
-                  
-                  {jobsLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="text-sm text-gray-600 mt-2">Loading recommendations...</p>
-                    </div>
-                  ) : jobsError ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-red-600">{jobsError}</p>
-                    </div>
-                  ) : jobRecommendations.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-gray-600">No job recommendations available</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {jobRecommendations.slice(0, 3).map((job) => (
-                        <div
-                          key={job.id}
-                          className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-colors"
-                          onClick={() => handleSelectJob(job)}
-                        >
-                          <h3 className="font-medium text-sm mb-1">
-                            {job.metadata.preferred_label || job.metadata.title || 'Job Title'}
-                          </h3>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                            {job.metadata.description || 'No description available'}
-                          </p>
-                          <div className="flex justify-between items-center mt-2">
-                            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                              {Math.round(job.score * 100)}% match
-                            </div>
-                            {job.metadata.skills && job.metadata.skills.length > 0 && (
-                              <div className="flex gap-1 flex-wrap">
-                                {job.metadata.skills.slice(0, 2).map((skill, index) => (
-                                  <span
-                                    key={index}
-                                    className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full"
-                                  >
-                                    {skill}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Recommended Jobs</h2>
+                  <Link
+                    href="/career/recommendations"
+                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  >
+                    <span>See all</span>
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
+                    </svg>
+                  </Link>
                 </div>
+                
+                {jobsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="text-sm text-gray-600 mt-2">Loading recommendations...</p>
+                  </div>
+                ) : jobsError ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-red-600">{jobsError}</p>
+                  </div>
+                ) : jobRecommendations.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-600">No job recommendations available</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {jobRecommendations.slice(0, 3).map((job) => (
+                      <div
+                        key={job.id}
+                        className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                        onClick={() => handleSelectJob(job)}
+                      >
+                        <h3 className="font-medium text-sm mb-1">
+                          {job.metadata.preferred_label || job.metadata.title || 'Job Title'}
+                        </h3>
+                        <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                          {job.metadata.description || 'No description available'}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <div className="text-xs text-blue-600 font-medium">
+                            {Math.round(job.score * 100)}% match
+                          </div>
+                          {job.metadata.skills && job.metadata.skills.length > 0 && (
+                            <div className="flex gap-1 flex-wrap">
+                              {job.metadata.skills.slice(0, 2).map((skill, index) => (
+                                <span
+                                  key={index}
+                                  className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Vector Search (Center Right) - Takes 3 columns */}
@@ -376,7 +375,7 @@ export default function Home() {
                 <VectorSearchCard />
               </div>
 
-              {/* Events & Notes (Right) - Takes 3 columns */}
+              {/* Events & Notes (Right) - Takes 3 columns (same as calendar) */}
               <div className="col-span-12 md:col-span-3">
                 <EventsNotes
                   events={[
