@@ -47,6 +47,38 @@ interface ChatInterfaceProps {
   currentUserId: number;
 }
 
+// Paper Chat Message Component - mimics writing on paper
+interface PaperChatMessageProps {
+  message: Message;
+  isLast: boolean;
+}
+
+const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast }) => {
+  const isUser = message.role === 'user';
+  
+  return (
+    <div className="space-y-4">
+      {/* AI/System message with elegant blue accent */}
+      {!isUser && (
+        <div className="border-l-3 border-blue-500 pl-8 py-2">
+          <p className="text-xl leading-relaxed text-blue-600 font-light tracking-wide">
+            {message.content}
+          </p>
+        </div>
+      )}
+      
+      {/* User message as elegant plain text */}
+      {isUser && (
+        <div className="pl-4 py-1">
+          <p className="text-xl leading-relaxed text-gray-800 font-light tracking-wide">
+            {message.content}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -61,6 +93,8 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [refreshConversationList, setRefreshConversationList] = useState(0);
   const [chatStarted, setChatStarted] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editingTitleValue, setEditingTitleValue] = useState('');
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -344,289 +378,324 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     }
   };
 
+  const handleTitleEdit = () => {
+    if (currentConversation) {
+      setEditingTitleValue(currentConversation.title);
+      setIsEditingTitle(true);
+    }
+  };
+
+  const handleTitleSave = async () => {
+    if (!currentConversation || !editingTitleValue.trim()) {
+      setIsEditingTitle(false);
+      setEditingTitleValue('');
+      return;
+    }
+
+    const newTitle = editingTitleValue.trim();
+    if (newTitle === currentConversation.title) {
+      setIsEditingTitle(false);
+      setEditingTitleValue('');
+      return;
+    }
+
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${currentConversation.id}`,
+        { title: newTitle },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Update local state
+      setCurrentConversation({ ...currentConversation, title: newTitle });
+      setIsEditingTitle(false);
+      setEditingTitleValue('');
+    } catch (error) {
+      console.error('Failed to update conversation title:', error);
+      // Revert to original title on error
+      setIsEditingTitle(false);
+      setEditingTitleValue('');
+    }
+  };
+
   if (!chatStarted && !currentConversation) {
-    // Initial state - centered chat interface
+    // Paper-like initial state
     return (
-      <div className="flex h-[calc(100vh-4rem)] relative">
-        {/* Conversations Sidebar - Slides in from left */}
-        <div className={`absolute left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out z-10 ${
-          showConversations ? 'translate-x-0' : '-translate-x-full'
-        }`}>
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Conversations</h3>
-              <button
-                onClick={() => setShowConversations(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-              >
-                ×
-              </button>
+      <div className="min-h-screen bg-white flex flex-col">
+        {/* Header with conversations history icon */}
+        <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 p-6">
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
+            <div className="flex-1">
+              <h1 className="text-2xl font-light text-gray-800 tracking-wide">Chat</h1>
             </div>
+            <button
+              onClick={() => setShowConversations(true)}
+              className="p-2 text-gray-400 hover:text-blue-500 transition-colors rounded-full hover:bg-blue-50"
+              title="View conversation history"
+            >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </button>
           </div>
-          <ConversationList
-            selectedConversationId={currentConversation?.id}
-            onSelectConversation={handleSelectConversation}
-            onCreateNew={handleCreateNewConversation}
-            refreshTrigger={refreshConversationList}
-          />
         </div>
 
-        {/* Main centered content */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          {/* NAVIGO Title with Gradient */}
-          <div className="mb-12 text-center">
-            <h1 className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
-              NAVIGO
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              Your AI career guidance companion
-            </p>
-          </div>
-
-          {/* Chat Interface Container */}
-          <div className={styles.container_chat_bot}>
-            <div className={styles['container-chat-options']}>
-              <div className={styles.chat}>
-                <div className={styles['chat-bot']}>
+        {/* Paper-like Chat Interface */}
+        <div className="flex-1 overflow-y-auto px-8 py-12">
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-8">
+              {/* Welcome prompt */}
+              <div className="border-l-3 border-blue-500 pl-8 py-2">
+                <p className="text-xl leading-relaxed text-blue-600 font-light tracking-wide">
+                  What would you like to talk about today?
+                </p>
+              </div>
+              
+              {/* Paper-like input area */}
+              <div className="pl-4 py-2">
+                <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="w-full">
                   <textarea
                     ref={inputRef}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !isTyping && (e.preventDefault(), handleSend())}
-                    placeholder="Ask me anything about your career path..."
+                    placeholder="Write here.."
+                    className="w-full text-xl leading-relaxed text-gray-800 placeholder-gray-300 
+                      bg-transparent border-none outline-none resize-none font-light tracking-wide
+                      focus:text-gray-900 transition-all duration-300 min-h-[2.5rem]
+                      focus:placeholder-gray-200 focus:outline-none focus:ring-0 focus:border-none"
+                    rows={1}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                      // Auto-resize textarea
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height = `${target.scrollHeight}px`;
+                    }}
+                    onInput={(e) => {
+                      // Auto-resize textarea
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height = `${target.scrollHeight}px`;
+                    }}
                     disabled={isTyping}
+                    autoFocus
+                    style={{ minHeight: '2.5rem' }}
                   />
-                </div>
-                <div className={styles.options}>
-                  <div className={styles['btns-add']}>
-                    <button
-                      onClick={() => setShowConversations(true)}
-                      className="flex items-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
-                        <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
-                      </svg>
-                      <span className="text-xs">History</span>
-                    </button>
-                  </div>
-                  <button
-                    onClick={handleSend}
-                    disabled={!inputText.trim() || isTyping}
-                    className={styles['btn-submit']}
-                  >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </button>
-                </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Overlay when conversations are shown */}
+        {/* Conversations History Popup */}
         {showConversations && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-5"
-            onClick={() => setShowConversations(false)}
-          />
+          <>
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setShowConversations(false)}
+            />
+            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 max-w-90vw max-h-80vh bg-white rounded-lg shadow-xl z-50 overflow-hidden">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium text-gray-800">Conversation History</h3>
+                  <button
+                    onClick={() => setShowConversations(false)}
+                    className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="p-4 max-h-96 overflow-y-auto">
+                <ConversationList
+                  selectedConversationId={currentConversation?.id}
+                  onSelectConversation={(conversation) => {
+                    handleSelectConversation(conversation);
+                    setShowConversations(false);
+                  }}
+                  onCreateNew={() => {
+                    handleCreateNewConversation();
+                    setShowConversations(false);
+                  }}
+                  refreshTrigger={refreshConversationList}
+                />
+              </div>
+            </div>
+          </>
         )}
       </div>
     );
   }
 
-  // Full chat interface after first message
+  // Paper-like full chat interface
   return (
-    <div className="flex h-[calc(100vh-4rem)] max-w-7xl mx-auto relative">
-      {/* Sidebar - Hidden by default, slides in when shown */}
-      <div className={`absolute left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out z-20 ${
-        showSidebar ? 'translate-x-0' : '-translate-x-full'
-      } flex flex-col`}>
-        {/* Sidebar Navigation */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Chat Menu</h3>
-            <button
-              onClick={() => setShowSidebar(false)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-            >
-              ×
-            </button>
-          </div>
-          <div className="flex space-x-1">
-            <button
-              onClick={() => setSidebarView('conversations')}
-              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                sidebarView === 'conversations'
-                  ? 'bg-primary text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              Chats
-            </button>
-            <button
-              onClick={() => setSidebarView('categories')}
-              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                sidebarView === 'categories'
-                  ? 'bg-primary text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              Categories
-            </button>
-            <button
-              onClick={() => setSidebarView('analytics')}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                sidebarView === 'analytics'
-                  ? 'bg-primary text-white'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Sidebar Content */}
-        <div className="flex-1 overflow-y-auto">
-          {sidebarView === 'conversations' && (
-            <ConversationList
-              selectedConversationId={currentConversation?.id}
-              onSelectConversation={handleSelectConversation}
-              onCreateNew={handleCreateNewConversation}
-              refreshTrigger={refreshConversationList}
-            />
-          )}
-          {sidebarView === 'categories' && (
-            <div className="p-4">
-              <CategoryManager
-                selectedCategoryId={selectedCategory?.id}
-                onSelectCategory={setSelectedCategory}
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Header with conversations history icon */}
+      <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 p-6">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          <div className="flex-1">
+            {isEditingTitle ? (
+              <input
+                type="text"
+                value={editingTitleValue}
+                onChange={(e) => setEditingTitleValue(e.target.value)}
+                onBlur={handleTitleSave}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleTitleSave();
+                  } else if (e.key === 'Escape') {
+                    setIsEditingTitle(false);
+                    setEditingTitleValue('');
+                  }
+                }}
+                className="text-2xl font-light text-gray-800 tracking-wide bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none w-full"
+                autoFocus
               />
-            </div>
-          )}
-          {sidebarView === 'analytics' && (
-            <AnalyticsDashboard />
-          )}
-        </div>
-      </div>
-
-      {/* Overlay when sidebar is shown */}
-      {showSidebar && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-10"
-          onClick={() => setShowSidebar(false)}
-        />
-      )}
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col w-full">
-        {/* Chat Header */}
-        {currentConversation ? (
-          <ConversationManager
-            conversationId={currentConversation.id}
-            conversationTitle={currentConversation.title}
-            isArchived={currentConversation.is_archived}
-            onTitleUpdate={handleTitleUpdate}
-            onArchive={handleArchiveConversation}
-            onDelete={handleDeleteConversation}
-            onRefresh={loadConversationMessages}
-          />
-        ) : (
-          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowSidebar(!showSidebar)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                >
-                  <Menu className="w-5 h-5" />
-                </button>
-                <h2 className="text-lg font-medium">New Conversation</h2>
-              </div>
-              <button
-                onClick={() => setShowSearch(!showSearch)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            ) : (
+              <h1 
+                className="text-2xl font-light text-gray-800 tracking-wide cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={handleTitleEdit}
+                title="Click to edit conversation name"
               >
-                <Search className="w-5 h-5" />
-              </button>
-            </div>
-            {selectedCategory && (
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Category:</span>
-                <span 
-                  className="px-2 py-1 rounded text-sm"
-                  style={{ 
-                    backgroundColor: `${selectedCategory.color}20`,
-                    color: selectedCategory.color 
-                  }}
-                >
-                  {selectedCategory.name}
-                </span>
-              </div>
+                {currentConversation?.title || 'Chat'}
+              </h1>
             )}
           </div>
-        )}
-
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-          {(messages || [])
-            .filter(message => message.role !== 'system') // Filter out system messages
-            .map((message) => (
-              <div key={message.id} id={`message-${message.id}`} className="transition-colors">
-                <ChatMessage 
-                  message={message.content}
-                  type={message.role === 'user' ? 'user' : 'ai'}
-                  userColor="bg-blue-500"
-                  aiColor="bg-gray-100 dark:bg-gray-800"
-                />
-              </div>
-            ))}
-          {isTyping && (
-            <ChatMessage 
-              message="Thinking..."
-              type="ai"
-              userColor="bg-blue-500"
-              aiColor="bg-gray-100 dark:bg-gray-800"
-            />
-          )}
-        </div>
-
-        {/* Input Area - Fixed at bottom */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-3 md:p-4 bg-white dark:bg-gray-900">
-          <div className="flex items-center space-x-2">
-            <textarea
-              ref={inputRef}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !isTyping && (e.preventDefault(), handleSend())}
-              placeholder="Type your message..."
-              className="flex-1 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-              rows="1"
-              disabled={isTyping}
-            />
-            <button 
-              onClick={handleSend}
-              disabled={!inputText.trim() || isTyping}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 min-w-[80px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              aria-label="Send message"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowConversations(true)}
+              className="p-2 text-gray-400 hover:text-blue-500 transition-colors rounded-full hover:bg-blue-50"
+              title="View conversation history"
             >
-              <span className="hidden xs:inline">Send</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 xs:ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
               </svg>
+            </button>
+            <button
+              onClick={handleCreateNewConversation}
+              className="p-2 text-gray-400 hover:text-blue-500 transition-colors rounded-full hover:bg-blue-50"
+              title="New conversation"
+            >
+              <Plus className="w-5 h-5" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Search Modal */}
-      {showSearch && (
-        <SearchInterface
-          onSelectResult={handleSearchResult}
-          onClose={() => setShowSearch(false)}
-        />
+      {/* Paper-like Messages Area */}
+      <div className="flex-1 overflow-y-auto px-8 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-8">
+            {(messages || [])
+              .filter(message => message.role !== 'system')
+              .map((message, index) => (
+                <PaperChatMessage 
+                  key={message.id} 
+                  message={message}
+                  isLast={index === messages.length - 1}
+                />
+              ))}
+            
+            {isTyping && (
+              <div className="border-l-3 border-blue-500 pl-8 py-2">
+                <div className="flex items-center space-x-2">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                  <span className="text-blue-500 text-sm font-light">Thinking...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Inline input for continuing conversation */}
+            <div className="pl-4 py-2">
+              <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="w-full">
+                <textarea
+                  ref={inputRef}
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  placeholder="Continue writing.."
+                  className="w-full text-xl leading-relaxed text-gray-800 placeholder-gray-300 
+                    bg-transparent border-none outline-none resize-none font-light tracking-wide
+                    focus:text-gray-900 transition-all duration-300 min-h-[2.5rem]
+                    focus:placeholder-gray-200 focus:outline-none focus:ring-0 focus:border-none"
+                  rows={1}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                    // Auto-resize textarea
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
+                  onInput={(e) => {
+                    // Auto-resize textarea
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
+                  disabled={isTyping}
+                  style={{ minHeight: '2.5rem' }}
+                />
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Conversations History Popup */}
+      {showConversations && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setShowConversations(false)}
+          />
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 max-w-90vw max-h-80vh bg-white rounded-lg shadow-xl z-50 overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-800">Conversation History</h3>
+                <button
+                  onClick={() => setShowConversations(false)}
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="p-4 max-h-96 overflow-y-auto">
+              <ConversationList
+                selectedConversationId={currentConversation?.id}
+                onSelectConversation={(conversation) => {
+                  handleSelectConversation(conversation);
+                  setShowConversations(false);
+                }}
+                onCreateNew={() => {
+                  handleCreateNewConversation();
+                  setShowConversations(false);
+                }}
+                refreshTrigger={refreshConversationList}
+              />
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
