@@ -191,7 +191,7 @@ export default function Home() {
               </div>
 
               {/* Personalité Card (Center) - Takes 6 columns */}
-              <div className="col-span-12 md:col-span-6">
+              <div className="col-span-12 md:col-span-6" style={{ marginTop: '52px' }}>
                 <PhilosophicalCard userId={currentUserId} />
               </div>
 
