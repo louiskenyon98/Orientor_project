@@ -5,7 +5,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import UserCard from '@/components/ui/UserCard';
-import PhilosophicalCard from '@/components/ui/PhilosophicalCard';
+import DailyQuestionCard from '@/components/ui/DailyQuestionCard';
 import Calendar from '@/components/ui/Calendar';
 import EventsNotes from '@/components/ui/EventsNotes';
 import JobRecommendationVerticalList from '@/components/jobs/JobRecommendationVerticalList';
@@ -218,9 +218,9 @@ export default function Home() {
                 
               </div>
 
-              {/* Personalité Card (Center Left) - Takes 3 columns */}
+              {/* Daily Question Card (Center Left) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3" style={{ marginTop: '52px' }}>
-                <PhilosophicalCard userId={currentUserId} />
+                <DailyQuestionCard userId={currentUserId} />
               </div>
 
               {/* Career Goal Card (Center Right) - Takes 4 columns */}
