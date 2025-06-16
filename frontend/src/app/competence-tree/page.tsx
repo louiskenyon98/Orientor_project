@@ -15,19 +15,29 @@ interface UserResponse {
 }
 
 const CompetenceTreePage: React.FC = () => {
-  console.log("CompetenceTreePage: Composant chargé");
-  
   const router = useRouter();
-  console.log("CompetenceTreePage: Router initialisé", router);
-  
   const searchParams = useSearchParams();
-  console.log("CompetenceTreePage: SearchParams récupérés", searchParams);
   
-  const graphId = searchParams ? searchParams.get('graph_id') : null;
-  console.log("CompetenceTreePage: GraphId récupéré", graphId);
-  
+  // Get graphId from URL params or try to restore from localStorage
+  const urlGraphId = searchParams ? searchParams.get('graph_id') : null;
+  const [currentGraphId, setCurrentGraphId] = useState<string | null>(urlGraphId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-restore last viewed tree if no graphId in URL
+  useEffect(() => {
+    if (!urlGraphId) {
+      const lastGraphId = localStorage.getItem('last-competence-tree-id');
+      if (lastGraphId) {
+        console.log("Restoring last viewed tree:", lastGraphId);
+        setCurrentGraphId(lastGraphId);
+      }
+    } else {
+      // Save current graphId as the last viewed
+      localStorage.setItem('last-competence-tree-id', urlGraphId);
+      setCurrentGraphId(urlGraphId);
+    }
+  }, [urlGraphId]);
 
   // Check authentication on mount
   useEffect(() => {
@@ -63,14 +73,14 @@ const CompetenceTreePage: React.FC = () => {
       });
       
       const userId = response.data.id;
-      console.log("handleGenerateTree: Appel à generateCompetenceTree avec userId:", userId);
-      
       const result = await generateCompetenceTree(userId);
-      console.log("handleGenerateTree: Résultat de generateCompetenceTree:", result);
+      
+      // Save as last viewed tree and update state
+      localStorage.setItem('last-competence-tree-id', result.graph_id);
+      setCurrentGraphId(result.graph_id);
       
       // Rediriger vers la même page avec le graph_id en paramètre
       const newUrl = `/competence-tree?graph_id=${result.graph_id}`;
-      console.log("handleGenerateTree: Redirection vers:", newUrl);
       router.push(newUrl);
     } catch (err: any) {
       console.error("handleGenerateTree: Erreur lors de la génération:", err);
@@ -87,7 +97,7 @@ const CompetenceTreePage: React.FC = () => {
   return (
     <MainLayout>
       <div className="container">
-        {!graphId ? (
+        {!currentGraphId ? (
           <div className="generate-tree-container" style={{ textAlign: 'center', padding: '50px' }}>
             <h2>Arbre de Compétences</h2>
             <p>Vous n'avez pas encore d'arbre de compétences. Générez-en un pour commencer!</p>
@@ -122,7 +132,7 @@ const CompetenceTreePage: React.FC = () => {
             {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
           </div>
         ) : (
-          <CompetenceTreeView graphId={graphId} />
+          <CompetenceTreeView graphId={currentGraphId} />
         )}
       </div>
     </MainLayout>

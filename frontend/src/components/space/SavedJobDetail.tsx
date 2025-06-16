@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SavedJob, getJobDetails } from '@/services/spaceService';
+import ProgramRecommendationsModal from './ProgramRecommendationsModal';
 
 interface SavedJobDetailProps {
   job: SavedJob;
@@ -25,6 +26,8 @@ const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
   const [jobDetails, setJobDetails] = useState<JobDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showProgramsModal, setShowProgramsModal] = useState(false);
+  const [mockGoalId] = useState(1); // Mock career goal ID - in real app, this would come from user's actual career goals
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -201,15 +204,20 @@ const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
         </button>
         
         <button
-          onClick={() => {
-            // Future: Link to relevant programs
-            alert('Educational pathways feature coming soon!');
-          }}
+          onClick={() => setShowProgramsModal(true)}
           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
         >
           📚 Explore Programs
         </button>
       </div>
+
+      {/* Program Recommendations Modal */}
+      <ProgramRecommendationsModal
+        isOpen={showProgramsModal}
+        onClose={() => setShowProgramsModal(false)}
+        goalId={mockGoalId}
+        jobTitle={job.job_title}
+      />
     </div>
   );
 };
