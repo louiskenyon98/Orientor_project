@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import Dict, Any, List
+from pydantic import BaseModel, Field
 import logging
 import json
 
@@ -12,6 +13,13 @@ from ..models import User, UserSkillTree
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# Request schemas
+class AnchorSkillsRequest(BaseModel):
+    anchor_skills: List[str] = Field(..., min_items=5, max_items=5, description="Exactly 5 ESCO skill IDs")
+    max_depth: int = Field(3, ge=1, le=6, description="Maximum tree depth")
+    max_nodes: int = Field(50, ge=10, le=100, description="Maximum nodes in tree")
+    include_occupations: bool = Field(True, description="Include occupation nodes")
 
 router = APIRouter(
     prefix="/competence-tree",
@@ -157,6 +165,101 @@ def generate_competence_tree(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error during tree generation: {str(e)}"
+        )
+
+@router.post("/generate-from-anchors", response_model=Dict[str, Any])
+def generate_tree_from_anchors(
+    request: AnchorSkillsRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Generate a competence tree from 5 specific anchor skills.
+    
+    This endpoint allows users to generate a competence tree based on
+    5 pre-selected anchor skills (ESCO skill IDs).
+    
+    Args:
+        request: Contains anchor_skills list with exactly 5 ESCO skill IDs
+        current_user: Current authenticated user
+        db: Database session
+        
+    Returns:
+        Dict with graph_id for accessing the generated tree
+    """
+    logger.info(f"Request to generate tree from anchor skills for user {current_user.id}")
+    logger.info(f"Anchor skills provided: {request.anchor_skills}")
+    
+    try:
+        # Validate anchor skills count (additional validation beyond Pydantic)
+        if len(request.anchor_skills) != 5:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Exactly 5 anchor skills required, got {len(request.anchor_skills)}"
+            )
+        
+        # Check for duplicates
+        if len(set(request.anchor_skills)) != len(request.anchor_skills):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Duplicate anchor skills provided. All 5 skills must be unique."
+            )
+        
+        # Get or create the competence tree service
+        tree_service = get_competence_tree_service()
+        
+        # Generate tree from the provided anchor skills
+        logger.info(f"Creating tree from anchors with max_depth={request.max_depth}, max_nodes={request.max_nodes}")
+        
+        # Use the existing create_skill_tree method with anchor skills
+        tree_data = tree_service.create_skill_tree_from_anchors(
+            db,
+            current_user.id,
+            anchor_skills=request.anchor_skills,
+            max_depth=request.max_depth,
+            max_nodes_per_level=max(5, min(10, request.max_nodes // request.max_depth)),
+            include_occupations=request.include_occupations
+        )
+        
+        if not tree_data:
+            logger.error(f"create_skill_tree_from_anchors returned empty data")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create tree from anchor skills"
+            )
+        
+        # Log tree statistics
+        nodes_count = len(tree_data.get('nodes', []))
+        edges_count = len(tree_data.get('edges', []))
+        
+        logger.info(f"Tree generated successfully: nodes={nodes_count}, edges={edges_count}")
+        
+        # Save the tree
+        graph_id = tree_service.save_skill_tree(db, current_user.id, tree_data)
+        
+        if not graph_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save generated tree"
+            )
+        
+        return {
+            "graph_id": graph_id,
+            "status": "success",
+            "nodes_generated": nodes_count,
+            "edges_generated": edges_count,
+            "message": "Tree generated successfully from anchor skills"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error generating tree from anchors: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error: {str(e)}"
         )
 
 @router.get("/anchor-skills", response_model=Dict[str, Any])

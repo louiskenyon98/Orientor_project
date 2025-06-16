@@ -68,6 +68,21 @@ export interface Note {
   updated_at: string;
 }
 
+// Saved Job types (from tree exploration)
+export interface SavedJob {
+  id: number;
+  user_id: number;
+  esco_id: string;
+  job_title: string;
+  skills_required: string[];
+  discovery_source: string;
+  tree_graph_id?: string;
+  relevance_score?: number;
+  saved_at: string;
+  metadata: Record<string, any>;
+  already_saved: boolean;
+}
+
 export interface NoteCreate {
   content: string;
   saved_recommendation_id?: number;
@@ -344,6 +359,49 @@ export const getSkillComparison = async (oasisCode: string): Promise<any> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching skill comparison:', error);
+    throw error;
+  }
+};
+
+// ===== SAVED JOBS FUNCTIONALITY =====
+
+// Fetch saved jobs from tree exploration
+export const fetchSavedJobs = async (): Promise<SavedJob[]> => {
+  try {
+    const response = await axios.get<{jobs: SavedJob[], total: number}>(
+      `${API_URL}/jobs/saved`, 
+      getAuthHeader()
+    );
+    return response.data.jobs;
+  } catch (error) {
+    console.error('Error fetching saved jobs:', error);
+    throw error;
+  }
+};
+
+// Delete a saved job
+export const deleteSavedJob = async (jobId: number): Promise<void> => {
+  try {
+    await axios.delete(
+      `${API_URL}/jobs/${jobId}`, 
+      getAuthHeader()
+    );
+  } catch (error) {
+    console.error('Error deleting saved job:', error);
+    throw error;
+  }
+};
+
+// Get job details from ESCO
+export const getJobDetails = async (escoId: string): Promise<any> => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/jobs/${escoId}/details`, 
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching job details:', error);
     throw error;
   }
 }; 

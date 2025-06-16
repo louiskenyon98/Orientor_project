@@ -111,3 +111,111 @@ export const completeChallenge = async (nodeId: string, userId: number): Promise
     throw error;
   }
 };
+
+// Job saving functionality
+export interface SaveJobRequest {
+  esco_id: string;
+  job_title: string;
+  skills_required?: string[];
+  discovery_source?: string;
+  tree_graph_id?: string;
+  relevance_score?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface SavedJobResponse {
+  id: number;
+  user_id: number;
+  esco_id: string;
+  job_title: string;
+  skills_required: string[];
+  discovery_source: string;
+  tree_graph_id?: string;
+  relevance_score?: number;
+  saved_at: string;
+  metadata: Record<string, any>;
+  already_saved: boolean;
+}
+
+export const saveJobFromTree = async (jobData: SaveJobRequest): Promise<SavedJobResponse> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    const response = await axios.post(
+      `${API_URL}/jobs/save`,
+      jobData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    console.log('Job saved successfully:', response.data);
+    return response.data as SavedJobResponse;
+  } catch (error: any) {
+    console.error('Error saving job:', error);
+    if (error.response?.status === 401) {
+      throw new Error('Authentication failed. Please log in again.');
+    }
+    throw new Error(error.response?.data?.detail || 'Failed to save job');
+  }
+};
+
+export const getSavedJobs = async (): Promise<SavedJobResponse[]> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    const response = await axios.get(
+      `${API_URL}/jobs/saved`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    return response.data.jobs as SavedJobResponse[];
+  } catch (error: any) {
+    console.error('Error fetching saved jobs:', error);
+    throw new Error(error.response?.data?.detail || 'Failed to fetch saved jobs');
+  }
+};
+
+export const generateTreeFromAnchors = async (
+  anchorSkills: string[]
+): Promise<{ graph_id: string }> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    const response = await axios.post(
+      `${API_URL}/competence-tree/generate-from-anchors`,
+      {
+        anchor_skills: anchorSkills,
+        max_depth: 3,
+        max_nodes: 50,
+        include_occupations: true
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        timeout: 60000 // 1 minute timeout
+      }
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('Error generating tree from anchors:', error);
+    throw error;
+  }
+};

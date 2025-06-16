@@ -1327,6 +1327,71 @@ class CompetenceTreeService:
             logger.error(traceback.format_exc())
             return {}
     
+    def create_skill_tree_from_anchors(self, db: Session, user_id: int, anchor_skills: List[str], 
+                                     max_depth: int = 3, max_nodes_per_level: int = 5, 
+                                     include_occupations: bool = True) -> Dict[str, Any]:
+        """
+        Create a skill tree from specific anchor skills provided by the user.
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            anchor_skills: List of 5 ESCO skill IDs
+            max_depth: Maximum tree depth
+            max_nodes_per_level: Maximum nodes per level
+            include_occupations: Whether to include occupation nodes
+            
+        Returns:
+            Dict containing the generated tree data
+        """
+        try:
+            # Generate a single UUID for the entire tree
+            graph_id = str(uuid4())
+            logger.info(f"Generated new graph_id: {graph_id} for user {user_id} with provided anchor skills")
+            
+            # Get user age for challenge generation
+            query = text("SELECT age FROM user_profiles WHERE user_id = :user_id")
+            result = db.execute(query, {"user_id": user_id}).fetchone()
+            user_age = result[0] if result and result[0] else 25
+            logger.info(f"User age for {user_id}: {user_age}")
+            
+            # Validate and format anchor skills
+            formatted_anchors = []
+            for skill_id in anchor_skills:
+                # Format skill data for tree generation
+                skill_data = {
+                    "id": skill_id,
+                    "esco_id": skill_id,
+                    "esco_label": f"Skill {skill_id}",  # This will be enriched by ESCO lookup
+                    "is_anchor": True
+                }
+                formatted_anchors.append(skill_data)
+            
+            logger.info(f"Creating tree from {len(formatted_anchors)} anchor skills for user {user_id}")
+            
+            # Use the enhanced skill tree creation method
+            gamified_graph = self._create_enhanced_skill_tree(
+                formatted_anchors, 
+                user_age, 
+                graph_id, 
+                db, 
+                max_depth, 
+                max_nodes_per_level
+            )
+            
+            # Ensure anchors are stored properly
+            gamified_graph["anchors"] = anchor_skills
+            gamified_graph["anchor_metadata"] = formatted_anchors
+            gamified_graph["graph_id"] = graph_id
+            
+            logger.info(f"Skill tree created successfully from anchor skills for user {user_id}")
+            return gamified_graph
+            
+        except Exception as e:
+            logger.error(f"Error creating skill tree from anchors: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise
+    
     def _create_enhanced_skill_tree(self, anchor_skills: List[Dict[str, Any]], user_age: int, graph_id: str, db: Session, max_depth: int = 3, max_nodes_per_level: int = 5) -> Dict[str, Any]:
         """
         Create an enhanced skill tree using proper graph traversal like the occupation tree.
@@ -1347,13 +1412,30 @@ class CompetenceTreeService:
             Enhanced skill tree structure with proper connections
         """
         try:
-            # Import GraphTraversalService
+            # Import GraphTraversalService - try multiple import methods
             import sys
             import os
-            # Add path to competenceTree_dev directory (it's in the backend folder)
-            competence_tree_dev_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "competenceTree_dev")
-            sys.path.append(competence_tree_dev_path)
-            from graph_traversal_service import GraphTraversalService
+            
+            # Method 1: Try relative import like occupationTree.py does
+            try:
+                from dev.competenceTree_dev.graph_traversal_service import GraphTraversalService
+                logger.info("Imported GraphTraversalService using relative import")
+            except ImportError:
+                # Method 2: Add path to sys.path
+                backend_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                competence_tree_dev_path = os.path.join(backend_path, "dev", "competenceTree_dev")
+                
+                if not os.path.exists(competence_tree_dev_path):
+                    logger.error(f"competenceTree_dev path does not exist: {competence_tree_dev_path}")
+                    # Try another path construction
+                    competence_tree_dev_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", "dev", "competenceTree_dev")
+                    
+                if os.path.exists(competence_tree_dev_path):
+                    sys.path.insert(0, competence_tree_dev_path)
+                    from graph_traversal_service import GraphTraversalService
+                    logger.info(f"Imported GraphTraversalService by adding path: {competence_tree_dev_path}")
+                else:
+                    raise ImportError(f"Cannot find competenceTree_dev at any expected location")
             
             # Initialize graph traversal service
             try:
