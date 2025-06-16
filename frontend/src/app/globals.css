@@ -8,6 +8,28 @@
   }
 }
 
+/* Chat Onboarding Styles */
+.chat-bubble-system {
+  @apply max-w-sm bg-gray-100 text-gray-800 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-gray-200;
+}
+
+.chat-bubble-user {
+  @apply max-w-sm bg-blue-500 text-white px-4 py-3 rounded-2xl rounded-br-md shadow-sm;
+}
+
+[data-theme="dark"] .chat-bubble-system {
+  @apply bg-gray-800 text-gray-200 border-gray-700;
+}
+
+/* Fix chat input text visibility */
+.chat-input {
+  @apply text-gray-900 placeholder-gray-500;
+}
+
+[data-theme="dark"] .chat-input {
+  @apply text-gray-100 bg-gray-800 border-gray-700;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

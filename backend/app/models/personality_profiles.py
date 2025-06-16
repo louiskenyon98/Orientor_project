@@ -2,9 +2,11 @@
 Personality assessment and profile models.
 """
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.models.base import Base
+import uuid
 
 class PersonalityAssessment(Base):
     """Model for personality assessment sessions."""
@@ -14,14 +16,14 @@ class PersonalityAssessment(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     assessment_type = Column(String(50), nullable=False)
     assessment_version = Column(String(20), nullable=False)
-    session_id = Column(String, nullable=False, unique=True)
+    session_id = Column(UUID(as_uuid=True), nullable=False, unique=True, default=uuid.uuid4)
     status = Column(String(20), nullable=False, default="in_progress")
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True))
     total_items = Column(Integer)
     completed_items = Column(Integer, default=0)
     validity_flags = Column(JSON, default=dict)
-    assessment_metadata = Column(JSON, default=dict)
+    assessment_metadata = Column("metadata", JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -41,7 +43,7 @@ class PersonalityResponse(Base):
     response_time_ms = Column(Integer)
     revision_count = Column(Integer, default=0)
     confidence_level = Column(Integer)
-    behavioral_data = Column(JSON, default=dict)
+    behavioral_metadata = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

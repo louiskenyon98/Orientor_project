@@ -1,0 +1,177 @@
+import api from './api';
+import { PsychologicalProfile, OnboardingResponse } from '../types/onboarding';
+
+export interface OnboardingStatus {
+  isComplete: boolean;
+  hasStarted: boolean;
+  currentStep?: string;
+  completedAt?: string;
+}
+
+export interface OnboardingSessionResponse {
+  session_id: string;
+  message: string;
+}
+
+export interface OnboardingProgressResponse {
+  message: string;
+  progress: number;
+  total: number;
+}
+
+export interface OnboardingCompleteResponse {
+  message: string;
+  assessment_id: number;
+  profile_created: boolean;
+}
+
+export interface OnboardingProfileResponse {
+  profile: PsychologicalProfile;
+  description: string;
+  created_at: string;
+  assessment_version: string;
+}
+
+export interface OnboardingResponsesData {
+  responses: OnboardingResponse[];
+  assessment_status: string;
+  completed_items: number;
+  total_items: number;
+}
+
+class OnboardingService {
+  private baseURL = '/onboarding';
+
+  /**
+   * Get the current onboarding status for the authenticated user
+   */
+  async getStatus(): Promise<OnboardingStatus> {
+    try {
+      console.log('Checking onboarding status...');
+      const response = await api.get(`${this.baseURL}/status`);
+      console.log('Onboarding status response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get onboarding status:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Start a new onboarding session
+   */
+  async startOnboarding(): Promise<OnboardingSessionResponse> {
+    try {
+      const response = await api.post(`${this.baseURL}/start`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to start onboarding:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Save a single onboarding response
+   */
+  async saveResponse(responseData: OnboardingResponse): Promise<OnboardingProgressResponse> {
+    try {
+      const response = await api.post(`${this.baseURL}/response`, responseData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to save onboarding response:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Complete the onboarding process
+   */
+  async completeOnboarding(data: {
+    responses: OnboardingResponse[];
+    psychProfile?: PsychologicalProfile;
+  }): Promise<OnboardingCompleteResponse> {
+    try {
+      console.log('Sending onboarding completion data:', {
+        responses: data.responses.length,
+        psychProfile: data.psychProfile ? 'Present' : 'Missing',
+        data: data
+      });
+      const response = await api.post(`${this.baseURL}/complete`, data);
+      console.log('Onboarding completion response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to complete onboarding:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the user's onboarding psychological profile
+   */
+  async getProfile(): Promise<OnboardingProfileResponse> {
+    try {
+      const response = await api.get(`${this.baseURL}/profile`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get onboarding profile:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all onboarding responses for the user
+   */
+  async getResponses(): Promise<OnboardingResponsesData> {
+    try {
+      const response = await api.get(`${this.baseURL}/responses`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to get onboarding responses:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Reset onboarding progress for the user
+   */
+  async resetOnboarding(): Promise<{ message: string }> {
+    try {
+      const response = await api.delete(`${this.baseURL}/reset`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to reset onboarding:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user needs onboarding
+   */
+  async needsOnboarding(): Promise<boolean> {
+    try {
+      const status = await this.getStatus();
+      return !status.isComplete;
+    } catch (error) {
+      // If we can't check status, assume they need onboarding
+      console.warn('Could not check onboarding status, assuming onboarding needed');
+      return true;
+    }
+  }
+
+  /**
+   * Get onboarding progress percentage
+   */
+  async getProgress(): Promise<number> {
+    try {
+      const responsesData = await this.getResponses();
+      if (responsesData.total_items === 0) return 0;
+      return Math.round((responsesData.completed_items / responsesData.total_items) * 100);
+    } catch (error) {
+      console.error('Failed to get onboarding progress:', error);
+      return 0;
+    }
+  }
+}
+
+export const onboardingService = new OnboardingService();
+export default onboardingService;
