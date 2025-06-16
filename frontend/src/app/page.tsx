@@ -13,6 +13,7 @@ import PersonalityCard from '@/components/ui/PersonalityCard';
 import SkillShowcase from '@/components/ui/SkillShowcase';
 import StarConstellation from '@/components/ui/StarConstellation';
 import VectorSearchCard from '@/components/search/VectorSearchCard';
+import CareerGoalCard from '@/components/ui/CareerGoalCard';
 import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
 import { getJobRecommendations } from '@/services/api';
 import { Job } from '@/components/jobs/JobCard';
@@ -165,7 +166,7 @@ export default function Home() {
         
         <div className="relative z-10 w-full">
           <div className="flex-1 w-full px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
-            {/* First Section - Avatar, Personality Card, Calendar with different widths */}
+            {/* First Section - Avatar, Personality Card, Career Goal Card, Calendar with different widths */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
               {/* User Avatar Card (Left) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3 flex flex-col">
@@ -191,12 +192,25 @@ export default function Home() {
                 
               </div>
 
-              {/* Personalité Card (Center) - Takes 6 columns */}
-              <div className="col-span-12 md:col-span-6" style={{ marginTop: '52px' }}>
+              {/* Personalité Card (Center Left) - Takes 3 columns */}
+              <div className="col-span-12 md:col-span-3" style={{ marginTop: '52px' }}>
                 <PhilosophicalCard userId={currentUserId} />
               </div>
 
-              {/* Calendar (Right) - Takes 3 columns (narrower) */}
+              {/* Career Goal Card (Center Right) - Takes 3 columns */}
+              <div className="col-span-12 md:col-span-3" style={{ marginTop: '52px' }}>
+                <CareerGoalCard
+                  style={{
+                    width: '100%',
+                    minHeight: '254px',
+                    borderRadius: '30px',
+                    background: '#e0e0e0',
+                    boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff'
+                  }}
+                />
+              </div>
+
+              {/* Calendar (Right) - Takes 3 columns */}
               <div className="col-span-12 md:col-span-3">
                 <Calendar 
                   events={[
