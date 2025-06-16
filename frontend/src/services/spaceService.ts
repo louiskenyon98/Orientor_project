@@ -178,6 +178,35 @@ export const fetchNotes = async (recommendationId: number): Promise<Note[]> => {
   }
 };
 
+// Fetch all user notes (not tied to specific recommendations)
+export const fetchAllUserNotes = async (): Promise<Note[]> => {
+  try {
+    const response = await axios.get<Note[]>(
+      `${API_URL}/space/notes`, 
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching all user notes:', error);
+    throw error;
+  }
+};
+
+// Create a standalone note (not tied to a recommendation)
+export const createStandaloneNote = async (content: string): Promise<Note> => {
+  try {
+    const response = await axios.post<Note>(
+      `${API_URL}/space/notes`, 
+      { content }, 
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating standalone note:', error);
+    throw error;
+  }
+};
+
 // Create a new note
 export const createNote = async (note: NoteCreate): Promise<Note> => {
   try {

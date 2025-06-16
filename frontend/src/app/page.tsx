@@ -17,6 +17,7 @@ import CareerGoalCard from '@/components/ui/CareerGoalCard';
 import hollandTestService, { ScoreResponse } from '@/services/hollandTestService';
 import { getJobRecommendations } from '@/services/api';
 import { Job } from '@/components/jobs/JobCard';
+import { fetchAllUserNotes, Note } from '@/services/spaceService';
 import axios from 'axios';
 
 interface JobRecommendationsResponse {
@@ -58,6 +59,9 @@ export default function Home() {
   const [peers, setPeers] = useState<EnhancedPeerProfile[]>([]);
   const [peersLoading, setPeersLoading] = useState(true);
   const [peersError, setPeersError] = useState<string | null>(null);
+  const [userNotes, setUserNotes] = useState<Note[]>([]);
+  const [notesLoading, setNotesLoading] = useState(true);
+  const [notesError, setNotesError] = useState<string | null>(null);
 
   // Sample user data
   const userData = {
@@ -156,6 +160,28 @@ export default function Home() {
     fetchPeers();
   }, [cleanApiUrl]);
 
+  // Fetch user notes
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        setNotesLoading(true);
+        setNotesError(null);
+        
+        const notes = await fetchAllUserNotes();
+        // Get top 3 most recent notes for home page
+        const recentNotes = notes.slice(0, 3);
+        setUserNotes(recentNotes);
+      } catch (err: any) {
+        console.error('Error fetching user notes:', err);
+        setNotesError('Unable to fetch notes');
+      } finally {
+        setNotesLoading(false);
+      }
+    };
+
+    fetchNotes();
+  }, []);
+
   const handleSelectJob = (job: Job) => {
     setSelectedJob(job);
   };
@@ -168,8 +194,8 @@ export default function Home() {
           <div className="flex-1 w-full px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
             {/* First Section - Avatar, Personality Card, Career Goal Card, Calendar with different widths */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
-              {/* User Avatar Card (Left) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3 flex flex-col">
+              {/* User Avatar Card (Left) - Takes 2 columns (narrower) */}
+              <div className="col-span-12 md:col-span-2 flex flex-col">
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold mb-4" style={{ color: '#000000' }}>My Progress</h2>
                   <UserCard
@@ -197,8 +223,8 @@ export default function Home() {
                 <PhilosophicalCard userId={currentUserId} />
               </div>
 
-              {/* Career Goal Card (Center Right) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3" style={{ marginTop: '52px' }}>
+              {/* Career Goal Card (Center Right) - Takes 4 columns */}
+              <div className="col-span-12 md:col-span-4" style={{ marginTop: '52px' }}>
                 <CareerGoalCard
                   style={{
                     width: '100%',
@@ -210,7 +236,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* Calendar (Right) - Takes 3 columns */}
+              {/* Calendar (Right) - Takes 3 columns to align with Activity section below */}
               <div className="col-span-12 md:col-span-3">
                 <Calendar 
                   events={[
@@ -398,24 +424,15 @@ export default function Home() {
                       description: 'Complete the data analysis challenge'
                     }
                   ]}
-                  notes={[
-                    {
-                      id: 1,
-                      title: 'Career Goals 2025',
-                      content: 'Focus on machine learning and deep learning skills...',
-                      createdAt: new Date(2025, 0, 15),
-                      tags: ['Career', 'Goals']
-                    },
-                    {
-                      id: 2,
-                      title: 'Interview Prep Notes',
-                      content: 'Remember to highlight project experience...',
-                      createdAt: new Date(2025, 0, 10),
-                      tags: ['Interview', 'Preparation']
-                    }
-                  ]}
+                  notes={notesLoading ? [] : notesError ? [] : userNotes.map(note => ({
+                    id: note.id,
+                    title: note.content.length > 50 ? `${note.content.substring(0, 50)}...` : note.content,
+                    content: note.content.length > 100 ? `${note.content.substring(0, 100)}...` : note.content,
+                    createdAt: new Date(note.created_at),
+                    recommendationId: note.saved_recommendation_id
+                  }))}
                   onEventClick={(event) => console.log('Event clicked:', event)}
-                  onNoteClick={(note) => router.push(`/notes/${note.id}`)}
+                  onNoteClick={(note) => router.push('/notes')}
                 />
               </div>
             </div>
