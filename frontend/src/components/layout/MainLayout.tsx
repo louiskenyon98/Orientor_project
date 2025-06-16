@@ -168,7 +168,6 @@ export default function MainLayout({
     // Navigation items for the sidebar
     const navItems = [
         { name: 'Dashboard', icon: 'Dashboard', path: '/' },
-        { name: 'Classes', icon: 'Classes', path: '/classes' },
         { name: 'Education', icon: 'Education', path: '/education' },
         { name: 'Chat', icon: 'Chat', path: '/chat' },
         { name: 'Swipe', icon: 'Swipe', path: '/find-your-way' },
@@ -418,14 +417,7 @@ export default function MainLayout({
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
             {isLoggedIn && (
                 <div className="fixed bottom-0 left-0 right-0 w-full bg-stitch-primary border-t border-stitch-border md:hidden z-50 font-departure">
-                    <div className="grid grid-cols-5 py-2">
-                        <Link 
-                            href="/classes" 
-                            className={`flex flex-col items-center text-xs font-departure relative ${pathname === '/classes' || pathname?.startsWith('/classes/') ? 'text-stitch-accent' : 'text-stitch-sage'}`}
-                        >
-                            <span className="material-icons-outlined">class</span>
-                            <span>Classes</span>
-                        </Link>
+                    <div className="grid grid-cols-4 py-2">
                         <Link 
                             href="/chat" 
                             className={`flex flex-col items-center text-xs font-departure ${pathname === '/chat' ? 'text-stitch-accent' : 'text-stitch-sage'}`}

@@ -19,8 +19,15 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)],
 )
 
-# Initialize service
-competence_tree_service = CompetenceTreeService()
+# Global variable for lazy loading
+_competence_tree_service = None
+
+def get_competence_tree_service():
+    """Get or initialize the competence tree service with lazy loading"""
+    global _competence_tree_service
+    if _competence_tree_service is None:
+        _competence_tree_service = CompetenceTreeService()
+    return _competence_tree_service
 
 @router.post("/generate", response_model=Dict[str, Any])
 def generate_competence_tree(
@@ -70,7 +77,7 @@ def generate_competence_tree(
             # Create the competence tree with reduced parameters to avoid timeout
             logger.info(f"Creating competence tree for user {current_user.id} with max_depth={max_depth}, max_nodes_per_level={max(5, min(8, max_nodes // max_depth))}")
             
-            tree_data = competence_tree_service.create_skill_tree(
+            tree_data = get_competence_tree_service().create_skill_tree(
                 db, 
                 current_user.id,
                 max_depth=max_depth,
@@ -108,7 +115,7 @@ def generate_competence_tree(
             
             # Save the tree in the database
             logger.info(f"Saving competence tree to database for user {current_user.id}")
-            graph_id = competence_tree_service.save_skill_tree(db, current_user.id, tree_data)
+            graph_id = get_competence_tree_service().save_skill_tree(db, current_user.id, tree_data)
             
             if not graph_id:
                 logger.error(f"save_skill_tree returned empty graph_id for user {current_user.id}")
@@ -311,7 +318,7 @@ def complete_challenge(
     try:
         # Complete the challenge using the new service method
         logger.info(f"Marking challenge {node_id} as completed for user {current_user.id}")
-        result = competence_tree_service.complete_challenge(db, node_id, current_user.id)
+        result = get_competence_tree_service().complete_challenge(db, node_id, current_user.id)
         
         if not result.get("success"):
             raise HTTPException(

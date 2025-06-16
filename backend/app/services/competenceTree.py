@@ -864,15 +864,26 @@ class CompetenceTreeService:
     
     def _initialize_embedding_model(self):
         """
-        Initialise le modèle d'embedding pour la recherche vectorielle.
+        Initialise le modèle d'embedding pour la recherche vectorielle (lazy loading).
         """
-        try:
-            from sentence_transformers import SentenceTransformer
-            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-            logger.info("Modèle d'embedding initialisé avec succès")
-        except Exception as e:
-            logger.warning(f"Failed to initialize embedding model: {str(e)}")
-            logger.warning(traceback.format_exc())
+        # Don't initialize here - use lazy loading in get_embedding_model()
+        self.embedding_model = None
+        logger.info("Embedding model will be loaded on first use (lazy loading)")
+    
+    def get_embedding_model(self):
+        """Get or initialize the embedding model with lazy loading"""
+        if self.embedding_model is None:
+            try:
+                from sentence_transformers import SentenceTransformer
+                logger.info("Loading competence tree embedding model...")
+                # Force CPU to avoid MPS issues on macOS
+                self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+                logger.info("Competence tree embedding model loaded successfully on CPU")
+            except Exception as e:
+                logger.error(f"Failed to initialize embedding model: {str(e)}")
+                logger.error(traceback.format_exc())
+                raise e
+        return self.embedding_model
     
     def _initialize_gnn_model(self):
         """
@@ -999,11 +1010,13 @@ class CompetenceTreeService:
                     searchable_text = self.esco_service.create_searchable_text(formatted_skill)
                     
                     # Generate embedding
-                    if not self.embedding_model:
-                        logger.warning("Embedding model not available, using fallback")
+                    try:
+                        embedding_model = self.get_embedding_model()
+                    except Exception as e:
+                        logger.warning(f"Embedding model not available, using fallback: {str(e)}")
                         continue
                     
-                    embedding = self.embedding_model.encode([searchable_text])[0]
+                    embedding = self.get_embedding_model().encode([searchable_text])[0]
                     
                     # Query Pinecone for top match
                     matches = self.query_skill_recommendations(embedding, top_k=1)

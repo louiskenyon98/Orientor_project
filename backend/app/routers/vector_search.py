@@ -155,8 +155,25 @@ class SuggestedPeersResponse(BaseModel):
 
 from sentence_transformers import SentenceTransformer
 
-# Initialize embedding model globally
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+# Global variable for lazy loading
+_embedding_model = None
+
+def get_embedding_model():
+    """Get or initialize the embedding model with lazy loading"""
+    global _embedding_model
+    if _embedding_model is None:
+        try:
+            logger.info("Loading vector search embedding model...")
+            # Force CPU to avoid MPS issues on macOS
+            _embedding_model = SentenceTransformer("all-MiniLM-L6-v2", device='cpu')
+            logger.info("Vector search embedding model loaded successfully on CPU")
+        except Exception as e:
+            logger.error(f"Error loading vector search embedding model: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Embedding model unavailable: {str(e)}"
+            )
+    return _embedding_model
 
 @router.post("/search", response_model=SearchResponse)
 async def search_embeddings(request: SearchRequest):
@@ -168,6 +185,7 @@ async def search_embeddings(request: SearchRequest):
         index = get_pinecone_index()
 
         # Compute query embedding
+        embedding_model = get_embedding_model()
         query_embedding = embedding_model.encode(
             request.query,
             normalize_embeddings=True
