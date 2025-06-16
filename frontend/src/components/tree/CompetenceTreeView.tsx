@@ -6,6 +6,7 @@ import '../tree/treestyles.css';
 
 // Composant pour afficher un défi
 import ChallengeCard from '../ui/ChallengeCard';
+import NodeDetailModal from './NodeDetailModal';
 import { getCompetenceTree, completeChallenge } from '../../services/competenceTreeService';
 
 // Types personnalisés
@@ -46,11 +47,13 @@ const TreeNode: React.FC<{
   node: PositionedNode;
   onComplete: (nodeId: string) => void;
   onNodeClick: (node: PositionedNode) => void;
-}> = ({ node, onComplete, onNodeClick }) => {
+  isSaved?: boolean;
+}> = ({ node, onComplete, onNodeClick, isSaved = false }) => {
   const [showTooltip, setShowTooltip] = React.useState(false);
   const displayLabel = node.label || node.skill_label || "Unknown Skill";
   
   const getNodeColor = () => {
+    if (isSaved && node.type === "occupation") return "#fbbf24"; // Gold for saved jobs
     if (node.is_anchor) return "#667eea";
     if (node.type === "occupation") return "#f093fb";
     if (node.type === "skillgroup") return "#4facfe";
@@ -153,6 +156,18 @@ const TreeNode: React.FC<{
           cx={nodeRadius - 10}
           cy={-nodeRadius + 10}
           fill="#10b981"
+          stroke="#fff"
+          strokeWidth="2"
+        />
+      )}
+      
+      {/* Saved job indicator */}
+      {isSaved && node.type === "occupation" && (
+        <circle
+          r="8"
+          cx={-nodeRadius + 10}
+          cy={-nodeRadius + 10}
+          fill="#fbbf24"
           stroke="#fff"
           strokeWidth="2"
         />
@@ -408,6 +423,8 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<PositionedNode | null>(null);
+  const [showNodeModal, setShowNodeModal] = useState<boolean>(false);
+  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
   
   // Function to automatically save the tree as an image
   const saveTreeAsImage = useCallback(() => {
@@ -561,6 +578,16 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
 
   const handleNodeClick = (node: PositionedNode) => {
     setSelectedNode(node);
+    setShowNodeModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowNodeModal(false);
+    setSelectedNode(null);
+  };
+
+  const handleJobSaved = (node: CompetenceNode) => {
+    setSavedJobs(prev => new Set([...prev, node.id]));
   };
   
   if (loading) {
@@ -698,61 +725,21 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
                 node={node}
                 onComplete={handleCompleteChallenge}
                 onNodeClick={handleNodeClick}
+                isSaved={savedJobs.has(node.id)}
               />
             ))}
           </svg>
         </div>
         
-        {/* Node Details Panel */}
-        {selectedNode && (
-          <div style={{ 
-            width: '280px', 
-            padding: '15px', 
-            background: 'white', 
-            borderLeft: '1px solid #e2e8f0',
-            overflow: 'auto',
-            boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.1)'
-          }}>
-            <h3>{selectedNode.label || selectedNode.skill_label || "Unknown Skill"}</h3>
-            <p><strong>Type:</strong> {selectedNode.type || 'skill'}</p>
-            {selectedNode.is_anchor && <p><strong>🌟 Anchor Skill</strong></p>}
-            {selectedNode.xp_reward && <p><strong>XP Reward:</strong> {selectedNode.xp_reward}</p>}
-            {selectedNode.challenge && (
-              <div>
-                <h4>Challenge:</h4>
-                <p style={{ fontSize: '14px', lineHeight: '1.4' }}>{selectedNode.challenge}</p>
-                {selectedNode.state !== 'completed' && (
-                  <button
-                    onClick={() => handleCompleteChallenge(selectedNode.id)}
-                    style={{
-                      background: '#4ade80',
-                      color: 'white',
-                      border: 'none',
-                      padding: '8px 16px',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      marginTop: '10px'
-                    }}
-                  >
-                    Complete Challenge
-                  </button>
-                )}
-              </div>
-            )}
-            <button
-              onClick={() => setSelectedNode(null)}
-              style={{
-                background: '#e2e8f0',
-                border: 'none',
-                padding: '8px 16px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                marginTop: '10px'
-              }}
-            >
-              Close
-            </button>
-          </div>
+        {/* Node Detail Modal */}
+        {showNodeModal && selectedNode && (
+          <NodeDetailModal
+            node={selectedNode}
+            graphId={treeData?.graph_id}
+            onClose={handleCloseModal}
+            onCompleteChallenge={handleCompleteChallenge}
+            onSaveJob={handleJobSaved}
+          />
         )}
       </div>
     </div>

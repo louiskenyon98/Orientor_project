@@ -23,6 +23,7 @@ from app.routers.tree import router as tree_router
 from app.routers.tree_paths import router as tree_paths_router
 from app.routers.node_notes import router as node_notes_router
 from app.routers.user_progress import router as user_progress_router
+from app.routers.jobs import router as jobs_router
 from app.routers.holland_test import router as holland_test_router
 from app.routers.hexaco_test import router as hexaco_test_router
 from app.routers.insight_router import router as insight_router
@@ -131,11 +132,12 @@ app.include_router(tree_router)
 app.include_router(tree_paths_router)
 app.include_router(node_notes_router)
 app.include_router(user_progress_router)
+app.include_router(jobs_router)
 app.include_router(holland_test_router)
 app.include_router(hexaco_test_router)
 app.include_router(insight_router)
 app.include_router(competence_tree_router, prefix="/api/v1")
-app.include_router(users_router)
+app.include_router(users_router, prefix="/api/v1")
 app.include_router(reflection_router)
 app.include_router(avatar_router, prefix="/api/v1")
 app.include_router(onboarding_router)

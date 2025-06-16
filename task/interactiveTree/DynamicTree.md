@@ -1,6 +1,9 @@
 Enhance the competency tree with job saving functionality and complete career planning flow:
 
-I want you to spawn multiple agents if required. organize and document your steps 
+I want you to spawn multiple agents if required. organize and document your steps in the folder task/interactiveTree. Make sure you really understand well the current competence tree implementation. 
+Make sure to document everything so that other agents can follow your work and help you on the task. 
+
+Make sure to clearly understand each of the priority, and their sequential nature when required.
 
 PRIORITY 1 - Fix tree generation:
 - Debug the 404 error when generating trees from anchor skills
