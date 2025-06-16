@@ -278,24 +278,14 @@ export default function MainLayout({
                 <header className="fixed top-0 left-0 right-0 w-full z-50 px-4 py-3 hidden md:block font-departure header" style={{ backgroundColor: '#ffffff' }}>
                     <div className="w-full px-4">
                         <div className="flex justify-between items-center w-full">
-                            {/* Left Side - Logo and Greeting side by side - positioned at far left */}
-                            <div className="flex items-center gap-4">
+                            {/* Left Side - Logo positioned at far left */}
+                            <div className="flex items-center">
                                 {/* Logo */}
                                 <Link href="/landing" className="flex-shrink-0 flex items-center">
                                     <span className="text-xl font-bold tracking-tight text-stitch-accent font-departure">
                                         Navigo
                                     </span>
                                 </Link>
-                                
-                                {/* User Greeting - directly to the right */}
-                                <div className="flex flex-col">
-                                    <h1 className="text-2xl font-bold" style={{ color: '#000000' }}>
-                                        Hey Phil
-                                    </h1>
-                                    <p className="text-sm" style={{ color: '#666666' }}>
-                                        It's sunny today and it's time to explore 🌞
-                                    </p>
-                                </div>
                             </div>
 
                             {/* Right Side - Chat, XP Progress, Dark Mode Toggle */}
