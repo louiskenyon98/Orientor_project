@@ -361,6 +361,14 @@ export default function MainLayout({
                 <div className="fixed bottom-0 left-0 right-0 w-full bg-stitch-primary border-t border-stitch-border md:hidden z-50 font-departure">
                     <div className="grid grid-cols-5 py-2">
                         <Link 
+                            href="/education" 
+                            className={`flex flex-col items-center text-xs font-departure relative ${pathname === '/education' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
+                        >
+                            <span className="material-icons-outlined">school</span>
+                            <span>Education</span>
+                            <span className="absolute -top-1 right-2 bg-stitch-accent text-white text-xs rounded-full px-1">New</span>
+                        </Link>
+                        <Link 
                             href="/chat" 
                             className={`flex flex-col items-center text-xs font-departure ${pathname === '/chat' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
                         >
