@@ -88,27 +88,54 @@ async def save_job(
                 already_saved=True
             )
         
-        # Insert new saved job
-        insert_query = text("""
-            INSERT INTO saved_jobs (
-                user_id, esco_id, job_title, skills_required, 
-                discovery_source, tree_graph_id, relevance_score, metadata
-            ) VALUES (
-                :user_id, :esco_id, :job_title, :skills_required::jsonb, 
-                :discovery_source, :tree_graph_id::uuid, :relevance_score, :metadata::jsonb
-            ) RETURNING id, saved_at
-        """)
+        # Insert new saved job - handle None values properly
+        import json
         
-        result = db.execute(insert_query, {
-            "user_id": current_user.id,
-            "esco_id": request.esco_id,
-            "job_title": request.job_title,
-            "skills_required": request.skills_required,
-            "discovery_source": request.discovery_source,
-            "tree_graph_id": request.tree_graph_id,
-            "relevance_score": request.relevance_score,
-            "metadata": request.metadata
-        }).fetchone()
+        # Prepare parameters with proper None handling
+        skills_json = json.dumps(request.skills_required) if request.skills_required else '[]'
+        metadata_json = json.dumps(request.metadata) if request.metadata else '{}'
+        
+        if request.tree_graph_id:
+            insert_query = text("""
+                INSERT INTO saved_jobs (
+                    user_id, esco_id, job_title, skills_required, 
+                    discovery_source, tree_graph_id, relevance_score, metadata
+                ) VALUES (
+                    :user_id, :esco_id, :job_title, CAST(:skills_required AS jsonb), 
+                    :discovery_source, CAST(:tree_graph_id AS uuid), :relevance_score, CAST(:metadata AS jsonb)
+                ) RETURNING id, saved_at
+            """)
+            
+            result = db.execute(insert_query, {
+                "user_id": current_user.id,
+                "esco_id": request.esco_id,
+                "job_title": request.job_title,
+                "skills_required": skills_json,
+                "discovery_source": request.discovery_source,
+                "tree_graph_id": request.tree_graph_id,
+                "relevance_score": request.relevance_score,
+                "metadata": metadata_json
+            }).fetchone()
+        else:
+            insert_query = text("""
+                INSERT INTO saved_jobs (
+                    user_id, esco_id, job_title, skills_required, 
+                    discovery_source, relevance_score, metadata
+                ) VALUES (
+                    :user_id, :esco_id, :job_title, CAST(:skills_required AS jsonb), 
+                    :discovery_source, :relevance_score, CAST(:metadata AS jsonb)
+                ) RETURNING id, saved_at
+            """)
+            
+            result = db.execute(insert_query, {
+                "user_id": current_user.id,
+                "esco_id": request.esco_id,
+                "job_title": request.job_title,
+                "skills_required": skills_json,
+                "discovery_source": request.discovery_source,
+                "relevance_score": request.relevance_score,
+                "metadata": metadata_json
+            }).fetchone()
         
         db.commit()
         

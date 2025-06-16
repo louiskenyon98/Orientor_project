@@ -369,7 +369,7 @@ export const getSkillComparison = async (oasisCode: string): Promise<any> => {
 export const fetchSavedJobs = async (): Promise<SavedJob[]> => {
   try {
     const response = await axios.get<{jobs: SavedJob[], total: number}>(
-      `${API_URL}/jobs/saved`, 
+      `${API_URL}/api/v1/jobs/saved`, 
       getAuthHeader()
     );
     return response.data.jobs;
@@ -383,7 +383,7 @@ export const fetchSavedJobs = async (): Promise<SavedJob[]> => {
 export const deleteSavedJob = async (jobId: number): Promise<void> => {
   try {
     await axios.delete(
-      `${API_URL}/jobs/${jobId}`, 
+      `${API_URL}/api/v1/jobs/${jobId}`, 
       getAuthHeader()
     );
   } catch (error) {
@@ -396,7 +396,7 @@ export const deleteSavedJob = async (jobId: number): Promise<void> => {
 export const getJobDetails = async (escoId: string): Promise<any> => {
   try {
     const response = await axios.get(
-      `${API_URL}/jobs/${escoId}/details`, 
+      `${API_URL}/api/v1/jobs/${escoId}/details`, 
       getAuthHeader()
     );
     return response.data;
