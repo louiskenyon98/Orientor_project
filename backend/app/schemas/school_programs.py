@@ -7,7 +7,13 @@ This module contains the request/response models for the school programs functio
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from uuid import UUID
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+
+# Handle different Pydantic versions
+try:
+    from pydantic import validator  # Pydantic v1
+except ImportError:
+    from pydantic import field_validator as validator  # Pydantic v2
 
 
 class ProgramSearchQuery(BaseModel):
