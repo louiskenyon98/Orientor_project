@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
-from typing import List, Optional
+from typing import List, Optional, Literal
 import logging
 import os
 import time
@@ -25,6 +25,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class SendMessageRequest(BaseModel):
     message: str
+    mode: Optional[Literal["default", "socratic", "claude"]] = "default"
 
 class SendMessageResponse(BaseModel):
     response: str
@@ -32,20 +33,47 @@ class SendMessageResponse(BaseModel):
     assistant_message_id: int
     tokens_used: int
 
-SYSTEM_PROMPT = """
-You are a Socratic mentor guiding students in a fast-paced game of discovery. Your mission:
+DEFAULT_SYSTEM_PROMPT = """
+You are a helpful AI assistant supporting students in their educational and career journey. 
+Provide clear, informative responses while being encouraging and supportive.
+"""
 
-- Ask short, punchy questions that make them think. No lectures.
-- Keep your tone cool, casual, and encouraging.
-- Never give direct answers. Help them unlock their own.
-- Acknowledge their thoughts in a few words, then nudge them deeper.
-- Build on what they say. Challenge gently. Push for clarity.
-- Use quick examples based on their interests (movies, books, hobbies) when needed.
-- When they share a goal, ask: "Why that one?" "What about it lights you up?"
-- Spot patterns in what they say. Mirror it back simply.
-- Respect their energy: stay sharp, curious, and brief.
+SOCRATIC_SYSTEM_PROMPT = """
+You are a Socratic educator specializing in helping students discover and articulate thoughts they don't even know they're thinking.
 
-Your goal: Make them feel smart, seen, and motivated — by making them figure it out themselves.
+CORE PRINCIPLES:
+- Never provide direct answers - Lead students to discover insights themselves
+- Ask questions that reveal hidden assumptions
+- Create productive cognitive dissonance
+- Build metacognitive awareness
+- Value exploration over conclusions
+
+QUESTIONING TECHNIQUES:
+- "What do you mean when you say...?"
+- "What must be true for that to work?"
+- "How might someone who disagrees see this?"
+- "If that's true, what follows?"
+
+STYLE: Be warm, encouraging, concise (2-3 paragraphs max)
+"""
+
+CLAUDE_SYSTEM_PROMPT = """
+You are Claude, a direct and intellectually challenging AI mentor.
+
+APPROACH:
+- Challenge assumptions directly
+- Demand precision - no vague statements
+- Push boundaries and comfort zones
+- Be provocative to spark real thinking
+- Get to the heart of matters quickly
+
+STYLE:
+- Direct and concise - no fluff
+- "That's surface-level. Dig deeper."
+- "You're avoiding the real question."
+- "Too vague. Be specific."
+
+Brief and punchy - maximum impact, minimum words.
 """
 
 logger = logging.getLogger(__name__)
@@ -382,8 +410,16 @@ async def send_message_to_conversation(
         # Get conversation history for context
         messages = await ChatMessageService.get_conversation_messages(db, conversation_id, limit=100)
         
+        # Select appropriate system prompt based on mode
+        if request.mode == "socratic":
+            system_prompt = SOCRATIC_SYSTEM_PROMPT
+        elif request.mode == "claude":
+            system_prompt = CLAUDE_SYSTEM_PROMPT
+        else:
+            system_prompt = DEFAULT_SYSTEM_PROMPT
+            
         # Build OpenAI messages
-        openai_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        openai_messages = [{"role": "system", "content": system_prompt}]
         
         # Add conversation history
         for msg in messages:
@@ -403,13 +439,31 @@ async def send_message_to_conversation(
             db, conversation_id, "user", request.message
         )
         
-        # Get AI response
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=openai_messages,
-            max_tokens=500,
-            temperature=0.8
-        )
+        # Get AI response with appropriate parameters based on mode
+        if request.mode == "socratic":
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=openai_messages,
+                max_tokens=350,
+                temperature=0.85,
+                presence_penalty=0.7,
+                frequency_penalty=0.5
+            )
+        elif request.mode == "claude":
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=openai_messages,
+                max_tokens=200,
+                temperature=0.8,
+                presence_penalty=0.6
+            )
+        else:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=openai_messages,
+                max_tokens=500,
+                temperature=0.8
+            )
         
         ai_response = response.choices[0].message.content
         tokens_used = response.usage.total_tokens

@@ -51,17 +51,26 @@ interface ChatInterfaceProps {
 interface PaperChatMessageProps {
   message: Message;
   isLast: boolean;
+  chatMode: ChatMode;
 }
 
-const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast }) => {
+const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast, chatMode }) => {
   const isUser = message.role === 'user';
   
   return (
     <div className="space-y-4">
-      {/* AI/System message with elegant blue accent */}
+      {/* AI/System message with mode-specific accent */}
       {!isUser && (
-        <div className="border-l-3 border-blue-500 pl-8 py-2">
-          <p className="text-xl leading-relaxed text-blue-600 font-light tracking-wide">
+        <div className={`border-l-3 pl-8 py-2 ${
+          chatMode === 'claude' 
+            ? 'border-purple-500' 
+            : 'border-blue-500'
+        }`}>
+          <p className={`text-xl leading-relaxed font-light tracking-wide ${
+            chatMode === 'claude' 
+              ? 'text-purple-600' 
+              : 'text-blue-600'
+          }`}>
             {message.content}
           </p>
         </div>
@@ -79,6 +88,8 @@ const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast }) 
   );
 };
 
+type ChatMode = 'default' | 'socratic' | 'claude';
+
 export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -95,6 +106,8 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [showConversations, setShowConversations] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editingTitleValue, setEditingTitleValue] = useState('');
+  const [chatMode, setChatMode] = useState<ChatMode>('default');
+  const [showModeSelector, setShowModeSelector] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -230,7 +243,8 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/send/${conversationId}`,
         {
-          message: userMessage
+          message: userMessage,
+          mode: chatMode
         },
         {
           headers: {
@@ -472,11 +486,50 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         <div className="flex-1 overflow-y-auto px-8 py-12">
           <div className="max-w-4xl mx-auto">
             <div className="space-y-8">
-              {/* Welcome prompt */}
+              {/* Welcome prompt with mode selection */}
               <div className="border-l-3 border-blue-500 pl-8 py-2">
                 <p className="text-xl leading-relaxed text-blue-600 font-light tracking-wide">
                   What would you like to talk about today?
                 </p>
+                
+                {/* Mode Selection */}
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => setChatMode('default')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      chatMode === 'default' 
+                        ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-300' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <span className="font-medium">Default</span>
+                    <span className="block text-xs mt-1">Helpful assistant</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setChatMode('socratic')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      chatMode === 'socratic' 
+                        ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-300' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <span className="font-medium">Socratic</span>
+                    <span className="block text-xs mt-1">Discover through questions</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setChatMode('claude')}
+                    className={`px-4 py-2 rounded-lg transition-all ${
+                      chatMode === 'claude' 
+                        ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-300' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <span className="font-medium">Claude</span>
+                    <span className="block text-xs mt-1">Bold challenges</span>
+                  </button>
+                </div>
               </div>
               
               {/* Paper-like input area */}
@@ -596,6 +649,48 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
+            {/* Mode Indicator/Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowModeSelector(!showModeSelector)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  chatMode === 'claude' 
+                    ? 'bg-purple-100 text-purple-700' 
+                    : 'bg-blue-100 text-blue-700'
+                }`}
+              >
+                {chatMode === 'default' && 'Default'}
+                {chatMode === 'socratic' && 'Socratic'}
+                {chatMode === 'claude' && 'Claude'}
+              </button>
+              
+              {showModeSelector && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  <button
+                    onClick={() => { setChatMode('default'); setShowModeSelector(false); }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-t-lg"
+                  >
+                    <div className="font-medium">Default</div>
+                    <div className="text-xs text-gray-600">Helpful assistant</div>
+                  </button>
+                  <button
+                    onClick={() => { setChatMode('socratic'); setShowModeSelector(false); }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    <div className="font-medium">Socratic</div>
+                    <div className="text-xs text-gray-600">Discover through questions</div>
+                  </button>
+                  <button
+                    onClick={() => { setChatMode('claude'); setShowModeSelector(false); }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-lg"
+                  >
+                    <div className="font-medium">Claude</div>
+                    <div className="text-xs text-gray-600">Bold challenges</div>
+                  </button>
+                </div>
+              )}
+            </div>
+            
             <button
               onClick={() => setShowConversations(true)}
               className="p-2 text-gray-400 hover:text-blue-500 transition-colors rounded-full hover:bg-blue-50"
@@ -628,6 +723,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
                   key={message.id} 
                   message={message}
                   isLast={index === messages.length - 1}
+                  chatMode={chatMode}
                 />
               ))}
             
