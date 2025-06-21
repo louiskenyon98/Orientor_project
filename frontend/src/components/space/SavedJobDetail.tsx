@@ -86,19 +86,28 @@ const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
             </div>
           </div>
           
-          {onSetCareerGoal && (
+          <div className="flex space-x-2">
+            {onSetCareerGoal && (
+              <button
+                onClick={() => onSetCareerGoal(job)}
+                disabled={careerGoalLoading}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  careerGoalLoading 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                } text-white`}
+              >
+                {careerGoalLoading ? 'Setting...' : '🎯 Set as Career Goal'}
+              </button>
+            )}
+            
             <button
-              onClick={() => onSetCareerGoal(job)}
-              disabled={careerGoalLoading}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                careerGoalLoading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700'
-              } text-white`}
+              onClick={() => window.open('/goals', '_blank')}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
             >
-              {careerGoalLoading ? 'Setting...' : '🎯 Set as Career Goal'}
+              📈 View Career Timeline
             </button>
-          )}
+          </div>
         </div>
       </div>
 
