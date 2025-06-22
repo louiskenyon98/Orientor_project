@@ -33,7 +33,6 @@ export default function SpacePage() {
   const [selectedJob, setSelectedJob] = useState<SavedJob | null>(null);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [jobsError, setJobsError] = useState<string | null>(null);
-  const [careerGoalLoading, setCareerGoalLoading] = useState(false);
   
   const router = useRouter();
   const pathname = usePathname();
@@ -106,17 +105,6 @@ export default function SpacePage() {
     }
   };
 
-  const handleSetCareerGoal = async (job: SavedJob) => {
-    try {
-      setCareerGoalLoading(true);
-      // TODO: Implement career goal API
-      toast.success('Career goal set! (Feature coming soon)');
-    } catch {
-      toast.error('Failed to set career goal');
-    } finally {
-      setCareerGoalLoading(false);
-    }
-  };
 
   const handleGenerate = async () => {
     if (!selected || !selected.id) return;
@@ -233,8 +221,6 @@ export default function SpacePage() {
             selectedJob ? (
               <SavedJobDetail
                 job={selectedJob}
-                onSetCareerGoal={handleSetCareerGoal}
-                careerGoalLoading={careerGoalLoading}
               />
             ) : (
               <div className="text-base text-center mt-20" style={{ color: 'var(--text-secondary)' }}>

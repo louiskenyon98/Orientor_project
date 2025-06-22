@@ -18,6 +18,7 @@ from .conversation_category import ConversationCategory
 from .conversation_share import ConversationShare
 from .user_chat_analytics import UserChatAnalytics
 from .course import Course, PsychologicalInsight, CareerSignal, ConversationLog, CareerProfileAggregate
+from .career_goal import CareerGoal, CareerMilestone
 from ..utils.database import Base
 
 __all__ = [
@@ -28,5 +29,5 @@ __all__ = [
     'Conversation', 'ChatMessage', 'ConversationCategory',
     'ConversationShare', 'UserChatAnalytics', 'Course',
     'PsychologicalInsight', 'CareerSignal', 'ConversationLog',
-    'CareerProfileAggregate', 'Base'
+    'CareerProfileAggregate', 'CareerGoal', 'CareerMilestone', 'Base'
 ]

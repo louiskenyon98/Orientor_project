@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import styles from './JobCard.module.css';
+import SetCareerGoalButton from '@/components/common/SetCareerGoalButton';
 
 // Interface pour les données d'un emploi
 export interface Job {
@@ -165,6 +166,17 @@ const JobCard: React.FC<JobCardProps> = ({ job, isSelected, onClick, className =
               </div>
             </div>
           )}
+          
+          {/* Career Goal Button */}
+          <div className="mt-4">
+            <SetCareerGoalButton 
+              job={job} 
+              size="sm" 
+              variant="secondary"
+              source="oasis"
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
     </motion.div>

@@ -38,3 +38,4 @@ class User(Base):
     career_signals = relationship("CareerSignal", back_populates="user", cascade="all, delete-orphan")
     conversation_logs = relationship("ConversationLog", back_populates="user", cascade="all, delete-orphan")
     career_profile_aggregates = relationship("CareerProfileAggregate", back_populates="user", cascade="all, delete-orphan")
+    career_goals = relationship("CareerGoal", back_populates="user", cascade="all, delete-orphan")
