@@ -23,12 +23,12 @@ const JobRecommendationVerticalList: React.FC<JobRecommendationVerticalListProps
       <div className={styles.jobsList}>
         {jobs.map((job) => (
           <div
-            key={job.oasis_code}
+            key={job.id}
             className={styles.jobCard}
             onClick={() => onJobClick?.(job)}
           >
             <div className={styles.jobHeader}>
-              <h3 className={styles.jobTitle}>{job.label}</h3>
+              <h3 className={styles.jobTitle}>{job.metadata.preferred_label || job.metadata.title}</h3>
               <button
                 className={styles.saveButton}
                 onClick={(e) => {
@@ -43,10 +43,10 @@ const JobRecommendationVerticalList: React.FC<JobRecommendationVerticalListProps
               </button>
             </div>
             
-            <p className={styles.jobDescription}>{job.description}</p>
+            <p className={styles.jobDescription}>{job.metadata.description}</p>
             
             <div className={styles.jobSkills}>
-              {job.top_skills && job.top_skills.slice(0, 4).map((skill, index) => (
+              {job.metadata.skills && job.metadata.skills.slice(0, 4).map((skill, index) => (
                 <span key={index} className={styles.skillTag}>
                   {skill}
                 </span>

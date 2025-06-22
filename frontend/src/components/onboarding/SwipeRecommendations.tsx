@@ -339,7 +339,7 @@ const SwipeRecommendations: React.FC<SwipeRecommendationsProps> = ({
               <div className="mb-4">
                 <h4 className="font-semibold text-gray-800 mb-2">Key Skills:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {currentCard.skills_required.slice(0, 3).map((skill, index) => (
+                  {currentCard.skills_required?.slice(0, 3).map((skill, index) => (
                     <span 
                       key={index}
                       className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"

@@ -308,7 +308,7 @@ async def analyze_career_fit(
                        adaptability, independence, evaluation, decision_making,
                        stress_tolerance
                 FROM saved_recommendations
-                WHERE id = :job_id OR oasis_code = :job_id
+                WHERE oasis_code = :job_id
                 LIMIT 1
             """)
             result = db.execute(query, {"job_id": request.job_id}).fetchone()
@@ -344,7 +344,7 @@ async def analyze_career_fit(
             query = text("""
                 SELECT esco_id, job_title, metadata
                 FROM saved_jobs
-                WHERE id = :job_id OR esco_id = :job_id
+                WHERE esco_id = :job_id
                 LIMIT 1
             """)
             result = db.execute(query, {"job_id": request.job_id}).fetchone()

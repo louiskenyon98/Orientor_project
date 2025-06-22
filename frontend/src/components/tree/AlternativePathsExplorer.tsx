@@ -193,7 +193,7 @@ const AlternativePathsExplorer: React.FC<AlternativePathsExplorerProps> = ({
     });
     
     const result: Node[] = [];
-    const maxLevel = Math.max(...levels.keys());
+    const maxLevel = Math.max(...Array.from(levels.keys()));
     
     for (let level = 0; level <= maxLevel; level++) {
       const levelNodes = levels.get(level) || [];

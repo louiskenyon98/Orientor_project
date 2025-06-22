@@ -681,7 +681,7 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
   };
 
   const handleJobSaved = (node: CompetenceNode) => {
-    setSavedJobs(prev => new Set([...prev, node.id]));
+    setSavedJobs(prev => new Set([...Array.from(prev), node.id]));
   };
 
   // Zoom and pan handlers with smooth transitions

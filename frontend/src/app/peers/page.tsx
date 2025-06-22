@@ -193,10 +193,10 @@ export default function SuggestedPeersPage() {
                     </div>
                     <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                       viewMode === 'compatible' 
-                        ? getCompatibilityColor(peer.compatibility_score || peer.similarity)
+                        ? getCompatibilityColor(peer.compatibility_score || 0)
                         : 'bg-secondary-teal bg-opacity-10 text-secondary-teal'
                     }`}>
-                      {formatSimilarity(peer.compatibility_score || peer.similarity)} Match
+                      {formatSimilarity(peer.compatibility_score || 0)} Match
                     </div>
                   </div>
                   

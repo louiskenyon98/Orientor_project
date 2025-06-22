@@ -270,9 +270,7 @@ export default function StitchDemoPage() {
                       key={index}
                       name={user.name}
                       role={user.role}
-                      avatarUrl={user.avatarUrl}
                       skills={user.skills}
-                      domain={user.domain}
                     />
                   ))}
                 </div>
@@ -285,13 +283,10 @@ export default function StitchDemoPage() {
                   {challenges.map((challenge, index) => (
                     <ChallengeCard
                       key={index}
-                      title={challenge.title}
-                      description={challenge.description}
+                      challenge={challenge.title}
                       xpReward={challenge.xpReward}
-                      progress={challenge.progress}
-                      isCompleted={challenge.isCompleted}
-                      difficulty={challenge.difficulty}
-                      domain={challenge.domain}
+                      completed={challenge.isCompleted}
+                      onComplete={() => console.log('Challenge completed:', challenge.title)}
                     />
                   ))}
                 </div>

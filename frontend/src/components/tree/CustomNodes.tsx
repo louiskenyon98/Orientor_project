@@ -12,7 +12,7 @@ const nodeVariants = {
     opacity: 1, 
     scale: 1,
     transition: { 
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 100,
       damping: 12,
       delay: 0.05
@@ -27,7 +27,7 @@ const popoverVariants = {
     opacity: 1, 
     scale: 1,
     transition: { 
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 200,
       damping: 15,
     }

@@ -270,7 +270,6 @@ export default function Home() {
                     <UserCard
                       name={userData.name}
                       role={userData.role}
-                      avatarUrl={userData.avatarUrl}
                       skills={userData.skills}
                       className="p-6 bg-black/30 rounded-lg border w-full shadow-md"
                     />

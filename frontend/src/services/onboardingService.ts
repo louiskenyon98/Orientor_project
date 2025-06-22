@@ -1,5 +1,5 @@
 import api from './api';
-import { PsychologicalProfile, OnboardingResponse } from '../types/onboarding';
+import { PsychProfile, OnboardingResponse } from '../types/onboarding';
 
 export interface OnboardingStatus {
   isComplete: boolean;
@@ -26,7 +26,7 @@ export interface OnboardingCompleteResponse {
 }
 
 export interface OnboardingProfileResponse {
-  profile: PsychologicalProfile;
+  profile: PsychProfile;
   description: string;
   created_at: string;
   assessment_version: string;
@@ -88,7 +88,7 @@ class OnboardingService {
    */
   async completeOnboarding(data: {
     responses: OnboardingResponse[];
-    psychProfile?: PsychologicalProfile;
+    psychProfile?: PsychProfile;
   }): Promise<OnboardingCompleteResponse> {
     try {
       console.log('Sending onboarding completion data:', {

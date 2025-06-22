@@ -397,15 +397,15 @@ export class CareerGoalsService {
       ],
       goals: [
         {
-          id: 'goal-1',
+          id: 1,
+          user_id: 1,
           title: 'Master Frontend Development',
           description: 'Become proficient in React and modern frontend technologies',
           target_date: '2024-12-31',
-          progress: 65,
-          tier_id: 'tier-2',
-          skill_ids: ['skill-2-1', 'skill-2-4'],
-          created_at: '2024-01-15',
-          updated_at: '2024-06-20'
+          is_active: true,
+          progress_percentage: 65,
+          created_at: '2024-01-15T00:00:00Z',
+          updated_at: '2024-06-20T00:00:00Z'
         }
       ],
       graphsage_scores: [
@@ -427,4 +427,4 @@ export class CareerGoalsService {
 }
 
 // Export types for use in components
-export type { CareerGoal, GraphSageScore, CareerProgressionResponse };
+export type { GraphSageScore, CareerProgressionResponse };

@@ -223,7 +223,8 @@ const SkillShowcase: React.FC<SkillShowcaseProps> = ({ userId, className = '' })
                 key={index}
                 skill={{
                   name: skill.name,
-                  description: skill.description
+                  description: skill.description,
+                  icon: "🎯"
                 }}
                 className="h-full"
               />

@@ -22,6 +22,7 @@ import { getJobRecommendations } from '@/services/api';
 import { Job } from '@/components/jobs/JobCard';
 import { fetchAllUserNotes, Note } from '@/services/spaceService';
 import axios from 'axios';
+import SaveJobButton from '@/components/common/SaveJobButton';
 
 interface JobRecommendationsResponse {
   recommendations: Job[];
@@ -396,8 +397,8 @@ export default function Home() {
                       <p className="text-xs text-gray-600">No job recommendations available</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      {jobRecommendations.slice(0, 2).map((job) => (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {jobRecommendations.map((job) => (
                         <div
                           key={job.id}
                           className="p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
@@ -430,18 +431,21 @@ export default function Home() {
                             <div className="text-xs text-blue-600 font-medium">
                               {Math.round(job.score * 100)}% match
                             </div>
-                            {job.metadata.skills && job.metadata.skills.length > 0 && (
-                              <div className="flex gap-1 flex-wrap">
-                                {job.metadata.skills.slice(0, 2).map((skill, index) => (
-                                  <span
-                                    key={index}
-                                    className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full"
-                                  >
-                                    {skill}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {job.metadata.skills && job.metadata.skills.length > 0 && (
+                                <div className="flex gap-1 flex-wrap">
+                                  {job.metadata.skills.slice(0, 2).map((skill, index) => (
+                                    <span
+                                      key={index}
+                                      className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full"
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              <SaveJobButton job={job} size="sm" />
+                            </div>
                           </div>
                         </div>
                       ))}

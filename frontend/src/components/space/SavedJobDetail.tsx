@@ -91,8 +91,8 @@ const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
             <SetCareerGoalButton 
               job={{
                 esco_id: job.esco_id,
-                title: job.title,
-                description: jobDetails?.description || job.discovery_context
+                title: job.job_title,
+                description: jobDetails?.description || ''
               }}
               variant="primary"
               source="saved"

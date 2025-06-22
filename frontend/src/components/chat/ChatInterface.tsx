@@ -130,8 +130,8 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
 
   // Handle initial message from URL parameters
   useEffect(() => {
-    const initialMessage = searchParams.get('initial_message');
-    const messageType = searchParams.get('type');
+    const initialMessage = searchParams?.get('initial_message');
+    const messageType = searchParams?.get('type');
     
     if (initialMessage && !currentConversation && messages.length === 0) {
       // Decode the message and set it as the input text
@@ -594,7 +594,7 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
               </div>
               <div className="p-4 max-h-96 overflow-y-auto">
                 <ConversationList
-                  selectedConversationId={currentConversation?.id}
+                  selectedConversationId={(currentConversation as Conversation | null)?.id}
                   onSelectConversation={(conversation) => {
                     handleSelectConversation(conversation);
                     setShowConversations(false);

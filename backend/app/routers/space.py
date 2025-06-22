@@ -206,17 +206,28 @@ def get_saved_recommendations(
     
     return result
 
-@router.delete("/recommendations/{recommendation_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/recommendations/{identifier}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_saved_recommendation(
-    recommendation_id: int,
+    identifier: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Find the recommendation
-    recommendation = db.query(SavedRecommendation).filter(
-        SavedRecommendation.id == recommendation_id,
-        SavedRecommendation.user_id == current_user.id
-    ).first()
+    # Try to parse as integer first (for backward compatibility)
+    recommendation = None
+    
+    try:
+        # Try as integer ID first
+        recommendation_id = int(identifier)
+        recommendation = db.query(SavedRecommendation).filter(
+            SavedRecommendation.id == recommendation_id,
+            SavedRecommendation.user_id == current_user.id
+        ).first()
+    except ValueError:
+        # If not an integer, treat as OASIS code
+        recommendation = db.query(SavedRecommendation).filter(
+            SavedRecommendation.oasis_code == identifier,
+            SavedRecommendation.user_id == current_user.id
+        ).first()
     
     if not recommendation:
         raise HTTPException(

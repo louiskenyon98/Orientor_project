@@ -46,9 +46,8 @@ export default function SpacePage() {
     const load = async () => {
       try {
         const data = await fetchSavedRecommendations();
-        // Filter ESCO recommendations (home page)
-        const escoRecs = data.filter(item => item.source_type === 'esco' || item.oasis_code);
-        setRecommendations(escoRecs);
+        // All saved recommendations are ESCO jobs from home page (they have oasis_code)
+        setRecommendations(data);
       } catch (err) {
         setError('Could not fetch recommendations.');
       } finally {
@@ -62,10 +61,9 @@ export default function SpacePage() {
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const data = await fetchSavedRecommendations();
-        // Filter OaSIS jobs (SwipeMyWay)
-        const oasisJobs = data.filter(item => item.source_type === 'oasis' || item.esco_id);
-        setSavedJobs(oasisJobs);
+        const data = await fetchSavedJobs();
+        // OaSIS jobs from tree exploration are in separate table
+        setSavedJobs(data);
       } catch (err) {
         setJobsError('Could not fetch saved jobs.');
       } finally {

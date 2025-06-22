@@ -8,7 +8,7 @@ import { courseAnalysisService, Course, PsychologicalInsight } from '@/services/
 
 export default function CourseInsightsPage() {
   const params = useParams();
-  const courseId = parseInt(params.id as string);
+  const courseId = params ? parseInt(params.id as string) : null;
   
   const [course, setCourse] = useState<Course | null>(null);
   const [insights, setInsights] = useState<PsychologicalInsight[]>([]);
@@ -22,6 +22,7 @@ export default function CourseInsightsPage() {
   }, [courseId]);
 
   const fetchData = async () => {
+    if (!courseId) return;
     try {
       const [courseData, insightsData] = await Promise.all([
         courseAnalysisService.getCourse(courseId),
