@@ -6,6 +6,7 @@ import { getAllJobRecommendations } from '@/services/api';
 import JobSkillsTree from '@/components/jobs/JobSkillsTree';
 import JobCard, { Job } from '@/components/jobs/JobCard';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import SaveJobButton from '@/components/common/SaveJobButton';
 
 export default function CareerRecommendationsPage() {
   const [recommendations, setRecommendations] = useState<Job[]>([]);
@@ -96,9 +97,12 @@ export default function CareerRecommendationsPage() {
           <div className="xl:col-span-6 bg-white rounded-lg shadow-lg p-10 min-h-[1400px]">
             {selectedJob ? (
               <div className="h-full">
-                <h2 className="text-3xl font-semibold mb-6">
-                  {selectedJob.metadata.preferred_label || selectedJob.metadata.title || selectedJob.id.replace('occupation::key_', '')}
-                </h2>
+                <div className="flex justify-between items-start mb-6">
+                  <h2 className="text-3xl font-semibold">
+                    {selectedJob.metadata.preferred_label || selectedJob.metadata.title || selectedJob.id.replace('occupation::key_', '')}
+                  </h2>
+                  <SaveJobButton job={selectedJob} size="lg" />
+                </div>
                 <div className="h-[calc(100%-5rem)]">
                   <JobSkillsTree jobId={selectedJob.id} height="1000px" />
                 </div>

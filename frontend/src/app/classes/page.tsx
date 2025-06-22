@@ -62,8 +62,8 @@ export default function ClassesPage() {
     return 'text-red-600';
   };
 
-  const uniqueCategories = [...new Set(courses.map(c => c.subject_category).filter(Boolean))];
-  const uniqueSemesters = [...new Set(courses.map(c => c.semester).filter(Boolean))];
+  const uniqueCategories = Array.from(new Set(courses.map(c => c.subject_category).filter((cat): cat is string => Boolean(cat))));
+  const uniqueSemesters = Array.from(new Set(courses.map(c => c.semester).filter((sem): sem is string => Boolean(sem))));
 
   if (loading) {
     return (

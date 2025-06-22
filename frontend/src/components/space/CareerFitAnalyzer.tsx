@@ -39,15 +39,15 @@ const CareerFitAnalyzer: React.FC<CareerFitAnalyzerProps> = ({ job, jobSource })
   const [fitAnalysis, setFitAnalysis] = useState<CareerFitResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showLLMChat, setShowLLMChat] = useState(false);
+  const [showLLMChat, setShowLLMChat] = useState(true); // Show by default
   const [llmQuery, setLlmQuery] = useState('');
   const [llmResponse, setLlmResponse] = useState('');
   const [llmLoading, setLlmLoading] = useState(false);
 
   // Determine job ID based on type
   const jobId = jobSource === 'esco' ? 
-    ('oasis_code' in job ? job.oasis_code : job.id.toString()) :  // ESCO jobs use oasis_code
-    ('esco_id' in job ? job.esco_id : job.id.toString());        // OaSIS jobs use esco_id
+    ('oasis_code' in job ? job.oasis_code : job.id?.toString() || '') :  // ESCO jobs use oasis_code
+    ('esco_id' in job ? job.esco_id : job.id?.toString() || '');        // OaSIS jobs use esco_id
 
   useEffect(() => {
     fetchCareerFitAnalysis();
@@ -202,7 +202,7 @@ const CareerFitAnalyzer: React.FC<CareerFitAnalyzerProps> = ({ job, jobSource })
             Top 5 High-Relevance Skills (GraphSAGE Analysis)
           </h3>
           <div className="space-y-3">
-            {('graphsage_skills' in job && job.graphsage_skills?.length > 0) ? (
+            {('graphsage_skills' in job && job.graphsage_skills && job.graphsage_skills.length > 0) ? (
               job.graphsage_skills.map((skill, index) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-blue-50">
                   <div className="flex-1">
@@ -226,25 +226,27 @@ const CareerFitAnalyzer: React.FC<CareerFitAnalyzerProps> = ({ job, jobSource })
         </div>
       )}
 
-      {/* Skill Comparison Radar */}
-      <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
-        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>
-          Skill Match Analysis
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <RadarChart data={prepareRadarData()}>
-            <PolarGrid stroke="var(--border)" />
-            <PolarAngleAxis dataKey="skill" style={{ fill: 'var(--text-secondary)' }} />
-            <PolarRadiusAxis angle={30} domain={[0, 5]} style={{ fill: 'var(--text-secondary)' }} />
-            <Radar name="Your Skills" dataKey="user" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
-            <Radar name="Required Skills" dataKey="required" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.6} />
-            <Legend />
-          </RadarChart>
-        </ResponsiveContainer>
-      </div>
+      {/* Skill Comparison Radar - Only for ESCO jobs */}
+      {jobSource === 'esco' && (
+        <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>
+            Skill Match Analysis
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <RadarChart data={prepareRadarData()}>
+              <PolarGrid stroke="var(--border)" />
+              <PolarAngleAxis dataKey="skill" style={{ fill: 'var(--text-secondary)' }} />
+              <PolarRadiusAxis angle={30} domain={[0, 5]} style={{ fill: 'var(--text-secondary)' }} />
+              <Radar name="Your Skills" dataKey="user" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
+              <Radar name="Required Skills" dataKey="required" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.6} />
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
-      {/* Gap Analysis */}
-      {fitAnalysis.gap_analysis.skill_gaps.length > 0 && (
+      {/* Gap Analysis - Only for ESCO jobs */}
+      {jobSource === 'esco' && fitAnalysis.gap_analysis.skill_gaps.length > 0 && (
         <div className="p-6 rounded-lg" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text)' }}>
             Skills to Develop

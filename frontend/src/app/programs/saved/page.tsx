@@ -11,14 +11,13 @@ import { BookmarkIcon, Trash2, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'react-hot-toast';
 import { schoolProgramsService } from '@/services/schoolProgramsService';
 import { Program } from '@/components/school-programs/types';
 
 export default function SavedProgramsPage() {
   const [savedPrograms, setSavedPrograms] = useState<Program[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     loadSavedPrograms();
@@ -30,11 +29,7 @@ export default function SavedProgramsPage() {
       const programs = await schoolProgramsService.getSavedPrograms();
       setSavedPrograms(programs);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load saved programs.",
-        variant: "destructive",
-      });
+      toast.error("Failed to load saved programs.");
     } finally {
       setIsLoading(false);
     }
@@ -44,16 +39,9 @@ export default function SavedProgramsPage() {
     try {
       await schoolProgramsService.removeSavedProgram(programId);
       setSavedPrograms(prev => prev.filter(p => p.id !== programId));
-      toast({
-        title: "Success",
-        description: "Program removed from your saved list.",
-      });
+      toast.success("Program removed from your saved list.");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to remove program.",
-        variant: "destructive",
-      });
+      toast.error("Failed to remove program.");
     }
   };
 
@@ -92,8 +80,8 @@ export default function SavedProgramsPage() {
             <p className="text-muted-foreground mb-4">
               Start exploring programs and save the ones that interest you.
             </p>
-            <Button asChild>
-              <a href="/programs">Search Programs</a>
+            <Button onClick={() => window.location.href = '/programs'}>
+              Search Programs
             </Button>
           </CardContent>
         </Card>
@@ -163,20 +151,21 @@ export default function SavedProgramsPage() {
                   )}
 
                   <div className="flex gap-2 mt-4">
-                    <Button variant="outline" size="sm" asChild className="flex-1">
-                      <a href={`/programs/${program.id}`}>
-                        View Details
-                      </a>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => window.location.href = `/programs/${program.id}`}
+                    >
+                      View Details
                     </Button>
                     {program.institution.website && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a 
-                          href={program.institution.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.open(program.institution.website, '_blank', 'noopener,noreferrer')}
+                      >
+                        <ExternalLink className="h-4 w-4" />
                       </Button>
                     )}
                   </div>

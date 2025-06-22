@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { SearchFilters as ISearchFilters, SearchResults } from './types';
 
 interface SearchFiltersProps {
@@ -79,7 +79,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, onFiltersChange,
                 <Checkbox
                   id={`type-${type}`}
                   checked={filters.program_types.includes(type)}
-                  onCheckedChange={() => toggleArrayFilter('program_types', type)}
+                  onChange={() => toggleArrayFilter('program_types', type)}
                 />
                 <label htmlFor={`type-${type}`} className="text-sm cursor-pointer">
                   {type.charAt(0).toUpperCase() + type.slice(1)} ({count})
@@ -98,7 +98,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, onFiltersChange,
                 <Checkbox
                   id={`level-${level}`}
                   checked={filters.levels.includes(level)}
-                  onCheckedChange={() => toggleArrayFilter('levels', level)}
+                  onChange={() => toggleArrayFilter('levels', level)}
                 />
                 <label htmlFor={`level-${level}`} className="text-sm cursor-pointer">
                   {level.charAt(0).toUpperCase() + level.slice(1)} ({count})
@@ -114,20 +114,15 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, onFiltersChange,
           <div className="space-y-3">
             <Select 
               value={filters.location.province || ''} 
-              onValueChange={(value) => updateLocationFilter('province', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Province" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Provinces</SelectItem>
-                {Object.entries(facets.provinces).map(([province, count]) => (
-                  <SelectItem key={province} value={province}>
-                    {province} ({count})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={(e) => updateLocationFilter('province', e.target.value)}
+              options={[
+                { value: '', label: 'All Provinces' },
+                ...Object.entries(facets.provinces).map(([province, count]) => ({
+                  value: province,
+                  label: `${province} (${count})`
+                }))
+              ]}
+            />
           </div>
         </div>
 
@@ -139,7 +134,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, onFiltersChange,
               <Checkbox
                 id="lang-en"
                 checked={filters.languages.includes('en')}
-                onCheckedChange={() => toggleArrayFilter('languages', 'en')}
+                onChange={() => toggleArrayFilter('languages', 'en')}
               />
               <label htmlFor="lang-en" className="text-sm cursor-pointer">English</label>
             </div>
@@ -147,7 +142,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, onFiltersChange,
               <Checkbox
                 id="lang-fr"
                 checked={filters.languages.includes('fr')}
-                onCheckedChange={() => toggleArrayFilter('languages', 'fr')}
+                onChange={() => toggleArrayFilter('languages', 'fr')}
               />
               <label htmlFor="lang-fr" className="text-sm cursor-pointer">French</label>
             </div>

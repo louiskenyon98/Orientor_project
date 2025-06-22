@@ -187,8 +187,8 @@ const CareerAnalysisChat: React.FC<CareerAnalysisChatProps> = ({
       const analysisResult: AnalysisResponse = await response.json();
       
       // Process discovered insights
-      if (analysisResult.insights_discovered && analysisResult.insights_discovered.length > 0) {
-        const newInsights = analysisResult.insights_discovered;
+      if (analysisResult.insights && analysisResult.insights.length > 0) {
+        const newInsights = analysisResult.insights;
         setDiscoveredInsights(prev => [...prev, ...newInsights]);
         
         // Add insight message
@@ -220,7 +220,7 @@ const CareerAnalysisChat: React.FC<CareerAnalysisChatProps> = ({
         const completionMessage: ConversationMessage = {
           id: 'completion',
           type: 'system',
-          content: `🎉 Analysis complete! I've discovered ${discoveredInsights.length + (analysisResult.insights_discovered?.length || 0)} insights about your career preferences. You can view the full summary and recommendations below.`,
+          content: `🎉 Analysis complete! I've discovered ${discoveredInsights.length + (analysisResult.insights?.length || 0)} insights about your career preferences. You can view the full summary and recommendations below.`,
           timestamp: new Date()
         };
         

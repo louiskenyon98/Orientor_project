@@ -12,7 +12,7 @@ import { courseAnalysisService, Course, PsychologicalInsight } from '@/services/
 export default function CourseDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const courseId = parseInt(params.id as string);
+  const courseId = params ? parseInt(params.id as string) : null;
   
   const [course, setCourse] = useState<Course | null>(null);
   const [insights, setInsights] = useState<PsychologicalInsight[]>([]);
@@ -28,6 +28,7 @@ export default function CourseDetailsPage() {
   }, [courseId]);
 
   const fetchCourseDetails = async () => {
+    if (!courseId) return;
     try {
       const courseData = await courseAnalysisService.getCourse(courseId);
       setCourse(courseData);
@@ -38,6 +39,7 @@ export default function CourseDetailsPage() {
   };
 
   const fetchCourseInsights = async () => {
+    if (!courseId) return;
     try {
       const insightsData = await courseAnalysisService.getCourseInsights(courseId);
       setInsights(insightsData);
@@ -54,6 +56,8 @@ export default function CourseDetailsPage() {
       setDeleteConfirm(true);
       return;
     }
+
+    if (!courseId) return;
 
     try {
       await courseAnalysisService.deleteCourse(courseId);

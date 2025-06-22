@@ -324,7 +324,7 @@ export default function SkillTreeFlow() {
         >
           <MiniMap nodeStrokeWidth={3} zoomable pannable />
           <Background color="#f3f4f6" gap={24} />
-          <Controls showinteractive={false} position="bottom-right" />
+          <Controls showInteractive={false} position="bottom-right" />
         </ReactFlow>
       </ReactFlowProvider>
     </div>

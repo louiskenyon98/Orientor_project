@@ -163,7 +163,8 @@ const ChatOnboard: React.FC<ChatOnboardProps> = ({ onComplete, className = '' })
     const responseData = {
       questionId: currentQuestion.id,
       question: currentQuestion.text,
-      response: inputValue.trim()
+      response: inputValue.trim(),
+      timestamp: new Date()
     };
 
     // Add response to store

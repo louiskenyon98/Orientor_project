@@ -9,7 +9,7 @@ import CareerAnalysisChat from '@/components/classes/CareerAnalysisChat';
 
 export default function CourseAnalysisPage() {
   const params = useParams();
-  const courseId = parseInt(params.id as string);
+  const courseId = params ? parseInt(params.id as string) : null;
   
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,7 @@ export default function CourseAnalysisPage() {
   }, [courseId]);
 
   const fetchCourseDetails = async () => {
+    if (!courseId) return;
     try {
       const courseData = await courseAnalysisService.getCourse(courseId);
       setCourse(courseData);
@@ -143,12 +144,14 @@ export default function CourseAnalysisPage() {
 
         {/* Analysis Chat Interface */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <CareerAnalysisChat
-            courseId={courseId}
-            courseName={course.course_name}
-            onInsightsDiscovered={handleInsightsDiscovered}
-            onSessionComplete={handleSessionComplete}
-          />
+          {courseId && (
+            <CareerAnalysisChat
+              courseId={courseId}
+              courseName={course.course_name}
+              onInsightsDiscovered={handleInsightsDiscovered}
+              onSessionComplete={handleSessionComplete}
+            />
+          )}
         </div>
 
         {/* Help Section */}

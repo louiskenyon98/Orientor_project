@@ -3,11 +3,10 @@
  */
 
 import { useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'react-hot-toast';
 import { Program, SearchFilters, SearchResults, UserProgramInteraction, SaveProgramRequest } from '../types';
 
 export const useSchoolProgramsAPI = () => {
-  const { toast } = useToast();
 
   const searchPrograms = useCallback(async (filters: SearchFilters, page: number = 1): Promise<SearchResults> => {
     try {
@@ -29,14 +28,10 @@ export const useSchoolProgramsAPI = () => {
 
       return await response.json();
     } catch (error) {
-      toast({
-        title: "Search Error",
-        description: "Unable to search programs. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Unable to search programs. Please try again.");
       throw error;
     }
-  }, [toast]);
+  }, []);
 
   const getProgramDetails = useCallback(async (programId: string): Promise<Program> => {
     try {
@@ -52,14 +47,10 @@ export const useSchoolProgramsAPI = () => {
 
       return await response.json();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Unable to load program details.",
-        variant: "destructive",
-      });
+      toast.error("Unable to load program details.");
       throw error;
     }
-  }, [toast]);
+  }, []);
 
   const saveProgram = useCallback(async (programId: string, notes?: string): Promise<void> => {
     try {
@@ -79,18 +70,11 @@ export const useSchoolProgramsAPI = () => {
         throw new Error('Failed to save program');
       }
 
-      toast({
-        title: "Success",
-        description: "Program saved to your list!",
-      });
+      toast.success("Program saved to your list!");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Unable to save program. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Unable to save program. Please try again.");
     }
-  }, [toast]);
+  }, []);
 
   const recordInteraction = useCallback(async (programId: string, type: string, metadata?: any): Promise<void> => {
     try {
@@ -126,14 +110,10 @@ export const useSchoolProgramsAPI = () => {
 
       return await response.json();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Unable to load saved programs.",
-        variant: "destructive",
-      });
+      toast.error("Unable to load saved programs.");
       throw error;
     }
-  }, [toast]);
+  }, []);
 
   const removeSavedProgram = useCallback(async (programId: string): Promise<void> => {
     try {
@@ -148,18 +128,11 @@ export const useSchoolProgramsAPI = () => {
         throw new Error('Failed to remove saved program');
       }
 
-      toast({
-        title: "Success",
-        description: "Program removed from your saved list.",
-      });
+      toast.success("Program removed from your saved list.");
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Unable to remove program. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Unable to remove program. Please try again.");
     }
-  }, [toast]);
+  }, []);
 
   const getAvailableFilters = useCallback(async () => {
     try {
