@@ -6,6 +6,8 @@ import TimelineVisualization, { SkillNode, TimelineTier } from '@/components/car
 import SkillRelationshipGraph from '@/components/career/SkillRelationshipGraph';
 // import { motion } from 'framer-motion'; // Removed for build compatibility
 import { toast } from 'react-hot-toast';
+import { CareerGoalsService, CareerGoal } from '@/services/careerGoalsService';
+import { useRouter } from 'next/navigation';
 
 // Mock data generator with GraphSage-style scoring
 const generateMockCareerData = (): TimelineTier[] => {
@@ -320,29 +322,74 @@ const GoalsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSkill, setSelectedSkill] = useState<SkillNode | null>(null);
   const [activeView, setActiveView] = useState<'timeline' | 'graph'>('timeline');
+  const [activeGoal, setActiveGoal] = useState<CareerGoal | null>(null);
+  const [milestones, setMilestones] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    // Simulate loading career progression data
-    const loadCareerData = async () => {
-      setLoading(true);
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      try {
-        const data = generateMockCareerData();
-        setCareerData(data);
-        toast.success('Career progression loaded successfully!');
-      } catch (error) {
-        toast.error('Failed to load career progression data');
-        console.error('Error loading career data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCareerData();
+    loadActiveGoalAndProgression();
   }, []);
+
+  const loadActiveGoalAndProgression = async () => {
+    setLoading(true);
+    
+    try {
+      // Fetch active career goal
+      const { goal, progression, milestones: goalMilestones } = await CareerGoalsService.getActiveCareerGoal();
+      
+      if (goal) {
+        setActiveGoal(goal);
+        setMilestones(goalMilestones || []);
+        
+        // Convert progression to timeline format if available
+        if (progression && progression.tiers) {
+          const timelineData = convertProgressionToTimeline(progression.tiers);
+          setCareerData(timelineData);
+          toast.success(`Loaded progression for: ${goal.title}`);
+        } else {
+          // Use mock data if no progression available
+          const mockData = generateMockCareerData();
+          setCareerData(mockData);
+        }
+      } else {
+        // No active goal - use mock data
+        const mockData = generateMockCareerData();
+        setCareerData(mockData);
+      }
+    } catch (error) {
+      console.error('Error loading career goal:', error);
+      toast.error('Failed to load career progression');
+      // Fallback to mock data
+      const mockData = generateMockCareerData();
+      setCareerData(mockData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const convertProgressionToTimeline = (tiers: any[]): TimelineTier[] => {
+    return tiers.map((tier, index) => ({
+      id: `tier-${tier.tier_number || index + 1}`,
+      title: tier.title || `Tier ${tier.tier_number || index + 1}`,
+      level: tier.tier_number || index + 1,
+      timeline_months: tier.timeline_months || 6 * (index + 1),
+      confidence_threshold: tier.confidence_threshold || 0.8 - (index * 0.1),
+      skills: (tier.skills || []).map((skill: any) => ({
+        id: skill.id,
+        label: skill.label,
+        confidence_score: skill.graphsage_score || skill.confidence_score || 0.5,
+        type: 'skill',
+        level: tier.tier_number || index + 1,
+        relationships: skill.relationships || [],
+        metadata: {
+          description: skill.description || '',
+          estimated_months: skill.estimated_months || 3,
+          prerequisites: skill.prerequisites || [],
+          learning_resources: skill.learning_resources || []
+        }
+      }))
+    }));
+  };
 
   const handleSkillClick = (skill: SkillNode) => {
     setSelectedSkill(skill);
@@ -379,11 +426,87 @@ const GoalsPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Active Goal Header */}
+        {activeGoal ? (
+          <div className="mb-8 animate-in slide-in-from-top duration-300">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-blue-900">
+                    Current Goal: {activeGoal.title}
+                  </h2>
+                  <p className="text-blue-700 mt-1">
+                    Target: {new Date(activeGoal.target_date).toLocaleDateString()}
+                  </p>
+                  {activeGoal.description && (
+                    <p className="text-gray-600 mt-2">{activeGoal.description}</p>
+                  )}
+                  <div className="flex items-center mt-3 space-x-4">
+                    <div className="text-sm">
+                      <span className="text-gray-500">Progress:</span>
+                      <span className="font-semibold text-blue-900 ml-1">
+                        {Math.round(activeGoal.progress_percentage)}%
+                      </span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-500">Milestones:</span>
+                      <span className="font-semibold text-blue-900 ml-1">
+                        {activeGoal.completed_milestones || 0} / {activeGoal.milestones_count || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <button
+                    onClick={() => router.push('/find-your-way')}
+                    className="px-4 py-2 bg-white text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors"
+                  >
+                    Change Goal
+                  </button>
+                  <button
+                    onClick={() => router.push('/saved')}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    View Saved Jobs
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-8 animate-in slide-in-from-top duration-300">
+            <div className="bg-gray-50 rounded-xl p-8 border border-gray-200 text-center">
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                No Career Goal Set
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Set a career goal from any job card to see your personalized progression timeline
+              </p>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => router.push('/find-your-way')}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Explore Careers
+                </button>
+                <button
+                  onClick={() => router.push('/saved')}
+                  className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  View Saved Jobs
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Section Header */}
         <div className="mb-8 animate-in slide-in-from-top duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Career Goals</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {activeGoal ? 'Career Progression Timeline' : 'Career Goals'}
+              </h1>
               <p className="text-gray-600 mt-2">
                 Track your progression with GraphSage-powered confidence scoring
               </p>

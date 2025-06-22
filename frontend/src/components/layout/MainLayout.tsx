@@ -171,7 +171,6 @@ export default function MainLayout({
         { name: 'Education', icon: 'Education', path: '/education' },
         { name: 'Chat', icon: 'Chat', path: '/chat' },
         { name: 'Swipe', icon: 'Swipe', path: '/find-your-way' },
-        { name: 'Goals', icon: 'Goals', path: '/goals' },
         { name: 'Saved', icon: 'Bookmark', path: '/space' },
         { name: 'Challenges', icon: 'Trophy', path: '/challenges' },
         { name: 'Notes', icon: 'Note', path: '/notes' },
@@ -351,11 +350,6 @@ export default function MainLayout({
                                                         {item.icon === 'Swipe' && (
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                                                                 <path d="M216,64H176V56a16,16,0,0,0-16-16H136V24a8,8,0,0,0-16,0V40H96A16,16,0,0,0,80,56v8H40A16,16,0,0,0,24,80V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64ZM96,56h64v8H96ZM216,200H40V80H216V200ZM128,96a12,12,0,1,0,12,12A12,12,0,0,0,128,96Zm0,48a12,12,0,1,0,12,12A12,12,0,0,0,128,144Zm40-24a12,12,0,1,0,12,12A12,12,0,0,0,168,120ZM88,120a12,12,0,1,0,12,12A12,12,0,0,0,88,120Z"></path>
-                                                            </svg>
-                                                        )}
-                                                        {item.icon === 'Goals' && (
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                                                                <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM128,64a64,64,0,1,0,64,64A64.07,64.07,0,0,0,128,64Zm0,112a48,48,0,1,1,48-48A48.05,48.05,0,0,1,128,176Zm0-80a32,32,0,1,0,32,32A32,32,0,0,0,128,96Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,128,144Z"></path>
                                                             </svg>
                                                         )}
                                                         {item.icon === 'Bookmark' && (

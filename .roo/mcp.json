@@ -27,6 +27,10 @@
     },
     "perplexityai": {
       "url": "https://mcp.composio.dev/perplexityai/abandoned-creamy-horse-Y39-hm?agent=cursor"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
     }
   }
 }

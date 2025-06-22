@@ -39,6 +39,7 @@ from app.routers.school_programs import router as school_programs_router
 from app.routers.courses import router as courses_router
 from app.routers.enhanced_chat import router as enhanced_chat_router
 from app.routers.socratic_chat import router as socratic_chat_router
+from app.routers.career_goals import router as career_goals_router
 from app.api.endpoints.job_recommendations import router as job_recommendations_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
@@ -152,6 +153,7 @@ app.include_router(school_programs_router)
 app.include_router(courses_router)
 app.include_router(enhanced_chat_router, prefix="/api/v1")
 app.include_router(socratic_chat_router)
+app.include_router(career_goals_router)
 app.include_router(job_recommendations_router, prefix="/api/v1/jobs")
 logger.info("All routers included successfully")
 

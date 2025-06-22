@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { SavedJob, getJobDetails } from '@/services/spaceService';
 import ProgramRecommendationsModal from './ProgramRecommendationsModal';
+import SetCareerGoalButton from '@/components/common/SetCareerGoalButton';
 
 interface SavedJobDetailProps {
   job: SavedJob;
-  onSetCareerGoal?: (job: SavedJob) => void;
-  careerGoalLoading?: boolean;
 }
 
 interface JobDetails {
@@ -19,9 +18,7 @@ interface JobDetails {
 }
 
 const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
-  job,
-  onSetCareerGoal,
-  careerGoalLoading = false
+  job
 }) => {
   const [jobDetails, setJobDetails] = useState<JobDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,19 +84,15 @@ const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
           </div>
           
           <div className="flex space-x-2">
-            {onSetCareerGoal && (
-              <button
-                onClick={() => onSetCareerGoal(job)}
-                disabled={careerGoalLoading}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  careerGoalLoading 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700'
-                } text-white`}
-              >
-                {careerGoalLoading ? 'Setting...' : '🎯 Set as Career Goal'}
-              </button>
-            )}
+            <SetCareerGoalButton 
+              job={{
+                esco_id: job.esco_id,
+                title: job.title,
+                description: jobDetails?.description || job.discovery_context
+              }}
+              variant="primary"
+              source="saved"
+            />
             
             <button
               onClick={() => window.open('/goals', '_blank')}

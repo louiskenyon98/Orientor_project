@@ -6,6 +6,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import StarIcon from '@mui/icons-material/Star';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { getCareerRecommendations, saveCareer } from '@/services/api';
+import SetCareerGoalButton from '@/components/common/SetCareerGoalButton';
 
 interface CareerRecommendation {
   id: number;
@@ -316,6 +317,22 @@ const FindYourWay: React.FC = () => {
                       ))}
                     </Stack>
                   )}
+                  
+                  {/* Career Goal Button */}
+                  <Box sx={{ mt: 'auto', mb: 2 }}>
+                    <SetCareerGoalButton 
+                      job={{
+                        id: currentCareer.id.toString(),
+                        oasis_code: currentCareer.oasis_code,
+                        title: currentCareer.title,
+                        description: currentCareer.description
+                      }}
+                      variant="primary"
+                      size="md"
+                      source="swipe"
+                      className="w-full"
+                    />
+                  </Box>
                   
                   <Box sx={{ 
                     position: 'absolute', 

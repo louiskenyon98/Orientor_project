@@ -6,6 +6,7 @@ import { Heart, X, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
 import { PsychProfile, CareerRecommendation } from '../../types/onboarding';
 import { getAllJobRecommendations, saveCareer } from '../../services/api';
 import { useRouter } from 'next/navigation';
+import SetCareerGoalButton from '@/components/common/SetCareerGoalButton';
 
 interface SwipeRecommendationsProps {
   onComplete: () => void;
@@ -349,8 +350,23 @@ const SwipeRecommendations: React.FC<SwipeRecommendationsProps> = ({
                 </div>
               </div>
               
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-gray-500 mb-4">
                 {currentCard.education_level}
+              </div>
+              
+              {/* Career Goal Button */}
+              <div className="mt-auto">
+                <SetCareerGoalButton 
+                  job={{
+                    id: currentCard.id,
+                    title: currentCard.title,
+                    description: currentCard.description
+                  }}
+                  variant="primary"
+                  size="md"
+                  source="swipe"
+                  className="w-full"
+                />
               </div>
             </div>
           </motion.div>
