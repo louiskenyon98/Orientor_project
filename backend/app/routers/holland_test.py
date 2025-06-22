@@ -686,7 +686,14 @@ async def get_user_profile_description(
         
         # 2. Récupérer les données du profil utilisateur
         profile_query = text("""
-            SELECT * FROM user_profiles
+            SELECT 
+                id, user_id, name, age, sex, major, year, gpa,
+                hobbies, country, state_province, unique_quality,
+                story, favorite_movie, favorite_book, favorite_celebrities,
+                learning_style, interests, job_title, industry,
+                years_experience, education_level, career_goals,
+                skills, personal_analysis, created_at, updated_at
+            FROM user_profiles
             WHERE user_id = :user_id
         """)
         

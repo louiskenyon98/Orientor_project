@@ -324,7 +324,15 @@ def fetch_user_data(db: Session, user_id: int) -> Dict[str, Any]:
     try:
         # Fetch basic profile data
         profile_query = text("""
-            SELECT * FROM user_profiles WHERE user_id = :user_id
+            SELECT 
+                id, user_id, name, age, sex, major, year, gpa,
+                hobbies, country, state_province, unique_quality,
+                story, favorite_movie, favorite_book, favorite_celebrities,
+                learning_style, interests, job_title, industry,
+                years_experience, education_level, career_goals,
+                skills, personal_analysis, created_at, updated_at
+            FROM user_profiles 
+            WHERE user_id = :user_id
         """)
         profile_result = db.execute(profile_query, {"user_id": user_id}).fetchone()
         

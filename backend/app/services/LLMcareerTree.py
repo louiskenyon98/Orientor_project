@@ -7,11 +7,12 @@ from typing import Dict, Any
 import openai
 from pydantic import ValidationError
 from app.schemas.career_tree import CareerTreeNode
+from ..core.cache import cache
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# In-memory cache to store generated career trees
+# In-memory cache to store generated career trees (kept for backward compatibility)
 career_tree_cache = {}
 
 class CareerTreeService:
@@ -184,10 +185,22 @@ class CareerTreeService:
         start_time = time.time()
         logger.info(f"Starting career tree generation for {'user ' + user_id if user_id else 'anonymous user'}")
         
-        # Check cache first (if user_id is provided)
-        if user_id and user_id in career_tree_cache:
-            logger.info(f"Using cached career tree for user {user_id}")
-            return career_tree_cache[user_id]
+        # Check Redis cache first (if user_id is provided)
+        if user_id:
+            # Try Redis cache
+            cached_tree = await cache.get(user_id, namespace="career_trees")
+            if cached_tree:
+                logger.info(f"Using Redis cached career tree for user {user_id}")
+                try:
+                    # Reconstruct the CareerTreeNode from cached data
+                    return CareerTreeNode(**cached_tree)
+                except Exception as e:
+                    logger.warning(f"Failed to reconstruct tree from cache: {str(e)}")
+            
+            # Fallback to in-memory cache
+            if user_id in career_tree_cache:
+                logger.info(f"Using in-memory cached career tree for user {user_id}")
+                return career_tree_cache[user_id]
         
         # Build prompt
         logger.info("Building prompt")
@@ -241,6 +254,19 @@ class CareerTreeService:
                 # Cache the result if user_id is provided
                 if user_id:
                     logger.info(f"Caching career tree for user {user_id}")
+                    # Cache to Redis (24 hour TTL)
+                    try:
+                        await cache.set(
+                            user_id, 
+                            tree.dict(), 
+                            ttl=86400,  # 24 hours
+                            namespace="career_trees"
+                        )
+                        logger.info(f"Successfully cached to Redis for user {user_id}")
+                    except Exception as e:
+                        logger.warning(f"Failed to cache to Redis: {str(e)}")
+                    
+                    # Also cache in memory as fallback
                     career_tree_cache[user_id] = tree
                 
                 total_duration = time.time() - start_time

@@ -1,90 +1,143 @@
-// import type { NextConfig } from "next";
-
-// const nextConfig: NextConfig = {
-//   /* config options here */
-// };
-
-// export default nextConfig;
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  images: {
-    domains: ['navigo-env.eba-i8thih2y.us-east-1.elasticbeanstalk.com'], // Add your AWS domain here
-    unoptimized: true, // This helps with static exports if needed
-  },
-  // Vercel specific settings
   swcMinify: true,
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+  
+  // Enable production optimizations
+  productionBrowserSourceMaps: false,
+  
+  // Optimize images
+  images: {
+    domains: ['localhost', 'orientor.com'],
+    formats: ['image/avif', 'image/webp'],
   },
-  // Handle environment variables
-  env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  
+  // Webpack configuration for optimization
+  webpack: (config, { isServer, dev }) => {
+    // Production optimizations
+    if (!dev && !isServer) {
+      // Enable tree shaking
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+        
+        // Split chunks for better caching
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            
+            // Vendor chunks
+            framework: {
+              name: 'framework',
+              chunks: 'all',
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
+              priority: 40,
+              enforce: true,
+            },
+            
+            lib: {
+              test(module) {
+                return module.size() > 160000 &&
+                  /node_modules[/\\]/.test(module.identifier());
+              },
+              name(module) {
+                const hash = require('crypto')
+                  .createHash('sha1')
+                  .update(module.identifier())
+                  .digest('hex')
+                  .substring(0, 8);
+                return `lib-${hash}`;
+              },
+              priority: 30,
+              minChunks: 1,
+              reuseExistingChunk: true,
+            },
+            
+            commons: {
+              name: 'commons',
+              chunks: 'all',
+              minChunks: 2,
+              priority: 20,
+            },
+            
+            shared: {
+              name(module, chunks) {
+                const hash = require('crypto')
+                  .createHash('sha1')
+                  .update(chunks.reduce((acc, chunk) => acc + chunk.name, ''))
+                  .digest('hex')
+                  .substring(0, 8);
+                return `shared-${hash}`;
+              },
+              priority: 10,
+              minChunks: 2,
+              reuseExistingChunk: true,
+            },
+          },
+          
+          // Limit the maximum number of parallel requests
+          maxAsyncRequests: 6,
+          maxInitialRequests: 4,
+        },
+      };
+      
+      // Minimize bundle size
+      config.optimization.minimize = true;
+      
+      // Add bundle analyzer in production build with ANALYZE=true
+      if (process.env.ANALYZE === 'true') {
+        const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+        config.plugins.push(
+          new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            reportFilename: './analyze.html',
+            openAnalyzer: true,
+          })
+        );
+      }
+    }
+    
+    return config;
   },
-  // Configure build output - ensure this is properly set
-  output: 'standalone',
-  distDir: '.next',
-  poweredByHeader: false,
-  // Performance optimizations
+  
+  // Experimental features for better performance
   experimental: {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // Error handling and performance
-  onDemandEntries: {
-    maxInactiveAge: 60 * 60 * 1000,
-    pagesBufferLength: 5,
-  },
-  // Add rewrite rules for API proxying
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*', // Preserve the /api prefix
-      },
-    ];
-  },
-  // Custom error handling
+  
+  // Headers for better caching
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|avif)',
         headers: [
           {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
       {
-        // Add specific CORS headers for API routes
-        source: '/api/:path*',
+        source: '/_next/static/:path*',
         headers: [
           {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS',
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization',
-          },
-          {
-            key: 'Access-Control-Allow-Credentials',
-            value: 'true',
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
     ];
   },
+  
+  // Compression
+  compress: true,
+  
+  // Disable x-powered-by header
+  poweredByHeader: false,
 };
 
 module.exports = nextConfig;

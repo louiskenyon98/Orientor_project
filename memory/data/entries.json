@@ -456,5 +456,153 @@
     "checksum": "22950e5c78084653b639d95659431d0676da12ea74f5cc2665728b4b2c088607",
     "references": [],
     "dependencies": []
+  },
+  {
+    "id": "entry_mc8326ae_z9q36i7fw",
+    "key": "swarm-auto-centralized-1750620903508/architect/directory-structure",
+    "value": {
+      "project_structure": {
+        "backend": {
+          "services": {
+            "career": {
+              "domain": {
+                "entities": [
+                  "career.py"
+                ],
+                "value_objects": [
+                  "recommendation.py"
+                ],
+                "repositories": [
+                  "career_repository.py"
+                ]
+              },
+              "application": {
+                "use_cases": [
+                  "recommend_career.py"
+                ],
+                "services": [
+                  "career_service.py"
+                ]
+              },
+              "infrastructure": {
+                "persistence": [
+                  "sqlalchemy_career_repo.py",
+                  "career_read_repo.py",
+                  "models.py"
+                ],
+                "external": [
+                  "openai_adapter.py"
+                ],
+                "dependencies.py": "Dependency injection configuration"
+              },
+              "api": {
+                "routes.py": "FastAPI routes",
+                "schemas.py": "Pydantic schemas"
+              }
+            },
+            "skills": "To be implemented",
+            "assessment": "To be implemented",
+            "user": "To be implemented",
+            "matching": "To be implemented"
+          },
+          "shared": {
+            "domain": [
+              "base_entity.py"
+            ],
+            "infrastructure": {
+              "database.py": "Shared database configuration",
+              "cache": [
+                "redis_cache.py"
+              ],
+              "messaging": [
+                "event_bus.py"
+              ]
+            },
+            "api": [
+              "middleware.py"
+            ]
+          },
+          "gateway": {
+            "main.py": "API Gateway with circuit breaker pattern"
+          }
+        }
+      },
+      "status": "Career Service fully implemented with Clean Architecture"
+    },
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-22T19:51:07.862Z",
+    "updatedAt": "2025-06-22T19:51:07.862Z",
+    "lastAccessedAt": "2025-06-22T19:51:07.862Z",
+    "version": 1,
+    "size": 978,
+    "compressed": false,
+    "checksum": "6268a6cb5e07fdae19a0a762cb6feb67f140c72eb760311c086b3ff46c3592d8",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mc832iqp_zfb3pqm65",
+    "key": "swarm-auto-centralized-1750620903508/architect/domain-model",
+    "value": "{\"domain_boundaries\":{\"career_service\":{\"description\":\"Manages career information, recommendations, and progression paths\",\"aggregates\":[\"Career\"],\"entities\":[\"SkillRequirement\",\"CareerProgression\"],\"value_objects\":[\"CareerMatch\",\"SkillGap\",\"CareerRecommendation\",\"CareerPath\"],\"repositories\":[\"CareerRepository\",\"CareerReadRepository\"],\"use_cases\":[\"RecommendCareerUseCase\"],\"external_dependencies\":[\"OpenAI LLM\",\"Redis Cache\"]},\"skills_service\":{\"description\":\"Manages skills taxonomy, relationships, and user skill profiles\",\"aggregates\":[\"Skill\",\"UserSkillProfile\"],\"entities\":[\"SkillRelationship\",\"SkillAssessment\"],\"value_objects\":[\"SkillLevel\",\"SkillCategory\"],\"repositories\":[\"SkillRepository\",\"UserSkillRepository\"]},\"assessment_service\":{\"description\":\"Handles personality tests, skill assessments, and evaluations\",\"aggregates\":[\"Assessment\",\"UserAssessment\"],\"entities\":[\"HollandTest\",\"HexacoTest\",\"SkillTest\"],\"value_objects\":[\"TestResult\",\"PersonalityProfile\"],\"repositories\":[\"AssessmentRepository\",\"TestResultRepository\"]},\"user_service\":{\"description\":\"Manages user accounts, profiles, and preferences\",\"aggregates\":[\"User\",\"UserProfile\"],\"entities\":[\"UserPreference\",\"UserGoal\"],\"value_objects\":[\"Email\",\"Password\",\"ProfileCompleteness\"],\"repositories\":[\"UserRepository\",\"ProfileRepository\"]},\"matching_service\":{\"description\":\"Handles matching algorithms for careers, peers, and programs\",\"aggregates\":[\"MatchingSession\"],\"entities\":[\"PeerMatch\",\"ProgramMatch\"],\"value_objects\":[\"MatchScore\",\"Compatibility\"],\"repositories\":[\"MatchingRepository\"],\"external_dependencies\":[\"GraphSage Model\",\"Vector Database\"]}}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-22T19:51:24.001Z",
+    "updatedAt": "2025-06-22T19:51:24.001Z",
+    "lastAccessedAt": "2025-06-22T19:51:24.001Z",
+    "version": 1,
+    "size": 1830,
+    "compressed": true,
+    "checksum": "fc723e5462a3695af97fb1aefa0a10d55f75edf0deb7c49ee9c37a3af8e7b4e9",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mc832wsw_esayv59sz",
+    "key": "swarm-auto-centralized-1750620903508/architect/service-interfaces",
+    "value": "{\"api_contracts\":{\"career_service\":{\"endpoints\":[\"GET /api/v1/careers/{career_id}\",\"POST /api/v1/careers/search\",\"POST /api/v1/careers/recommendations\",\"GET /api/v1/careers/{career_id}/progression-paths\",\"GET /api/v1/careers/{career_id}/related\",\"GET /api/v1/careers/trending/list\",\"GET /api/v1/careers/analytics/skill-demand\"],\"events_published\":[\"CareerCreatedEvent\",\"SkillRequirementAddedEvent\",\"CareerRecommendationsGeneratedEvent\"],\"events_consumed\":[\"UserSkillsUpdatedEvent\",\"AssessmentCompletedEvent\"]},\"gateway_patterns\":{\"circuit_breaker\":\"Implemented with failure threshold and recovery timeout\",\"rate_limiting\":\"100 requests per minute per client\",\"authentication\":\"JWT-based with middleware\",\"service_discovery\":\"Environment-based with health checks\",\"request_routing\":\"Direct inclusion for migrated services, proxy for others\"}},\"integration_patterns\":{\"sync_communication\":\"REST APIs with OpenAPI documentation\",\"async_communication\":\"Event-driven with RabbitMQ/Kafka\",\"data_consistency\":\"Event sourcing for audit trail\",\"caching\":\"Redis with TTL and cache-aside pattern\",\"monitoring\":\"Metrics middleware with request counting and latency tracking\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-22T19:51:42.224Z",
+    "updatedAt": "2025-06-22T19:51:42.224Z",
+    "lastAccessedAt": "2025-06-22T19:51:42.224Z",
+    "version": 1,
+    "size": 1272,
+    "compressed": true,
+    "checksum": "60d111ba1d284589a15364732c4739ae3e3f37f5bb220f99b6385c4c8dc47940",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mc8339yg_srxnqh18o",
+    "key": "swarm-auto-centralized-1750620903508/architect/migration-strategy",
+    "value": "{\"migration_approach\":\"Strangler Fig Pattern with gradual service extraction\",\"phases\":{\"phase1\":{\"name\":\"Foundation Setup\",\"duration\":\"2 weeks\",\"tasks\":[\"Set up microservices project structure\",\"Implement shared infrastructure (database, cache, messaging)\",\"Create API Gateway with routing and middleware\",\"Set up CI/CD pipelines for each service\"]},\"phase2\":{\"name\":\"Career Service Migration\",\"duration\":\"2 weeks\",\"tasks\":[\"Extract career domain logic from monolith\",\"Implement Career aggregate with Clean Architecture\",\"Set up career recommendations with caching\",\"Migrate career-related endpoints to new service\"]},\"phase3\":{\"name\":\"Skills & Assessment Services\",\"duration\":\"3 weeks\",\"tasks\":[\"Extract skills management to Skills Service\",\"Migrate Holland/Hexaco tests to Assessment Service\",\"Implement event-driven communication between services\",\"Update frontend to use new endpoints\"]},\"phase4\":{\"name\":\"User & Matching Services\",\"duration\":\"3 weeks\",\"tasks\":[\"Extract user management to User Service\",\"Implement Matching Service with ML models\",\"Set up vector database integration\",\"Implement peer and program matching\"]},\"phase5\":{\"name\":\"Optimization & Cleanup\",\"duration\":\"2 weeks\",\"tasks\":[\"Performance optimization and caching\",\"Remove deprecated code from monolith\",\"Implement comprehensive monitoring\",\"Documentation and knowledge transfer\"]}},\"risk_mitigation\":{\"data_consistency\":\"Use event sourcing and saga pattern for distributed transactions\",\"rollback_strategy\":\"Feature flags for gradual rollout with quick rollback capability\",\"performance_testing\":\"Load testing at each phase to ensure no degradation\",\"monitoring\":\"Comprehensive logging and metrics from day one\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-22T19:51:59.272Z",
+    "updatedAt": "2025-06-22T19:51:59.272Z",
+    "lastAccessedAt": "2025-06-22T19:51:59.272Z",
+    "version": 1,
+    "size": 1844,
+    "compressed": true,
+    "checksum": "90bfd4a5a8f62e1e1fcecc9767ce0bcec0d1932d4933a8e2cf7aeb2344e5d13a",
+    "references": [],
+    "dependencies": []
   }
 ]
