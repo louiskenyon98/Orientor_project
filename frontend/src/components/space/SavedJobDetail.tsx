@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SavedJob, getJobDetails } from '@/services/spaceService';
 import ProgramRecommendationsModal from './ProgramRecommendationsModal';
 import SetCareerGoalButton from '@/components/common/SetCareerGoalButton';
+import CareerFitAnalyzer from './CareerFitAnalyzer';
 
 interface SavedJobDetailProps {
   job: SavedJob;
@@ -65,6 +66,9 @@ const SavedJobDetail: React.FC<SavedJobDetailProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Career Fit Analyzer - For OaSIS jobs (SwipeMyWay) */}
+      <CareerFitAnalyzer job={job} jobSource="oasis" />
+      
       {/* Header */}
       <div className="border-b pb-4" style={{ borderColor: 'var(--border)' }}>
         <div className="flex items-start justify-between">
