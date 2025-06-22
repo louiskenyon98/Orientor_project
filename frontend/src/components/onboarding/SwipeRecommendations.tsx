@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo, animate } from 'framer-motion';
 import { Heart, X, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
 import { PsychProfile, CareerRecommendation } from '../../types/onboarding';
-import { getAllJobRecommendations, saveCareer } from '../../services/api';
+import { getAllJobRecommendations } from '../../services/api';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import SetCareerGoalButton from '@/components/common/SetCareerGoalButton';
 
@@ -89,9 +90,60 @@ const SwipeRecommendations: React.FC<SwipeRecommendationsProps> = ({
 
   const handleSwipeRight = async (career: CareerRecommendation) => {
     try {
-      // Save career using existing API (convert string id to number if needed)
-      const careerId = typeof career.id === 'string' ? parseInt(career.id) : career.id;
-      await saveCareer(careerId);
+      // Use the same save mechanism as SaveJobButton to ensure consistency with /space tab
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
+      const jobData = {
+        oasis_code: career.id,
+        label: career.title || 'Untitled Job',
+        description: career.description || '',
+        main_duties: '',
+        // Default skill values
+        role_creativity: 3.0,
+        role_leadership: 3.0,
+        role_digital_literacy: 3.0,
+        role_critical_thinking: 3.0,
+        role_problem_solving: 3.0,
+        // Default cognitive traits
+        analytical_thinking: 3.5,
+        attention_to_detail: 3.5,
+        collaboration: 3.5,
+        adaptability: 3.5,
+        independence: 3.5,
+        evaluation: 3.5,
+        decision_making: 3.5,
+        stress_tolerance: 3.5,
+        all_fields: {
+          title: career.title,
+          description: career.description,
+          skills_required: career.skills_required,
+          education_level: career.education_level,
+          match_percentage: career.match_percentage
+        }
+      };
+
+      console.log('Saving job data:', jobData);
+      console.log('API URL:', apiUrl);
+      console.log('Token present:', !!token);
+
+      const response = await axios.post(
+        `${apiUrl}/space/recommendations`,
+        jobData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log('Save response:', response.status, response.data);
+      console.log('✅ Successfully saved career:', career.title);
       setSavedCareers(prev => [...prev, career]);
       
       // Reset position and move to next card
@@ -108,8 +160,21 @@ const SwipeRecommendations: React.FC<SwipeRecommendationsProps> = ({
           }
         }
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save career:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response,
+        status: err.response?.status,
+        data: err.response?.data
+      });
+      
+      // Handle duplicate entries like SaveJobButton does
+      if (err.response?.status === 409 && err.response?.data?.detail?.includes('already saved')) {
+        console.log('Job already saved, treating as success');
+        setSavedCareers(prev => [...prev, career]);
+      }
+      
       // Still move to next card even if save fails
       animate(x, 0, {
         type: "spring",

@@ -68,7 +68,11 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '', he
 
   // Fonction pour convertir les données de l'arbre de compétences en format ReactFlow
   const convertToReactFlowFormat = useCallback((data: SkillTreeData) => {
-    if (!data || !data.nodes || !data.edges) return;
+    console.log("convertToReactFlowFormat appelée avec:", data);
+    if (!data || !data.nodes || !data.edges) {
+      console.log("Données invalides pour ReactFlow:", { data, hasNodes: !!data?.nodes, hasEdges: !!data?.edges });
+      return;
+    }
 
     // Identifier le nœud d'emploi (occupation)
     const occupationNode = Object.values(data.nodes).find(node => node.type === 'occupation');
@@ -316,8 +320,10 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '', he
     console.log("Nombre de nœuds:", flowNodes.length);
     console.log("Nombre d'arêtes:", flowEdges.length);
     
+    console.log("Setting ReactFlow nodes and edges...");
     setNodes(flowNodes);
     setEdges(flowEdges);
+    console.log("ReactFlow nodes and edges set successfully");
   }, [setNodes, setEdges, treeDepth, nodesPerLevel]);
 
   // Forcer un rechargement complet du composant lorsque les paramètres changent
@@ -352,8 +358,9 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '', he
       setSkillTreeData(typedData);
       
       console.log("Données de l'arbre de compétences reçues:", typedData);
-      console.log(`Nombre de nœuds reçus: ${Object.keys(typedData.nodes).length}`);
-      console.log(`Nombre d'arêtes reçues: ${typedData.edges.length}`);
+      console.log(`Nombre de nœuds reçus: ${Object.keys(typedData.nodes || {}).length}`);
+      console.log(`Nombre d'arêtes reçues: ${typedData.edges?.length || 0}`);
+      console.log("Structure des données:", JSON.stringify(typedData, null, 2));
       
       // Analyser la profondeur des nœuds reçus
       const nodesByLevel: { [level: number]: number } = {};
@@ -433,7 +440,12 @@ const JobSkillsTree: React.FC<JobSkillsTreeProps> = ({ jobId, className = '', he
   }
 
   // Afficher un message si aucune donnée n'est disponible
-  if (!skillTreeData || Object.keys(skillTreeData.nodes).length === 0) {
+  if (!skillTreeData || Object.keys(skillTreeData.nodes || {}).length === 0) {
+    console.log("JobSkillsTree: Pas de données ou nœuds vides", { 
+      skillTreeData, 
+      hasNodes: !!skillTreeData?.nodes, 
+      nodeCount: Object.keys(skillTreeData?.nodes || {}).length 
+    });
     return (
       <div className={`rounded-lg p-6 text-center ${className}`} style={{
         backgroundColor: 'var(--primary-color)',

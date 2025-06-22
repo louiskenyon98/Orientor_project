@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-22T00:39:28.396Z",
+  "timestamp": "2025-06-22T14:46:36.906Z",
   "version": "1.0",
   "entries": [
     {
@@ -137,7 +137,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:51:09.314Z",
       "updatedAt": "2025-06-21T22:51:09.314Z",
-      "lastAccessedAt": "2025-06-22T00:39:28.381Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 3484,
       "compressed": true,
@@ -157,7 +157,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:51:35.351Z",
       "updatedAt": "2025-06-21T22:51:35.351Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4572,
       "compressed": true,
@@ -177,7 +177,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:51:58.675Z",
       "updatedAt": "2025-06-21T22:51:58.675Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 3466,
       "compressed": true,
@@ -197,7 +197,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:52:26.684Z",
       "updatedAt": "2025-06-21T22:52:26.684Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4782,
       "compressed": true,
@@ -217,7 +217,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:52:45.787Z",
       "updatedAt": "2025-06-21T22:52:45.787Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 2172,
       "compressed": true,
@@ -237,7 +237,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:53:21.366Z",
       "updatedAt": "2025-06-21T22:53:21.366Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4643,
       "compressed": true,
@@ -257,7 +257,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:53:42.286Z",
       "updatedAt": "2025-06-21T22:53:42.286Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 2514,
       "compressed": true,
@@ -277,7 +277,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:55:52.026Z",
       "updatedAt": "2025-06-21T22:55:52.026Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4663,
       "compressed": true,
@@ -297,7 +297,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:55:52.674Z",
       "updatedAt": "2025-06-21T22:55:52.674Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 3889,
       "compressed": true,
@@ -317,57 +317,196 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:59:56.399Z",
       "updatedAt": "2025-06-21T22:59:56.399Z",
-      "lastAccessedAt": "2025-06-22T00:39:23.049Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 2574,
       "compressed": true,
       "checksum": "72d3f6e0efecfd72a944ca770ea0013fa209e3957ed3637ad424d2379d2b8d3e",
       "references": [],
       "dependencies": []
+    },
+    {
+      "id": "entry_mc6xyw5n_vkhrlre9d",
+      "key": "swarm-auto-centralized-1750552628330/database-architect/esco-fields-audit",
+      "value": "\"# ESCO Fields Audit for Career Fit Analyzer\\n\\n## Available ESCO Fields in saved_recommendations Table\\n\\n### Core Fields\\n- oasis_code (String) - Unique job identifier\\n- label (String) - Job title\\n- description (Text) - Job description\\n- main_duties (Text) - Primary responsibilities\\n\\n### Role Skill Fields (Float 0-5)\\n- role_creativity\\n- role_leadership  \\n- role_digital_literacy\\n- role_critical_thinking\\n- role_problem_solving\\n- analytical_thinking\\n- attention_to_detail\\n- collaboration\\n- adaptability\\n- independence\\n- evaluation\\n- decision_making\\n- stress_tolerance\\n\\n### Additional Fields\\n- all_fields (JSON) - Complete ESCO data\\n- personal_analysis (Text) - LLM analysis\\n- entry_qualifications (Text) - Entry requirements\\n- suggested_improvements (Text) - Career improvement suggestions\\n\\n## Current User Profile Fields\\n\\n### user_profiles Table\\n- Personal: name, age, sex, country, state_province\\n- Academic: major, year, gpa, education_level\\n- Career: job_title, industry, years_experience, career_goals, skills (Array)\\n- Personality: favorite_movie, favorite_book, favorite_celebrities, learning_style, interests\\n- Story: unique_quality, story\\n- Analysis: personal_analysis (RIASEC)\\n\\n### user_skills Table (Float 0-5)\\n- creativity\\n- leadership\\n- digital_literacy\\n- critical_thinking\\n- problem_solving\\n- analytical_thinking\\n- attention_to_detail\\n- collaboration\\n- adaptability\\n- independence\\n- evaluation\\n- decision_making\\n- stress_tolerance\\n\\n### personality_profiles Table\\n- profile_type (big_five, hexaco, social_emotional, cognitive_style, values)\\n- scores (JSON) - Personality trait scores\\n- percentile_ranks (JSON)\\n- narrative_description (Text)\\n\\n## Missing User-Side Fields for Career Fit Analysis\\n\\n### Academic Requirements Mapping\\n- completed_courses (Array) - For prerequisite matching\\n- certifications (Array) - Professional certifications\\n- portfolio_url (String) - For creative fields\\n- research_experience (Boolean) - For PhD requirements\\n- internship_experience (JSON) - Industry exposure\\n\\n### Financial Planning Fields\\n- expected_graduation_date (Date)\\n- current_debt (Decimal)\\n- financial_support (JSON) - Scholarships, family support\\n- minimum_salary_requirement (Decimal)\\n- relocation_willingness (Boolean)\\n\\n### Timeline & Commitment Fields\\n- available_study_years (Integer) - How many years they can study\\n- part_time_work_needed (Boolean)\\n- family_obligations (JSON)\\n- career_urgency (Integer 1-5) - How quickly they need income\\n\\n### Skills Gap Analysis Fields\\n- skill_learning_rate (JSON) - Self-assessed learning speed per skill\\n- preferred_learning_methods (Array)\\n- skill_confidence_levels (JSON) - Confidence vs actual skill level\\n\\n## Critical ESCO Fields to Prioritize\\n\\n### Entry Conditions (High Priority)\\n- entry_level_education - Minimum education required\\n- entry_experience_years - Years of experience needed  \\n- entry_certifications - Required certifications\\n- entry_portfolio_required - Portfolio requirements\\n\\n### Education Pathways\\n- typical_education_level - Most common education level\\n- alternative_pathways - Non-traditional routes\\n- continuing_education - Ongoing learning requirements\\n- specialization_options - Advanced focus areas\\n\\n### Skills Taxonomy\\n- essential_skills - Must-have skills\\n- optional_skills - Nice-to-have skills\\n- transferable_skills - Skills from other fields\\n- emerging_skills - Future-relevant skills\\n\\n### Career Trajectory\\n- entry_level_titles - Starting positions\\n- mid_career_titles - 5-10 year positions\\n- senior_titles - Leadership roles\\n- lateral_moves - Related career pivots\\n\\n### Industry Context\\n- sector_classification - Industry sector\\n- isco_code - International classification\\n- growth_rate - Job market growth\\n- automation_risk - Future job security\\n- remote_work_percentage - Remote opportunities\\n\\n## GraphSAGE Integration Requirements\\n\\n### For OaSIS Jobs\\n- Extract top 5 skill embeddings using GraphSAGE\\n- Map skill relevance scores to user profile\\n- Calculate skill gap distances\\n- Generate learning path recommendations\\n- Estimate time-to-competency per skill\\n\\n### Enhanced Matching Algorithm\\n- Use GraphSAGE embeddings for semantic skill matching\\n- Calculate career path similarity scores\\n- Identify transferable skill clusters\\n- Predict success probability based on peer paths\"",
+      "type": "string",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T00:40:50.507Z",
+      "updatedAt": "2025-06-22T00:40:50.507Z",
+      "lastAccessedAt": "2025-06-22T00:40:50.507Z",
+      "version": 1,
+      "size": 4564,
+      "compressed": true,
+      "checksum": "7100a4c53563483220da51e1769d0dd49518afdce6525799de498e2609afd346",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc6xzbih_rdud04kpc",
+      "key": "swarm-auto-centralized-1750552628330/tdd-lead/test-plan",
+      "value": {
+        "testPlan": "Created comprehensive TDD test plan for Career Fit Analyzer",
+        "location": "/__tests__/career-fit-analyzer/TEST_PLAN.md",
+        "coverage": {
+          "unit": [
+            "CareerFitCalculator",
+            "ESCOParser",
+            "LLMChatService",
+            "UserProfileService"
+          ],
+          "integration": [
+            "JobRendering",
+            "CareerFitDashboard",
+            "LLMChat"
+          ],
+          "e2e": [
+            "UserJourney",
+            "Performance"
+          ],
+          "components": [
+            "CareerFitScore",
+            "SkillGapAnalysis",
+            "CareerTimeline"
+          ],
+          "stores": [
+            "CareerFitStore"
+          ],
+          "api": [
+            "CareerEndpoints"
+          ]
+        },
+        "infrastructure": "Jest with React Testing Library",
+        "coverageTarget": "80%",
+        "phases": 5,
+        "estimatedDays": 10
+      },
+      "type": "object",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T00:41:10.409Z",
+      "updatedAt": "2025-06-22T00:41:10.409Z",
+      "lastAccessedAt": "2025-06-22T00:41:10.409Z",
+      "version": 1,
+      "size": 579,
+      "compressed": false,
+      "checksum": "17845cd17ed94413a17518e7887a9c50f3af41121c62da349ee04b20ae47aa76",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc6y12sp_iellngyv8",
+      "key": "swarm-auto-centralized-1750552628330/database-architect/graphsage-integration",
+      "value": "\"# GraphSAGE Integration Requirements for OaSIS Jobs\\n\\n## Current GraphSAGE Implementation\\n\\n### Model Architecture\\n- Input: 384-dimensional embeddings\\n- Hidden: 256 dimensions\\n- Output: 128-dimensional node embeddings\\n- Model Path: backend/app/services/GNN/best_model_20250520_022237.pt\\n\\n### Available Services\\n- graphsage_llm_integration.py - Core GraphSAGE-LLM bridge\\n- enhanced_chat_service.py - Chat with GraphSAGE insights\\n- Oasisembedding_service.py - OaSIS embedding generation\\n- competenceTree.py - Skill tree traversal\\n\\n## Integration Requirements for Career Fit\\n\\n### 1. Skill Extraction for OaSIS Jobs\\n```python\\ndef extract_top_skills_for_job(oasis_code: str) -> List[Dict]:\\n    \\\"\\\"\\\"\\n    Extract top 5 skills for an OaSIS job using GraphSAGE\\n    Returns: [{skill: name, relevance: score, embedding: vector}]\\n    \\\"\\\"\\\"\\n    # Get job node embedding\\n    job_embedding = get_node_embedding(oasis_code, node_type='occupation')\\n    \\n    # Find skill nodes with highest cosine similarity\\n    skill_similarities = []\\n    for skill_node in all_skill_nodes:\\n        skill_embedding = get_node_embedding(skill_node.id)\\n        similarity = cosine_similarity(job_embedding, skill_embedding)\\n        skill_similarities.append({\\n            'skill': skill_node.name,\\n            'relevance': similarity,\\n            'embedding': skill_embedding\\n        })\\n    \\n    # Return top 5\\n    return sorted(skill_similarities, key=lambda x: x['relevance'], reverse=True)[:5]\\n```\\n\\n### 2. User-Job Compatibility Scoring\\n```python\\ndef calculate_oasis_job_fit(user_id: int, oasis_code: str) -> Dict:\\n    \\\"\\\"\\\"\\n    Calculate fit score between user and OaSIS job\\n    \\\"\\\"\\\"\\n    # Get user skill embeddings\\n    user_skills = get_user_skills(user_id)\\n    user_embedding = aggregate_skill_embeddings(user_skills)\\n    \\n    # Get job embedding\\n    job_embedding = get_node_embedding(oasis_code, 'occupation')\\n    \\n    # Calculate compatibility\\n    compatibility_score = cosine_similarity(user_embedding, job_embedding)\\n    \\n    # Find skill gaps\\n    job_skills = extract_top_skills_for_job(oasis_code)\\n    skill_gaps = []\\n    for job_skill in job_skills:\\n        user_skill_level = user_skills.get(job_skill['skill'], 0)\\n        gap = job_skill['relevance'] - (user_skill_level / 5.0)\\n        if gap > 0:\\n            skill_gaps.append({\\n                'skill': job_skill['skill'],\\n                'gap': gap,\\n                'priority': job_skill['relevance']\\n            })\\n    \\n    return {\\n        'compatibility_score': compatibility_score,\\n        'skill_gaps': skill_gaps,\\n        'top_matching_skills': find_matching_skills(user_embedding, job_skills)\\n    }\\n```\\n\\n### 3. Learning Path Generation\\n```python\\ndef generate_skill_learning_path(user_id: int, target_skills: List[str]) -> Dict:\\n    \\\"\\\"\\\"\\n    Generate optimized learning path using GraphSAGE graph traversal\\n    \\\"\\\"\\\"\\n    current_skills = get_user_skills(user_id)\\n    \\n    learning_paths = []\\n    for target_skill in target_skills:\\n        # Use GraphSAGE to find intermediate skills\\n        path = find_skill_path(\\n            start_skills=current_skills,\\n            target_skill=target_skill,\\n            max_hops=3\\n        )\\n        \\n        # Estimate time for each step\\n        time_estimate = estimate_learning_time(path, user_learning_rate)\\n        \\n        learning_paths.append({\\n            'target': target_skill,\\n            'path': path,\\n            'estimated_months': time_estimate\\n        })\\n    \\n    return {\\n        'paths': learning_paths,\\n        'total_months': sum(p['estimated_months'] for p in learning_paths),\\n        'parallel_opportunities': find_parallel_learning(learning_paths)\\n    }\\n```\\n\\n### 4. Database Schema Extensions for GraphSAGE\\n\\n```sql\\n-- Store GraphSAGE embeddings for faster retrieval\\nCREATE TABLE IF NOT EXISTS graphsage_embeddings (\\n    id SERIAL PRIMARY KEY,\\n    node_id VARCHAR(255) UNIQUE NOT NULL,\\n    node_type VARCHAR(50) NOT NULL, -- 'skill', 'occupation', 'user'\\n    embedding FLOAT[] NOT NULL, -- 128-dimensional vector\\n    model_version VARCHAR(50) DEFAULT 'v1.0',\\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\\n);\\n\\nCREATE INDEX idx_graphsage_node ON graphsage_embeddings(node_id, node_type);\\n\\n-- Cache skill paths for common queries\\nCREATE TABLE IF NOT EXISTS skill_learning_paths (\\n    id SERIAL PRIMARY KEY,\\n    user_id INTEGER REFERENCES users(id),\\n    start_skills JSONB NOT NULL,\\n    target_skill VARCHAR(255) NOT NULL,\\n    path_nodes JSONB NOT NULL, -- Array of skill nodes in order\\n    estimated_months INTEGER,\\n    confidence_score DECIMAL(3,2),\\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\\n    expires_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '30 days'\\n);\\n\\nCREATE INDEX idx_skill_paths_user ON skill_learning_paths(user_id, target_skill);\\n```\\n\\n### 5. API Endpoints for GraphSAGE Features\\n\\n```python\\n# New endpoints in space.py router\\n\\n@router.post(\\\"/jobs/{job_id}/graphsage-analysis\\\")\\nasync def analyze_job_with_graphsage(\\n    job_id: int,\\n    current_user: User = Depends(get_current_user),\\n    db: Session = Depends(get_db)\\n):\\n    \\\"\\\"\\\"Get GraphSAGE analysis for a saved job\\\"\\\"\\\"\\n    job = get_saved_job(db, job_id, current_user.id)\\n    \\n    if job.source_type == 'oasis':\\n        # Extract top skills\\n        top_skills = extract_top_skills_for_job(job.oasis_code)\\n        \\n        # Calculate fit\\n        fit_analysis = calculate_oasis_job_fit(current_user.id, job.oasis_code)\\n        \\n        # Generate learning path\\n        skill_targets = [s['skill'] for s in fit_analysis['skill_gaps'][:3]]\\n        learning_path = generate_skill_learning_path(current_user.id, skill_targets)\\n        \\n        return {\\n            'top_skills': top_skills,\\n            'fit_score': fit_analysis['compatibility_score'],\\n            'skill_gaps': fit_analysis['skill_gaps'],\\n            'learning_path': learning_path\\n        }\\n    else:\\n        # ESCO job - use traditional analysis\\n        return analyze_esco_job(job, current_user)\\n\\n@router.get(\\\"/skills/learning-path\\\")\\nasync def get_skill_learning_path(\\n    target_skill: str,\\n    current_user: User = Depends(get_current_user),\\n    db: Session = Depends(get_db)\\n):\\n    \\\"\\\"\\\"Get optimized learning path to acquire a skill\\\"\\\"\\\"\\n    path = generate_skill_learning_path(\\n        current_user.id, \\n        [target_skill]\\n    )\\n    return path\\n```\\n\\n## Implementation Priority\\n\\n1. **Phase 1**: Basic skill extraction for OaSIS jobs\\n   - Implement extract_top_skills_for_job()\\n   - Store results in graphsage_top_skills field\\n   - Display in UI\\n\\n2. **Phase 2**: Compatibility scoring\\n   - Implement calculate_oasis_job_fit()\\n   - Add to career fit analysis\\n   - Show match percentage\\n\\n3. **Phase 3**: Learning paths\\n   - Implement skill path finding\\n   - Time estimation algorithm\\n   - Interactive path visualization\\n\\n4. **Phase 4**: Caching and optimization\\n   - Implement embedding cache\\n   - Pre-compute common paths\\n   - Background job updates\"",
+      "type": "string",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T00:42:32.425Z",
+      "updatedAt": "2025-06-22T00:42:32.425Z",
+      "lastAccessedAt": "2025-06-22T00:42:32.425Z",
+      "version": 1,
+      "size": 7514,
+      "compressed": true,
+      "checksum": "e73c130f8c355fb523470823f762398105af951f66310ac89d040b25414651e1",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc7s3wat_1jh7cscd7",
+      "key": "issue_analysis",
+      "value": "SwipeRecommendations saves jobs using POST /careers/save/{id} but Space tab expects data from saved_recommendations table. LLM chat exists but not integrated into UnifiedJobCard. GraphSAGE foundation exists but skills extraction for saved jobs not implemented. ESCO scrolling issue on home page needs investigation.",
+      "type": "string",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T14:44:32.453Z",
+      "updatedAt": "2025-06-22T14:44:32.453Z",
+      "lastAccessedAt": "2025-06-22T14:44:32.453Z",
+      "version": 1,
+      "size": 346,
+      "compressed": false,
+      "checksum": "16bdead87c63438ed9544daefc351fbf8e93528b98ef62c9599ade66a3fb6c2c",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc7s6kbs_g3hxopsx0",
+      "key": "fix_progress",
+      "value": "Fixed SwipeRecommendations save mechanism to use POST /space/recommendations instead of /careers/save/{id}. Integrated JobCardChat component into UnifiedJobCard in /space tab with 'Ask Questions' button. Ready to implement GraphSAGE skills extraction and spawn TDD agent.",
+      "type": "string",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T14:46:36.904Z",
+      "updatedAt": "2025-06-22T14:46:36.904Z",
+      "lastAccessedAt": "2025-06-22T14:46:36.904Z",
+      "version": 1,
+      "size": 302,
+      "compressed": false,
+      "checksum": "22950e5c78084653b639d95659431d0676da12ea74f5cc2665728b4b2c088607",
+      "references": [],
+      "dependencies": []
     }
   ],
   "statistics": {
     "overview": {
-      "totalEntries": 10,
-      "totalSize": 36759,
-      "compressedEntries": 10,
-      "compressionRatio": 0,
-      "indexSize": 500,
-      "memoryUsage": 10431480,
+      "totalEntries": 15,
+      "totalSize": 50064,
+      "compressedEntries": 12,
+      "compressionRatio": -38.80195599022005,
+      "indexSize": 750,
+      "memoryUsage": 10952552,
       "diskUsage": 0
     },
     "distribution": {
       "byNamespace": {
         "default": {
-          "count": 10,
-          "size": 36759
+          "count": 15,
+          "size": 50064
         }
       },
       "byType": {
         "object": {
-          "count": 10,
-          "size": 36759
+          "count": 11,
+          "size": 37338
+        },
+        "string": {
+          "count": 4,
+          "size": 12726
         }
       },
       "byOwner": {
         "system": {
-          "count": 10,
-          "size": 36759
+          "count": 15,
+          "size": 50064
         }
       },
       "byAccessLevel": {
         "shared": {
-          "count": 10,
-          "size": 36759
+          "count": 15,
+          "size": 50064
         }
       }
     },
     "temporal": {
-      "entriesCreatedLast24h": 10,
-      "entriesUpdatedLast24h": 10,
-      "entriesAccessedLast24h": 10,
+      "entriesCreatedLast24h": 15,
+      "entriesUpdatedLast24h": 15,
+      "entriesAccessedLast24h": 15,
       "oldestEntry": "2025-06-21T22:51:09.314Z",
-      "newestEntry": "2025-06-21T22:59:56.399Z"
+      "newestEntry": "2025-06-22T14:46:36.904Z"
     },
     "performance": {
       "averageQueryTime": 0,

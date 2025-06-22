@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UnifiedJob, isESCOJob, isOaSISJob } from '@/types/unifiedJob';
+import { JobCardChat } from '@/components/jobs/JobCardChat';
+import { Job } from '@/components/jobs/JobCard';
 
 interface UnifiedJobCardProps {
   job: UnifiedJob;
@@ -14,6 +16,7 @@ const UnifiedJobCard: React.FC<UnifiedJobCardProps> = ({
   onSelect,
   onDelete
 }) => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const getSourceBadge = () => {
     if (isESCOJob(job)) {
       return (
@@ -175,11 +178,11 @@ const UnifiedJobCard: React.FC<UnifiedJobCardProps> = ({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            // Quick view functionality can be added here
+            setIsChatOpen(true);
           }}
-          className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
         >
-          👁️ Quick View
+          💬 Ask Questions
         </button>
         
         <button
@@ -192,6 +195,27 @@ const UnifiedJobCard: React.FC<UnifiedJobCardProps> = ({
           🗑️ Remove
         </button>
       </div>
+
+      {/* LLM Chat Interface */}
+      {isChatOpen && (
+        <JobCardChat
+          job={{
+            id: job.id,
+            metadata: {
+              title: job.title,
+              preferred_label: job.title,
+              description: job.description || '',
+              skills: isESCOJob(job) ? job.skillsRequired : undefined,
+              education_level: isESCOJob(job) ? job.educationLevel : undefined,
+              oasis_code: isOaSISJob(job) ? job.oasisCode : undefined,
+              ...('allFields' in job ? job.allFields : {})
+            },
+            score: job.relevanceScore || 0
+          } as Job}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+        />
+      )}
     </div>
   );
 };

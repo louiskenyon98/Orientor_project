@@ -47,7 +47,8 @@ async def query_career_advisor(
         if request.job_source == "esco":
             # Get ESCO job from saved_recommendations (home page recommendations)
             saved_rec = db.query(SavedRecommendation).filter(
-                SavedRecommendation.oasis_code == request.job_id
+                SavedRecommendation.oasis_code == request.job_id,
+                SavedRecommendation.user_id == current_user.id
             ).first()
             
             if saved_rec:
@@ -63,7 +64,11 @@ async def query_career_advisor(
                         "problem_solving": saved_rec.role_problem_solving
                     },
                     "entry_qualifications": saved_rec.entry_qualifications,
-                    "all_fields": json.loads(saved_rec.all_fields) if saved_rec.all_fields else {}
+                    "all_fields": (
+                        saved_rec.all_fields if isinstance(saved_rec.all_fields, dict) 
+                        else json.loads(saved_rec.all_fields) if saved_rec.all_fields 
+                        else {}
+                    )
                 }
                 formatter_type = "ESCO-OccupationFormatter"  # ESCO uses ESCO formatter
                 
@@ -73,10 +78,10 @@ async def query_career_advisor(
             query = text("""
                 SELECT job_title, metadata
                 FROM saved_jobs
-                WHERE esco_id = :job_id
+                WHERE esco_id = :job_id AND user_id = :user_id
                 LIMIT 1
             """)
-            result = db.execute(query, {"job_id": request.job_id}).fetchone()
+            result = db.execute(query, {"job_id": request.job_id, "user_id": current_user.id}).fetchone()
             
             if result:
                 job_details = {

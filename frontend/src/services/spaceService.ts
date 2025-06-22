@@ -111,11 +111,14 @@ const getAuthHeader = () => {
 // Fetch saved recommendations
 export const fetchSavedRecommendations = async (): Promise<Recommendation[]> => {
   try {
+    console.log('Fetching saved recommendations from:', `${API_URL}/careers/saved`);
     const response = await axios.get<Recommendation[]>(`${API_URL}/careers/saved`, getAuthHeader());
     console.log('API response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching saved recommendations:', error);
+    console.error('API URL used:', `${API_URL}/careers/saved`);
+    console.error('Auth header:', getAuthHeader());
     throw error;
   }
 };
@@ -173,7 +176,7 @@ export const saveRecommendationWithLLMAnalysis = async (
 };
 
 // Delete a saved recommendation
-export const deleteRecommendation = async (recommendationId: number): Promise<void> => {
+export const deleteRecommendation = async (recommendationId: number | string): Promise<void> => {
   try {
     await axios.delete(
       `${API_URL}/space/recommendations/${recommendationId}`, 
@@ -453,6 +456,20 @@ export const analyzeCareerFit = async (jobId: string, jobSource: 'esco' | 'oasis
     return response.data;
   } catch (error) {
     console.error('Error analyzing career fit:', error);
+    throw error;
+  }
+};
+
+// Cleanup fake test jobs
+export const cleanupTestJobs = async (): Promise<{success: boolean, message: string, deleted_count: number}> => {
+  try {
+    const response = await axios.delete<{success: boolean, message: string, deleted_count: number}>(
+      `${API_URL}/careers/cleanup-test-jobs`,
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error cleaning up test jobs:', error);
     throw error;
   }
 }; 

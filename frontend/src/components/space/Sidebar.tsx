@@ -4,7 +4,7 @@ interface SidebarProps {
   items: Recommendation[];
   selectedId?: number;
   onSelect: (item: Recommendation) => void;
-  onDelete: (id: number) => void;
+  onDelete: (item: Recommendation) => void;
   loading: boolean;
   error: string | null;
 }
@@ -52,7 +52,7 @@ export default function Sidebar({ items, selectedId, onSelect, onDelete, loading
             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{item.oasis_code}</p>
           </div>
           <button
-            onClick={() => item.id && onDelete(item.id)}
+            onClick={() => onDelete(item)}
             className="mt-2 text-xs font-medium transition-colors duration-200"
             style={{ color: 'var(--text-secondary)' }}
             onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}

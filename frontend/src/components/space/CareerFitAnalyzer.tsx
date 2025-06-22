@@ -72,10 +72,17 @@ const CareerFitAnalyzer: React.FC<CareerFitAnalyzerProps> = ({ job, jobSource })
 
     setLlmLoading(true);
     try {
+      // Get auth token
+      const token = localStorage.getItem('access_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
       // This would call your LLM service with the job context and user query
-      const response = await fetch('/api/careers/llm-query', {
+      const response = await fetch(`${apiUrl}/api/careers/llm-query`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify({
           job_id: jobId,
           job_source: jobSource,
@@ -84,9 +91,14 @@ const CareerFitAnalyzer: React.FC<CareerFitAnalyzerProps> = ({ job, jobSource })
         })
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       setLlmResponse(data.response);
     } catch (err) {
+      console.error('LLM query error:', err);
       setLlmResponse('Failed to get AI response. Please try again.');
     } finally {
       setLlmLoading(false);

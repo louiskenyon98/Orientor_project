@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from 'recharts';
 import { Recommendation } from '@/services/spaceService';
 import { extractChartData } from '@/utils/chartUtils';
 import NotesSection from './NotesSection';
 import CareerFitAnalyzer from './CareerFitAnalyzer';
+import JobSkillsTree from '@/components/jobs/JobSkillsTree';
 
 interface RecommendationDetailProps {
   recommendation: Recommendation;
@@ -27,6 +29,52 @@ export default function RecommendationDetail({ recommendation, onGenerate, gener
     <div className="space-y-6">
       {/* Career Fit Analyzer - For ESCO recommendations (home page) */}
       <CareerFitAnalyzer job={recommendation} jobSource="esco" />
+      
+      {/* ESCO Competence Tree Graph with Skills Analysis - Only show for ESCO jobs */}
+      {(() => {
+        const shouldShow = recommendation.oasis_code && 
+          !recommendation.oasis_code.startsWith('oasis_') && 
+          !recommendation.oasis_code.startsWith('career_') && 
+          (recommendation.oasis_code.startsWith('occupation::key_') || !isNaN(Number(recommendation.id)));
+        console.log("RecommendationDetail: Should show tree?", {
+          shouldShow,
+          oasisCode: recommendation.oasis_code,
+          recommendationId: recommendation.id,
+          checks: {
+            hasOasisCode: !!recommendation.oasis_code,
+            notOasisPrefix: !recommendation.oasis_code?.startsWith('oasis_'),
+            notCareerPrefix: !recommendation.oasis_code?.startsWith('career_'),
+            validFormat: recommendation.oasis_code?.startsWith('occupation::key_') || !isNaN(Number(recommendation.id))
+          }
+        });
+        return shouldShow;
+      })() && (
+        <div className="space-y-6">
+          {/* Skills Tree Visualization */}
+          <div className="p-6 rounded-lg" style={{
+            backgroundColor: 'var(--card)',
+            border: '1px solid var(--border)'
+          }}>
+            <div className="mb-4">
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--text)' }}>
+                Analyse des compétences ESCO
+              </h3>
+              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+                Explorez l'arbre de compétences et identifiez les compétences clés pour ce poste
+              </p>
+            </div>
+            
+            {/* Full JobSkillsTree component with all features */}
+            <div style={{ minHeight: '1000px' }}>
+              <JobSkillsTree 
+                jobId={recommendation.oasis_code || `occupation::key_${recommendation.id}`} 
+                height="100%" 
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Original Job Details Card */}
       <div className="p-6 rounded-lg" style={{

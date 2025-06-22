@@ -226,6 +226,13 @@ class JobRecommendationService:
             Dict[str, Any]: Arbre de compétences généré avec visualisation
         """
         try:
+            # Add the dev directory to the Python path temporarily
+            import sys
+            import os
+            dev_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'dev')
+            if dev_path not in sys.path:
+                sys.path.append(dev_path)
+            
             from competenceTree_dev.graph_traversal_service import GraphTraversalService
             from competenceTree_dev.skill_tree_visualization import SkillTreeVisualization
             

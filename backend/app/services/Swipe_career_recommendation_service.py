@@ -1054,9 +1054,14 @@ def get_saved_careers(db: Session, user_id: int) -> List[Dict[str, Any]]:
             all_fields = {}
             if row.all_fields:
                 try:
-                    all_fields = json.loads(row.all_fields)
-                except json.JSONDecodeError:
-                    logger.error(f"Error decoding all_fields JSON for career {row.id}")
+                    # Check if all_fields is already a dict (from SQLAlchemy JSON column)
+                    if isinstance(row.all_fields, dict):
+                        all_fields = row.all_fields
+                    else:
+                        # It's a string, so parse it
+                        all_fields = json.loads(row.all_fields)
+                except (json.JSONDecodeError, TypeError) as e:
+                    logger.error(f"Error decoding all_fields for career {row.id}: {e}")
             
             career = {
                 "id": row.id,

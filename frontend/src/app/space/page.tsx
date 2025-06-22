@@ -12,7 +12,8 @@ import {
   deleteRecommendation, 
   generateLLMAnalysisForRecommendation,
   fetchSavedJobs,
-  deleteSavedJob 
+  deleteSavedJob,
+  cleanupTestJobs
 } from '@/services/spaceService';
 import type { Recommendation, SavedJob } from '@/services/spaceService';
 import { toast } from 'react-hot-toast';
@@ -42,19 +43,34 @@ export default function SpacePage() {
   }, [pathname]);
 
   // Load recommendations
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await fetchSavedRecommendations();
-        // All saved recommendations are ESCO jobs from home page (they have oasis_code)
-        setRecommendations(data);
-      } catch (err) {
-        setError('Could not fetch recommendations.');
-      } finally {
-        setLoading(false);
+  const loadRecommendations = async () => {
+    try {
+      console.log('🔄 Loading saved recommendations...');
+      const data = await fetchSavedRecommendations();
+      console.log('📊 Fetched recommendations:', data);
+      console.log(`📈 Total recommendations found: ${data.length}`);
+      
+      if (data.length === 0) {
+        console.log('⚠️ No saved recommendations found. Make sure you have saved some jobs from SwipeRecommendations.');
+      } else {
+        console.log('✅ Recommendations loaded successfully');
+        data.forEach((rec, index) => {
+          console.log(`${index + 1}. ${rec.title || rec.label} (ID: ${rec.id})`);
+        });
       }
-    };
-    load();
+      
+      // All saved recommendations are ESCO jobs from home page (they have oasis_code)
+      setRecommendations(data);
+    } catch (err) {
+      console.error('❌ Error fetching recommendations:', err);
+      setError('Could not fetch recommendations.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRecommendations();
   }, []);
 
   // Load saved jobs
@@ -79,11 +95,17 @@ export default function SpacePage() {
     setSelectedJob(null); // Clear job selection
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (recommendation: Recommendation) => {
     try {
-      await deleteRecommendation(id);
-      setRecommendations(prev => prev.filter(r => r.id !== id));
-      if (selected?.id === id) setSelected(null);
+      // For fake test jobs with occupation::key_* codes, use oasis_code
+      // For real jobs, use the numeric ID
+      const identifier = recommendation.oasis_code?.startsWith('occupation::key_') 
+        ? recommendation.oasis_code 
+        : recommendation.id;
+      
+      await deleteRecommendation(identifier);
+      setRecommendations(prev => prev.filter(r => r.id !== recommendation.id));
+      if (selected?.id === recommendation.id) setSelected(null);
       toast.success('Recommendation deleted');
     } catch {
       toast.error('Failed to delete recommendation');
@@ -124,6 +146,18 @@ export default function SpacePage() {
     }
   };
 
+  // Cleanup test jobs function
+  const handleCleanupTestJobs = async () => {
+    try {
+      const result = await cleanupTestJobs();
+      await loadRecommendations(); // Reload the list
+      toast.success(`Removed ${result.deleted_count} test jobs`);
+    } catch (err) {
+      console.error('Error cleaning up test jobs:', err);
+      toast.error('Failed to cleanup test jobs');
+    }
+  };
+
   return (
     <MainLayout>
       <div className="flex min-h-screen font-inter" style={{
@@ -159,6 +193,16 @@ export default function SpacePage() {
                 🌳 From Tree
               </button>
             </div>
+            
+            {/* Cleanup button - only show for recommendations tab */}
+            {activeTab === 'recommendations' && (
+              <button
+                onClick={handleCleanupTestJobs}
+                className="w-full mt-2 px-3 py-2 text-xs bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+              >
+                🧹 Remove Test Jobs
+              </button>
+            )}
           </div>
 
           {/* Tab Content */}
@@ -190,12 +234,23 @@ export default function SpacePage() {
               {activeTab === 'recommendations' ? 'Saved Recommendations' : 'Jobs from Tree Exploration'}
             </h1>
             
-            {/* Badge with count */}
-            <div className="flex gap-3">
+            {/* Badge with count and refresh button */}
+            <div className="flex gap-3 items-center">
               {activeTab === 'recommendations' && (
-                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                  {recommendations.length} saved
-                </span>
+                <>
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                    {recommendations.length} saved
+                  </span>
+                  <button
+                    onClick={() => {
+                      setLoading(true);
+                      loadRecommendations();
+                    }}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                  >
+                    Refresh
+                  </button>
+                </>
               )}
               {activeTab === 'jobs' && (
                 <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">

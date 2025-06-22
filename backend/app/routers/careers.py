@@ -297,8 +297,8 @@ async def analyze_career_fit(
         
         # Get job details based on source
         job_details = None
-        if request.job_source == "oasis":
-            # Get from saved_recommendations
+        if request.job_source == "esco":
+            # ESCO jobs are in saved_recommendations table (home page recommendations)
             from sqlalchemy import text
             query = text("""
                 SELECT oasis_code, label, description, main_duties,
@@ -338,8 +338,8 @@ async def analyze_career_fit(
                     }
                 }
                 
-        elif request.job_source == "esco":
-            # Get from saved_jobs
+        elif request.job_source == "oasis":
+            # OaSIS jobs are in saved_jobs table (SwipeMyWay discoveries)
             from sqlalchemy import text
             query = text("""
                 SELECT esco_id, job_title, metadata
@@ -355,7 +355,7 @@ async def analyze_career_fit(
                     "title": result.job_title,
                     "description": result.metadata.get("description", "") if result.metadata else "",
                     "skills": result.metadata.get("skills", {}) if result.metadata else {},
-                    "cognitive_traits": {}  # ESCO jobs might not have these
+                    "cognitive_traits": {}  # OaSIS jobs might not have these
                 }
         
         if not job_details:
@@ -480,4 +480,42 @@ async def analyze_career_fit(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to analyze career fit: {str(e)}"
+        )
+
+@router.delete("/cleanup-test-jobs")
+async def cleanup_test_jobs(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Cleanup fake test jobs that start with 'occupation::key_' from saved_recommendations.
+    These are dummy jobs created during development/testing.
+    """
+    try:
+        from sqlalchemy import text
+        
+        # Delete fake ESCO jobs (starting with occupation::key_)
+        delete_query = text("""
+            DELETE FROM saved_recommendations 
+            WHERE user_id = :user_id 
+            AND oasis_code LIKE 'occupation::key_%'
+        """)
+        result = db.execute(delete_query, {"user_id": current_user.id})
+        deleted_count = result.rowcount
+        db.commit()
+        
+        logger.info(f"Cleaned up {deleted_count} fake test jobs for user {current_user.id}")
+        
+        return {
+            "success": True,
+            "message": f"Removed {deleted_count} test jobs",
+            "deleted_count": deleted_count
+        }
+        
+    except Exception as e:
+        logger.error(f"Error cleaning up test jobs: {str(e)}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to cleanup test jobs: {str(e)}"
         ) 

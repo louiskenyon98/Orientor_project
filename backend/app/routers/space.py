@@ -52,6 +52,9 @@ def create_saved_recommendation(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    logger.info(f"Creating recommendation for user {current_user.id} with oasis_code: {recommendation.oasis_code}")
+    logger.info(f"Recommendation data: {recommendation.dict()}")
+    
     # Check if recommendation already exists
     db_recommendation = db.query(SavedRecommendation).filter(
         SavedRecommendation.user_id == current_user.id,
@@ -59,60 +62,72 @@ def create_saved_recommendation(
     ).first()
     
     if db_recommendation:
+        logger.info(f"Recommendation already exists for user {current_user.id}, oasis_code: {recommendation.oasis_code}")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="This recommendation is already saved."
         )
     
-    # Create new saved recommendation
-    db_recommendation = SavedRecommendation(
-        user_id=current_user.id,
-        oasis_code=recommendation.oasis_code,
-        label=recommendation.label,
-        description=recommendation.description,
-        main_duties=recommendation.main_duties,
-        role_creativity=recommendation.role_creativity,
-        role_leadership=recommendation.role_leadership,
-        role_digital_literacy=recommendation.role_digital_literacy,
-        role_critical_thinking=recommendation.role_critical_thinking,
-        role_problem_solving=recommendation.role_problem_solving,
-        analytical_thinking=recommendation.analytical_thinking,
-        attention_to_detail=recommendation.attention_to_detail,
-        collaboration=recommendation.collaboration,
-        adaptability=recommendation.adaptability,
-        independence=recommendation.independence,
-        evaluation=recommendation.evaluation,
-        decision_making=recommendation.decision_making,
-        stress_tolerance=recommendation.stress_tolerance,
-        all_fields=recommendation.all_fields
-    )
-    
-    db.add(db_recommendation)
-    db.commit()
-    db.refresh(db_recommendation)
-    
-    # Generate LLM analysis for the recommendation asynchronously
     try:
-        import asyncio
-        # Run the async function in a sync context
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        analysis = loop.run_until_complete(
-            generate_personalized_analysis(current_user.id, db_recommendation, db)
+        # Create new saved recommendation
+        db_recommendation = SavedRecommendation(
+            user_id=current_user.id,
+            oasis_code=recommendation.oasis_code,
+            label=recommendation.label,
+            description=recommendation.description,
+            main_duties=recommendation.main_duties,
+            role_creativity=recommendation.role_creativity,
+            role_leadership=recommendation.role_leadership,
+            role_digital_literacy=recommendation.role_digital_literacy,
+            role_critical_thinking=recommendation.role_critical_thinking,
+            role_problem_solving=recommendation.role_problem_solving,
+            analytical_thinking=recommendation.analytical_thinking,
+            attention_to_detail=recommendation.attention_to_detail,
+            collaboration=recommendation.collaboration,
+            adaptability=recommendation.adaptability,
+            independence=recommendation.independence,
+            evaluation=recommendation.evaluation,
+            decision_making=recommendation.decision_making,
+            stress_tolerance=recommendation.stress_tolerance,
+            all_fields=recommendation.all_fields
         )
-        loop.close()
         
-        # Update the recommendation with the analysis
-        db_recommendation.personal_analysis = analysis['personal_analysis']
-        db_recommendation.entry_qualifications = analysis['entry_qualifications']
-        db_recommendation.suggested_improvements = analysis['suggested_improvements']
+        db.add(db_recommendation)
         db.commit()
         db.refresh(db_recommendation)
+        logger.info(f"Successfully created recommendation with ID: {db_recommendation.id}")
+        
+        # Generate LLM analysis for the recommendation asynchronously
+        try:
+            import asyncio
+            # Run the async function in a sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            analysis = loop.run_until_complete(
+                generate_personalized_analysis(current_user.id, db_recommendation, db)
+            )
+            loop.close()
+            
+            # Update the recommendation with the analysis
+            db_recommendation.personal_analysis = analysis['personal_analysis']
+            db_recommendation.entry_qualifications = analysis['entry_qualifications']
+            db_recommendation.suggested_improvements = analysis['suggested_improvements']
+            db.commit()
+            db.refresh(db_recommendation)
+            logger.info(f"Successfully generated LLM analysis for recommendation {db_recommendation.id}")
+        except Exception as e:
+            logger.error(f"Failed to generate LLM analysis: {str(e)}")
+            # Continue without analysis if it fails
+        
+        return db_recommendation
+        
     except Exception as e:
-        logger.error(f"Failed to generate LLM analysis: {str(e)}")
-        # Continue without analysis if it fails
-    
-    return db_recommendation
+        logger.error(f"Failed to create recommendation: {str(e)}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to save recommendation: {str(e)}"
+        )
 
 @router.get("/recommendations", response_model=List[RecommendationWithNotes])
 def get_saved_recommendations(
