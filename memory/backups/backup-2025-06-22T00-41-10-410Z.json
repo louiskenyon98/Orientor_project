@@ -1,11 +1,134 @@
 {
-  "timestamp": "2025-06-21T22:55:52.028Z",
+  "timestamp": "2025-06-22T00:41:10.410Z",
   "version": "1.0",
   "entries": [
     {
       "id": "entry_mc6u1u2q_0rthkyjsa",
       "key": "swarm-auto-centralized-1750546044069/coordinator/architecture",
-      "value": "{\"step\":\"Lead Coordination - Architecture Analysis\",\"timestamp\":\"2025-06-21T22:51:09.3NZ\",\"objective\":\"Career progression timeline implementation with GraphSage edge scoring\",\"existingArchitecture\":{\"graphSageModel\":{\"location\":\"/backend/app/services/GNN/GraphSage.py\",\"components\":[\"GraphSAGE encoder\",\"EdgeRegHead regression\",\"CareerTreeModel\"],\"currentUsage\":\"Competence tree generation and skill path recommendations\",\"features\":[\"Node embeddings\",\"Edge scoring\",\"Tree traversal\"]},\"navigation\":{\"currentItems\":[{\"name\":\"Dashboard\",\"path\":\"/\"},{\"name\":\"Education\",\"path\":\"/education\"},{\"name\":\"Chat\",\"path\":\"/chat\"},{\"name\":\"Swipe\",\"path\":\"/find-your-way\"},{\"name\":\"Saved\",\"path\":\"/space\"},{\"name\":\"Challenges\",\"path\":\"/challenges\"},{\"name\":\"Notes\",\"path\":\"/notes\"},{\"name\":\"Case Study\",\"path\":\"/case-study-journey\"},{\"name\":\"Competence Tree\",\"path\":\"/competence-tree\"}],\"missingGoalsRoute\":true,\"needsGoalsIntegration\":true},\"careerSystem\":{\"existingComponents\":[\"Career recommendations via GraphSage\",\"Swipe career recommendations\",\"Saved career tracking\",\"Competence tree with progress tracking\",\"User progress system with XP\"],\"careerGoalCard\":\"Exists but static - needs dynamic data integration\"},\"backend\":{\"models\":[\"User\",\"UserProgress\",\"TreePath\",\"UserSkillTree\",\"SavedRecommendation\"],\"services\":[\"CompetenceTreeService\",\"Swipe_career_recommendation_service\"],\"graphsageIntegration\":\"Active in competence tree generation\"}},\"requiredImplementation\":{\"newComponents\":[\"/frontend/src/app/goals/page.tsx - Goals dashboard page\",\"/backend/app/models/career_goal.py - Career goal data model\",\"/backend/app/models/career_milestone.py - Milestone tracking model\",\"/backend/app/models/career_timeline.py - Timeline progression model\",\"/backend/app/services/career_timeline_service.py - Timeline logic with GraphSage\",\"/backend/app/routers/career_goals.py - Goals API endpoints\",\"/frontend/src/services/careerGoalsService.ts - Frontend API client\",\"/frontend/src/components/goals/ - Goals UI components\"],\"modifiedComponents\":[\"/frontend/src/components/layout/MainLayout.tsx - Add Goals to navigation\",\"/frontend/src/components/ui/CareerGoalCard.tsx - Make dynamic with real data\",\"/backend/app/services/GNN/GraphSage.py - Extend for timeline scoring\",\"/frontend/src/app/page.tsx - Update homepage goals integration\"]},\"graphsageTimeline\":{\"edgeScoring\":\"Use existing EdgeRegHead for career progression probability scoring\",\"nodeEmbeddings\":\"Leverage existing node embeddings for career positions\",\"timelineGeneration\":\"Create temporal career paths using edge weights\",\"progressTracking\":\"Integrate with existing UserProgress XP system\"},\"integration\":{\"frontend\":\"Goals tab at localhost:3000/goals with navigation integration\",\"backend\":\"Extend existing GraphSage service for timeline generation\",\"database\":\"New models integrate with existing User and UserProgress\",\"api\":\"RESTful endpoints following existing patterns\"},\"coordination\":{\"phase1\":\"Database models and core service implementation\",\"phase2\":\"GraphSage timeline generation integration\",\"phase3\":\"Frontend components and API integration\",\"phase4\":\"Navigation integration and testing\"},\"progress\":\"25% - Architecture analysis complete\"}",
+      "value": {
+        "step": "Lead Coordination - Architecture Analysis",
+        "timestamp": "2025-06-21T22:51:09.3NZ",
+        "objective": "Career progression timeline implementation with GraphSage edge scoring",
+        "existingArchitecture": {
+          "graphSageModel": {
+            "location": "/backend/app/services/GNN/GraphSage.py",
+            "components": [
+              "GraphSAGE encoder",
+              "EdgeRegHead regression",
+              "CareerTreeModel"
+            ],
+            "currentUsage": "Competence tree generation and skill path recommendations",
+            "features": [
+              "Node embeddings",
+              "Edge scoring",
+              "Tree traversal"
+            ]
+          },
+          "navigation": {
+            "currentItems": [
+              {
+                "name": "Dashboard",
+                "path": "/"
+              },
+              {
+                "name": "Education",
+                "path": "/education"
+              },
+              {
+                "name": "Chat",
+                "path": "/chat"
+              },
+              {
+                "name": "Swipe",
+                "path": "/find-your-way"
+              },
+              {
+                "name": "Saved",
+                "path": "/space"
+              },
+              {
+                "name": "Challenges",
+                "path": "/challenges"
+              },
+              {
+                "name": "Notes",
+                "path": "/notes"
+              },
+              {
+                "name": "Case Study",
+                "path": "/case-study-journey"
+              },
+              {
+                "name": "Competence Tree",
+                "path": "/competence-tree"
+              }
+            ],
+            "missingGoalsRoute": true,
+            "needsGoalsIntegration": true
+          },
+          "careerSystem": {
+            "existingComponents": [
+              "Career recommendations via GraphSage",
+              "Swipe career recommendations",
+              "Saved career tracking",
+              "Competence tree with progress tracking",
+              "User progress system with XP"
+            ],
+            "careerGoalCard": "Exists but static - needs dynamic data integration"
+          },
+          "backend": {
+            "models": [
+              "User",
+              "UserProgress",
+              "TreePath",
+              "UserSkillTree",
+              "SavedRecommendation"
+            ],
+            "services": [
+              "CompetenceTreeService",
+              "Swipe_career_recommendation_service"
+            ],
+            "graphsageIntegration": "Active in competence tree generation"
+          }
+        },
+        "requiredImplementation": {
+          "newComponents": [
+            "/frontend/src/app/goals/page.tsx - Goals dashboard page",
+            "/backend/app/models/career_goal.py - Career goal data model",
+            "/backend/app/models/career_milestone.py - Milestone tracking model",
+            "/backend/app/models/career_timeline.py - Timeline progression model",
+            "/backend/app/services/career_timeline_service.py - Timeline logic with GraphSage",
+            "/backend/app/routers/career_goals.py - Goals API endpoints",
+            "/frontend/src/services/careerGoalsService.ts - Frontend API client",
+            "/frontend/src/components/goals/ - Goals UI components"
+          ],
+          "modifiedComponents": [
+            "/frontend/src/components/layout/MainLayout.tsx - Add Goals to navigation",
+            "/frontend/src/components/ui/CareerGoalCard.tsx - Make dynamic with real data",
+            "/backend/app/services/GNN/GraphSage.py - Extend for timeline scoring",
+            "/frontend/src/app/page.tsx - Update homepage goals integration"
+          ]
+        },
+        "graphsageTimeline": {
+          "edgeScoring": "Use existing EdgeRegHead for career progression probability scoring",
+          "nodeEmbeddings": "Leverage existing node embeddings for career positions",
+          "timelineGeneration": "Create temporal career paths using edge weights",
+          "progressTracking": "Integrate with existing UserProgress XP system"
+        },
+        "integration": {
+          "frontend": "Goals tab at localhost:3000/goals with navigation integration",
+          "backend": "Extend existing GraphSage service for timeline generation",
+          "database": "New models integrate with existing User and UserProgress",
+          "api": "RESTful endpoints following existing patterns"
+        },
+        "coordination": {
+          "phase1": "Database models and core service implementation",
+          "phase2": "GraphSage timeline generation integration",
+          "phase3": "Frontend components and API integration",
+          "phase4": "Navigation integration and testing"
+        },
+        "progress": "25% - Architecture analysis complete"
+      },
       "type": "object",
       "namespace": "default",
       "tags": [],
@@ -14,7 +137,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:51:09.314Z",
       "updatedAt": "2025-06-21T22:51:09.314Z",
-      "lastAccessedAt": "2025-06-21T22:51:09.314Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 3484,
       "compressed": true,
@@ -34,7 +157,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:51:35.351Z",
       "updatedAt": "2025-06-21T22:51:35.351Z",
-      "lastAccessedAt": "2025-06-21T22:51:35.351Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4572,
       "compressed": true,
@@ -54,7 +177,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:51:58.675Z",
       "updatedAt": "2025-06-21T22:51:58.675Z",
-      "lastAccessedAt": "2025-06-21T22:51:58.675Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 3466,
       "compressed": true,
@@ -74,7 +197,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:52:26.684Z",
       "updatedAt": "2025-06-21T22:52:26.684Z",
-      "lastAccessedAt": "2025-06-21T22:52:26.684Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4782,
       "compressed": true,
@@ -94,7 +217,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:52:45.787Z",
       "updatedAt": "2025-06-21T22:52:45.787Z",
-      "lastAccessedAt": "2025-06-21T22:52:45.787Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 2172,
       "compressed": true,
@@ -114,7 +237,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:53:21.366Z",
       "updatedAt": "2025-06-21T22:53:21.366Z",
-      "lastAccessedAt": "2025-06-21T22:53:21.366Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4643,
       "compressed": true,
@@ -134,7 +257,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:53:42.286Z",
       "updatedAt": "2025-06-21T22:53:42.286Z",
-      "lastAccessedAt": "2025-06-21T22:53:42.286Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 2514,
       "compressed": true,
@@ -154,57 +277,176 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-21T22:55:52.026Z",
       "updatedAt": "2025-06-21T22:55:52.026Z",
-      "lastAccessedAt": "2025-06-21T22:55:52.026Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
       "version": 1,
       "size": 4663,
       "compressed": true,
       "checksum": "c6e5a99243a61f9cc75fb6a57cdb8131bd40af7681014ab965feaaf9c55ddeab",
       "references": [],
       "dependencies": []
+    },
+    {
+      "id": "entry_mc6u7wpu_dtyoappla",
+      "key": "swarm-auto-centralized-1750546044069/llm/integration",
+      "value": "{\"step\":\"LLM Integration\",\"timestamp\":\"2025-06-21T22:55:52.3NZ\",\"scoreIntegration\":{\"description\":\"GraphSage score integration with LLM prompts\",\"implementation\":\"Enhanced chat service that computes skill relevance scores using GraphSage model and passes them to LLM for contextualized conversations\",\"features\":[\"Real-time GraphSage score computation\",\"Skill relevance analysis in conversations\",\"Enhanced system prompts with relevance data\",\"Score-based skill prioritization\"],\"files\":[\"/backend/app/services/graphsage_llm_integration.py\",\"/backend/app/services/enhanced_chat_service.py\"]},\"explanations\":{\"description\":\"Skill explanation generation system\",\"implementation\":\"LLM-powered explanations for why skills scored highly based on GraphSage analysis and user profile\",\"features\":[\"Personalized skill explanations\",\"Relevance score interpretation\",\"Career path connection analysis\",\"Contextual skill importance reasoning\"],\"endpoints\":[\"/api/v1/enhanced-chat/skill-explanation\",\"/api/v1/enhanced-chat/graphsage-insights\"]},\"personalization\":{\"description\":\"Personalized learning priority suggestions\",\"implementation\":\"GraphSage-driven learning path generation with skill prioritization based on relevance scores\",\"features\":[\"High-impact skill identification (score > 0.8)\",\"Foundational skill recommendations (score > 0.6)\",\"6-month structured learning paths\",\"Phase-based skill development plans\"],\"algorithms\":[\"Skill relevance scoring\",\"Learning path optimization\",\"Priority-based recommendations\"]},\"conversationFlow\":{\"description\":\"Enhanced conversation flow with GraphSage insights\",\"implementation\":\"Real-time conversation enhancement with skill relevance analysis and contextual suggestions\",\"features\":[\"Dynamic conversation context building\",\"Career keyword detection\",\"Skill gap identification\",\"Interactive skill exploration\"],\"components\":[\"Enhanced system prompts\",\"Real-time insights display\",\"Interactive skill badges\",\"Quick action suggestions\"]},\"llmIntegration\":{\"description\":\"Integration with existing LLM systems\",\"implementation\":\"Seamless integration with existing chat infrastructure while adding GraphSage capabilities\",\"features\":[\"Backward compatibility with existing chat\",\"Enhanced router with new endpoints\",\"GraphSage model loading and caching\",\"Conversation history preservation\"],\"integrationPoints\":[\"Enhanced chat router (/api/v1/enhanced-chat)\",\"GraphSage model initialization\",\"Existing conversation service extension\",\"Frontend component integration\"]},\"technicalImplementation\":{\"backend\":{\"services\":[\"GraphSageLLMIntegration - Core integration service\",\"EnhancedChatService - Enhanced conversation handling\",\"Enhanced chat router - API endpoints\"],\"models\":\"GraphSage model loading and inference\",\"apis\":[\"POST /enhanced-chat/send - Enhanced messaging\",\"POST /enhanced-chat/skill-explanation - Skill analysis\",\"GET /enhanced-chat/learning-recommendations - Learning paths\",\"POST /enhanced-chat/career-path-analysis - Career compatibility\",\"GET /enhanced-chat/graphsage-insights - General insights\",\"GET /enhanced-chat/status - System status\"]},\"frontend\":{\"components\":[\"EnhancedChat.tsx - Main chat interface\",\"GraphSage insights sidebar\",\"Real-time skill relevance display\",\"Interactive learning recommendations\"],\"features\":[\"Real-time GraphSage insights\",\"Skill explanation on click\",\"Learning priority visualization\",\"System status monitoring\"]}},\"progress\":\"95%\",\"status\":\"Implementation Complete\",\"nextSteps\":[\"Test GraphSage model loading\",\"Validate skill relevance calculations\",\"Optimize conversation enhancement performance\",\"Add more sophisticated learning path algorithms\"]}",
+      "type": "object",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-21T22:55:52.674Z",
+      "updatedAt": "2025-06-21T22:55:52.674Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
+      "version": 1,
+      "size": 3889,
+      "compressed": true,
+      "checksum": "8fe1df952d737b1ab4c9bef25aea45f7efb4c69da7ac9a87dd6c187e52db141c",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc6ud4rz_5lvudcpot",
+      "key": "swarm-auto-centralized-1750546044069/frontend/completion",
+      "value": "{\"step\":\"Frontend Visualization - Final Status\",\"timestamp\":\"2025-06-21T22:59:56.3NZ\",\"status\":\"COMPLETED\",\"build_status\":\"SUCCESSFUL\",\"implementation_summary\":{\"timeline_visualization\":\"✅ Complete - Interactive tier expansion with GraphSage scoring\",\"skill_relationship_graph\":\"✅ Complete - Force-directed graph with confidence visualization\",\"goals_page\":\"✅ Complete - Dual-view timeline and graph interface\",\"navigation_integration\":\"✅ Complete - Added Goals tab to main navigation\",\"service_layer\":\"✅ Complete - CareerGoalsService with API endpoints\",\"responsive_design\":\"✅ Complete - Mobile-friendly layouts\",\"graphsage_integration\":\"✅ Complete - Confidence scoring with visual prominence\",\"interactive_features\":\"✅ Complete - Click-to-expand, skill selection, goal setting\"},\"key_features_delivered\":[\"Timeline visualization with expandable tiers\",\"GraphSage confidence score visualization (size, color, prominence)\",\"Interactive skill node selection and relationship highlighting\",\"Force-directed skill relationship graph\",\"Career goal setting interface\",\"Progress tracking with tier-based timeline\",\"Integration with existing space/saved jobs workflow\",\"Responsive design for mobile and desktop\"],\"technical_achievements\":{\"confidence_scoring\":\"Visual prominence scales with GraphSage scores (0-100%)\",\"tier_expansion\":\"Interactive expand/collapse for career progression tiers\",\"relationship_mapping\":\"Dynamic skill connection visualization\",\"build_compatibility\":\"Removed motion dependencies for stable compilation\",\"performance\":\"Optimized rendering with efficient state management\"},\"integration_points\":{\"main_navigation\":\"Added Goals tab with target icon\",\"saved_jobs\":\"Career timeline link from SavedJobDetail component\",\"existing_layout\":\"Seamless integration with MainLayout system\",\"toast_notifications\":\"User feedback for actions and progress\"},\"files_created\":[\"/frontend/src/components/career/TimelineVisualization.tsx\",\"/frontend/src/components/career/SkillRelationshipGraph.tsx\",\"/frontend/src/app/goals/page.tsx\",\"/frontend/src/services/careerGoalsService.ts\"],\"files_modified\":[\"/frontend/src/components/layout/MainLayout.tsx\",\"/frontend/src/components/space/SavedJobDetail.tsx\"],\"dependencies_added\":[\"@heroicons/react\",\"framer-motion\",\"react-hot-toast\"],\"next_phase_ready\":\"Backend API integration for real GraphSage model\",\"deployment_ready\":true,\"phase_3_completion\":\"100%\"}",
+      "type": "object",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-21T22:59:56.399Z",
+      "updatedAt": "2025-06-21T22:59:56.399Z",
+      "lastAccessedAt": "2025-06-22T00:39:39.450Z",
+      "version": 1,
+      "size": 2574,
+      "compressed": true,
+      "checksum": "72d3f6e0efecfd72a944ca770ea0013fa209e3957ed3637ad424d2379d2b8d3e",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc6xyw5n_vkhrlre9d",
+      "key": "swarm-auto-centralized-1750552628330/database-architect/esco-fields-audit",
+      "value": "\"# ESCO Fields Audit for Career Fit Analyzer\\n\\n## Available ESCO Fields in saved_recommendations Table\\n\\n### Core Fields\\n- oasis_code (String) - Unique job identifier\\n- label (String) - Job title\\n- description (Text) - Job description\\n- main_duties (Text) - Primary responsibilities\\n\\n### Role Skill Fields (Float 0-5)\\n- role_creativity\\n- role_leadership  \\n- role_digital_literacy\\n- role_critical_thinking\\n- role_problem_solving\\n- analytical_thinking\\n- attention_to_detail\\n- collaboration\\n- adaptability\\n- independence\\n- evaluation\\n- decision_making\\n- stress_tolerance\\n\\n### Additional Fields\\n- all_fields (JSON) - Complete ESCO data\\n- personal_analysis (Text) - LLM analysis\\n- entry_qualifications (Text) - Entry requirements\\n- suggested_improvements (Text) - Career improvement suggestions\\n\\n## Current User Profile Fields\\n\\n### user_profiles Table\\n- Personal: name, age, sex, country, state_province\\n- Academic: major, year, gpa, education_level\\n- Career: job_title, industry, years_experience, career_goals, skills (Array)\\n- Personality: favorite_movie, favorite_book, favorite_celebrities, learning_style, interests\\n- Story: unique_quality, story\\n- Analysis: personal_analysis (RIASEC)\\n\\n### user_skills Table (Float 0-5)\\n- creativity\\n- leadership\\n- digital_literacy\\n- critical_thinking\\n- problem_solving\\n- analytical_thinking\\n- attention_to_detail\\n- collaboration\\n- adaptability\\n- independence\\n- evaluation\\n- decision_making\\n- stress_tolerance\\n\\n### personality_profiles Table\\n- profile_type (big_five, hexaco, social_emotional, cognitive_style, values)\\n- scores (JSON) - Personality trait scores\\n- percentile_ranks (JSON)\\n- narrative_description (Text)\\n\\n## Missing User-Side Fields for Career Fit Analysis\\n\\n### Academic Requirements Mapping\\n- completed_courses (Array) - For prerequisite matching\\n- certifications (Array) - Professional certifications\\n- portfolio_url (String) - For creative fields\\n- research_experience (Boolean) - For PhD requirements\\n- internship_experience (JSON) - Industry exposure\\n\\n### Financial Planning Fields\\n- expected_graduation_date (Date)\\n- current_debt (Decimal)\\n- financial_support (JSON) - Scholarships, family support\\n- minimum_salary_requirement (Decimal)\\n- relocation_willingness (Boolean)\\n\\n### Timeline & Commitment Fields\\n- available_study_years (Integer) - How many years they can study\\n- part_time_work_needed (Boolean)\\n- family_obligations (JSON)\\n- career_urgency (Integer 1-5) - How quickly they need income\\n\\n### Skills Gap Analysis Fields\\n- skill_learning_rate (JSON) - Self-assessed learning speed per skill\\n- preferred_learning_methods (Array)\\n- skill_confidence_levels (JSON) - Confidence vs actual skill level\\n\\n## Critical ESCO Fields to Prioritize\\n\\n### Entry Conditions (High Priority)\\n- entry_level_education - Minimum education required\\n- entry_experience_years - Years of experience needed  \\n- entry_certifications - Required certifications\\n- entry_portfolio_required - Portfolio requirements\\n\\n### Education Pathways\\n- typical_education_level - Most common education level\\n- alternative_pathways - Non-traditional routes\\n- continuing_education - Ongoing learning requirements\\n- specialization_options - Advanced focus areas\\n\\n### Skills Taxonomy\\n- essential_skills - Must-have skills\\n- optional_skills - Nice-to-have skills\\n- transferable_skills - Skills from other fields\\n- emerging_skills - Future-relevant skills\\n\\n### Career Trajectory\\n- entry_level_titles - Starting positions\\n- mid_career_titles - 5-10 year positions\\n- senior_titles - Leadership roles\\n- lateral_moves - Related career pivots\\n\\n### Industry Context\\n- sector_classification - Industry sector\\n- isco_code - International classification\\n- growth_rate - Job market growth\\n- automation_risk - Future job security\\n- remote_work_percentage - Remote opportunities\\n\\n## GraphSAGE Integration Requirements\\n\\n### For OaSIS Jobs\\n- Extract top 5 skill embeddings using GraphSAGE\\n- Map skill relevance scores to user profile\\n- Calculate skill gap distances\\n- Generate learning path recommendations\\n- Estimate time-to-competency per skill\\n\\n### Enhanced Matching Algorithm\\n- Use GraphSAGE embeddings for semantic skill matching\\n- Calculate career path similarity scores\\n- Identify transferable skill clusters\\n- Predict success probability based on peer paths\"",
+      "type": "string",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T00:40:50.507Z",
+      "updatedAt": "2025-06-22T00:40:50.507Z",
+      "lastAccessedAt": "2025-06-22T00:40:50.507Z",
+      "version": 1,
+      "size": 4564,
+      "compressed": true,
+      "checksum": "7100a4c53563483220da51e1769d0dd49518afdce6525799de498e2609afd346",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mc6xzbih_rdud04kpc",
+      "key": "swarm-auto-centralized-1750552628330/tdd-lead/test-plan",
+      "value": {
+        "testPlan": "Created comprehensive TDD test plan for Career Fit Analyzer",
+        "location": "/__tests__/career-fit-analyzer/TEST_PLAN.md",
+        "coverage": {
+          "unit": [
+            "CareerFitCalculator",
+            "ESCOParser",
+            "LLMChatService",
+            "UserProfileService"
+          ],
+          "integration": [
+            "JobRendering",
+            "CareerFitDashboard",
+            "LLMChat"
+          ],
+          "e2e": [
+            "UserJourney",
+            "Performance"
+          ],
+          "components": [
+            "CareerFitScore",
+            "SkillGapAnalysis",
+            "CareerTimeline"
+          ],
+          "stores": [
+            "CareerFitStore"
+          ],
+          "api": [
+            "CareerEndpoints"
+          ]
+        },
+        "infrastructure": "Jest with React Testing Library",
+        "coverageTarget": "80%",
+        "phases": 5,
+        "estimatedDays": 10
+      },
+      "type": "object",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-22T00:41:10.409Z",
+      "updatedAt": "2025-06-22T00:41:10.409Z",
+      "lastAccessedAt": "2025-06-22T00:41:10.409Z",
+      "version": 1,
+      "size": 579,
+      "compressed": false,
+      "checksum": "17845cd17ed94413a17518e7887a9c50f3af41121c62da349ee04b20ae47aa76",
+      "references": [],
+      "dependencies": []
     }
   ],
   "statistics": {
     "overview": {
-      "totalEntries": 8,
-      "totalSize": 30296,
-      "compressedEntries": 8,
-      "compressionRatio": 0,
-      "indexSize": 400,
-      "memoryUsage": 10296104,
+      "totalEntries": 12,
+      "totalSize": 41902,
+      "compressedEntries": 11,
+      "compressionRatio": -70.36960276338515,
+      "indexSize": 600,
+      "memoryUsage": 10683056,
       "diskUsage": 0
     },
     "distribution": {
       "byNamespace": {
         "default": {
-          "count": 8,
-          "size": 30296
+          "count": 12,
+          "size": 41902
         }
       },
       "byType": {
         "object": {
-          "count": 8,
-          "size": 30296
+          "count": 11,
+          "size": 37338
+        },
+        "string": {
+          "count": 1,
+          "size": 4564
         }
       },
       "byOwner": {
         "system": {
-          "count": 8,
-          "size": 30296
+          "count": 12,
+          "size": 41902
         }
       },
       "byAccessLevel": {
         "shared": {
-          "count": 8,
-          "size": 30296
+          "count": 12,
+          "size": 41902
         }
       }
     },
     "temporal": {
-      "entriesCreatedLast24h": 8,
-      "entriesUpdatedLast24h": 8,
-      "entriesAccessedLast24h": 8,
+      "entriesCreatedLast24h": 12,
+      "entriesUpdatedLast24h": 12,
+      "entriesAccessedLast24h": 12,
       "oldestEntry": "2025-06-21T22:51:09.314Z",
-      "newestEntry": "2025-06-21T22:55:52.026Z"
+      "newestEntry": "2025-06-22T00:41:10.409Z"
     },
     "performance": {
       "averageQueryTime": 0,

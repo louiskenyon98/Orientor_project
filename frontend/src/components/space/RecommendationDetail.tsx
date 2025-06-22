@@ -2,6 +2,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Recommendation } from '@/services/spaceService';
 import { extractChartData } from '@/utils/chartUtils';
 import NotesSection from './NotesSection';
+import CareerFitAnalyzer from './CareerFitAnalyzer';
 
 interface RecommendationDetailProps {
   recommendation: Recommendation;
@@ -23,16 +24,21 @@ const extractSkillData = (comparison: any) => {
 
 export default function RecommendationDetail({ recommendation, onGenerate, generating }: RecommendationDetailProps) {
   return (
-    <div className="p-6 rounded-lg" style={{
-      backgroundColor: 'var(--card)',
-      border: '1px solid var(--border)'
-    }}>
-      <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--text)' }}>
-        {recommendation.label}
-      </h2>
-      <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-        {recommendation.description}
-      </p>
+    <div className="space-y-6">
+      {/* Career Fit Analyzer - For ESCO recommendations (home page) */}
+      <CareerFitAnalyzer job={recommendation} jobSource="esco" />
+      
+      {/* Original Job Details Card */}
+      <div className="p-6 rounded-lg" style={{
+        backgroundColor: 'var(--card)',
+        border: '1px solid var(--border)'
+      }}>
+        <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--text)' }}>
+          {recommendation.label}
+        </h2>
+        <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+          {recommendation.description}
+        </p>
       
       {recommendation.main_duties && (
         <div className="mb-6">
@@ -234,7 +240,8 @@ export default function RecommendationDetail({ recommendation, onGenerate, gener
         </div>
       )}
       
-      <NotesSection recommendation={recommendation} />
+        <NotesSection recommendation={recommendation} />
+      </div>
     </div>
   );
 } 

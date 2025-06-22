@@ -81,6 +81,12 @@ export interface SavedJob {
   saved_at: string;
   metadata: Record<string, any>;
   already_saved: boolean;
+  graphsage_skills?: Array<{
+    skill_id: string;
+    skill_name: string;
+    relevance_score: number;
+    description: string;
+  }>;
 }
 
 export interface NoteCreate {
@@ -105,7 +111,7 @@ const getAuthHeader = () => {
 // Fetch saved recommendations
 export const fetchSavedRecommendations = async (): Promise<Recommendation[]> => {
   try {
-    const response = await axios.get<Recommendation[]>(`${API_URL}/space/recommendations`, getAuthHeader());
+    const response = await axios.get<Recommendation[]>(`${API_URL}/careers/saved`, getAuthHeader());
     console.log('API response:', response.data);
     return response.data;
   } catch (error) {
@@ -402,6 +408,51 @@ export const getJobDetails = async (escoId: string): Promise<any> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching job details:', error);
+    throw error;
+  }
+};
+
+// ===== CAREER FIT ANALYSIS =====
+
+export interface SkillMatch {
+  skill_name: string;
+  user_level?: number;
+  required_level?: number;
+  match_percentage: number;
+}
+
+export interface GapAnalysis {
+  skill_gaps: Array<{
+    skill: string;
+    current: number;
+    required: number;
+    gap: number;
+  }>;
+  strength_areas: string[];
+  improvement_areas: string[];
+}
+
+export interface CareerFitResponse {
+  fit_score: number;
+  skill_match: Record<string, SkillMatch>;
+  gap_analysis: GapAnalysis;
+  recommendations: string[];
+}
+
+// Analyze career fit for a job
+export const analyzeCareerFit = async (jobId: string, jobSource: 'esco' | 'oasis'): Promise<CareerFitResponse> => {
+  try {
+    const response = await axios.post<CareerFitResponse>(
+      `${API_URL}/careers/fit-analysis`,
+      {
+        job_id: jobId,
+        job_source: jobSource
+      },
+      getAuthHeader()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error analyzing career fit:', error);
     throw error;
   }
 }; 
