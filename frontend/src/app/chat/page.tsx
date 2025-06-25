@@ -48,7 +48,7 @@ export default function ChatPage() {
                     </div>
                 </div>
             )}
-            <ChatInterface currentUserId={currentUserId} />
+            <ChatInterface currentUserId={currentUserId} enableOrientator={true} />
         </MainLayout>
     );
 } 

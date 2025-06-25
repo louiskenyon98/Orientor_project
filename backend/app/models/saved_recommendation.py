@@ -33,6 +33,13 @@ class SavedRecommendation(Base):
     entry_qualifications = Column(Text, nullable=True)
     suggested_improvements = Column(Text, nullable=True)
     
+    # Orientator AI integration fields
+    source_tool = Column(String(50), nullable=True, index=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id", ondelete="SET NULL"), nullable=True, index=True)
+    component_type = Column(String(50), nullable=True)
+    component_data = Column(JSON, nullable=True)
+    interaction_metadata = Column(JSON, nullable=True)
+    
     # Define unique constraint to prevent duplicates
     __table_args__ = (
         UniqueConstraint('user_id', 'oasis_code', name='uq_user_oasis_code'),

@@ -1,0 +1,13 @@
+{
+  "objective": "/Users/philippebeliveau/Desktop/Notebook/Orientor_project/Orientor_project/task/refactor/refactor.md",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-06-22T19:35:03.507Z",
+  "id": "swarm-auto-centralized-1750620903508"
+}

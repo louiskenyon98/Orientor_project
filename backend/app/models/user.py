@@ -39,3 +39,7 @@ class User(Base):
     conversation_logs = relationship("ConversationLog", back_populates="user", cascade="all, delete-orphan")
     career_profile_aggregates = relationship("CareerProfileAggregate", back_populates="user", cascade="all, delete-orphan")
     career_goals = relationship("CareerGoal", back_populates="user", cascade="all, delete-orphan")
+    
+    # Orientator AI relationships
+    tool_invocations = relationship("ToolInvocation", back_populates="user")
+    journey_milestones = relationship("UserJourneyMilestone", back_populates="user", cascade="all, delete-orphan")

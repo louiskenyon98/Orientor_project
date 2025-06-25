@@ -42,6 +42,7 @@ from app.routers.socratic_chat import router as socratic_chat_router
 from app.routers.career_goals import router as career_goals_router
 from app.api.endpoints.job_recommendations import router as job_recommendations_router
 from app.routers.llm_career_advisor import router as llm_career_advisor_router
+from app.routers.orientator import router as orientator_router
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
 from scripts.model_loader import load_models
@@ -109,6 +110,7 @@ try:
     logger.info(f"Registering holland_test_router routes: {[f'{route.path} [{route.methods}]' for route in holland_test_router.routes]}")
     logger.info(f"Registering hexaco_test_router routes: {[f'{route.path} [{route.methods}]' for route in hexaco_test_router.routes]}")
     logger.info(f"Registering insight_router routes: {[f'{route.path} [{route.methods}]' for route in insight_router.routes]}")
+    logger.info(f"Registering orientator_router routes: {[f'{route.path} [{route.methods}]' for route in orientator_router.routes]}")
     logger.info("============================================")
 except Exception as e:
     logger.error(f"Error while logging router details: {str(e)}")
@@ -157,6 +159,7 @@ app.include_router(socratic_chat_router)
 app.include_router(career_goals_router)
 app.include_router(job_recommendations_router, prefix="/api/v1/jobs")
 app.include_router(llm_career_advisor_router)
+app.include_router(orientator_router, prefix="/api")
 logger.info("All routers included successfully")
 
 # Explicitly capture route after including it

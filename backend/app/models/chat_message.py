@@ -24,6 +24,7 @@ class ChatMessage(Base):
     
     # Relationships
     conversation = relationship("Conversation", back_populates="messages")
+    components = relationship("MessageComponent", back_populates="message", cascade="all, delete-orphan", lazy="selectin")
     
     def __repr__(self):
         return f"<ChatMessage(id={self.id}, role='{self.role}', conversation_id={self.conversation_id})>"

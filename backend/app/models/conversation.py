@@ -25,6 +25,8 @@ class Conversation(Base):
     messages = relationship("ChatMessage", back_populates="conversation", cascade="all, delete-orphan", lazy="selectin")
     category = relationship("ConversationCategory", back_populates="conversations", lazy="selectin")
     shares = relationship("ConversationShare", back_populates="conversation", cascade="all, delete-orphan")
+    tool_invocations = relationship("ToolInvocation", back_populates="conversation", cascade="all, delete-orphan")
+    journey_milestones = relationship("UserJourneyMilestone", back_populates="conversation")
     
     def __repr__(self):
         return f"<Conversation(id={self.id}, title='{self.title}', user_id={self.user_id})>"

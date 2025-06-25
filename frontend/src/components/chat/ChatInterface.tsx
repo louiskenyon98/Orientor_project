@@ -11,6 +11,7 @@ import CategoryManager from './CategoryManager';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import { Menu, Search, Folder, BarChart3, Plus } from 'lucide-react';
 import styles from './ChatBot.module.css';
+import { MessageComponentRenderer, MessageComponent, ComponentAction, MessageComponentType } from './MessageComponent';
 
 interface Message {
   id: number;
@@ -18,6 +19,12 @@ interface Message {
   content: string;
   created_at: string;
   tokens_used?: number;
+  components?: MessageComponent[];
+  metadata?: {
+    tools_invoked?: string[];
+    processing_time_ms?: number;
+    confidence_score?: number;
+  };
 }
 
 interface Conversation {
@@ -45,6 +52,7 @@ interface Category {
 
 interface ChatInterfaceProps {
   currentUserId: number;
+  enableOrientator?: boolean;
 }
 
 // Paper Chat Message Component - mimics writing on paper
@@ -52,27 +60,42 @@ interface PaperChatMessageProps {
   message: Message;
   isLast: boolean;
   chatMode: ChatMode;
+  onComponentAction?: (action: ComponentAction, componentId: string) => void;
 }
 
-const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast, chatMode }) => {
+const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast, chatMode, onComponentAction }) => {
   const isUser = message.role === 'user';
   
   return (
     <div className="space-y-4">
       {/* AI/System message with mode-specific accent */}
       {!isUser && (
-        <div className={`border-l-3 pl-8 py-2 ${
-          chatMode === 'claude' 
-            ? 'border-purple-500' 
-            : 'border-blue-500'
-        }`}>
-          <p className={`text-xl leading-relaxed font-light tracking-wide ${
+        <div>
+          <div className={`border-l-3 pl-8 py-2 ${
             chatMode === 'claude' 
-              ? 'text-purple-600' 
-              : 'text-blue-600'
+              ? 'border-purple-500' 
+              : 'border-blue-500'
           }`}>
-            {message.content}
-          </p>
+            <p className={`text-xl leading-relaxed font-light tracking-wide ${
+              chatMode === 'claude' 
+                ? 'text-purple-600' 
+                : 'text-blue-600'
+            }`}>
+              {message.content}
+            </p>
+          </div>
+          {/* Render message components if present */}
+          {message.components && message.components.length > 0 && (
+            <div className="mt-4 space-y-3 pl-8">
+              {message.components.map((component, index) => (
+                <MessageComponentRenderer
+                  key={component.id || index}
+                  component={component}
+                  onAction={onComponentAction || (() => {})}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
       
@@ -90,7 +113,7 @@ const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast, ch
 
 type ChatMode = 'default' | 'socratic' | 'claude';
 
-export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
+export default function ChatInterface({ currentUserId, enableOrientator = false }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -106,12 +129,98 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
   const [showConversations, setShowConversations] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editingTitleValue, setEditingTitleValue] = useState('');
-  const [chatMode, setChatMode] = useState<ChatMode>('default');
+  const [chatMode, setChatMode] = useState<ChatMode>(() => {
+    // Restore chat mode from localStorage
+    if (typeof window !== 'undefined') {
+      const savedMode = localStorage.getItem('chat_mode');
+      return (savedMode as ChatMode) || 'default';
+    }
+    return 'default';
+  });
   const [showModeSelector, setShowModeSelector] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Persist chat mode changes to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chat_mode', chatMode);
+    }
+  }, [chatMode]);
+
+  // Handle component actions from Orientator messages
+  const handleComponentAction = useCallback(async (action: ComponentAction, componentId: string) => {
+    console.log('Component action:', action, 'for component:', componentId);
+    
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      switch (action.type) {
+        case 'save':
+          const saveResponse = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/orientator/save-component`,
+            {
+              component_id: componentId,
+              conversation_id: currentConversation?.id,
+              ...action.params
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          
+          // Add save confirmation message
+          const confirmationMessage: Message = {
+            id: Date.now(),
+            role: 'system',
+            content: '',
+            created_at: new Date().toISOString(),
+            components: [{
+              id: `save-confirm-${Date.now()}`,
+              type: MessageComponentType.SAVE_CONFIRMATION,
+              data: saveResponse.data,
+              actions: [],
+              saved: true
+            }]
+          };
+          
+          setMessages(prev => [...prev, confirmationMessage]);
+          break;
+          
+        case 'explore':
+        case 'start':
+          // Handle exploration or start actions
+          if (action.endpoint) {
+            const response = await axios.post(
+              `${process.env.NEXT_PUBLIC_API_URL}${action.endpoint}`,
+              action.params,
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
+            // Handle response based on action type
+          }
+          break;
+          
+        default:
+          console.log('Unhandled action type:', action.type);
+      }
+    } catch (error) {
+      console.error('Failed to handle component action:', error);
+    }
+  }, [currentConversation, router]);
 
   // Load conversation when selected
   useEffect(() => {
@@ -157,22 +266,32 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
     console.log('Loading messages for conversation:', currentConversation.id);
     
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${currentConversation.id}/messages`,
-        {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
+      // Use Orientator endpoint if enabled to get messages with components
+      const endpoint = enableOrientator 
+        ? `${process.env.NEXT_PUBLIC_API_URL}/orientator/conversations/${currentConversation.id}/messages`
+        : `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${currentConversation.id}/messages`;
+        
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
-      );
+      });
 
       console.log('Messages API response:', response.data);
       
-      // Handle both unified format {"messages": [...]} and legacy format [...]
+      // Handle different response formats
       let messagesData;
       if (response.data.messages) {
-        // Unified format from conversations_router  
-        messagesData = response.data.messages;
+        // Unified format with components support
+        messagesData = response.data.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          created_at: msg.created_at,
+          components: msg.components || [],
+          metadata: msg.metadata,
+          tokens_used: msg.tokens_used
+        }));
         console.log('Using unified format - Number of messages loaded:', messagesData.length);
       } else if (Array.isArray(response.data)) {
         // Legacy format from chat_router (fallback)
@@ -186,7 +305,30 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       setMessages(messagesData);
     } catch (error) {
       console.error('Failed to load conversation messages:', error);
-      setMessages([]);
+      // Fallback to regular chat endpoint if Orientator endpoint fails
+      if (enableOrientator) {
+        try {
+          const fallbackResponse = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${currentConversation.id}/messages`,
+            {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+              }
+            }
+          );
+          
+          const fallbackData = Array.isArray(fallbackResponse.data) 
+            ? fallbackResponse.data 
+            : fallbackResponse.data.messages || [];
+          setMessages(fallbackData);
+          console.log('Loaded messages using fallback endpoint');
+        } catch (fallbackError) {
+          console.error('Both Orientator and fallback endpoints failed:', fallbackError);
+          setMessages([]);
+        }
+      } else {
+        setMessages([]);
+      }
     }
   };
 
@@ -240,9 +382,17 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       }
 
       // Send message to existing conversation
+      const endpoint = enableOrientator 
+        ? `${process.env.NEXT_PUBLIC_API_URL}/orientator/message`
+        : `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/send/${conversationId}`;
+        
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/send/${conversationId}`,
-        {
+        endpoint,
+        enableOrientator ? {
+          message: userMessage,
+          conversation_id: conversationId,
+          mode: chatMode
+        } : {
           message: userMessage,
           mode: chatMode
         },
@@ -255,21 +405,37 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
       );
       
       // Add both user and assistant messages
-      const newMessages: Message[] = [
-        {
-          id: response.data.user_message_id,
-          role: 'user',
-          content: userMessage,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: response.data.assistant_message_id,
-          role: 'assistant',
-          content: response.data.response,
-          created_at: new Date().toISOString(),
-          tokens_used: response.data.tokens_used
-        }
-      ];
+      let newMessages: Message[] = [];
+      
+      if (enableOrientator && response.data.messages) {
+        // Orientator format with components
+        newMessages = response.data.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          created_at: msg.created_at,
+          components: msg.components,
+          metadata: msg.metadata,
+          tokens_used: msg.tokens_used
+        }));
+      } else {
+        // Standard chat format
+        newMessages = [
+          {
+            id: response.data.user_message_id,
+            role: 'user',
+            content: userMessage,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: response.data.assistant_message_id,
+            role: 'assistant',
+            content: response.data.response,
+            created_at: new Date().toISOString(),
+            tokens_used: response.data.tokens_used
+          }
+        ];
+      }
       
       setMessages(prev => [...prev, ...newMessages]);
       setChatStarted(true); // Transition to full chat interface after sending first message
@@ -649,6 +815,13 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
+            {/* Orientator Mode Indicator */}
+            {enableOrientator && (
+              <div className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full border border-green-200">
+                🤖 Orientator AI
+              </div>
+            )}
+            
             {/* Mode Indicator/Selector */}
             <div className="relative">
               <button
@@ -717,13 +890,14 @@ export default function ChatInterface({ currentUserId }: ChatInterfaceProps) {
         <div className="max-w-4xl mx-auto">
           <div className="space-y-8">
             {(messages || [])
-              .filter(message => message.role !== 'system')
+              .filter(message => message.role !== 'system' || (message.components && message.components.length > 0))
               .map((message, index) => (
                 <PaperChatMessage 
                   key={message.id} 
                   message={message}
                   isLast={index === messages.length - 1}
                   chatMode={chatMode}
+                  onComponentAction={enableOrientator ? handleComponentAction : undefined}
                 />
               ))}
             
