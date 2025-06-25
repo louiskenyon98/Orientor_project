@@ -43,6 +43,78 @@ router = APIRouter(
     }
 )
 
+# Test endpoint without authentication that mimics real flow
+@router.post("/test-message")
+async def test_orientator_message(
+    request: dict,
+    db: Session = Depends(get_db)
+) -> dict:
+    """
+    Test endpoint for Orientator AI without authentication.
+    Returns mock rich components for frontend testing.
+    """
+    try:
+        logger.info(f"Test Orientator message: {request.get('message', '')}")
+        
+        # Create mock tool results
+        mock_tool_results = [
+            {
+                "tool_name": "career_tree",
+                "result": type('MockResult', (), {
+                    'success': True,
+                    'data': {"career_path": "Data Scientist"},
+                    'metadata': {"source": "career_tree"}
+                })()
+            },
+            {
+                "tool_name": "esco_skills", 
+                "result": type('MockResult', (), {
+                    'success': True,
+                    'data': {"skills": ["Python", "Statistics", "Machine Learning"]},
+                    'metadata': {"source": "esco_skills"}
+                })()
+            },
+            {
+                "tool_name": "oasis_explorer",
+                "result": type('MockResult', (), {
+                    'success': True,
+                    'data': {"jobs": ["Data Scientist", "ML Engineer", "Data Analyst"]},
+                    'metadata': {"source": "oasis_explorer"}
+                })()
+            }
+        ]
+        
+        # Mock intent
+        mock_intent = {
+            "intent": "career_exploration",
+            "entities": {"career_goals": "data scientist"},
+            "confidence": 0.95,
+            "suggested_tools": ["career_tree", "esco_skills", "oasis_explorer"]
+        }
+        
+        message = request.get('message', 'I want to become a data scientist')
+        
+        # Generate response with components  
+        response = await orientator_service.generate_response(message, mock_intent, mock_tool_results)
+        
+        # Convert to response format without database storage
+        from app.schemas.orientator import MessageComponent as MessageComponentSchema
+        return {
+            "message_id": 999999,
+            "role": "assistant",
+            "content": response.content,
+            "components": [MessageComponentSchema(**c.dict()).dict() for c in response.components],
+            "metadata": response.metadata,
+            "created_at": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in test endpoint: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Test failed: {str(e)}"
+        )
+
 # Initialize service
 orientator_service = OrientatorAIService()
 
@@ -50,8 +122,8 @@ orientator_service = OrientatorAIService()
 @router.post("/message", response_model=OrientatorMessageResponse)
 async def send_orientator_message(
     request: OrientatorMessageRequest,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ) -> OrientatorMessageResponse:
     """
     Process a message with Orientator AI.

@@ -66,6 +66,12 @@ interface PaperChatMessageProps {
 const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast, chatMode, onComponentAction }) => {
   const isUser = message.role === 'user';
   
+  // Debug logging for message rendering
+  if (!isUser && message.components && message.components.length > 0) {
+    console.log('🎨 Rendering message with', message.components.length, 'components');
+    console.log('🧩 Component types:', message.components.map(c => c.type));
+  }
+  
   return (
     <div className="space-y-4">
       {/* AI/System message with mode-specific accent */}
@@ -114,6 +120,10 @@ const PaperChatMessage: React.FC<PaperChatMessageProps> = ({ message, isLast, ch
 type ChatMode = 'default' | 'socratic' | 'claude';
 
 export default function ChatInterface({ currentUserId, enableOrientator = false }: ChatInterfaceProps) {
+  
+  console.log('🔧 ChatInterface initialized with:');
+  console.log('   currentUserId:', currentUserId);
+  console.log('   enableOrientator:', enableOrientator);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -164,7 +174,7 @@ export default function ChatInterface({ currentUserId, enableOrientator = false 
       switch (action.type) {
         case 'save':
           const saveResponse = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/orientator/save-component`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/orientator/save-component`,
             {
               component_id: componentId,
               conversation_id: currentConversation?.id,
@@ -383,43 +393,78 @@ export default function ChatInterface({ currentUserId, enableOrientator = false 
 
       // Send message to existing conversation
       const endpoint = enableOrientator 
-        ? `${process.env.NEXT_PUBLIC_API_URL}/orientator/message`
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/orientator/test-message`
         : `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/send/${conversationId}`;
+      
+      console.log('🚀 Sending message to endpoint:', endpoint);
+      console.log('🤖 Orientator enabled:', enableOrientator);
+      console.log('💬 Message payload:', enableOrientator ? {
+        message: userMessage,
+        conversation_id: conversationId,
+        mode: chatMode
+      } : { message: userMessage, mode: chatMode });
         
       const response = await axios.post(
         endpoint,
         enableOrientator ? {
-          message: userMessage,
-          conversation_id: conversationId,
-          mode: chatMode
+          message: userMessage
         } : {
           message: userMessage,
           mode: chatMode
         },
         {
-          headers: {
+          headers: enableOrientator ? {
+            'Content-Type': 'application/json'
+          } : {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }
       );
       
+      console.log('📨 Response received:', response.data);
+      console.log('🔍 Response has message_id:', !!response.data.message_id);
+      console.log('🧩 Response has components:', !!response.data.components, response.data.components?.length || 0);
+      
       // Add both user and assistant messages
       let newMessages: Message[] = [];
       
-      if (enableOrientator && response.data.messages) {
-        // Orientator format with components
-        newMessages = response.data.messages.map((msg: any) => ({
-          id: msg.id,
-          role: msg.role,
-          content: msg.content,
-          created_at: msg.created_at,
-          components: msg.components,
-          metadata: msg.metadata,
-          tokens_used: msg.tokens_used
-        }));
+      console.log('🔍 Checking Orientator conditions:');
+      console.log('   enableOrientator:', enableOrientator);
+      console.log('   response.data.message_id:', response.data.message_id);
+      console.log('   Both conditions met:', enableOrientator && response.data.message_id);
+      
+      if (enableOrientator && response.data.message_id) {
+        // Orientator format with components - single message response
+        console.log('✅ Using Orientator format!');
+        newMessages = [
+          {
+            id: Date.now(), // User message ID
+            role: 'user',
+            content: userMessage,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: response.data.message_id,
+            role: response.data.role,
+            content: response.data.content,
+            created_at: response.data.created_at,
+            components: response.data.components,
+            metadata: response.data.metadata,
+            tokens_used: response.data.tokens_used
+          }
+        ];
+        
+        console.log('✅ Created Orientator messages:', newMessages.length);
+        console.log('🎨 Assistant message components:', newMessages[1]?.components?.length || 0);
+        if (newMessages[1]?.components?.length > 0) {
+          newMessages[1].components.forEach((comp, i) => {
+            console.log(`   ${i+1}. ${comp.type} component with ${comp.actions?.length || 0} actions`);
+          });
+        }
       } else {
         // Standard chat format
+        console.log('❌ Using standard chat format!');
         newMessages = [
           {
             id: response.data.user_message_id,
