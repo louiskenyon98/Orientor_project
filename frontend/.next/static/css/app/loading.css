@@ -1,0 +1,120 @@
+/*!*************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[7].use[3]!./src/styles/loading.module.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************/
+/* The loader container */
+.loading_loader__pJwS6 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 100px;
+  margin-top: -100px;
+  margin-left: -100px;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.loading_loader--reflect__uVb8r {
+  margin-top: 0;
+}
+
+.loading_loader--reflect__uVb8r:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 110%;
+  background: linear-gradient(0deg, rgba(238, 238, 238, 1), rgba(238, 238, 238, 1) 20%, rgba(238, 238, 238, 0.3));
+}
+
+/* The bar */
+.loading_bar__NR08v {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 20px;
+  height: 100px;
+  background-color: #1e3f57;
+  transform: scaleY(0);
+  transform-style: preserve-3d;
+  animation: loading_bar__NR08v 1.5s cubic-bezier(.81,.04,.4,.7) infinite;
+}
+
+.loading_bar__NR08v:nth-child(2) {
+  left: 20px;
+  background-color: #264a63;
+  animation-delay: 25ms;
+}
+
+.loading_bar__NR08v:nth-child(3) {
+  left: 40px;
+  background-color: #2d566f;
+  animation-delay: 50ms;
+}
+
+.loading_bar__NR08v:nth-child(4) {
+  left: 60px;
+  background-color: #35617a;
+  animation-delay: 75ms;
+}
+
+.loading_bar__NR08v:nth-child(5) {
+  left: 80px;
+  background-color: #3d6d86;
+  animation-delay: 100ms;
+}
+
+.loading_bar__NR08v:nth-child(6) {
+  left: 100px;
+  background-color: #447892;
+  animation-delay: 125ms;
+}
+
+.loading_bar__NR08v:nth-child(7) {
+  left: 120px;
+  background-color: #4c849e;
+  animation-delay: 150ms;
+}
+
+.loading_bar__NR08v:nth-child(8) {
+  left: 140px;
+  background-color: #548fa9;
+  animation-delay: 175ms;
+}
+
+.loading_bar__NR08v:nth-child(9) {
+  left: 160px;
+  background-color: #5c9bb5;
+  animation-delay: 200ms;
+}
+
+.loading_bar__NR08v:nth-child(10) {
+  left: 180px;
+  background-color: #63a6c1;
+  animation-delay: 225ms;
+}
+
+.loading_loader--reflect__uVb8r .loading_bar__NR08v {
+  animation-name: loading_bar-reflect__GCBQy;
+}
+
+@keyframes loading_bar__NR08v {
+  0% {
+    transform: rotateZ(-180deg) rotateX(-360deg);
+  }
+
+  75%,100% {
+    transform: rotateZ(0) rotateX(0);
+  }
+}
+
+@keyframes loading_bar-reflect__GCBQy {
+  0% {
+    transform: rotateZ(180deg) rotateX(360deg);
+  }
+
+  75%,100% {
+    transform: rotateZ(0) rotateX(0);
+  }
+} 

@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"../app/login/page.tsx -> ../../services/onboardingService\":{\"id\":\"../app/login/page.tsx -> ../../services/onboardingService\",\"files\":[\"static/chunks/_app-pages-browser_src_services_onboardingService_ts.js\"]}}"

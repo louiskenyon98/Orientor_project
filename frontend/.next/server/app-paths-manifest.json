@@ -1,0 +1,9 @@
+{
+  "/not-found": "app/not-found.js",
+  "/page": "app/page.js",
+  "/chat/page": "app/chat/page.js",
+  "/login/page": "app/login/page.js",
+  "/onboarding/page": "app/onboarding/page.js",
+  "/landing/page": "app/landing/page.js",
+  "/space/page": "app/space/page.js"
+}

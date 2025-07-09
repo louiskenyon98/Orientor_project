@@ -1,0 +1,1273 @@
+/*!***********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!./node_modules/reactflow/dist/style.css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************/
+/* this gets exported as style.css and can be used for the default theming */
+/* these are the necessary styles for React Flow, they get used by base.css and style.css */
+.react-flow {
+  direction: ltr;
+}
+.react-flow__container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.react-flow__pane {
+  z-index: 1;
+  cursor: grab;
+}
+.react-flow__pane.selection {
+    cursor: pointer;
+  }
+.react-flow__pane.dragging {
+    cursor: grabbing;
+  }
+.react-flow__viewport {
+  transform-origin: 0 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.react-flow__renderer {
+  z-index: 4;
+}
+.react-flow__selection {
+  z-index: 6;
+}
+.react-flow__nodesselection-rect:focus,
+.react-flow__nodesselection-rect:focus-visible {
+  outline: none;
+}
+.react-flow .react-flow__edges {
+  pointer-events: none;
+  overflow: visible;
+}
+.react-flow__edge-path,
+.react-flow__connection-path {
+  stroke: #b1b1b7;
+  stroke-width: 1;
+  fill: none;
+}
+.react-flow__edge {
+  pointer-events: visibleStroke;
+  cursor: pointer;
+}
+.react-flow__edge.animated path {
+    stroke-dasharray: 5;
+    animation: dashdraw 0.5s linear infinite;
+  }
+.react-flow__edge.animated path.react-flow__edge-interaction {
+    stroke-dasharray: none;
+    animation: none;
+  }
+.react-flow__edge.inactive {
+    pointer-events: none;
+  }
+.react-flow__edge.selected,
+  .react-flow__edge:focus,
+  .react-flow__edge:focus-visible {
+    outline: none;
+  }
+.react-flow__edge.selected .react-flow__edge-path,
+  .react-flow__edge:focus .react-flow__edge-path,
+  .react-flow__edge:focus-visible .react-flow__edge-path {
+    stroke: #555;
+  }
+.react-flow__edge-textwrapper {
+    pointer-events: all;
+  }
+.react-flow__edge-textbg {
+    fill: white;
+  }
+.react-flow__edge .react-flow__edge-text {
+    pointer-events: none;
+    -webkit-user-select: none;
+            user-select: none;
+  }
+.react-flow__connection {
+  pointer-events: none;
+}
+.react-flow__connection .animated {
+    stroke-dasharray: 5;
+    animation: dashdraw 0.5s linear infinite;
+  }
+.react-flow__connectionline {
+  z-index: 1001;
+}
+.react-flow__nodes {
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+.react-flow__node {
+  position: absolute;
+  -webkit-user-select: none;
+          user-select: none;
+  pointer-events: all;
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  cursor: grab;
+}
+.react-flow__node.dragging {
+    cursor: grabbing;
+  }
+.react-flow__nodesselection {
+  z-index: 3;
+  transform-origin: left top;
+  pointer-events: none;
+}
+.react-flow__nodesselection-rect {
+    position: absolute;
+    pointer-events: all;
+    cursor: grab;
+  }
+.react-flow__handle {
+  position: absolute;
+  pointer-events: none;
+  min-width: 5px;
+  min-height: 5px;
+  width: 6px;
+  height: 6px;
+  background: #1a192b;
+  border: 1px solid white;
+  border-radius: 100%;
+}
+.react-flow__handle.connectionindicator {
+    pointer-events: all;
+    cursor: crosshair;
+  }
+.react-flow__handle-bottom {
+    top: auto;
+    left: 50%;
+    bottom: -4px;
+    transform: translate(-50%, 0);
+  }
+.react-flow__handle-top {
+    left: 50%;
+    top: -4px;
+    transform: translate(-50%, 0);
+  }
+.react-flow__handle-left {
+    top: 50%;
+    left: -4px;
+    transform: translate(0, -50%);
+  }
+.react-flow__handle-right {
+    right: -4px;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+.react-flow__edgeupdater {
+  cursor: move;
+  pointer-events: all;
+}
+.react-flow__panel {
+  position: absolute;
+  z-index: 5;
+  margin: 15px;
+}
+.react-flow__panel.top {
+    top: 0;
+  }
+.react-flow__panel.bottom {
+    bottom: 0;
+  }
+.react-flow__panel.left {
+    left: 0;
+  }
+.react-flow__panel.right {
+    right: 0;
+  }
+.react-flow__panel.center {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+.react-flow__attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 2px 3px;
+  margin: 0;
+}
+.react-flow__attribution a {
+    text-decoration: none;
+    color: #999;
+  }
+@keyframes dashdraw {
+  from {
+    stroke-dashoffset: 10;
+  }
+}
+.react-flow__edgelabel-renderer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-user-select: none;
+          user-select: none;
+}
+.react-flow__edge.updating .react-flow__edge-path {
+      stroke: #777;
+    }
+.react-flow__edge-text {
+    font-size: 10px;
+  }
+.react-flow__node.selectable:focus,
+  .react-flow__node.selectable:focus-visible {
+    outline: none;
+  }
+.react-flow__node-default,
+.react-flow__node-input,
+.react-flow__node-output,
+.react-flow__node-group {
+  padding: 10px;
+  border-radius: 3px;
+  width: 150px;
+  font-size: 12px;
+  color: #222;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #1a192b;
+  background-color: white;
+}
+.react-flow__node-default.selectable:hover, .react-flow__node-input.selectable:hover, .react-flow__node-output.selectable:hover, .react-flow__node-group.selectable:hover {
+      box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.08);
+    }
+.react-flow__node-default.selectable.selected,
+    .react-flow__node-default.selectable:focus,
+    .react-flow__node-default.selectable:focus-visible,
+    .react-flow__node-input.selectable.selected,
+    .react-flow__node-input.selectable:focus,
+    .react-flow__node-input.selectable:focus-visible,
+    .react-flow__node-output.selectable.selected,
+    .react-flow__node-output.selectable:focus,
+    .react-flow__node-output.selectable:focus-visible,
+    .react-flow__node-group.selectable.selected,
+    .react-flow__node-group.selectable:focus,
+    .react-flow__node-group.selectable:focus-visible {
+      box-shadow: 0 0 0 0.5px #1a192b;
+    }
+.react-flow__node-group {
+  background-color: rgba(240, 240, 240, 0.25);
+}
+.react-flow__nodesselection-rect,
+.react-flow__selection {
+  background: rgba(0, 89, 220, 0.08);
+  border: 1px dotted rgba(0, 89, 220, 0.8);
+}
+.react-flow__nodesselection-rect:focus,
+  .react-flow__nodesselection-rect:focus-visible,
+  .react-flow__selection:focus,
+  .react-flow__selection:focus-visible {
+    outline: none;
+  }
+.react-flow__controls {
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
+}
+.react-flow__controls-button {
+    border: none;
+    background: #fefefe;
+    border-bottom: 1px solid #eee;
+    box-sizing: content-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    -webkit-user-select: none;
+            user-select: none;
+    padding: 5px;
+  }
+.react-flow__controls-button:hover {
+      background: #f4f4f4;
+    }
+.react-flow__controls-button svg {
+      width: 100%;
+      max-width: 12px;
+      max-height: 12px;
+    }
+.react-flow__controls-button:disabled {
+      pointer-events: none;
+    }
+.react-flow__controls-button:disabled svg {
+        fill-opacity: 0.4;
+      }
+.react-flow__minimap {
+  background-color: #fff;
+}
+.react-flow__minimap svg {
+  display: block;
+}
+.react-flow__resize-control {
+  position: absolute;
+}
+.react-flow__resize-control.left,
+.react-flow__resize-control.right {
+  cursor: ew-resize;
+}
+.react-flow__resize-control.top,
+.react-flow__resize-control.bottom {
+  cursor: ns-resize;
+}
+.react-flow__resize-control.top.left,
+.react-flow__resize-control.bottom.right {
+  cursor: nwse-resize;
+}
+.react-flow__resize-control.bottom.left,
+.react-flow__resize-control.top.right {
+  cursor: nesw-resize;
+}
+/* handle styles */
+.react-flow__resize-control.handle {
+  width: 4px;
+  height: 4px;
+  border: 1px solid #fff;
+  border-radius: 1px;
+  background-color: #3367d9;
+  transform: translate(-50%, -50%);
+}
+.react-flow__resize-control.handle.left {
+  left: 0;
+  top: 50%;
+}
+.react-flow__resize-control.handle.right {
+  left: 100%;
+  top: 50%;
+}
+.react-flow__resize-control.handle.top {
+  left: 50%;
+  top: 0;
+}
+.react-flow__resize-control.handle.bottom {
+  left: 50%;
+  top: 100%;
+}
+.react-flow__resize-control.handle.top.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.bottom.left {
+  left: 0;
+}
+.react-flow__resize-control.handle.top.right {
+  left: 100%;
+}
+.react-flow__resize-control.handle.bottom.right {
+  left: 100%;
+}
+/* line styles */
+.react-flow__resize-control.line {
+  border-color: #3367d9;
+  border-width: 0;
+  border-style: solid;
+}
+.react-flow__resize-control.line.left,
+.react-flow__resize-control.line.right {
+  width: 1px;
+  transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+}
+.react-flow__resize-control.line.left {
+  left: 0;
+  border-left-width: 1px;
+}
+.react-flow__resize-control.line.right {
+  left: 100%;
+  border-right-width: 1px;
+}
+.react-flow__resize-control.line.top,
+.react-flow__resize-control.line.bottom {
+  height: 1px;
+  transform: translate(0, -50%);
+  left: 0;
+  width: 100%;
+}
+.react-flow__resize-control.line.top {
+  top: 0;
+  border-top-width: 1px;
+}
+.react-flow__resize-control.line.bottom {
+  border-bottom-width: 1px;
+  top: 100%;
+}
+
+/*!******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!./src/components/landing/uiverse/typewrite.css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************/
+.typewriter {
+  --blue: #5C86FF;
+  --blue-dark: #275EFE;
+  --key: #fff;
+  --paper: #EEF0FD;
+  --text: #D3D4EC;
+  --tool: #FBC56C;
+  --duration: 3s;
+  position: relative;
+  animation: bounce05 var(--duration) linear infinite;
+}
+
+.typewriter .slide {
+  width: 92px;
+  height: 20px;
+  border-radius: 3px;
+  margin-left: 14px;
+  transform: translateX(14px);
+  background: linear-gradient(var(--blue), var(--blue-dark));
+  animation: slide05 var(--duration) ease infinite;
+}
+
+.typewriter .slide:before, .typewriter .slide:after,
+.typewriter .slide i:before {
+  content: "";
+  position: absolute;
+  background: var(--tool);
+}
+
+.typewriter .slide:before {
+  width: 2px;
+  height: 8px;
+  top: 6px;
+  left: 100%;
+}
+
+.typewriter .slide:after {
+  left: 94px;
+  top: 3px;
+  height: 14px;
+  width: 6px;
+  border-radius: 3px;
+}
+
+.typewriter .slide i {
+  display: block;
+  position: absolute;
+  right: 100%;
+  width: 6px;
+  height: 4px;
+  top: 4px;
+  background: var(--tool);
+}
+
+.typewriter .slide i:before {
+  right: 100%;
+  top: -2px;
+  width: 4px;
+  border-radius: 2px;
+  height: 14px;
+}
+
+.typewriter .paper {
+  position: absolute;
+  left: 24px;
+  top: -26px;
+  width: 40px;
+  height: 46px;
+  border-radius: 5px;
+  background: var(--paper);
+  transform: translateY(46px);
+  animation: paper05 var(--duration) linear infinite;
+}
+
+.typewriter .paper:before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 7px;
+  border-radius: 2px;
+  height: 4px;
+  transform: scaleY(0.8);
+  background: var(--text);
+  box-shadow: 0 12px 0 var(--text), 0 24px 0 var(--text), 0 36px 0 var(--text);
+}
+
+.typewriter .keyboard {
+  width: 120px;
+  height: 56px;
+  margin-top: -10px;
+  z-index: 1;
+  position: relative;
+}
+
+.typewriter .keyboard:before, .typewriter .keyboard:after {
+  content: "";
+  position: absolute;
+}
+
+.typewriter .keyboard:before {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  transform: perspective(10px) rotateX(2deg);
+  transform-origin: 50% 100%;
+}
+
+.typewriter .keyboard:after {
+  left: 2px;
+  top: 25px;
+  width: 11px;
+  height: 4px;
+  border-radius: 2px;
+  box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  animation: keyboard05 var(--duration) linear infinite;
+}
+
+@keyframes bounce05 {
+  85%, 92%, 100% {
+    transform: translateY(0);
+  }
+
+  89% {
+    transform: translateY(-4px);
+  }
+
+  95% {
+    transform: translateY(2px);
+  }
+}
+
+@keyframes slide05 {
+  5% {
+    transform: translateX(14px);
+  }
+
+  15%, 30% {
+    transform: translateX(6px);
+  }
+
+  40%, 55% {
+    transform: translateX(0);
+  }
+
+  65%, 70% {
+    transform: translateX(-4px);
+  }
+
+  80%, 89% {
+    transform: translateX(-12px);
+  }
+
+  100% {
+    transform: translateX(14px);
+  }
+}
+
+@keyframes paper05 {
+  5% {
+    transform: translateY(46px);
+  }
+
+  20%, 30% {
+    transform: translateY(34px);
+  }
+
+  40%, 55% {
+    transform: translateY(22px);
+  }
+
+  65%, 70% {
+    transform: translateY(10px);
+  }
+
+  80%, 85% {
+    transform: translateY(0);
+  }
+
+  92%, 100% {
+    transform: translateY(46px);
+  }
+}
+
+@keyframes keyboard05 {
+  5%, 12%, 21%, 30%, 39%, 48%, 57%, 66%, 75%, 84% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  9% {
+    box-shadow: 15px 2px 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  18% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 2px 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  27% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 12px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  36% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 12px 0 var(--key), 60px 12px 0 var(--key), 68px 12px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  45% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 2px 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  54% {
+    box-shadow: 15px 0 0 var(--key), 30px 2px 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  63% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 12px 0 var(--key);
+  }
+
+  72% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 2px 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+
+  81% {
+    box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 12px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+  }
+}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!./src/components/landing/uiverse/navigo_hoverIcon.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************/
+.light-button button.bt {
+    position: relative;
+    height: 300px;
+    display: flex;
+    align-items: flex-end;
+    outline: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .light-button button.bt .button-holder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    width: 200px;
+    background-color: #0a0a0a;
+    border-radius: 5px;
+    color: #0f0f0f;
+    font-weight: 700;
+    transition: 300ms;
+    outline: #0f0f0f 2px solid;
+    outline-offset: 20;
+  }
+  
+  .light-button button.bt .button-holder svg {
+    height: 50px;
+    fill: #0f0f0f;
+    transition: 300ms;
+  }
+
+  .light-button button.bt .button-holder img {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  
+  .light-button button.bt .light-holder {
+    position: absolute;
+    height: 300px;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .light-button button.bt .light-holder .dot {
+    position: absolute;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #0a0a0a;
+    border-radius: 10px;
+    z-index: 2;
+  }
+  
+  .light-button button.bt .light-holder .light {
+    position: absolute;
+    top: 0;
+    width: 200px;
+    height: 250px;
+    clip-path: polygon(50% 0%, 25% 100%, 75% 100%);
+    background: transparent;
+  }
+  
+  .light-button button.bt:hover .button-holder svg {
+    fill: rgba(88, 101, 242, 1);
+  }
+  
+  .light-button button.bt:hover .button-holder {
+    color: rgba(88, 101, 242, 1);
+    outline: rgba(88, 101, 242, 1) 2px solid;
+    outline-offset: 2px;
+  }
+
+  .light-button button.bt:hover .button-holder img {
+    opacity: 1;
+  }
+  
+  .light-button button.bt:hover .light-holder .light {
+    background: rgb(255, 255, 255);
+    background: linear-gradient(
+      180deg,
+      rgba(88, 101, 242, 1) 0%,
+      rgba(255, 255, 255, 0) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+  
+/*!**************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!./src/components/landing/uiverse/login.css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************/
+/* Styles premium pour les boutons de login/signup */
+.premium-login-btn {
+  font: inherit;
+  background-color: #f0f0f0;
+  border: 0;
+  color: #242424;
+  border-radius: 0.5em;
+  font-size: 1.35rem;
+  padding: 0.375em 1em;
+  font-weight: 600;
+  text-shadow: 0 0.0625em 0 #fff;
+  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
+              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
+              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
+              0 0.425em 0 0 #cacaca, 0 0.425em 0.5em 0 #cecece;
+  transition: 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  min-width: 120px;
+  text-align: center;
+}
+
+.premium-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
+              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
+              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
+              0 0.425em 0 0 #cacaca, 0 0.625em 1em 0 #cecece;
+}
+
+.premium-login-btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: white;
+  text-shadow: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.premium-login-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.premium-login-btn.outline {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+.premium-login-btn.outline:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Support dark mode */
+@media (prefers-color-scheme: dark) {
+  .premium-login-btn {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    text-shadow: 0 0.0625em 0 #000;
+    box-shadow: inset 0 0.0625em 0 0 #3a3a3a, 0 0.0625em 0 0 #1a1a1a,
+                0 0.125em 0 0 #1a1a1a, 0 0.25em 0 0 #0a0a0a,
+                0 0.3125em 0 0 #0a0a0a, 0 0.375em 0 0 #0a0a0a,
+                0 0.425em 0 0 #000000, 0 0.425em 0.5em 0 #000000;
+  }
+  
+  .premium-login-btn.outline {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: transparent;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .premium-login-btn {
+    font-size: 1.1rem;
+    padding: 0.5em 1.2em;
+  }
+}
+/*!*************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!./src/components/landing/landing-page.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************/
+/* Import des styles UI existants */
+
+/* Styles spécifiques à la landing page */
+.landing-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section {
+  padding: 4rem 0;
+  margin: 2rem 0;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: var(--accent); /* Fallback pour les navigateurs non compatibles */
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Styles pour les boutons premium */
+.btn {
+  font: inherit;
+  background-color: #f0f0f0;
+  border: 0;
+  color: #242424;
+  border-radius: 0.5em;
+  font-size: 1.35rem;
+  padding: 0.375em 1em;
+  font-weight: 600;
+  text-shadow: 0 0.0625em 0 #fff;
+  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
+              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
+              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
+              0 0.425em 0 0 #cacaca, 0 0.425em 0.5em 0 #cecece;
+  transition: 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  min-width: 120px;
+  text-align: center;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
+              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
+              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
+              0 0.425em 0 0 #cacaca, 0 0.625em 1em 0 #cecece;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: white;
+  text-shadow: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Header avec logo */
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+}
+
+/* Section Talk to Navigo avec typewriter */
+.talk-to-navigo-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.talk-to-navigo-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Cartes de diagnostic */
+.diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  margin: 2rem 0;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Ajustement de la largeur des cartes pour la grille */
+.diagnostic-grid .card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  border-radius: 24px;
+  line-height: 1.6;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  background: transparent;
+}
+
+.diagnostic-grid .card .content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 36px;
+  border-radius: 22px;
+  color: #ffffff;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card .content::before {
+  position: absolute;
+  content: "";
+  top: -4%;
+  left: 50%;
+  width: 90%;
+  height: 90%;
+  transform: translate(-50%);
+  background: #ced8ff;
+  z-index: -1;
+  transform-origin: bottom;
+  border-radius: inherit;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card .content::after {
+  position: absolute;
+  content: "";
+  top: -8%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%);
+  background: #e7ecff;
+  z-index: -2;
+  transform-origin: bottom;
+  border-radius: inherit;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card .content svg {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  z-index: 1;
+}
+
+.diagnostic-grid .card .content .para {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  font-size: 18px;
+  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.diagnostic-grid .card:hover {
+  transform: translate(0px, -16px);
+}
+
+.diagnostic-grid .card:hover .content::before {
+  rotate: -8deg;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.diagnostic-grid .card:hover .content::after {
+  rotate: 8deg;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Variantes de couleurs pour les cartes */
+.diagnostic-grid .card-problem-1 .content {
+  background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+}
+
+.diagnostic-grid .card-problem-2 .content {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+}
+
+.diagnostic-grid .card-solution-1 .content {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+}
+
+.diagnostic-grid .card-solution-2 .content {
+  background: linear-gradient(135deg, #1abc9c, #16a085) !important;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .diagnostic-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-container {
+    padding: 1rem;
+  }
+  
+  .landing-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .talk-to-navigo-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .talk-to-navigo-title {
+    font-size: 1.8rem;
+  }
+  
+  .typewriter {
+    transform: scale(0.8);
+  }
+  
+  .light-button button.bt {
+    height: 150px;
+  }
+  
+  .light-button button.bt .button-holder {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .diagnostic-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .diagnostic-grid .card {
+    max-width: 280px;
+  }
+  
+  .btn {
+    font-size: 1.1rem;
+    padding: 0.5em 1.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  .talk-to-navigo-title {
+    font-size: 1.5rem;
+  }
+  
+  .typewriter {
+    transform: scale(0.6);
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
+}
+
+/* Support dark mode */
+@media (prefers-color-scheme: dark) {
+  .btn {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    text-shadow: 0 0.0625em 0 #000;
+    box-shadow: inset 0 0.0625em 0 0 #3a3a3a, 0 0.0625em 0 0 #1a1a1a,
+                0 0.125em 0 0 #1a1a1a, 0 0.25em 0 0 #0a0a0a,
+                0 0.3125em 0 0 #0a0a0a, 0 0.375em 0 0 #0a0a0a,
+                0 0.425em 0 0 #000000, 0 0.425em 0.5em 0 #000000;
+  }
+  
+  .btn-outline {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: transparent;
+  }
+}
+
+/* Animations supplémentaires */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Amélioration de l'accessibilité */
+.btn:focus,
+.light-button button.bt:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Optimisation des performances */
+.card,
+.typewriter,
+.light-button {
+  will-change: transform;
+}
+
+.card:hover,
+.typewriter,
+.light-button button.bt:hover {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.radiogroup {
+  padding: 48px 64px;
+  border-radius: 16px;
+  background: #ecf0f3;
+  box-shadow: 4px 4px 4px 0px #d1d9e6 inset, -4px -4px 4px 0px #ffffff inset;
+}
+
+.wrapper {
+  margin: 24px 0;
+  position: relative;
+}
+
+.wrapper:first-child {
+  margin-top: 0;
+}
+
+.wrapper:last-child {
+  margin-bottom: 0;
+}
+
+.state {
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 1e-5;
+  pointer-events: none;
+}
+
+.label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  color: #394a56;
+  width: 100%;
+  transition: transform 0.2s ease;
+}
+
+.label:hover {
+  transform: translateX(4px);
+}
+
+.text {
+  margin-left: 16px;
+  flex: 1;
+  transition: opacity 0.2s linear, transform 0.2s ease-out;
+}
+
+.indicator {
+  position: relative;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+  flex-shrink: 0;
+  box-shadow: -8px -4px 8px 0px #ffffff, 8px 4px 12px 0px #d1d9e6;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.indicator::before,
+.indicator::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  height: 80%;
+  width: 80%;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.indicator::before {
+  box-shadow: -4px -2px 4px 0px #d1d9e6, 4px 2px 8px 0px #fff;
+}
+
+.indicator::after {
+  background-color: #ecf0f3;
+  box-shadow: -4px -2px 4px 0px #fff, 4px 2px 8px 0px #d1d9e6;
+  transform: scale3d(1, 1, 1);
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+}
+
+.state:checked ~ .label .indicator {
+  transform: scale(0.95);
+}
+
+.state:checked ~ .label .indicator::after {
+  transform: scale3d(0.975, 0.975, 1) translate3d(0, 10%, 0);
+  opacity: 0;
+  background-color: #4f46e5;
+}
+
+.state:checked ~ .label .text {
+  transform: translate3d(8px, 0, 0);
+  opacity: 1;
+}
+
+.state:focus ~ .label .text {
+  transform: translate3d(8px, 0, 0);
+  opacity: 1;
+}
+
+.label:hover .text {
+  opacity: 1;
+}

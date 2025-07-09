@@ -1,0 +1,14 @@
+
+> frontend@1.0.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+  ▲ Next.js 13.5.11
+  - Local:        http://localhost:3002
+  - Environments: .env
+  - Experiments (use at your own risk):
+     · optimizeCss
+     · scrollRestoration
+
+ ✓ Ready in 1647ms

@@ -1,0 +1,15 @@
+INFO:app.routers.chat:OpenAI API Key exists and starts with: sk-pr...
+INFO:datasets:PyTorch version 2.6.0 available.
+INFO:app.services.Oasisembedding_service:Module de formatage OaSIS importé avec succès
+/Users/philippebeliveau/miniforge3/envs/orientor/lib/python3.11/site-packages/pydantic/_internal/_config.py:373: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:app.services.esco_embedding_service384:Module de formatage ESCO importé avec succès
+INFO:app.routers.profiles:Profiles router module loaded with get_current_user from app.routes.user
+DEBUG:app.routers.profiles:Initializing profiles router module
+DEBUG:app.routers.profiles:Created profiles router with routes: ['/profiles/test', '/profiles/me', '/profiles/update', '/profiles/{user_id}']
+/Users/philippebeliveau/miniforge3/envs/orientor/lib/python3.11/site-packages/pydantic/_internal/_config.py:373: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:sentence_transformers.SentenceTransformer:Use pytorch device_name: mps
+INFO:sentence_transformers.SentenceTransformer:Load pretrained SentenceTransformer: all-MiniLM-L6-v2

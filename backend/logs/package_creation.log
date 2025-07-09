@@ -1,0 +1,8 @@
+Package creation started at Jeu  8 mai 2025 17:36:27 EDT
+Removed old deployment package.
+Creating new deployment package...
+Deployment package created successfully at ../deploy.zip
+Package size: 987M
+WARNING: Package is still larger than 200MB and may cause deployment issues!
+Consider further removing large files or libraries.
+Package creation completed at Jeu  8 mai 2025 17:36:30 EDT

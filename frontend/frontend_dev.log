@@ -1,0 +1,18 @@
+
+> frontend@1.0.0 dev
+> next dev
+
+  ▲ Next.js 13.5.11
+  - Local:        http://localhost:3000
+  - Environments: .env
+  - Experiments (use at your own risk):
+     · optimizeCss
+     · scrollRestoration
+
+ ✓ Ready in 1333ms
+ ✓ Compiled /page in 2.3s (2108 modules)
+ ✓ Compiled /chat/page in 754ms (2322 modules)
+ ✓ Compiled /not-found in 163ms (1186 modules)
+ ✓ Compiled /login/page in 453ms (2321 modules)
+ ✓ Compiled /_error in 441ms (2516 modules)
+Time 2.957792

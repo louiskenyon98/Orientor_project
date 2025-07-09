@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+      - DATABASE_URL=postgresql://postgres:pjvubkQRLZHUsdodRVLXUjEydHOpjXLL@caboose.proxy.rlwy.net:42911/railway
+      - SECRET_KEY=2fae399372646d30cefdf57065c3a000ab9b90d553c7dade460bdb0c18615f87
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - OPENAI_API_KEY=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
+      - PINECONE_API_KEY=pcsk_6eU2os_NtYFPGLFcUQjykH8f6LGmWEKtpEWC9QPBPqCyjcu7yAg7TUe2QMdX8wnGWduPDB
+      - PINECONE_ENVIRONMENT=us-east-1
+      - REACTIVE_RESUME_API_URL=http://localhost:3100/api
+      - REACTIVE_RESUME_JWT_SECRET=2fae399372646d30cefdf57065c3a000ab9b90d553c7dade460bdb0c18615f87
+      - FRONTEND_URL=http://localhost:3000
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge 
+x
+X
+
