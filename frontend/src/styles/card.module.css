@@ -1,7 +1,9 @@
 /* UserCard following exact UI format with platform colors */
 .card {
-  width: 320px;
-  height: 320px;
+  width: 100%;
+  max-width: 320px;
+  height: 280px;
+  min-height: 280px;
   background: var(--card, rgba(255, 255, 255, 0.9));
   border-radius: 32px;
   padding: 3px;
@@ -9,6 +11,11 @@
   box-shadow: var(--glow-secondary, 0 0 15px rgba(0, 80, 157, 0.4)) 0px 70px 30px -50px;
   transition: all 0.5s ease-in-out;
   border: 1px solid var(--border, rgba(0, 80, 157, 0.3));
+  /* Touch optimization */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  cursor: pointer;
 }
 
 .card .mail {
@@ -18,6 +25,13 @@
   background: transparent;
   border: none;
   cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .card .mail svg {
@@ -216,14 +230,21 @@
   color: var(--royal-blue-traditional, #00296bff);
   border: none;
   border-radius: 20px;
-  font-size: 0.75rem;
-  padding: 0.6rem 1rem;
+  font-size: 0.875rem;
+  padding: 0.75rem 1.25rem;
+  min-height: 44px;
+  min-width: 100px;
   box-shadow: var(--glow-primary, 0 0 20px rgba(253, 197, 0, 0.3)) 0px 5px 5px 0px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card__btn:hover {
@@ -233,8 +254,11 @@
   box-shadow: var(--glow-hover, 0 0 25px rgba(253, 197, 0, 0.5)) 0px 8px 15px 0px;
 }
 
-/* Hover effects - exactly following the UI format */
-.card:hover {
+/* Touch and hover effects - mobile-first approach */
+.card:hover,
+.card:active,
+.card:focus {
+  outline: none;
   border-top-left-radius: 55px;
   box-shadow: var(--glow-hover, 0 0 25px rgba(253, 197, 0, 0.5)) 0px 70px 30px -50px;
 }
@@ -319,6 +343,43 @@
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    max-width: none;
+    height: 240px;
+    border-radius: 20px;
+    margin: 0 auto;
+  }
+  
+  .card__title {
+    font-size: 1.1rem;
+  }
+  
+  .card__subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .card__btn {
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    min-height: 44px;
+  }
+  
+  /* Reduce hover effects on mobile, focus on touch */
+  .card:hover .bottom {
+    top: 30%;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover .card__avatar {
+    width: 100px;
+    height: 100px;
+    transition: all 0.3s ease;
   }
 }
 

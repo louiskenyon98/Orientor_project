@@ -208,16 +208,17 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <div className="relative flex w-full min-h-screen flex-col pb-12 overflow-x-hidden" style={{ backgroundColor: '#ffffff' }}>
+      <div className="relative flex w-full min-h-screen flex-col pb-20 overflow-x-hidden" style={{ backgroundColor: '#ffffff' }}>
         
         <div className="relative z-10 w-full">
-          <div className="flex-1 w-full px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
-            {/* First Section - Avatar, Colorful Cards Row, Calendar */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
-              {/* User Avatar Card (Left) - Takes 2 columns (narrower) */}
-              <div className="col-span-12 md:col-span-2 flex flex-col">
-                <div className="mb-4">
-                  <h2 className="text-xl font-semibold mb-4" style={{ color: '#000000' }}>My Progress</h2>
+          <div className="flex-1 w-full px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 max-w-none">
+            {/* Mobile-First Layout Stack */}
+            <div className="flex flex-col gap-6 mb-8">
+              
+              {/* Mobile: Progress Section */}
+              <div className="w-full">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 px-2" style={{ color: '#000000' }}>My Progress</h2>
+                <div className="w-full">
                   <UserCard
                     name={userData.name}
                     role={userData.role}
@@ -225,48 +226,51 @@ export default function Home() {
                     hollandResults={hollandResults}
                     loading={loading}
                     error={error}
-                    className="p-6 w-full"
+                    className="w-full max-w-sm mx-auto sm:max-w-none"
                     style={{
                       width: '100%',
-                      minHeight: '300px',
-                      borderRadius: '30px',
+                      maxWidth: '320px',
+                      height: '280px',
+                      borderRadius: '24px',
                       background: '#e0e0e0',
-                      boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff'
+                      boxShadow: '10px 10px 20px #bebebe, -10px -10px 20px #ffffff'
                     }}
                   />
                 </div>
               </div>
 
-              {/* Colorful Cards Row - Takes 7 columns */}
-              <div className="col-span-12 md:col-span-7" style={{ marginTop: '52px' }}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
+              {/* Mobile: Action Cards - Stacked on mobile, grid on larger screens */}
+              <div className="w-full">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 px-2" style={{ color: '#000000' }}>Today's Focus</h2>
+                <div className="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Daily Question Card */}
-                  <div className="col-span-1">
+                  <div className="w-full">
                     <ColorfulDailyQuestionCard 
                       userId={currentUserId}
-                      style={{ height: '300px' }}
+                      style={{ height: '220px' }}
                     />
                   </div>
 
                   {/* Career Goal Card */}
-                  <div className="col-span-1">
+                  <div className="w-full">
                     <ColorfulCareerGoalCard
-                      style={{ height: '300px' }}
+                      style={{ height: '220px' }}
                     />
                   </div>
 
                   {/* Classes Card */}
-                  <div className="col-span-1">
+                  <div className="w-full sm:col-span-2 lg:col-span-1">
                     <EnhancedClassesCard
                       userId={currentUserId}
-                      style={{ height: '300px' }}
+                      style={{ height: '220px' }}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Calendar (Right) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3">
+              {/* Mobile: Calendar moved to bottom, full width on mobile */}
+              <div className="w-full lg:hidden">
+                <h2 className="text-lg font-semibold mb-4 px-2" style={{ color: '#000000' }}>Schedule</h2>
                 <Calendar 
                   events={[
                     { id: '1', date: new Date(2025, 0, 20), title: 'Holland Test Review', type: 'test' },
@@ -278,10 +282,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Second Section - Top Peers, Recommended Jobs, Vector Search blended into white background */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
-              {/* Top Peers (Left) - Takes 3 columns */}
-              <div className="col-span-12 md:col-span-3">
+            {/* Mobile-First Content Sections */}
+            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 mb-8">
+              {/* Activity Section - Full width on mobile */}
+              <div className="w-full lg:col-span-4 xl:col-span-3">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Activity</h2>
                   <Link
@@ -360,8 +364,8 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Recommended Jobs with Vector Search (Center) - Takes 6 columns */}
-              <div className="col-span-12 md:col-span-6">
+              {/* Job Recommendations - Full width on mobile, larger on desktop */}
+              <div className="w-full lg:col-span-5 xl:col-span-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-semibold" style={{ color: '#000000' }}>Recommended Jobs</h2>
                   <Link
@@ -454,8 +458,20 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Events & Notes (Right) - Takes 3 columns (same as calendar) */}
-              <div className="col-span-12 md:col-span-3">
+              {/* Events & Notes + Desktop Calendar */}
+              <div className="w-full lg:col-span-3">
+                {/* Desktop Calendar - Hidden on mobile */}
+                <div className="hidden lg:block mb-6">
+                  <h2 className="text-lg font-semibold mb-4" style={{ color: '#000000' }}>Schedule</h2>
+                  <Calendar 
+                    events={[
+                      { id: '1', date: new Date(2025, 0, 20), title: 'Holland Test Review', type: 'test' },
+                      { id: '2', date: new Date(2025, 0, 25), title: 'Career Challenge', type: 'challenge' },
+                      { id: '3', date: new Date(2025, 0, 28), title: 'Peer Meetup', type: 'event' }
+                    ]}
+                    onDateClick={(date) => console.log('Date clicked:', date)}
+                  />
+                </div>
                 <EventsNotes
                   events={[
                     {

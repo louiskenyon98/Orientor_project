@@ -416,47 +416,51 @@ export default function MainLayout({
 
             {/* Mobile Bottom Navigation (only visible on smaller screens) */}
             {isLoggedIn && (
-                <div className="fixed bottom-0 left-0 right-0 w-full bg-stitch-primary border-t border-stitch-border md:hidden z-50 font-departure">
-                    <div className="grid grid-cols-4 py-2">
+                <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 md:hidden z-50 font-departure shadow-lg">
+                    <div className="grid grid-cols-4 py-1 px-2 safe-area-inset-bottom">
                         <Link 
                             href="/chat" 
-                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/chat' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
+                            className={`flex flex-col items-center justify-center text-xs font-departure py-2 px-1 rounded-lg transition-all duration-200 active:scale-95 ${pathname === '/chat' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'}`}
+                            style={{ minHeight: '60px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                         >
-                            <span className="material-icons-outlined">chat</span>
-                            <span>Chat</span>
+                            <span className="material-icons-outlined text-lg">chat</span>
+                            <span className="mt-1">Chat</span>
                         </Link>
                         <Link 
                             href="/peers" 
-                            className={`flex flex-col items-center text-xs font-departure ${pathname === '/peers' ? 'text-stitch-accent' : 'text-stitch-sage'}`}
+                            className={`flex flex-col items-center justify-center text-xs font-departure py-2 px-1 rounded-lg transition-all duration-200 active:scale-95 ${pathname === '/peers' ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'}`}
+                            style={{ minHeight: '60px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                         >
-                            <span className="material-icons-outlined">people</span>
-                            <span>Peers</span>
+                            <span className="material-icons-outlined text-lg">people</span>
+                            <span className="mt-1">Peers</span>
                         </Link>
                         
                         {/* More menu button */}
                         <div className="relative">
                             <button 
-                                className="flex flex-col items-center w-full text-xs text-stitch-sage font-departure"
+                                className={`flex flex-col items-center justify-center w-full text-xs font-departure py-2 px-1 rounded-lg transition-all duration-200 active:scale-95 ${moreMenuOpen ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'}`}
                                 onClick={() => setMoreMenuOpen(!moreMenuOpen)}
                                 aria-label="More options"
+                                style={{ minHeight: '60px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                             >
-                                <span className="material-icons-outlined">more_horiz</span>
-                                <span>More</span>
+                                <span className="material-icons-outlined text-lg">more_horiz</span>
+                                <span className="mt-1">More</span>
                             </button>
                             
                             {/* More dropdown menu */}
                             {moreMenuOpen && (
                                 <div 
                                     ref={moreMenuRef}
-                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-stitch-primary rounded-lg shadow-lg border border-stitch-border overflow-hidden"
+                                    className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-64 mb-3 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden"
                                 >
                                     <div className="py-1">
                                         {/* Dropdown menu items with dark mode styles */}
                                         <Link 
                                             href="/vector-search" 
-                                            className={`flex items-center px-4 py-3 text-sm ${pathname === '/vector-search' ? 'bg-stitch-primary/50 text-stitch-accent' : 'text-stitch-sage hover:bg-stitch-primary/30 hover:text-stitch-accent'}`}
+                                            className={`flex items-center px-4 py-4 text-sm font-medium transition-all duration-200 active:scale-95 ${pathname === '/vector-search' ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'}`}
+                                            style={{ minHeight: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                                         >
-                                            <span className="material-icons-outlined mr-2 text-stitch-sage">trending_up</span>
+                                            <span className="material-icons-outlined mr-3 text-current">trending_up</span>
                                             Career Recommendation
                                         </Link>
                                         <Link 
@@ -529,36 +533,34 @@ export default function MainLayout({
                         </div>
                         
                         <div className="relative">
-                            <Link
-                                href="/space"
-                                className={`flex flex-col items-center w-full text-xs ${
-                                    pathname === '/space' || pathname === '/tree-path'
-                                        ? 'text-stitch-accent'
-                                        : 'text-stitch-sage'
+                            <button
+                                className={`flex flex-col items-center justify-center w-full text-xs font-departure py-2 px-1 rounded-lg transition-all duration-200 active:scale-95 ${
+                                    pathname === '/space' || pathname === '/tree-path' || workspaceMenuOpen
+                                        ? 'text-blue-600 bg-blue-50'
+                                        : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
                                 }`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    setWorkspaceMenuOpen(!workspaceMenuOpen);
-                                }}
+                                onClick={() => setWorkspaceMenuOpen(!workspaceMenuOpen)}
+                                style={{ minHeight: '60px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                             >
-                                <span className="material-icons-outlined">folder</span>
-                                <span>Workspace</span>
-                            </Link>
+                                <span className="material-icons-outlined text-lg">folder</span>
+                                <span className="mt-1">Workspace</span>
+                            </button>
                             
                         {/* Mobile Workspace Dropdown Menu */}
                         {workspaceMenuOpen && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-56 mb-2 bg-stitch-primary rounded-lg shadow-lg border border-stitch-border overflow-hidden">
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-48 mb-3 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                                 <div className="py-1">
                                     <Link 
                                         href="/space"
                                         onClick={() => setWorkspaceMenuOpen(false)}
-                                        className={`block px-4 py-2 text-sm rounded-md transition-colors duration-150 ease-in-out
+                                        className={`flex items-center px-4 py-4 text-sm font-medium transition-all duration-200 active:scale-95
                                             ${pathname === '/space'
-                                                ? 'text-stitch-accent bg-stitch-primary/50'
-                                                : 'text-stitch-sage hover:text-stitch-accent hover:bg-stitch-primary/30'
+                                                ? 'text-blue-600 bg-blue-50'
+                                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
                                             }`}
+                                        style={{ minHeight: '56px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                                     >
-                                        <span className="material-icons-outlined mr-2 text-stitch-sage">space_dashboard</span>
+                                        <span className="material-icons-outlined mr-3 text-current">space_dashboard</span>
                                         Space
                                     </Link>
                                     <Link 
