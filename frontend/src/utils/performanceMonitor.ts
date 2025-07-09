@@ -28,8 +28,8 @@ class PerformanceMonitor {
 
     // First Input Delay (FID)
     this.observeMetric('first-input', (entries) => {
-      const firstEntry = entries[0];
-      const fid = firstEntry.processingStart - firstEntry.startTime;
+      const firstEntry = entries[0] as any;
+      const fid = (firstEntry.processingStart || firstEntry.startTime) - firstEntry.startTime;
       this.recordMetric('FID', fid, this.rateFID(fid));
     });
 
@@ -37,8 +37,9 @@ class PerformanceMonitor {
     let clsValue = 0;
     this.observeMetric('layout-shift', (entries) => {
       for (const entry of entries) {
-        if (!entry.hadRecentInput) {
-          clsValue += entry.value;
+        const layoutShiftEntry = entry as any;
+        if (!layoutShiftEntry.hadRecentInput) {
+          clsValue += layoutShiftEntry.value || 0;
         }
       }
       this.recordMetric('CLS', clsValue, this.rateCLS(clsValue));

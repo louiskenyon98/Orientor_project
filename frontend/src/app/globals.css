@@ -42,6 +42,9 @@
 /* Import Premium Theme */
 @import '../styles/premium-theme.css';
 
+/* Import White Sheet Theme */
+@import '../styles/white-sheet-theme.css';
+
 /* Global Premium Styles */
 * {
   box-sizing: border-box;

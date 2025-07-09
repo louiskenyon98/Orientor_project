@@ -30,7 +30,7 @@ const PeerCard: React.FC<{
   peer: PeerData; 
   onConnect: () => void;
   onMessage: () => void;
-  onSave: () => void;
+  onSave: () => Promise<void>;
   saved?: boolean;
 }> = ({ peer, onConnect, onMessage, onSave, saved }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -209,7 +209,7 @@ export const PeerCardMessage: React.FC<PeerCardMessageProps> = ({
     const saveAction = actions.find(a => a.type === 'save');
     if (saveAction) {
       onAction({ ...saveAction, params: { peerId } });
-      setSavedPeers(new Set([...savedPeers, peerId]));
+      setSavedPeers(new Set(Array.from(savedPeers).concat(peerId)));
     }
   };
 

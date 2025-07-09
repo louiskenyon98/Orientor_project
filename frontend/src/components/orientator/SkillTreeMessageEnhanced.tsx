@@ -94,8 +94,9 @@ export const SkillTreeMessageEnhanced: React.FC<SkillTreeMessageProps> = ({
                       r="4"
                       fill={category.color}
                       className="opacity-80 hover:opacity-100 cursor-pointer"
-                      title={`${skill.name} - ${skill.importance}% importance`}
-                    />
+                    >
+                      <title>{`${skill.name} - ${skill.importance}% importance`}</title>
+                    </circle>
                   );
                 })}
               </g>

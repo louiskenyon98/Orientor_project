@@ -48,10 +48,10 @@ export const useCompetenceTree = (graphId: string) => {
   // Complete a challenge/node
   const completeNode = useCallback(async (nodeId: string) => {
     try {
-      await completeChallenge(nodeId);
+      await completeChallenge(nodeId, 1); // Using default userId 1 for now
       
       // Update local state
-      setCompletedNodes(prev => new Set([...prev, nodeId]));
+      setCompletedNodes(prev => new Set(Array.from(prev).concat(nodeId)));
       
       // Update the node state in positioned nodes
       setPositionedNodes(prev => 

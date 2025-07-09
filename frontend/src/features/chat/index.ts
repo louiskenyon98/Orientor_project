@@ -1,5 +1,6 @@
 // Chat feature exports with lazy loading support
 import dynamic from 'next/dynamic';
+import React from 'react';
 
 // Regular exports for types and hooks
 export * from './types/chat.types';
@@ -14,7 +15,7 @@ export { ChatHeader } from './components/ChatHeader';
 export const ChatInterface = dynamic(
   () => import('./components/ChatInterface').then(mod => mod.ChatInterface),
   {
-    loading: () => <div>Loading Chat...</div>,
+    loading: () => React.createElement('div', null, 'Loading Chat...'),
     ssr: false
   }
 );

@@ -139,30 +139,29 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentUserId }) =
           <div className="flex-1 overflow-y-auto">
             {sidebarView === 'conversations' && (
               <ConversationList
-                currentUserId={currentUserId}
-                selectedCategory={selectedCategory}
+                selectedConversationId={currentConversation?.id}
                 onSelectConversation={actions.selectConversation}
                 onCreateNew={actions.createNewConversation}
-                currentConversationId={currentConversation?.id}
                 refreshTrigger={0}
               />
             )}
             {sidebarView === 'search' && (
               <SearchInterface
-                currentUserId={currentUserId}
-                onSearchResult={handleSearchResult}
+                onSelectResult={handleSearchResult}
+                onClose={() => setSidebarView('conversations')}
               />
             )}
             {sidebarView === 'categories' && (
               <CategoryManager
-                currentUserId={currentUserId}
+                selectedCategoryId={selectedCategory?.id}
                 onSelectCategory={(category) => 
                   setState(prev => ({ ...prev, selectedCategory: category }))
                 }
+                onClose={() => setSidebarView('conversations')}
               />
             )}
             {sidebarView === 'analytics' && (
-              <AnalyticsDashboard currentUserId={currentUserId} />
+              <AnalyticsDashboard />
             )}
           </div>
         </div>

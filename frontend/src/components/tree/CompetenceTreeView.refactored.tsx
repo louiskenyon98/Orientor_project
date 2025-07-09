@@ -119,11 +119,10 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
       {currentChallenge && (
         <div className="absolute bottom-4 left-4 right-4 max-w-md mx-auto">
           <ChallengeCard
-            title={currentChallenge.label || 'Challenge'}
-            description={currentChallenge.challenge || ''}
+            challenge={currentChallenge.challenge || ''}
             xpReward={currentChallenge.xp_reward || 0}
+            completed={false}
             onComplete={() => handleCompleteChallenge(currentChallenge.id)}
-            onClose={() => setCurrentChallenge(null)}
           />
         </div>
       )}
@@ -134,9 +133,8 @@ const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId }) => {
           <NodeDetailModal
             node={selectedNode}
             onClose={() => setShowModal(false)}
-            onStartChallenge={startChallenge}
-            onToggleSave={() => toggleSaveNode(selectedNode.id)}
-            isSaved={savedNodes.includes(selectedNode.id)}
+            onCompleteChallenge={(nodeId) => handleCompleteChallenge(nodeId)}
+            onSaveJob={(node) => toggleSaveNode(node.id)}
           />
         </Suspense>
       )}

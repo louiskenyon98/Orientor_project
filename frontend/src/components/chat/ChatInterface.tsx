@@ -457,7 +457,7 @@ export default function ChatInterface({ currentUserId, enableOrientator = false 
         
         console.log('✅ Created Orientator messages:', newMessages.length);
         console.log('🎨 Assistant message components:', newMessages[1]?.components?.length || 0);
-        if (newMessages[1]?.components?.length > 0) {
+        if (newMessages[1]?.components && newMessages[1].components.length > 0) {
           newMessages[1].components.forEach((comp, i) => {
             console.log(`   ${i+1}. ${comp.type} component with ${comp.actions?.length || 0} actions`);
           });

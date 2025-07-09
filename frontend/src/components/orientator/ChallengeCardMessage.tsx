@@ -47,7 +47,7 @@ const difficultyConfig = {
 const ChallengeCard: React.FC<{
   challenge: Challenge;
   onStart: () => void;
-  onSave: () => void;
+  onSave: () => Promise<void>;
   saved?: boolean;
 }> = ({ challenge, onStart, onSave, saved }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -217,7 +217,7 @@ export const ChallengeCardMessage: React.FC<ChallengeCardMessageProps> = ({
     const saveAction = actions.find(a => a.type === 'save');
     if (saveAction) {
       onAction({ ...saveAction, params: { challengeId } });
-      setSavedChallenges(new Set([...savedChallenges, challengeId]));
+      setSavedChallenges(new Set(Array.from(savedChallenges).concat(challengeId)));
     }
   };
 

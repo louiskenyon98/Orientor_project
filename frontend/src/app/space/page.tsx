@@ -55,7 +55,7 @@ export default function SpacePage() {
       } else {
         console.log('✅ Recommendations loaded successfully');
         data.forEach((rec, index) => {
-          console.log(`${index + 1}. ${rec.title || rec.label} (ID: ${rec.id})`);
+          console.log(`${index + 1}. ${rec.label} (ID: ${rec.id})`);
         });
       }
       
@@ -102,6 +102,11 @@ export default function SpacePage() {
       const identifier = recommendation.oasis_code?.startsWith('occupation::key_') 
         ? recommendation.oasis_code 
         : recommendation.id;
+      
+      if (!identifier) {
+        toast.error('Cannot delete recommendation: missing identifier');
+        return;
+      }
       
       await deleteRecommendation(identifier);
       setRecommendations(prev => prev.filter(r => r.id !== recommendation.id));

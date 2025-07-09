@@ -32,7 +32,7 @@ interface JobCardMessageProps {
 
 const JobCard: React.FC<{ 
   job: JobData; 
-  onSave: () => void; 
+  onSave: () => Promise<void>; 
   saved?: boolean;
   onExplore?: () => void;
 }> = ({ job, onSave, saved, onExplore }) => {
@@ -178,7 +178,7 @@ export const JobCardMessage: React.FC<JobCardMessageProps> = ({
     const saveAction = actions.find(a => a.type === 'save');
     if (saveAction) {
       onAction({ ...saveAction, params: { jobId } });
-      setSavedJobs(new Set([...savedJobs, jobId]));
+      setSavedJobs(new Set(Array.from(savedJobs).concat(jobId)));
     }
   };
 

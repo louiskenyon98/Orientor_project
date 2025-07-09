@@ -72,10 +72,10 @@ export const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId 
   // Handle node completion
   const handleNodeComplete = useCallback(async (nodeId: string) => {
     try {
-      await completeChallenge(nodeId);
-      const newCompleted = new Set([...completedNodes, nodeId]);
+      await completeChallenge(nodeId, 1); // Using default userId 1 for now
+      const newCompleted = new Set(Array.from(completedNodes).concat(nodeId));
       setCompletedNodes(newCompleted);
-      localStorage.setItem('completedChallenges', JSON.stringify([...newCompleted]));
+      localStorage.setItem('completedChallenges', JSON.stringify(Array.from(newCompleted)));
       
       // Update tree data to reflect completion
       if (treeData) {
@@ -184,21 +184,16 @@ export const CompetenceTreeView: React.FC<CompetenceTreeViewProps> = ({ graphId 
           <NodeDetailModal
             node={selectedNode}
             onClose={() => setShowNodeDetail(false)}
-            onComplete={handleNodeComplete}
+            onCompleteChallenge={handleNodeComplete}
           />
         )}
         
         {currentChallenge && (
           <ChallengeCard
-            challenge={{
-              id: currentChallenge.id,
-              title: currentChallenge.label || '',
-              description: currentChallenge.challenge || '',
-              xpReward: currentChallenge.xp_reward || 0,
-              completed: completedNodes.has(currentChallenge.id)
-            }}
+            challenge={currentChallenge.challenge || ''}
+            xpReward={currentChallenge.xp_reward || 0}
+            completed={completedNodes.has(currentChallenge.id)}
             onComplete={() => handleNodeComplete(currentChallenge.id)}
-            onClose={() => setCurrentChallenge(null)}
           />
         )}
       </Suspense>
