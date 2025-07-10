@@ -1,246 +1,237 @@
-/* Import des styles UI existants */
-@import './uiverse/typewrite.css';
-@import './uiverse/navigo_hoverIcon.css';
-@import './uiverse/login.css';
+/* OpenNote-inspired Typography and Layout */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-/* Styles spécifiques à la landing page */
-.landing-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
 }
 
-.section {
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #1f2937;
+  font-feature-settings: 'cv11', 'ss01';
+  font-variant-numeric: oldstyle-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* OpenNote-style section spacing */
+.opennote-section {
   padding: 4rem 0;
-  margin: 2rem 0;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: var(--accent); /* Fallback pour les navigateurs non compatibles */
+/* OpenNote-style typography */
+.opennote-heading {
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: #111827;
 }
 
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-/* Styles pour les boutons premium */
-.btn {
-  font: inherit;
-  background-color: #f0f0f0;
-  border: 0;
-  color: #242424;
-  border-radius: 0.5em;
-  font-size: 1.35rem;
-  padding: 0.375em 1em;
+.opennote-subheading {
   font-weight: 600;
-  text-shadow: 0 0.0625em 0 #fff;
-  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
-              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
-              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
-              0 0.425em 0 0 #cacaca, 0 0.425em 0.5em 0 #cecece;
-  transition: 0.15s ease;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  min-width: 120px;
-  text-align: center;
+  line-height: 1.3;
+  color: #374151;
 }
 
-.btn:hover {
+.opennote-body {
+  font-weight: 400;
+  line-height: 1.6;
+  color: #6b7280;
+}
+
+/* Subtle hover effects */
+.opennote-hover {
+  transition: all 0.2s ease;
+}
+
+.opennote-hover:hover {
   transform: translateY(-2px);
-  box-shadow: inset 0 0.0625em 0 0 #f4f4f4, 0 0.0625em 0 0 #efefef,
-              0 0.125em 0 0 #ececec, 0 0.25em 0 0 #e0e0e0,
-              0 0.3125em 0 0 #dedede, 0 0.375em 0 0 #dcdcdc,
-              0 0.425em 0 0 #cacaca, 0 0.625em 1em 0 #cecece;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-  color: white;
-  text-shadow: none;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px solid var(--accent);
-  color: var(--accent);
-  box-shadow: none;
-}
-
-.btn-outline:hover {
-  background: var(--accent);
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Header avec logo */
-.landing-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem 0;
-}
-
-/* Section Talk to Navigo avec typewriter */
-.talk-to-navigo-section {
-  display: flex;
+/* OpenNote-style buttons */
+.opennote-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.opennote-btn-primary {
+  background: #111827;
+  color: #ffffff;
+}
+
+.opennote-btn-primary:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.opennote-btn-secondary {
+  background: transparent;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.opennote-btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.opennote-btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+/* OpenNote-style navigation */
+.opennote-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.opennote-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.opennote-nav-links {
+  display: flex;
+  align-items: center;
   gap: 2rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
 }
 
-.talk-to-navigo-title {
-  font-size: 2.5rem;
-  font-weight: bold;
+.opennote-nav-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.opennote-nav-link:hover {
+  color: #111827;
+}
+
+/* OpenNote-style hero section */
+.opennote-hero {
   text-align: center;
-  color: var(--text);
-  margin: 0;
+  padding: 4rem 0 6rem;
 }
 
-/* Cartes de diagnostic */
-.diagnostic-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  justify-items: center;
-  margin: 2rem 0;
-  max-width: 1400px;
+.opennote-hero-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.opennote-hero-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  max-width: 42rem;
   margin-left: auto;
   margin-right: auto;
-}
-
-/* Ajustement de la largeur des cartes pour la grille */
-.diagnostic-grid .card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 320px;
-  border-radius: 24px;
   line-height: 1.6;
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
-  background: transparent;
 }
 
-.diagnostic-grid .card .content {
-  position: relative;
+.opennote-hero-actions {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 24px;
-  padding: 36px;
-  border-radius: 22px;
-  color: #ffffff;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 3rem;
 }
 
-.diagnostic-grid .card .content::before {
-  position: absolute;
-  content: "";
-  top: -4%;
-  left: 50%;
-  width: 90%;
-  height: 90%;
-  transform: translate(-50%);
-  background: #ced8ff;
-  z-index: -1;
-  transform-origin: bottom;
-  border-radius: inherit;
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+@media (min-width: 640px) {
+  .opennote-hero-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
 }
 
-.diagnostic-grid .card .content::after {
-  position: absolute;
-  content: "";
-  top: -8%;
-  left: 50%;
-  width: 80%;
-  height: 80%;
-  transform: translate(-50%);
-  background: #e7ecff;
-  z-index: -2;
-  transform-origin: bottom;
-  border-radius: inherit;
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+/* OpenNote-style feature cards */
+.opennote-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
 }
 
-.diagnostic-grid .card .content svg {
-  width: 48px;
-  height: 48px;
-  position: relative;
-  z-index: 1;
+.opennote-feature-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: all 0.2s ease;
 }
 
-.diagnostic-grid .card .content .para {
-  position: relative;
-  z-index: 1;
-  opacity: 1;
-  font-size: 18px;
-  transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+.opennote-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
 }
 
-.diagnostic-grid .card:hover {
-  transform: translate(0px, -16px);
+.opennote-feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
 }
 
-.diagnostic-grid .card:hover .content::before {
-  rotate: -8deg;
-  top: 0;
-  width: 100%;
-  height: 100%;
+.opennote-feature-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
 }
 
-.diagnostic-grid .card:hover .content::after {
-  rotate: 8deg;
-  top: 0;
-  width: 100%;
-  height: 100%;
+.opennote-feature-description {
+  color: #6b7280;
+  line-height: 1.6;
 }
 
-/* Variantes de couleurs pour les cartes */
-.diagnostic-grid .card-problem-1 .content {
-  background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
-}
-
-.diagnostic-grid .card-problem-2 .content {
-  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
-}
-
-.diagnostic-grid .card-solution-1 .content {
-  background: linear-gradient(135deg, #3498db, #2980b9) !important;
-}
-
-.diagnostic-grid .card-solution-2 .content {
-  background: linear-gradient(135deg, #1abc9c, #16a085) !important;
-}
-
-/* Responsive design */
-@media (max-width: 1200px) {
-  .diagnostic-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* OpenNote-style responsive design */
+@media (max-width: 768px) {
+  .opennote-feature-grid {
+    grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  
+  .opennote-hero-title {
+    font-size: 2rem;
+  }
+  
+  .opennote-nav-links {
+    display: none;
   }
 }
 
