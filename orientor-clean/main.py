@@ -18,9 +18,13 @@ async def startup_event():
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         try:
-            # Fix Railway's incomplete PostgreSQL URL
-            if "postgres.railway.i" in database_url and not database_url.endswith(".internal"):
+            # Fix Railway's malformed PostgreSQL URL
+            if "postgres.railway.i" in database_url:
+                # Handle various formatting issues with Railway URLs
+                database_url = database_url.replace("postgres.railway.i\n  nternal", "postgres.railway.internal")
                 database_url = database_url.replace("postgres.railway.i", "postgres.railway.internal")
+                # Remove any extra whitespace/newlines
+                database_url = ' '.join(database_url.split())
                 print(f"🔧 Fixed Railway database URL")
             
             engine = create_engine(database_url)
