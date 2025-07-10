@@ -4,7 +4,7 @@
 
 import Link from 'next/link';
 
-export default function LandingPage() {
+export default function LandingPageOpenNote() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
       
@@ -27,15 +27,15 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="font-bold text-xl text-gray-900">Navigo</div>
-              <div className="text-xs text-gray-500">Orientation & Carrières</div>
+              <div className="text-xs text-gray-500">Notes & Learning</div>
             </div>
           </div>
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/onboarding" className="text-gray-600 hover:text-gray-900 transition-colors">Tests</Link>
-            <Link href="/career" className="text-gray-600 hover:text-gray-900 transition-colors">Carrières</Link>
-            <Link href="/chat" className="text-gray-600 hover:text-gray-900 transition-colors">Chat IA</Link>
+            <Link href="/features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</Link>
+            <Link href="/templates" className="text-gray-600 hover:text-gray-900 transition-colors">Templates</Link>
+            <Link href="/pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</Link>
             <Link href="/login" className="bg-gradient-to-r from-indigo-500 to-sky-400 text-white px-4 py-2 rounded-lg hover:from-indigo-600 hover:to-sky-500 transition-all ink-button">
-              Commencer
+              Get Started
             </Link>
           </nav>
         </div>
@@ -55,41 +55,41 @@ export default function LandingPage() {
                     Navigo
                   </div>
                   <div className="book-subtitle text-white text-sm opacity-80">
-                    Guide d'Orientation
+                    Learning Notebook
                   </div>
                 </div>
                 <div className="book-content">
-                  <h3>Ton Guide Personnel</h3>
-                  <p>Où chaque page révèle de nouvelles possibilités de carrière</p>
+                  <h3>Your Digital Notebook</h3>
+                  <p>Where every page is a new discovery waiting to be written</p>
                 </div>
               </div>
               
               <div className="text-center space-y-8">
                 <h1 className="handwritten-title text-5xl lg:text-7xl text-gray-800 mb-6">
-                  Découvre ton chemin professionnel
+                  Bring your learning to life
                 </h1>
                 
                 <div className="ink-pen-line"></div>
                 
                 <p className="handwritten-text text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                  Ton style d'apprentissage est unique—tes outils d'exploration professionnelle aussi. Crée ton environnement parfait avec les outils interactifs de Navigo pour découvrir tes possibilités de carrière.
+                  Your learning style is unique—your educational tools should be too. Create your perfect learning environment with Navigo's interactive note-taking and discovery tools.
                 </p>
                 
                 {/* Empty notebook illustration */}
                 <div className="my-12 text-center">
                   <div className="inline-block bg-white p-8 rounded-lg shadow-lg border-2 border-dashed border-gray-300 max-w-md">
-                    <div className="text-6xl text-gray-300 mb-4">🗺️</div>
-                    <p className="text-gray-400 italic">Ton histoire est encore à écrire...</p>
-                    <p className="text-sm text-gray-500 mt-2">Ton parcours professionnel commence par une page blanche</p>
+                    <div className="text-6xl text-gray-300 mb-4">📝</div>
+                    <p className="text-gray-400 italic">Everything is yet to be written...</p>
+                    <p className="text-sm text-gray-500 mt-2">Your learning journey starts with a blank page</p>
                   </div>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
                   <Link href="/register" className="cta-primary bg-gradient-to-r from-indigo-500 to-sky-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:from-indigo-600 hover:to-sky-500 hover:scale-105 hover:shadow-lg ink-button">
-                    Commencer mon exploration
+                    Start Writing Your Story
                   </Link>
-                  <Link href="/onboarding" className="cta-secondary text-gray-600 hover:text-gray-900 transition-colors px-8 py-4 font-medium text-lg border-2 border-gray-300 rounded-lg hover:border-gray-400 hover:shadow-md ink-button">
-                    Voir comment ça marche
+                  <Link href="/demo" className="cta-secondary text-gray-600 hover:text-gray-900 transition-colors px-8 py-4 font-medium text-lg border-2 border-gray-300 rounded-lg hover:border-gray-400 hover:shadow-md ink-button">
+                    See How It Works
                   </Link>
                 </div>
               </div>
@@ -97,16 +97,17 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
       {/* Toolkit Section */}
       <section className="px-6 lg:px-12 py-20 bg-gradient-to-b from-white to-gray-50 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="handwritten-title text-4xl lg:text-5xl text-gray-900 mb-4">
-              Des outils qui s'adaptent à toi
+              The toolkit that adapts with you
             </h2>
             <div className="ink-pen-line"></div>
             <p className="handwritten-text text-gray-600 max-w-3xl mx-auto mt-6">
-              Combine tests de personnalité, exploration de carrières, chat IA et analyses personnalisées. Chaque outil conçu pour t'aider à découvrir tes possibilités professionnelles.
+              Mix and match custom notes, whiteboards, learning paths, and interactive exercises. Every tool designed to help you learn and discover.
             </p>
           </div>
           
@@ -116,12 +117,12 @@ export default function LandingPage() {
               <div className="go-corner">
                 <div className="go-arrow">→</div>
               </div>
-              <div className="feature-icon text-4xl mb-4">📱</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">SwipeMyWay</h3>
+              <div className="feature-icon text-4xl mb-4">📔</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Digital Notes</h3>
               <p className="text-gray-600 text-sm">
-                Découvre tes préférences en glissant sur des rôles. Interface intuitive qui apprend de tes choix instantanément.
+                Create, organize, and connect your thoughts with our intelligent note-taking system.
               </p>
-              <div className="mt-4 text-xs text-indigo-500 font-semibold">EXPLORATION RAPIDE</div>
+              <div className="mt-4 text-xs text-indigo-500 font-semibold">SMART ORGANIZATION</div>
             </div>
             
             {/* Learning Whiteboards */}
@@ -129,12 +130,12 @@ export default function LandingPage() {
               <div className="go-corner">
                 <div className="go-arrow">→</div>
               </div>
-              <div className="feature-icon text-4xl mb-4">🌳</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Arbre des Carrières</h3>
+              <div className="feature-icon text-4xl mb-4">🖊️</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Interactive Whiteboards</h3>
               <p className="text-gray-600 text-sm">
-                Navigation émotionnelle: Bâtisseur, Communicateur, Explorateur. Chaque branche mène vers des rôles réels.
+                Visual thinking spaces where ideas come alive. Draw, diagram, and discover connections.
               </p>
-              <div className="mt-4 text-xs text-sky-400 font-semibold">NAVIGATION INTUITIVE</div>
+              <div className="mt-4 text-xs text-sky-400 font-semibold">VISUAL LEARNING</div>
             </div>
             
             {/* Learning Paths */}
@@ -142,12 +143,12 @@ export default function LandingPage() {
               <div className="go-corner">
                 <div className="go-arrow">→</div>
               </div>
-              <div className="feature-icon text-4xl mb-4">🕰️</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Tests HEXACO</h3>
+              <div className="feature-icon text-4xl mb-4">🗺️</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Learning Paths</h3>
               <p className="text-gray-600 text-sm">
-                Analyse approfondie de ta personnalité avec 6 dimensions clés pour mieux te connaître professionnellement.
+                Guided journeys through subjects with checkpoints, challenges, and progress tracking.
               </p>
-              <div className="mt-4 text-xs text-indigo-500 font-semibold">CONNAISSANCE DE SOI</div>
+              <div className="mt-4 text-xs text-indigo-500 font-semibold">GUIDED DISCOVERY</div>
             </div>
             
             {/* Practice Problems */}
@@ -155,16 +156,17 @@ export default function LandingPage() {
               <div className="go-corner">
                 <div className="go-arrow">→</div>
               </div>
-              <div className="feature-icon text-4xl mb-4">🤖</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Chat IA Navigo</h3>
+              <div className="feature-icon text-4xl mb-4">🧩</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Practice Exercises</h3>
               <p className="text-gray-600 text-sm">
-                Conversations guidées avec notre IA pour explorer tes motivations et clarifier tes objectifs de carrière.
+                Interactive problems and challenges that adapt to your learning pace and style.
               </p>
-              <div className="mt-4 text-xs text-sky-400 font-semibold">GUIDANCE PERSONNALISÉE</div>
+              <div className="mt-4 text-xs text-sky-400 font-semibold">ACTIVE LEARNING</div>
             </div>
           </div>
         </div>
       </section>
+
       {/* Note-Taking Section */}
       <section className="px-6 lg:px-12 py-20 animate-on-scroll">
         <div className="max-w-7xl mx-auto">
@@ -174,13 +176,13 @@ export default function LandingPage() {
               <div className="paper-sheet bg-white min-h-96">
                 <div className="paper-lines"></div>
                 <div className="paper-content">
-                  <h3 className="handwritten-title text-3xl text-gray-800 mb-6">Découvre tes passions avec notre système d'exploration</h3>
+                  <h3 className="handwritten-title text-3xl text-gray-800 mb-6">Create open notes with our digital note-taking app</h3>
                   <div className="space-y-4 handwritten-text text-gray-600">
-                    <p>🎯 Identifie tes valeurs et motivations</p>
-                    <p>🔍 Explore des carrières alignées avec ta personnalité</p>
-                    <p>📊 Visualise tes compétences et ton potentiel</p>
-                    <p>🗺️ Planifie ton parcours professionnel</p>
-                    <p className="text-gray-400 italic text-sm mt-8">Ton avenir professionnel, révélé avec clarté...</p>
+                    <p>✏️ Capture ideas as they flow</p>
+                    <p>📝 Connect concepts with smart linking</p>
+                    <p>🔍 Find anything with intelligent search</p>
+                    <p>📚 Organize into meaningful collections</p>
+                    <p className="text-gray-400 italic text-sm mt-8">Your thoughts, beautifully organized...</p>
                   </div>
                 </div>
               </div>
@@ -189,32 +191,32 @@ export default function LandingPage() {
             {/* Description */}
             <div className="space-y-6">
               <h2 className="handwritten-title text-4xl text-gray-900">
-                Une approche interactive pour découvrir ta voie
+                Focus on interactive note creation and organization
               </h2>
               <div className="ink-pen-line"></div>
               <p className="handwritten-text text-gray-600 leading-relaxed">
-                Transforme ta manière d'explorer les carrières. Notre système comprend tes préférences, suggère des connexions, et t'aide à construire ta carte personnelle des possibilités.
+                Transform how you capture and connect knowledge. Our note-taking system understands context, suggests connections, and helps you build a personal knowledge graph.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <div className="text-green-500 mt-1">✓</div>
-                  <span className="text-gray-700">Tests de personnalité scientifiquement validés</span>
+                  <span className="text-gray-700">Rich text editing with markdown support</span>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="text-green-500 mt-1">✓</div>
-                  <span className="text-gray-700">Recommandations basées sur tes résultats</span>
+                  <span className="text-gray-700">Smart tagging and auto-categorization</span>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="text-green-500 mt-1">✓</div>
-                  <span className="text-gray-700">Exploration interactive des métiers</span>
+                  <span className="text-gray-700">Real-time collaboration and sharing</span>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="text-green-500 mt-1">✓</div>
-                  <span className="text-gray-700">Suivi de progression personnalisé</span>
+                  <span className="text-gray-700">Cross-platform synchronization</span>
                 </div>
               </div>
-              <Link href="/onboarding" className="inline-block cta-primary bg-gradient-to-r from-indigo-500 to-sky-400 text-white px-8 py-4 rounded-lg hover:from-indigo-600 hover:to-sky-500 transition-all duration-300 font-semibold hover:scale-105 hover:shadow-lg ink-button">
-                Commencer l'exploration
+              <Link href="/notes" className="inline-block cta-primary bg-gradient-to-r from-indigo-500 to-sky-400 text-white px-8 py-4 rounded-lg hover:from-indigo-600 hover:to-sky-500 transition-all duration-300 font-semibold hover:scale-105 hover:shadow-lg ink-button">
+                Start Taking Notes
               </Link>
             </div>
           </div>
@@ -226,48 +228,48 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="handwritten-title text-4xl lg:text-5xl text-gray-900 mb-4">
-              Vois tes possibilités prendre vie
+              Watch your lessons come alive
             </h2>
             <div className="ink-pen-line"></div>
             <p className="handwritten-text text-gray-600 max-w-3xl mx-auto mt-6">
-              Transforme tes réflexions en découvertes concrètes. Notre système "Synthèse" convertit tes réponses en recommandations personnalisées et connections visuelles.
+              Turn static notes into dynamic learning experiences. Our "Synthesis" feature transforms your written thoughts into interactive lessons and visual connections.
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Visual Learning */}
             <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105 assessment-card">
-              <div className="assessment-icon text-5xl mb-6 text-center">🗺️</div>
-              <h3 className="handwritten-title text-2xl text-gray-900 mb-4 text-center">Cartographie Professionnelle</h3>
+              <div className="assessment-icon text-5xl mb-6 text-center">🎨</div>
+              <h3 className="handwritten-title text-2xl text-gray-900 mb-4 text-center">Visual Learning</h3>
               <p className="handwritten-text text-gray-600 text-center mb-6">
-                Transforme tes intérêts en cartes visuelles, graphiques interactifs et diagrammes qui révèlent des connexions cachées entre métiers.
+                Transform notes into mind maps, flowcharts, and interactive diagrams that reveal hidden connections.
               </p>
               <div className="assessment-btn w-full bg-indigo-100 text-indigo-700 py-3 px-6 rounded-lg hover:bg-indigo-200 transition-all text-center font-semibold">
-                Explorer les Visualisations
+                Explore Visuals
               </div>
             </div>
             
             {/* Interactive Lessons */}
             <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105 assessment-card">
-              <div className="assessment-icon text-5xl mb-6 text-center">📈</div>
-              <h3 className="handwritten-title text-2xl text-gray-900 mb-4 text-center">Progression Guidée</h3>
+              <div className="assessment-icon text-5xl mb-6 text-center">⚡</div>
+              <h3 className="handwritten-title text-2xl text-gray-900 mb-4 text-center">Interactive Lessons</h3>
               <p className="handwritten-text text-gray-600 text-center mb-6">
-                Transforme tes découvertes en parcours guidés avec étapes, défis et révélations progressives de tes talents.
+                Turn your notes into guided lessons with quizzes, flashcards, and progressive reveals.
               </p>
               <div className="assessment-btn w-full bg-sky-100 text-sky-700 py-3 px-6 rounded-lg hover:bg-sky-200 transition-all text-center font-semibold">
-                Essayer le Mode Guidé
+                Try Interactive Mode
               </div>
             </div>
             
             {/* Knowledge Connections */}
             <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105 assessment-card">
-              <div className="assessment-icon text-5xl mb-6 text-center">🤖</div>
-              <h3 className="handwritten-title text-2xl text-gray-900 mb-4 text-center">IA Personnalisée</h3>
+              <div className="assessment-icon text-5xl mb-6 text-center">🕸️</div>
+              <h3 className="handwritten-title text-2xl text-gray-900 mb-4 text-center">Knowledge Graph</h3>
               <p className="handwritten-text text-gray-600 text-center mb-6">
-                Découvre comment tes intérêts se connectent entre domaines grâce à notre cartographie relationnelle alimentée par l'IA.
+                See how your ideas connect across subjects with AI-powered relationship mapping.
               </p>
               <div className="assessment-btn w-full bg-purple-100 text-purple-700 py-3 px-6 rounded-lg hover:bg-purple-200 transition-all text-center font-semibold">
-                Voir les Connexions
+                View Connections
               </div>
             </div>
           </div>
@@ -279,11 +281,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="handwritten-title text-4xl lg:text-5xl text-gray-900 mb-4">
-              Découvre Plus, Dépense Moins
+              Learn More, Spend Less
             </h2>
             <div className="ink-pen-line"></div>
             <p className="handwritten-text text-gray-600 max-w-2xl mx-auto mt-6">
-              Choisis l'environnement d'exploration parfait pour tes besoins. Commence gratuitement et évolue avec des fonctionnalités avancées.
+              Choose the perfect learning environment for your needs. Start free and grow with advanced features.
             </p>
           </div>
           
@@ -293,17 +295,17 @@ export default function LandingPage() {
               <div className="paper-sheet bg-white min-h-96 text-center">
                 <div className="paper-lines"></div>
                 <div className="paper-content">
-                  <h3 className="handwritten-title text-2xl text-gray-900 mb-4">Gratuit</h3>
-                  <p className="text-gray-600 mb-6">Parfait pour découvrir Navigo</p>
-                  <div className="handwritten-text text-3xl text-gray-900 mb-6">0$</div>
+                  <h3 className="handwritten-title text-2xl text-gray-900 mb-4">Free</h3>
+                  <p className="text-gray-600 mb-6">Perfect for trying out Navigo</p>
+                  <div className="handwritten-text text-3xl text-gray-900 mb-6">$0</div>
                   <ul className="handwritten-text text-gray-600 space-y-2 mb-8">
-                    <li>• Tests de base</li>
-                    <li>• Exploration limitée</li>
-                    <li>• Application mobile</li>
-                    <li>• Support communautaire</li>
+                    <li>• 100 notes</li>
+                    <li>• Basic templates</li>
+                    <li>• Mobile app</li>
+                    <li>• Community support</li>
                   </ul>
                   <button className="cta-secondary w-full border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:border-gray-400 hover:shadow-md transition-all font-semibold ink-button">
-                    Commencer Gratuitement
+                    Start Free
                   </button>
                 </div>
               </div>
@@ -313,19 +315,19 @@ export default function LandingPage() {
             <div className="paper-container">
               <div className="paper-sheet bg-gradient-to-br from-indigo-50 to-sky-50 min-h-96 text-center border-2 border-indigo-200">
                 <div className="paper-content">
-                  <div className="bg-indigo-500 text-white px-3 py-1 rounded-full text-sm font-semibold mb-4 inline-block">Plus Populaire</div>
+                  <div className="bg-indigo-500 text-white px-3 py-1 rounded-full text-sm font-semibold mb-4 inline-block">Most Popular</div>
                   <h3 className="handwritten-title text-2xl text-gray-900 mb-4">Premium</h3>
-                  <p className="text-gray-600 mb-6">Débloque tout ton potentiel d'exploration</p>
-                  <div className="handwritten-text text-3xl text-gray-900 mb-6">15$<span className="text-base">/mois</span></div>
+                  <p className="text-gray-600 mb-6">Unlock your full learning potential</p>
+                  <div className="handwritten-text text-3xl text-gray-900 mb-6">$12<span className="text-base">/month</span></div>
                   <ul className="handwritten-text text-gray-600 space-y-2 mb-8">
-                    <li>• Tous les tests avancés</li>
-                    <li>• Analyses approfondies</li>
-                    <li>• Recommandations IA</li>
-                    <li>• Support prioritaire</li>
-                    <li>• Outils de collaboration</li>
+                    <li>• Unlimited notes</li>
+                    <li>• Advanced templates</li>
+                    <li>• AI-powered insights</li>
+                    <li>• Priority support</li>
+                    <li>• Collaboration tools</li>
                   </ul>
                   <button className="cta-primary w-full bg-gradient-to-r from-indigo-500 to-sky-400 text-white py-3 px-6 rounded-lg hover:from-indigo-600 hover:to-sky-500 transition-all font-semibold hover:scale-105 hover:shadow-lg ink-button">
-                    Passer à Premium
+                    Go Premium
                   </button>
                 </div>
               </div>
@@ -336,18 +338,18 @@ export default function LandingPage() {
               <div className="paper-sheet bg-white min-h-96 text-center">
                 <div className="paper-lines"></div>
                 <div className="paper-content">
-                  <h3 className="handwritten-title text-2xl text-gray-900 mb-4">Entreprise</h3>
-                  <p className="text-gray-600 mb-6">Pour écoles et institutions</p>
-                  <div className="handwritten-text text-3xl text-gray-900 mb-6">Sur mesure</div>
+                  <h3 className="handwritten-title text-2xl text-gray-900 mb-4">Enterprise</h3>
+                  <p className="text-gray-600 mb-6">For schools and institutions</p>
+                  <div className="handwritten-text text-3xl text-gray-900 mb-6">Custom</div>
                   <ul className="handwritten-text text-gray-600 space-y-2 mb-8">
-                    <li>• Accès illimité complet</li>
-                    <li>• Intégrations personnalisées</li>
-                    <li>• Analyses avancées</li>
-                    <li>• Support dédié</li>
-                    <li>• SSO et conformité</li>
+                    <li>• Unlimited everything</li>
+                    <li>• Custom integrations</li>
+                    <li>• Advanced analytics</li>
+                    <li>• Dedicated support</li>
+                    <li>• SSO & compliance</li>
                   </ul>
                   <button className="cta-secondary w-full border-2 border-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:border-gray-400 hover:shadow-md transition-all font-semibold ink-button">
-                    Contacter les Ventes
+                    Contact Sales
                   </button>
                 </div>
               </div>
@@ -367,37 +369,37 @@ export default function LandingPage() {
         
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="handwritten-title text-4xl lg:text-6xl text-white mb-6">
-            Une exploration qui fonctionne vraiment pour toi
+            Learning that actually works for you
           </h2>
           <div className="w-32 h-1 bg-white/30 mx-auto rounded mb-8"></div>
           <p className="handwritten-text text-xl text-white/90 max-w-2xl mx-auto mb-12">
-            Rejoins des milliers d'étudiants qui ont transformé leur approche de l'orientation avec la plateforme intelligente de Navigo.
+            Join thousands of learners who have transformed their study habits with Navigo's intelligent note-taking platform.
           </p>
           
           {/* Features list */}
           <div className="grid md:grid-cols-4 gap-6 mb-12 text-white">
             <div className="space-y-2">
-              <div className="text-2xl">🔍</div>
-              <p className="font-semibold">Découvre tes passions cachées</p>
+              <div className="text-2xl">📝</div>
+              <p className="font-semibold">Create digital open notes</p>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl">🎯</div>
-              <p className="font-semibold">Organise tes objectifs efficacement</p>
+              <div className="text-2xl">📚</div>
+              <p className="font-semibold">Organize notes efficiently</p>
             </div>
             <div className="space-y-2">
               <div className="text-2xl">🤝</div>
-              <p className="font-semibold">Partage tes découvertes avec des pairs</p>
+              <p className="font-semibold">Share notes with classmates</p>
             </div>
             <div className="space-y-2">
               <div className="text-2xl">📈</div>
-              <p className="font-semibold">Suis ta progression d'exploration</p>
+              <p className="font-semibold">Track learning progress</p>
             </div>
           </div>
           
           <Link href="/register" className="cta-primary inline-block bg-white text-indigo-600 px-12 py-4 rounded-lg font-bold text-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 ink-button">
-            Essaie Navigo aujourd'hui
+            Try Navigo today
           </Link>
-          <p className="handwritten-text text-white/80 mt-4 text-sm">Étudiants qui créent des outils pour étudiants • Gratuit pour commencer</p>
+          <p className="handwritten-text text-white/80 mt-4 text-sm">Students crafting tools for students • Free to start</p>
         </div>
       </section>
 
@@ -412,15 +414,15 @@ export default function LandingPage() {
               <div className="handwritten-title text-2xl text-gray-900">Navigo</div>
             </div>
             <p className="handwritten-text text-gray-600 max-w-2xl mx-auto">
-              Plateforme d'exploration professionnelle conçue pour les étudiants modernes. Conçue avec passion pour l'éducation et la découverte.
+              Digital note-taking platform designed for modern learners. Built with love for education and discovery.
             </p>
           </div>
           
           <div className="border-t border-gray-200 pt-8">
             <p className="text-sm text-gray-500">
-              © 2024 Plateforme Navigo. Conçue pour les esprits curieux du monde entier.
+              © 2024 Navigo Learning Platform. Crafted for curious minds everywhere.
               <br />
-              <span className="italic">Où chaque découverte devient un tremplin vers ton avenir.</span>
+              <span className="italic">Where every note becomes a stepping stone to knowledge.</span>
             </p>
           </div>
         </div>

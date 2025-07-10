@@ -105,8 +105,7 @@ export default function LoginPage() {
         <div className={styles.container}>
             <div className={styles.loginForm}>
                 <div className={styles.header}>
-                    <h1 className={styles.title}>Navigo</h1>
-                    <p className={styles.subtitle}>Welcome back</p>
+                    <h1 className={styles.title}>Sign In To Navigo</h1>
                 </div>
                 
                 <form onSubmit={handleSubmit} className={styles.form}>
@@ -169,7 +168,7 @@ export default function LoginPage() {
                     <p className={styles.linkText}>
                         Don't have an account?{' '}
                         <Link href="/register" className={styles.link}>
-                            Create account
+                            Sign Up
                         </Link>
                     </p>
                 </div>

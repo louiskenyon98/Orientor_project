@@ -1,10 +1,11 @@
 import logging
 from sqlalchemy import create_engine, text, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
+from typing import Optional
 from ..core.config import settings
 
 # Set up logging
@@ -13,48 +14,171 @@ logger = logging.getLogger(__name__)
 # Create Base class for models
 Base = declarative_base()
 
-try:
-    # Create engine using the URL from settings
-    engine = create_engine(
-        settings.get_database_url,
-        pool_size=5,
-        max_overflow=10,
-        pool_timeout=30,
-        pool_recycle=1800,
-        pool_pre_ping=True
-    )
-    
-    # Test the connection and log database information
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT current_database(), current_user, version()"))
-        db_name, db_user, version = result.fetchone()
-        logger.info(f"Connected to PostgreSQL database: {db_name}")
-        logger.info(f"Database user: {db_user}")
-        logger.info(f"PostgreSQL version: {version}")
-        
-        # Check if tables exist
-        result = conn.execute(text("""
-            SELECT table_name 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public'
-        """))
-        tables = [row[0] for row in result]
-        logger.info(f"Available tables: {tables}")
-        
-except SQLAlchemyError as e:
-    logger.error(f"Database connection error: {str(e)}")
-    raise
-except Exception as e:
-    logger.error(f"Unexpected error: {str(e)}")
-    raise
+# Global variables for database connection
+engine: Optional[object] = None
+SessionLocal: Optional[object] = None
+database_connected = False
 
-# Create session factory
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def create_database_engine():
+    """Create database engine with Railway-optimized configuration"""
+    global engine
+    
+    try:
+        database_url = settings.get_database_url
+        logger.info(f"Attempting to connect to database...")
+        
+        # Railway-optimized engine configuration
+        engine_kwargs = {
+            "pool_size": 3,  # Reduced for Railway
+            "max_overflow": 5,  # Reduced for Railway
+            "pool_timeout": 20,  # Reduced timeout
+            "pool_recycle": 1800,
+            "pool_pre_ping": True,  # Important for Railway
+            "connect_args": {
+                "connect_timeout": 10,  # Connection timeout
+                "options": "-c timezone=utc"  # Set timezone
+            }
+        }
+        
+        # Additional settings for Railway production
+        if settings.is_railway:
+            engine_kwargs.update({
+                "pool_size": 2,  # Even smaller for Railway
+                "max_overflow": 3,
+                "pool_timeout": 15,
+                "echo": False  # Disable SQL logging in production
+            })
+        
+        engine = create_engine(database_url, **engine_kwargs)
+        logger.info("✅ Database engine created successfully")
+        return engine
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to create database engine: {str(e)}")
+        raise
+
+def test_database_connection():
+    """Test database connection and log information"""
+    global database_connected
+    
+    if not engine:
+        logger.error("Database engine not initialized")
+        return False
+    
+    try:
+        # Test the connection with timeout
+        with engine.connect() as conn:
+            # Set a statement timeout
+            conn.execute(text("SET statement_timeout = '30s'"))
+            
+            # Basic connection test
+            result = conn.execute(text("SELECT 1 as test"))
+            test_result = result.fetchone()
+            
+            if test_result[0] == 1:
+                logger.info("✅ Database connection test successful")
+                
+                # Get database information
+                try:
+                    result = conn.execute(text("SELECT current_database(), current_user, version()"))
+                    db_name, db_user, version = result.fetchone()
+                    logger.info(f"Database: {db_name}")
+                    logger.info(f"User: {db_user}")
+                    logger.info(f"PostgreSQL version: {version[:50]}...")  # Truncate long version string
+                    
+                    # Check if tables exist (with limit)
+                    result = conn.execute(text("""
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public'
+                        LIMIT 10
+                    """))
+                    tables = [row[0] for row in result]
+                    logger.info(f"Sample tables: {tables[:5]}...")  # Show first 5 tables
+                    
+                except Exception as info_error:
+                    logger.warning(f"Could not get database info: {info_error}")
+                
+                database_connected = True
+                return True
+            
+    except OperationalError as e:
+        logger.error(f"❌ Database connection failed (Operational): {str(e)}")
+        database_connected = False
+        return False
+    except SQLAlchemyError as e:
+        logger.error(f"❌ Database connection failed (SQLAlchemy): {str(e)}")
+        database_connected = False
+        return False
+    except Exception as e:
+        logger.error(f"❌ Database connection failed (Unexpected): {str(e)}")
+        database_connected = False
+        return False
+
+def initialize_database():
+    """Initialize database connection"""
+    global SessionLocal, engine
+    
+    try:
+        # Create engine
+        engine = create_database_engine()
+        
+        # Test connection
+        if test_database_connection():
+            # Create session factory
+            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+            logger.info("✅ Database initialization completed successfully")
+            return True
+        else:
+            logger.warning("⚠️ Database connection test failed, but continuing...")
+            # Create session factory anyway for graceful degradation
+            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ Database initialization failed: {str(e)}")
+        # Create a mock session factory for graceful degradation
+        SessionLocal = None
+        return False
 
 def get_db():
-    """Get database session."""
+    """Get database session with error handling"""
+    if not SessionLocal:
+        logger.error("Database session factory not initialized")
+        raise Exception("Database not available")
+    
     db = SessionLocal()
     try:
         yield db
+    except Exception as e:
+        logger.error(f"Database session error: {str(e)}")
+        db.rollback()
+        raise
     finally:
         db.close()
+
+def check_database_health():
+    """Check if database is healthy"""
+    global database_connected
+    
+    if not engine or not database_connected:
+        return False
+    
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return True
+    except Exception:
+        database_connected = False
+        return False
+
+# Initialize database on module import (but don't fail if it doesn't work)
+try:
+    if not settings.is_railway or settings.get_database_url:
+        logger.info("🔌 Initializing database connection...")
+        initialize_database()
+    else:
+        logger.info("⚠️ Skipping database initialization (no URL configured)")
+except Exception as e:
+    logger.error(f"❌ Database initialization failed on import: {str(e)}")
+    # Don't raise - allow app to start without database

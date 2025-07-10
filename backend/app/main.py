@@ -193,30 +193,59 @@ async def health_check():
         logger.error(f"Health check failed: {str(e)}")
         return {"status": "error", "detail": str(e)}
 
-# In your startup event
+# Startup event with error handling
 @app.on_event("startup")
 async def startup_event():
+    """Application startup configuration"""
     try:
-        logger.info("Application startup initiated")
-        load_models()
-        logger.info("Application startup completed successfully")
+        logger.info("🚀 Application startup initiated")
+        
+        # Load models if available
+        try:
+            load_models()
+            logger.info("✅ Models loaded successfully")
+        except Exception as model_e:
+            logger.warning(f"⚠️ Model loading failed (continuing anyway): {str(model_e)}")
+        
+        # Initialize database if not already done
+        try:
+            from .utils.database import initialize_database, database_connected
+            if not database_connected:
+                logger.info("🔌 Attempting database initialization...")
+                initialize_database()
+        except Exception as db_e:
+            logger.warning(f"⚠️ Database initialization failed (continuing anyway): {str(db_e)}")
+        
+        logger.info("✅ Application startup completed successfully")
+        
     except Exception as e:
-        logger.error(f"Error during startup: {str(e)}")
-        # Don't fail startup if models fail to load
+        logger.error(f"❌ Error during startup: {str(e)}")
+        # Don't fail startup - let Railway handle gracefully
         pass
 
 def load_models():
-    #     global ready
-    # # Load your big models here
-    # ready = True
+    """Load ML models with graceful error handling"""
     try:
-        # Load your big models here
         logger.info("Loading models...")
-        # Your model loading code here
-        logger.info("Models loaded successfully")
+        
+        # Try to load models from scripts if available
+        try:
+            from scripts.model_loader import load_models as script_load_models
+            script_load_models()
+            logger.info("Models loaded from scripts")
+        except ImportError:
+            logger.info("No model loader script found, skipping model loading")
+        except Exception as e:
+            logger.warning(f"Script model loading failed: {str(e)}")
+        
+        # Try to load any other models
+        # Add your specific model loading code here
+        
+        logger.info("Model loading process completed")
+        
     except Exception as e:
         logger.error(f"Error in load_models: {str(e)}")
-        # Don't raise the exception, just log it
+        # Don't raise the exception, just log it for graceful degradation
         pass
 
 # if __name__ == "__main__":
