@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { endpoint, logApiDetails } from '@/utils/api';
+import styles from './login-black.module.css';
 
 interface LoginResponse {
     access_token: string;
@@ -101,95 +102,76 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 py-12">
-            <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold font-display gradient-text mb-2">
-                        Navigo
-                    </h1>
-                    <h2 className="text-2xl font-bold text-neutral-100 mb-2">
-                        Welcome Back
-                    </h2>
-                    <p className="text-neutral-300">
-                        Sign in to continue your journey
-                    </p>
+        <div className={styles.container}>
+            <div className={styles.loginForm}>
+                <div className={styles.header}>
+                    <h1 className={styles.title}>Navigo</h1>
+                    <p className={styles.subtitle}>Welcome back</p>
                 </div>
                 
-                <div className="card backdrop-blur-md">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div className="space-y-4">
-                            <div className="input-group">
-                                <label htmlFor="email" className="label">
-                                    Email address
-                                </label>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="input"
-                                    placeholder="you@example.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isLoading}
-                                />
-                            </div>
-                            
-                            <div className="input-group">
-                                <label htmlFor="password" className="label">
-                                    Password
-                                </label>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="input"
-                                    placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    disabled={isLoading}
-                                />
-                            </div>
-                        </div>
-
-                        {error && (
-                            <div className="text-accent-coral text-sm text-center py-3 px-4 bg-accent-coral/10 border border-accent-coral/20 rounded-lg">
-                                {error}
-                            </div>
-                        )}
-
-                        <div>
-                            <button
-                                type="submit"
-                                className="btn btn-primary w-full"
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.inputGroup}>
+                        <div className={styles.inputWrapper}>
+                            <svg className={styles.inputIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                            </svg>
+                            <input
+                                type="email"
+                                className={styles.input}
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                                 disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <span className="flex items-center justify-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Signing in...
-                                    </span>
-                                ) : 'Sign In'}
-                            </button>
+                            />
                         </div>
-                        
-                        <div className="text-center text-sm text-neutral-300 pt-4">
-                            Don't have an account?{' '}
-                            <Link href="/register" className="text-primary-teal hover:text-primary-lilac transition-colors duration-300 font-medium">
-                                Create account
-                            </Link>
+                    </div>
+
+                    <div className={styles.inputGroup}>
+                        <div className={styles.inputWrapper}>
+                            <svg className={styles.inputIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <input
+                                type="password"
+                                className={styles.input}
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                disabled={isLoading}
+                            />
                         </div>
-                    </form>
-                </div>
-                
-                <div className="mt-8 text-center text-xs text-neutral-400">
-                    <a href="#" className="text-primary-teal hover:text-primary-lilac mx-1">Forgot password?</a>
-                    ·
-                    <a href="#" className="text-primary-teal hover:text-primary-lilac mx-1">Need help?</a>
+                    </div>
+
+                    {error && (
+                        <div className={styles.error}>
+                            {error}
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        className={styles.submitButton}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <div className={styles.spinner}>
+                                <div className={styles.spinnerInner}></div>
+                            </div>
+                        ) : (
+                            'Sign In'
+                        )}
+                    </button>
+                </form>
+
+                <div className={styles.links}>
+                    <p className={styles.linkText}>
+                        Don't have an account?{' '}
+                        <Link href="/register" className={styles.link}>
+                            Create account
+                        </Link>
+                    </p>
                 </div>
             </div>
         </div>
