@@ -15,28 +15,37 @@ app = FastAPI(
 # Database connection test - non-blocking
 @app.on_event("startup")
 async def startup_event():
+    # Try DATABASE_URL first, then fall back to DATABASE_PUBLIC_URL
     database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        try:
-            # Fix Railway's malformed PostgreSQL URL
-            if "postgres.railway.i" in database_url:
-                # Handle various formatting issues with Railway URLs
-                database_url = database_url.replace("postgres.railway.i\n  nternal", "postgres.railway.internal")
-                database_url = database_url.replace("postgres.railway.i", "postgres.railway.internal")
-                # Remove any extra whitespace/newlines
-                database_url = ' '.join(database_url.split())
-                print(f"🔧 Fixed Railway database URL")
-            
-            engine = create_engine(database_url)
-            connection = engine.connect()
-            connection.close()
-            print("✅ Database connected successfully!")
-        except Exception as e:
-            print(f"❌ Database connection failed: {e}")
-            print(f"🔍 DATABASE_URL: {database_url[:50]}...")
-            print("⚠️ Continuing without database connection")
+    database_public_url = os.environ.get("DATABASE_PUBLIC_URL")
+    
+    if database_url or database_public_url:
+        for url_name, url in [("DATABASE_URL", database_url), ("DATABASE_PUBLIC_URL", database_public_url)]:
+            if not url:
+                continue
+                
+            try:
+                # Fix Railway's malformed PostgreSQL URL
+                if "postgres.railway.i" in url:
+                    # Handle various formatting issues with Railway URLs
+                    url = url.replace("postgres.railway.i\n  nternal", "postgres.railway.internal")
+                    url = url.replace("postgres.railway.i", "postgres.railway.internal")
+                    # Remove any extra whitespace/newlines
+                    url = ' '.join(url.split())
+                    print(f"🔧 Fixed Railway database URL")
+                
+                engine = create_engine(url)
+                connection = engine.connect()
+                connection.close()
+                print(f"✅ Database connected successfully using {url_name}!")
+                break
+            except Exception as e:
+                print(f"❌ Database connection failed with {url_name}: {e}")
+                print(f"🔍 {url_name}: {url[:50]}...")
+                if url_name == "DATABASE_PUBLIC_URL":
+                    print("⚠️ All database URLs failed - continuing without database connection")
     else:
-        print("⚠️ No DATABASE_URL found - running without database")
+        print("⚠️ No DATABASE_URL or DATABASE_PUBLIC_URL found - running without database")
 
 # CORS configuration for Vercel
 app.add_middleware(
