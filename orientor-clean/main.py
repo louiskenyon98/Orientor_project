@@ -53,6 +53,8 @@ app.add_middleware(
     allow_origins=[
         "https://navigo-explorer.vercel.app",
         "https://*.vercel.app",
+        "https://orientor-backend-production.up.railway.app",
+        "https://*.railway.app",
         "http://localhost:3000",
         "*"
     ],
@@ -75,8 +77,14 @@ async def health_check():
     return {
         "status": "ok",
         "service": "orientor-fresh-api",
-        "version": "3.0.0"
+        "version": "3.0.0",
+        "timestamp": "2025-07-10",
+        "railway": "deployed"
     }
+
+@app.get("/test")
+async def test_endpoint():
+    return {"message": "Railway test endpoint working!", "status": "success"}
 
 @app.get("/api/health")
 async def api_health():
