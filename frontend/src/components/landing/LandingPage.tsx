@@ -4,13 +4,36 @@
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './landing-page.css';
 
 
 
 export default function LandingPage() {
   const router = useRouter();
+  const [isVisible, setIsVisible] = useState({});
+  const observerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(prev => ({
+              ...prev,
+              [entry.target.id]: true
+            }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '50px' }
+    );
+
+    const sections = document.querySelectorAll('.animate-on-scroll');
+    sections.forEach(section => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -41,101 +64,140 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Hero Section */}
-      <main className="px-6 lg:px-12 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Your personal guide to discovering who you are—and who you could become
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Navigo helps you reflect, plan, and progress with purpose, backed by intelligent guidance and adaptive learning.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Link href="/register" className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium">
-                Start Learning Today
-              </Link>
-              <Link href="/demo" className="text-gray-600 hover:text-gray-900 transition-colors px-8 py-3 font-medium">
-                View Demo
-              </Link>
-            </div>
+      {/* Blank Paper Section - "Everything Yet to Be Written" */}
+      <section className="relative min-h-screen flex items-center justify-center px-6 lg:px-12 py-20 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="floating-dots"></div>
+        </div>
+        
+        {/* Large Paper Sheet */}
+        <div className="paper-container relative">
+          <div className="paper-sheet animate-on-scroll" id="paper-sheet">
+            {/* Paper lines */}
+            <div className="paper-lines"></div>
             
-            {/* Simple illustration placeholder */}
-            <div className="relative mx-auto max-w-2xl">
-              <div className="aspect-video bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="text-6xl">🎯</div>
-                  <p className="text-gray-500 font-medium">Interactive AI Career Guide</p>
+            {/* Content on the paper */}
+            <div className={`paper-content ${isVisible['paper-sheet'] ? 'fade-in-up' : ''}`}>
+              <div className="text-center space-y-8">
+                <div className="space-y-4">
+                  <h1 className="handwritten-title text-4xl lg:text-6xl font-bold text-gray-800 mb-6">
+                    Your story starts here
+                  </h1>
+                  <div className="ink-pen-line"></div>
+                </div>
+                
+                <p className="handwritten-text text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                  Every career journey begins with a blank page. Let's discover what you'll write on yours.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+                  <Link href="/register" className="ink-button bg-black text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:bg-gray-800 hover:scale-105 hover:shadow-lg">
+                    Begin Your Story
+                  </Link>
+                  <Link href="/demo" className="text-gray-600 hover:text-gray-900 transition-colors px-8 py-4 font-medium text-lg border border-gray-300 rounded-lg hover:border-gray-400 hover:shadow-md">
+                    Explore First
+                  </Link>
                 </div>
               </div>
             </div>
+            
+            {/* Floating writing elements */}
+            <div className="writing-elements">
+              <div className="pencil floating"></div>
+              <div className="eraser floating-slow"></div>
+              <div className="pen floating-reverse"></div>
+            </div>
           </div>
         </div>
-      </main>
+      </section>
       {/* Features Section */}
-      <section className="px-6 lg:px-12 py-16 bg-gray-50">
+      <section className="px-6 lg:px-12 py-20 bg-gradient-to-b from-white to-gray-50 animate-on-scroll" id="features-section">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 transition-all duration-1000 delay-300 ${isVisible['features-section'] ? 'fade-in-up' : 'opacity-0 translate-y-12'}`}>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              How Navigo helps you learn
+              How your story unfolds
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our adaptive learning toolkit grows with you, helping you discover your path through reflection and personalized guidance.
+              Every great story has chapters. Here's how we help you write yours, one discovery at a time.
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200">
-              <div className="text-4xl mb-4">🤔</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Self-Discovery Through Reflection</h3>
+            <div className={`feature-card bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-700 delay-500 ${isVisible['features-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+              <div className="feature-icon text-4xl mb-4">🤔</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Chapter 1: Self-Discovery</h3>
               <p className="text-gray-600">
-                Engage with thoughtful questions and exercises that help you understand your strengths, interests, and values.
+                Start with deep reflection. Understand your strengths, values, and what truly motivates you.
               </p>
+              <div className="progress-dots mt-4">
+                <span className="dot active"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </div>
             </div>
             
             {/* Feature 2 */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200">
-              <div className="text-4xl mb-4">🎨</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Personalized Learning Paths</h3>
+            <div className={`feature-card bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-700 delay-700 ${isVisible['features-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+              <div className="feature-icon text-4xl mb-4">🎨</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Chapter 2: Path Creation</h3>
               <p className="text-gray-600">
-                Get recommendations tailored to your unique profile, goals, and learning style.
+                Build your unique journey with personalized recommendations that adapt to your evolving interests.
               </p>
+              <div className="progress-dots mt-4">
+                <span className="dot active"></span>
+                <span className="dot active"></span>
+                <span className="dot"></span>
+              </div>
             </div>
             
             {/* Feature 3 */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-200">
-              <div className="text-4xl mb-4">📈</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Track Your Growth</h3>
+            <div className={`feature-card bg-white p-8 rounded-2xl border border-gray-200 transition-all duration-700 delay-900 ${isVisible['features-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+              <div className="feature-icon text-4xl mb-4">📈</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Chapter 3: Growth & Evolution</h3>
               <p className="text-gray-600">
-                Visualize your progress and see how your skills and interests evolve over time.
+                Watch your story unfold as you track progress, celebrate milestones, and write new chapters.
               </p>
+              <div className="progress-dots mt-4">
+                <span className="dot active"></span>
+                <span className="dot active"></span>
+                <span className="dot active"></span>
+              </div>
             </div>
           </div>
         </div>
       </section>
       {/* Interactive Demo Section */}
-      <section className="px-6 lg:px-12 py-16">
+      <section className="px-6 lg:px-12 py-20 animate-on-scroll" id="demo-section">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className={`text-center mb-12 transition-all duration-1000 delay-200 ${isVisible['demo-section'] ? 'fade-in-up' : 'opacity-0 translate-y-12'}`}>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Your AI Learning Companion
+              Meet your writing companion
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Chat with Navigo to explore your interests, reflect on experiences, and get personalized guidance that adapts to your learning style.
+              Like having a thoughtful friend who asks the right questions, Navigo helps you discover what you want to write on your career page.
             </p>
           </div>
           
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+            <div className={`chat-container bg-white rounded-2xl border border-gray-200 p-8 shadow-lg transition-all duration-1000 delay-400 ${isVisible['demo-section'] ? 'fade-in-scale' : 'opacity-0 scale-95'}`}>
               <div className="text-center space-y-6">
-                <div className="text-6xl">🤖</div>
-                <h3 className="text-2xl font-semibold text-gray-900">Interactive Chat Experience</h3>
+                <div className="chat-avatar text-6xl animate-bounce-slow">🤖</div>
+                <h3 className="text-2xl font-semibold text-gray-900">Start a conversation</h3>
                 <p className="text-gray-600 max-w-lg mx-auto">
-                  Discover your strengths and interests through conversational AI that learns about you as you explore.
+                  "What excites you most about your future?" - Begin with questions that matter.
                 </p>
-                <Link href="/chat" className="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors font-medium">
-                  Try Demo Chat
+                <div className="chat-bubbles space-y-3 max-w-sm mx-auto">
+                  <div className="chat-bubble left animate-slide-in-left delay-1000">
+                    <p className="text-sm">What energizes you?</p>
+                  </div>
+                  <div className="chat-bubble right animate-slide-in-right delay-1200">
+                    <p className="text-sm">I love solving problems...</p>
+                  </div>
+                </div>
+                <Link href="/chat" className="inline-block bg-black text-white px-8 py-4 rounded-lg hover:bg-gray-800 transition-all duration-300 font-semibold hover:scale-105 hover:shadow-lg">
+                  Start Your Conversation
                 </Link>
               </div>
             </div>
@@ -189,58 +251,77 @@ export default function LandingPage() {
 
 
       {/* Assessment Section */}
-      <section className="px-6 lg:px-12 py-16">
+      <section className="px-6 lg:px-12 py-20 bg-gray-50 animate-on-scroll" id="assessment-section">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className={`text-center mb-12 transition-all duration-1000 delay-200 ${isVisible['assessment-section'] ? 'fade-in-up' : 'opacity-0 translate-y-12'}`}>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Understand Yourself Better
+              Tools to understand your story
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Take scientifically-backed assessments to discover your personality, interests, and ideal learning approach.
+              Like a good editor, these tools help you understand your unique voice, style, and what makes your story worth telling.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 text-center">
-              <div className="text-3xl mb-4">🧠</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Personality Assessment</h3>
-              <p className="text-gray-600 text-sm mb-4">Discover your core traits and working style</p>
-              <Link href="/hexaco-test" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Take Assessment</Link>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className={`assessment-card bg-white p-8 rounded-2xl border border-gray-200 text-center transition-all duration-700 delay-400 hover:shadow-lg hover:scale-105 ${isVisible['assessment-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+              <div className="assessment-icon text-4xl mb-6 animate-pulse-slow">🧠</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Your Character Profile</h3>
+              <p className="text-gray-600 mb-6">Discover your core traits and what makes you uniquely you</p>
+              <Link href="/hexaco-test" className="assessment-btn inline-block bg-blue-50 text-blue-700 px-6 py-3 rounded-lg hover:bg-blue-100 transition-all font-medium">Discover Your Profile</Link>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 text-center">
-              <div className="text-3xl mb-4">🎨</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Interest Explorer</h3>
-              <p className="text-gray-600 text-sm mb-4">Find careers that match your interests</p>
-              <Link href="/holland-test" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Explore Interests</Link>
+            <div className={`assessment-card bg-white p-8 rounded-2xl border border-gray-200 text-center transition-all duration-700 delay-600 hover:shadow-lg hover:scale-105 ${isVisible['assessment-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+              <div className="assessment-icon text-4xl mb-6 animate-pulse-slow">🎨</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Your Passion Compass</h3>
+              <p className="text-gray-600 mb-6">Find what genuinely excites and motivates you</p>
+              <Link href="/holland-test" className="assessment-btn inline-block bg-green-50 text-green-700 px-6 py-3 rounded-lg hover:bg-green-100 transition-all font-medium">Find Your Passions</Link>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 text-center">
-              <div className="text-3xl mb-4">📝</div>
-              <h3 className="font-semibold text-gray-900 mb-2">Reflection Journal</h3>
-              <p className="text-gray-600 text-sm mb-4">Deep dive into your values and goals</p>
-              <Link href="/self-reflection" className="text-sm text-blue-600 hover:text-blue-800 font-medium">Start Reflecting</Link>
+            <div className={`assessment-card bg-white p-8 rounded-2xl border border-gray-200 text-center transition-all duration-700 delay-800 hover:shadow-lg hover:scale-105 ${isVisible['assessment-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+              <div className="assessment-icon text-4xl mb-6 animate-pulse-slow">📝</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Your Reflection Space</h3>
+              <p className="text-gray-600 mb-6">A quiet place to think deeply about your aspirations</p>
+              <Link href="/self-reflection" className="assessment-btn inline-block bg-purple-50 text-purple-700 px-6 py-3 rounded-lg hover:bg-purple-100 transition-all font-medium">Start Reflecting</Link>
             </div>
           </div>
         </div>
       </section>
 
       {/* Final CTA Section */}
-      <section className="px-6 lg:px-12 py-20 bg-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6">
-            Ready to discover your path?
-          </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of students who are already using Navigo to unlock their potential and build meaningful careers.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="bg-white text-black px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-lg">
-              Start Learning Today
+      <section className="px-6 lg:px-12 py-24 bg-gradient-to-br from-gray-900 via-black to-gray-800 animate-on-scroll relative overflow-hidden" id="cta-section">
+        {/* Animated background stars */}
+        <div className="stars-container absolute inset-0">
+          <div className="star star-1"></div>
+          <div className="star star-2"></div>
+          <div className="star star-3"></div>
+          <div className="star star-4"></div>
+          <div className="star star-5"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className={`transition-all duration-1000 delay-200 ${isVisible['cta-section'] ? 'fade-in-up' : 'opacity-0 translate-y-12'}`}>
+            <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+              Your story is waiting
+            </h2>
+            <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+              The blank page isn't empty—it's full of possibilities. Let's start writing your next chapter together.
+            </p>
+          </div>
+          
+          <div className={`flex flex-col sm:flex-row gap-6 justify-center transition-all duration-1000 delay-500 ${isVisible['cta-section'] ? 'fade-in-up' : 'opacity-0 translate-y-8'}`}>
+            <Link href="/register" className="cta-primary bg-white text-black px-10 py-4 rounded-lg hover:bg-gray-100 transition-all duration-300 font-bold text-lg hover:scale-105 hover:shadow-2xl">
+              Begin Writing Today
             </Link>
-            <Link href="/demo" className="border border-gray-600 text-white px-8 py-4 rounded-lg hover:border-gray-400 transition-colors font-medium text-lg">
-              Try Demo First
+            <Link href="/demo" className="cta-secondary border-2 border-gray-400 text-white px-10 py-4 rounded-lg hover:border-white hover:bg-white hover:text-black transition-all duration-300 font-medium text-lg hover:scale-105">
+              Preview the Journey
             </Link>
+          </div>
+          
+          {/* Floating elements */}
+          <div className={`mt-16 transition-all duration-1500 delay-1000 ${isVisible['cta-section'] ? 'fade-in' : 'opacity-0'}`}>
+            <p className="text-sm text-gray-400">
+              Join 10,000+ students already writing their stories
+            </p>
           </div>
         </div>
       </section>
