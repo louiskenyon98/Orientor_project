@@ -251,4 +251,7 @@ dist
 .pnp.*
 
 # Claude-flow 
-.claude-test
+.claude-test# Remove large build files
+.next/
+node_modules/
+*.log
