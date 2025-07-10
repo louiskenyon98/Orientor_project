@@ -11,7 +11,7 @@ import './landing-page.css';
 
 export default function LandingPage() {
   const router = useRouter();
-  const [isVisible, setIsVisible] = useState({});
+  const [isVisible, setIsVisible] = useState<Record<string, boolean>>({});
   const observerRef = useRef(null);
 
   useEffect(() => {
