@@ -19,50 +19,34 @@ export default function LandingPage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            const elementId = entry.target.id;
             setIsVisible(prev => ({
               ...prev,
-              [entry.target.id]: true
+              [elementId]: true
             }));
+            // Add visible class for CSS animations
+            entry.target.classList.add('visible');
           }
         });
       },
       { threshold: 0.1, rootMargin: '50px' }
     );
 
-    const sections = document.querySelectorAll('.animate-on-scroll');
-    sections.forEach(section => observer.observe(section));
+    // Observe sections with slight delay to ensure DOM is ready
+    setTimeout(() => {
+      const sections = document.querySelectorAll('.animate-on-scroll');
+      sections.forEach(section => {
+        if (section) {
+          observer.observe(section);
+        }
+      });
+    }, 100);
 
     return () => observer.disconnect();
   }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation Header */}
-      <header className="w-full px-6 lg:px-12 py-6">
-        <nav className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-2">
-            <Image
-              src="/Logo.png"
-              alt="Navigo"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-            <span className="text-xl font-semibold text-gray-900">Navigo</span>
-          </div>
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</Link>
-            <Link href="/pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</Link>
-            <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
-            <Link href="/register" className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-              Get Started
-            </Link>
-          </div>
-        </nav>
-      </header>
 
       {/* Blank Paper Section - "Everything Yet to Be Written" */}
       <section className="relative min-h-screen flex items-center justify-center px-6 lg:px-12 py-20 overflow-hidden">

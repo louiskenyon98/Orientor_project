@@ -22,11 +22,7 @@ export default function RootLayout({
       </head>
       <Providers>
         <body className="min-h-screen antialiased">
-          {/* Main layout with navigation */}
-          <MainLayout>
-            {children}
-          </MainLayout>
-
+          {children}
           <Analytics />
           <SpeedInsights />
         </body>

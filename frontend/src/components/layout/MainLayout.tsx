@@ -179,7 +179,7 @@ export default function MainLayout({
     ];
 
     // Public routes that don't require authentication
-    const publicRoutes = ['/login', '/register', '/test-page'];
+    const publicRoutes = ['/login', '/register', '/test-page', '/'];
     const isPublicRoute = pathname ? publicRoutes.includes(pathname) : false;
 
     useEffect(() => {
