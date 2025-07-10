@@ -12,20 +12,27 @@ app = FastAPI(
     version="3.0.0"
 )
 
-# Database connection test
+# Database connection test - non-blocking
 @app.on_event("startup")
 async def startup_event():
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         try:
+            # Fix Railway's incomplete PostgreSQL URL
+            if "postgres.railway.i" in database_url and not database_url.endswith(".internal"):
+                database_url = database_url.replace("postgres.railway.i", "postgres.railway.internal")
+                print(f"🔧 Fixed Railway database URL")
+            
             engine = create_engine(database_url)
             connection = engine.connect()
             connection.close()
             print("✅ Database connected successfully!")
         except Exception as e:
             print(f"❌ Database connection failed: {e}")
+            print(f"🔍 DATABASE_URL: {database_url[:50]}...")
+            print("⚠️ Continuing without database connection")
     else:
-        print("⚠️ No DATABASE_URL found")
+        print("⚠️ No DATABASE_URL found - running without database")
 
 # CORS configuration for Vercel
 app.add_middleware(
